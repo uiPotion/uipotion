@@ -389,27 +389,194 @@
   },
   
   "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.1.1": "Non-text Content - All images have descriptive alt text",
+        "1.3.1": "Info and Relationships - Semantic HTML structure with proper roles",
+        "1.4.3": "Contrast Minimum - 4.5:1 for normal text, 3:1 for large text (verify with contrast checker)",
+        "2.1.1": "Keyboard - All interactive elements keyboard accessible",
+        "2.1.2": "No Keyboard Trap - Focus trapping only in mobile sidebar overlay",
+        "2.4.1": "Bypass Blocks - Skip link to main content (REQUIRED)",
+        "2.4.2": "Page Titled - Descriptive page title",
+        "2.4.3": "Focus Order - Logical tab order throughout",
+        "2.4.4": "Link Purpose - Clear link labels, icons have text or aria-label",
+        "2.4.7": "Focus Visible - Clear focus indicators on all interactive elements",
+        "3.2.1": "On Focus - No context changes on focus",
+        "3.2.2": "On Input - No unexpected changes",
+        "4.1.1": "Parsing - Valid HTML structure",
+        "4.1.2": "Name, Role, Value - All elements have accessible names and roles",
+        "4.1.3": "Status Messages - Use aria-live for dynamic content updates (optional but recommended)"
+      }
+    },
     "keyboardNavigation": {
-      "tabOrder": "Header → Sidebar → Content",
+      "tabOrder": "Skip link (if visible) → Header → Sidebar → Content → Footer",
       "sidebarItems": "Tab to focus, Enter/Space to activate",
-      "escapeKey": "Close dropdowns and mobile sidebar",
-      "skipLink": "Skip to content link for screen readers",
-      "focusTrap": "Trap focus within sidebar when open on mobile (use focus-trap library or manual implementation)",
-      "focusRestoration": "Restore focus to menu toggle button when sidebar closes"
+      "escapeKey": "Close dropdowns and mobile sidebar, restore focus to trigger",
+      "skipLink": {
+        "required": true,
+        "implementation": "First focusable element, hidden by default, visible on focus",
+        "target": "Main content area (id='contentArea' or id='main')",
+        "example": "<a href='#contentArea' class='skip-link'>Skip to main content</a>",
+        "css": "Position absolute, top: -40px, left: 0, z-index: 100. On :focus, top: 0"
+      },
+      "focusTrap": {
+        "when": "Mobile sidebar open",
+        "implementation": "Use focus-trap library or manual implementation",
+        "elements": "All focusable elements within sidebar (a, button, [tabindex]:not([tabindex='-1'])])",
+        "behavior": "Tab cycles within sidebar, Shift+Tab cycles backwards"
+      },
+      "focusRestoration": "Restore focus to menu toggle button when sidebar closes",
+      "focusManagement": {
+        "onOpen": "Move focus to first focusable element in sidebar",
+        "onClose": "Return focus to trigger button (menu toggle)",
+        "onEscape": "Close and restore focus to trigger"
+      }
     },
     "ariaAttributes": {
-      "sidebar": "role='navigation', aria-label='Main navigation'",
-      "menuToggle": "aria-expanded='true/false', aria-controls='sidebar'",
-      "dropdowns": "role='menu', aria-haspopup='true'",
-      "activeNavItem": "aria-current='page'",
-      "mobileOverlay": "aria-modal='true'"
+      "required": {
+        "sidebar": {
+          "role": "navigation",
+          "aria-label": "Main navigation",
+          "aria-hidden": "false on desktop, toggle based on mobile state"
+        },
+        "menuToggle": {
+          "aria-label": "Toggle menu",
+          "aria-expanded": "true/false (dynamically updated)",
+          "aria-controls": "sidebar (id of sidebar element)"
+        },
+        "sidebarToggle": {
+          "aria-label": "Toggle sidebar",
+          "aria-expanded": "true/false (dynamically updated)"
+        },
+        "activeNavItem": {
+          "aria-current": "page (on current page link only)"
+        },
+        "notificationsButton": {
+          "aria-label": "Notifications: {count} unread (include count in label)",
+          "aria-haspopup": "true",
+          "aria-expanded": "true/false (dynamically updated)"
+        },
+        "userMenuButton": {
+          "aria-label": "User menu",
+          "aria-haspopup": "true",
+          "aria-expanded": "true/false (dynamically updated)",
+          "aria-controls": "userDropdown (id of dropdown element)"
+        },
+        "userDropdown": {
+          "role": "menu",
+          "id": "userDropdown (matches aria-controls)"
+        },
+        "dropdownItems": {
+          "role": "menuitem",
+          "example": "<a href='#' class='dropdown-item' role='menuitem'>Profile</a>"
+        },
+        "backdrop": {
+          "aria-hidden": "true when hidden, false when visible",
+          "role": "presentation (optional)"
+        },
+        "mobileOverlay": {
+          "aria-modal": "true (when sidebar is open on mobile)"
+        },
+        "notificationsBadge": {
+          "aria-label": "{count} unread notifications",
+          "aria-live": "polite (optional, for dynamic updates)"
+        }
+      },
+      "optional": {
+        "mainContent": {
+          "role": "main (semantic HTML <main> preferred)",
+          "id": "contentArea or main (for skip link target)"
+        },
+        "header": {
+          "role": "banner (semantic HTML <header> preferred)"
+        },
+        "footer": {
+          "role": "contentinfo (semantic HTML <footer> preferred)"
+        },
+        "dynamicContent": {
+          "aria-live": "polite (for dashboard stats, activity feed updates)",
+          "aria-atomic": "false (announce only changed content)"
+        }
+      }
     },
     "screenReader": {
-      "announcements": "Announce sidebar state changes",
-      "labels": "Descriptive labels for icon-only buttons",
-      "hiddenText": "Hidden text for icon-only nav items in collapsed state",
-      "badges": "Notification badge count announced"
-    }
+      "announcements": {
+        "sidebarState": "Announce when sidebar opens/closes (use aria-live region or visually hidden text)",
+        "implementation": "Use aria-live='polite' region or visually hidden <span> with role='status'"
+      },
+      "labels": {
+        "iconOnlyButtons": "All icon-only buttons must have descriptive aria-label",
+        "collapsedNavItems": "In collapsed state, nav items should have aria-label or sr-only text",
+        "example": "<span class='sr-only'>Dashboard</span> or aria-label='Dashboard'"
+      },
+      "hiddenText": {
+        "purpose": "Provide text for icon-only nav items in collapsed state",
+        "implementation": "Use .sr-only class (visually hidden but accessible to screen readers)",
+        "css": ".sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }"
+      },
+      "badges": {
+        "notifications": "Notification badge count must be announced",
+        "implementation": "Include count in button aria-label: 'Notifications: 3 unread'",
+        "alternative": "Use aria-describedby pointing to badge element with aria-live"
+      },
+      "landmarks": {
+        "navigation": "Use <nav> or role='navigation' with aria-label",
+        "main": "Use <main> or role='main'",
+        "header": "Use <header> or role='banner'",
+        "footer": "Use <footer> or role='contentinfo'"
+      }
+    },
+    "focusManagement": {
+      "focusVisible": {
+        "required": true,
+        "implementation": "Clear focus indicators on all interactive elements",
+        "css": "outline: 2px solid [primary-color], outline-offset: 2px",
+        "fallback": "Use :focus-visible pseudo-class for modern browsers, :focus for older",
+        "example": "button:focus-visible, a:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }"
+      },
+      "focusOrder": {
+        "principle": "Logical reading order",
+        "order": "Skip link → Header → Sidebar → Main content → Footer"
+      },
+      "skipLink": {
+        "position": "First focusable element on page",
+        "target": "Main content area",
+        "visibility": "Hidden by default, visible on focus"
+      }
+    },
+    "colorContrast": {
+      "requirement": "WCAG AA: 4.5:1 for normal text, 3:1 for large text (18pt+ or 14pt+ bold)",
+      "verification": "Use WebAIM Contrast Checker or similar tool",
+      "criticalAreas": [
+        "Sidebar text on background",
+        "Header text on background",
+        "Footer text on background",
+        "Content text on background",
+        "Link text on background",
+        "Button text on background",
+        "Active nav item text",
+        "Focus indicators"
+      ],
+      "recommendation": "Aim for 7:1 contrast for important text (WCAG AAA)"
+    },
+    "implementationChecklist": [
+      "Add skip link as first focusable element",
+      "All buttons have aria-label or visible text",
+      "All icons have aria-label or sr-only text",
+      "Navigation items have aria-current='page' when active",
+      "Dropdowns have role='menu' and items have role='menuitem'",
+      "All interactive elements have aria-expanded when applicable",
+      "Notifications badge count included in button aria-label",
+      "Focus visible on all interactive elements",
+      "Focus trapped in mobile sidebar",
+      "Focus restored when sidebar closes",
+      "aria-hidden managed correctly for backdrop and mobile sidebar",
+      "aria-live regions for dynamic content (optional but recommended)",
+      "Color contrast verified with contrast checker tool",
+      "Keyboard navigation works throughout",
+      "Screen reader tested with NVDA, VoiceOver, or JAWS"
+    ]
   },
   
   "designSystem": {
@@ -697,6 +864,44 @@
     "windowResizeDuringAnimation": "Complete current animation before re-evaluating breakpoint",
     "verySmallScreens": "Consider further reducing padding/spacing on screens < 320px",
     "contentOverflow": "Ensure content doesn't overflow horizontally when sidebar collapses"
+  },
+  
+  "accessibilityExamples": {
+    "skipLink": {
+      "html": "<a href=\"#contentArea\" class=\"skip-link\">Skip to main content</a>",
+      "css": ".skip-link { position: absolute; top: -40px; left: 0; background: var(--primary-color); color: white; padding: 12px 16px; z-index: 1000; } .skip-link:focus { top: 0; }"
+    },
+    "sidebar": {
+      "html": "<aside class=\"sidebar\" id=\"sidebar\" role=\"navigation\" aria-label=\"Main navigation\" aria-hidden=\"false\">",
+      "note": "Update aria-hidden based on mobile state"
+    },
+    "menuToggle": {
+      "html": "<button class=\"menu-toggle\" id=\"menuToggle\" aria-label=\"Toggle menu\" aria-expanded=\"false\" aria-controls=\"sidebar\">",
+      "note": "Update aria-expanded dynamically when sidebar opens/closes"
+    },
+    "activeNavItem": {
+      "html": "<a href=\"/dashboard\" class=\"nav-item active\" aria-current=\"page\">",
+      "note": "Only set aria-current on the current page link"
+    },
+    "notificationsButton": {
+      "html": "<button class=\"notifications-btn\" aria-label=\"Notifications: 3 unread\" aria-haspopup=\"true\" aria-expanded=\"false\"><span class=\"notifications-icon\" aria-hidden=\"true\">🔔</span><span class=\"notifications-badge\" aria-label=\"3 unread notifications\">3</span></button>",
+      "note": "Include count in aria-label, update dynamically"
+    },
+    "userDropdown": {
+      "html": "<button class=\"user-menu-btn\" aria-label=\"User menu\" aria-haspopup=\"true\" aria-expanded=\"false\" aria-controls=\"userDropdown\">...</button><div class=\"user-dropdown\" id=\"userDropdown\" role=\"menu\"><a href=\"#\" class=\"dropdown-item\" role=\"menuitem\">Profile</a><a href=\"#\" class=\"dropdown-item\" role=\"menuitem\">Settings</a><a href=\"#\" class=\"dropdown-item\" role=\"menuitem\">Logout</a></div>",
+      "note": "Link button and dropdown with aria-controls, use role=\"menu\" and role=\"menuitem\""
+    },
+    "screenReaderOnly": {
+      "html": "<span class=\"sr-only\">Dashboard</span>",
+      "css": ".sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }"
+    },
+    "focusVisible": {
+      "css": "button:focus-visible, a:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }"
+    },
+    "ariaLive": {
+      "html": "<div class=\"dashboard-grid\" aria-live=\"polite\" aria-atomic=\"false\">",
+      "note": "Use aria-live=\"polite\" for non-critical updates, aria-live=\"assertive\" for urgent updates"
+    }
   },
   
   "testingChecklist": [

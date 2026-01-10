@@ -1135,6 +1135,40 @@ html {
    NEW DARK-THEMED POTION PAGE - Tailwind Inspired
    ============================================ */
 
+/* Skip Link for Accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary, #4f46e5);
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  z-index: 1000;
+  font-weight: 600;
+  border-radius: 0 0 4px 0;
+  transition: top 0.2s ease;
+  
+  &:focus {
+    top: 0;
+    outline: 2px solid white;
+    outline-offset: 2px;
+  }
+}
+
+/* Screen Reader Only Text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .potion-page {
   background: #0a0a0a;
   min-height: 100vh;

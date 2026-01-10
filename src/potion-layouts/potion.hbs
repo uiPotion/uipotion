@@ -1,14 +1,17 @@
 {{> head title=title description=excerpt agentManifest=agentManifest }}
 
+<!-- Skip to main content link for keyboard users -->
+<a href="#potion-main-content" class="skip-link">Skip to main content</a>
+
 <div class="potion-page">
   <!-- Hero Header with AI Link -->
-  <header class="potion-hero">
+  <header class="potion-hero" role="banner">
     <div class="potion-hero-container">
-      <div class="potion-breadcrumb">
+      <nav class="potion-breadcrumb" aria-label="Breadcrumb navigation">
         <a href="{{relativePath 'index.html'}}">← All Potions</a>
-        <span>/</span>
+        <span aria-hidden="true">/</span>
         <span>{{category}}</span>
-      </div>
+      </nav>
       
       <h1 class="potion-hero-title">{{title}}</h1>
       
@@ -28,21 +31,21 @@
         <p class="potion-ai-hint">
           Use this URL with your AI coding assistant (Claude, ChatGPT, etc.) to automatically implement this component in your stack
         </p>
-        <a href="{{relativePath agentManifest}}" class="potion-download-btn" download>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <a href="{{relativePath agentManifest}}" class="potion-download-btn" download aria-label="Download JSON guide for AI agents">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
           </svg>
-          Download JSON
+          <span>Download JSON</span>
         </a>
       </div>
       
       <!-- Meta Info -->
-      <div class="potion-meta-bar">
-        <div class="potion-category-badge">{{category}}</div>
+      <div class="potion-meta-bar" role="group" aria-label="Potion metadata">
+        <div class="potion-category-badge" aria-label="Category: {{category}}">{{category}}</div>
         {{#if tags}}
-        <div class="potion-tags-list">
+        <div class="potion-tags-list" role="list" aria-label="Tags">
           {{#each tags}}
-          <span class="potion-tag">{{this}}</span>
+          <span class="potion-tag" role="listitem">{{this}}</span>
           {{/each}}
         </div>
         {{/if}}
@@ -51,7 +54,7 @@
   </header>
   
   <!-- Main Content -->
-  <main class="potion-main">
+  <main class="potion-main" id="potion-main-content" role="main">
     <div class="potion-main-container">
       <article class="potion-article">
         {{{content}}}
@@ -61,10 +64,11 @@
 </div>
 
 <!-- Scroll to Top Button -->
-<button class="potion-scroll-top" id="potionScrollTop" aria-label="Scroll to top">
-  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<button class="potion-scroll-top" id="potionScrollTop" aria-label="Scroll to top of page">
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
   </svg>
+  <span class="sr-only">Scroll to top</span>
 </button>
 
 <script src="{{relativePath 'assets/js/scroll-to-top.js'}}"></script>

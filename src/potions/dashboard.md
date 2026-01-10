@@ -217,26 +217,206 @@ The footer contains a Copyright section on the left and Footer Navigation Links 
 
 ## Accessibility Requirements
 
+### WCAG 2.1 Compliance (Level AA Target)
+
+This dashboard layout should meet WCAG 2.1 Level AA standards. Key requirements:
+
+- **1.1.1 Non-text Content**: All images have descriptive alt text
+- **1.3.1 Info and Relationships**: Semantic HTML structure with proper roles
+- **1.4.3 Contrast Minimum**: 4.5:1 for normal text, 3:1 for large text (verify with contrast checker)
+- **2.1.1 Keyboard**: All interactive elements keyboard accessible
+- **2.1.2 No Keyboard Trap**: Focus trapping only in mobile sidebar overlay
+- **2.4.1 Bypass Blocks**: **Skip link to main content (REQUIRED)**
+- **2.4.2 Page Titled**: Descriptive page title
+- **2.4.3 Focus Order**: Logical tab order throughout
+- **2.4.4 Link Purpose**: Clear link labels, icons have text or aria-label
+- **2.4.7 Focus Visible**: Clear focus indicators on all interactive elements
+- **4.1.2 Name, Role, Value**: All elements have accessible names and roles
+- **4.1.3 Status Messages**: Use aria-live for dynamic content updates (recommended)
+
 ### Keyboard Navigation
-- Tab order: Header → Sidebar → Content
+
+**Tab Order:**
+- Skip link (if visible) → Header → Sidebar → Content → Footer
+
+**Implementation:**
 - Sidebar items: Tab to focus, Enter/Space to activate
-- Escape key: Close dropdowns and mobile sidebar
-- Skip to content link for screen readers
+- Escape key: Close dropdowns and mobile sidebar, restore focus to trigger
+- **Skip Link (REQUIRED)**: First focusable element, hidden by default, visible on focus
+  ```html
+  <a href="#contentArea" class="skip-link">Skip to main content</a>
+  ```
+  ```css
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 16px;
+    z-index: 1000;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
+  ```
+
+**Focus Management:**
 - **Focus trap**: Trap focus within sidebar when open on mobile (use focus-trap library or manual implementation)
 - **Focus restoration**: Restore focus to menu toggle button when sidebar closes
+- **Focus visible**: Clear focus indicators (2px solid outline, 2px offset) on all interactive elements
+- **Focus order**: Logical reading order maintained throughout
 
 ### ARIA Attributes
-- Sidebar: `role="navigation"`, `aria-label="Main navigation"`
-- Menu toggle: `aria-expanded="true/false"`, `aria-controls="sidebar"`
-- Dropdown menus: `role="menu"`, `aria-haspopup="true"`
-- Active nav item: `aria-current="page"`
-- Mobile overlay: `aria-modal="true"`
+
+**Required ARIA Attributes:**
+
+1. **Sidebar:**
+   ```html
+   <aside role="navigation" aria-label="Main navigation" aria-hidden="false">
+   ```
+
+2. **Menu Toggle:**
+   ```html
+   <button aria-label="Toggle menu" aria-expanded="false" aria-controls="sidebar">
+   ```
+
+3. **Sidebar Toggle:**
+   ```html
+   <button aria-label="Toggle sidebar" aria-expanded="true">
+   ```
+
+4. **Active Navigation Item:**
+   ```html
+   <a href="/dashboard" aria-current="page">Dashboard</a>
+   ```
+
+5. **Notifications Button:**
+   ```html
+   <button aria-label="Notifications: 3 unread" aria-haspopup="true" aria-expanded="false">
+     <span class="notifications-icon" aria-hidden="true">🔔</span>
+     <span class="notifications-badge" aria-label="3 unread notifications">3</span>
+   </button>
+   ```
+
+6. **User Menu:**
+   ```html
+   <button aria-label="User menu" aria-haspopup="true" aria-expanded="false" aria-controls="userDropdown">
+   <div class="user-dropdown" id="userDropdown" role="menu">
+     <a href="#" class="dropdown-item" role="menuitem">Profile</a>
+     <a href="#" class="dropdown-item" role="menuitem">Settings</a>
+     <a href="#" class="dropdown-item" role="menuitem">Logout</a>
+   </div>
+   ```
+
+7. **Backdrop:**
+   ```html
+   <div class="backdrop" aria-hidden="true" role="presentation"></div>
+   ```
+
+8. **Main Content:**
+   ```html
+   <main id="contentArea" role="main">
+   ```
+
+**Dynamic ARIA Updates:**
+- Update `aria-expanded` when dropdowns/sidebar open/close
+- Update `aria-hidden` for backdrop and mobile sidebar
+- Update `aria-current="page"` on active navigation item
+- Update `aria-label` on notifications button to include count
 
 ### Screen Reader Support
-- Announce sidebar state changes
-- Descriptive labels for icon-only buttons
-- Hidden text for icon-only nav items (collapsed state)
-- Notification badge count announced
+
+**Announcements:**
+- Announce sidebar state changes (use aria-live region or visually hidden text)
+- Example: `<span role="status" class="sr-only">Sidebar opened</span>`
+
+**Labels:**
+- All icon-only buttons must have descriptive `aria-label`
+- In collapsed state, nav items should have `aria-label` or sr-only text
+- Example: `<span class="sr-only">Dashboard</span>` or `aria-label="Dashboard"`
+
+**Screen Reader Only Text (sr-only class):**
+```css
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+```
+
+**Badges:**
+- Notification badge count must be announced
+- Include count in button `aria-label`: `"Notifications: 3 unread"`
+- Alternative: Use `aria-describedby` pointing to badge element
+
+**Landmarks:**
+- Use semantic HTML: `<nav>`, `<main>`, `<header>`, `<footer>`
+- Or use ARIA roles: `role="navigation"`, `role="main"`, `role="banner"`, `role="contentinfo"`
+
+### Color Contrast
+
+**Requirements:**
+- **WCAG AA**: 4.5:1 for normal text, 3:1 for large text (18pt+ or 14pt+ bold)
+- **WCAG AAA (Recommended)**: 7:1 for important text
+
+**Verification:**
+- Use WebAIM Contrast Checker or similar tool
+- Test all text/background combinations:
+  - Sidebar text on background
+  - Header text on background
+  - Footer text on background
+  - Content text on background
+  - Link text on background
+  - Button text on background
+  - Active nav item text
+  - Focus indicators
+
+### Focus Visible Styles
+
+**Implementation:**
+```css
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Fallback for older browsers */
+button:focus,
+a:focus,
+[tabindex]:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+```
+
+### Accessibility Implementation Checklist
+
+When implementing this dashboard, ensure:
+
+- [ ] Skip link added as first focusable element
+- [ ] All buttons have `aria-label` or visible text
+- [ ] All icons have `aria-label` or sr-only text
+- [ ] Navigation items have `aria-current="page"` when active
+- [ ] Dropdowns have `role="menu"` and items have `role="menuitem"`
+- [ ] All interactive elements have `aria-expanded` when applicable
+- [ ] Notifications badge count included in button `aria-label`
+- [ ] Focus visible on all interactive elements
+- [ ] Focus trapped in mobile sidebar
+- [ ] Focus restored when sidebar closes
+- [ ] `aria-hidden` managed correctly for backdrop and mobile sidebar
+- [ ] `aria-live` regions for dynamic content (optional but recommended)
+- [ ] Color contrast verified with contrast checker tool
+- [ ] Keyboard navigation works throughout
+- [ ] Screen reader tested with NVDA, VoiceOver, or JAWS
 
 ## Design System Specifications
 
