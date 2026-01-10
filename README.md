@@ -45,7 +45,7 @@ Think of it as "recipes for AI" - detailed guides that your AI assistant reads a
 ```
 Developer: "I need a dashboard layout with collapsible sidebar. 
 I'm using React and Tailwind. Use this guide: 
-https://uipotion.com/jsonData/potions/dashboard-layout.json"
+https://uipotion.com/potions/dashboard-layout.json"
 
 AI Assistant:
 - Loads dashboard-layout.json
@@ -63,13 +63,13 @@ AI agents can automatically discover and load potions:
 
 ```javascript
 // 1. Load main manifest
-const manifest = await fetch('https://uipotion.com/jsonData/uipotion-manifest.json');
+const manifest = await fetch('https://uipotion.com/uipotion-manifest.json');
 
 // 2. Browse available potions
-const potionsIndex = await fetch('https://uipotion.com/jsonData/potions-index.json');
+const potionsIndex = await fetch('https://uipotion.com/potions-index.json');
 
 // 3. Load specific guide
-const guide = await fetch('https://uipotion.com/jsonData/potions/dashboard-layout.json');
+const guide = await fetch('https://uipotion.com/potions/dashboard-layout.json');
 
 // 4. Parse specifications
 // 5. Generate implementation adapted to user's stack
@@ -118,7 +118,7 @@ import { Dashboard } from 'some-ui-lib'
 ### UIPotion Approach
 ```javascript
 // AI reads specification
-const spec = await fetch('uipotion.com/jsonData/potions/dashboard-layout.json')
+const spec = await fetch('uipotion.com/potions/dashboard-layout.json')
 
 // AI generates code adapted to YOUR stack:
 // - Your framework (React, Vue, Angular, Svelte, etc.)
@@ -187,7 +187,7 @@ src/
 │   ├── components/    # Reusable components (buttons, dialogs, cards)
 │   └── features/      # Complete features (pricing, auth flows)
 │
-├── jsonData/          # JSON guides (AI-readable specifications)
+├── statics/            # Static files copied to root (Harold)
 │   ├── uipotion-manifest.json    # Main entry point for AI agents
 │   ├── potions-index.json        # Searchable catalog of potions
 │   └── potions/                  # Individual component guides
@@ -218,7 +218,7 @@ build/                 # Generated output (don't edit!)
 ├── index.html
 ├── about.html
 ├── potions/           # Generated potion pages
-├── jsonData/          # Copied JSON guides
+├── potions/           # Generated potion pages
 ├── styles/            # Compiled CSS
 └── assets/            # Copied assets
 ```
@@ -250,7 +250,7 @@ category: 'Components'  # Layouts, Components, or Features
 tags:
   - relevant
   - tags
-agentManifest: 'jsonData/potions/your-component.json'
+agentManifest: 'potions/your-component.json'
 ---
 
 # Your Component Name
@@ -260,7 +260,7 @@ Detailed human-readable documentation...
 
 #### Step 2: Create JSON Guide
 
-Create `src/jsonData/potions/your-component.json`:
+Create `src/statics/potions/your-component.json`:
 
 Use `dashboard-layout.json` as a template. Include:
 - `aiAgentInstructions` - Summary and implementation steps
@@ -276,7 +276,7 @@ Use `dashboard-layout.json` as a template. Include:
 
 #### Step 3: Update Potions Index
 
-Add entry to `src/jsonData/potions-index.json`:
+Add entry to `src/statics/potions-index.json`:
 
 ```json
 {
@@ -288,7 +288,7 @@ Add entry to `src/jsonData/potions-index.json`:
   "complexity": "intermediate",
   "estimatedImplementationTime": "2-3 hours",
   "webUrl": "https://uipotion.com/potions/components/your-component.html",
-  "agentGuideUrl": "https://uipotion.com/jsonData/potions/your-component.json",
+  "agentGuideUrl": "https://uipotion.com/potions/your-component.json",
   "created": "2026-01-10",
   "updated": "2026-01-10"
 }
@@ -349,7 +349,7 @@ See `.cursorrules` for detailed guidelines on:
 
 ### Main Manifest
 
-**URL**: `https://uipotion.com/jsonData/uipotion-manifest.json`
+**URL**: `https://uipotion.com/uipotion-manifest.json`
 
 Entry point for AI agent discovery. Contains:
 - Service metadata
@@ -359,7 +359,7 @@ Entry point for AI agent discovery. Contains:
 
 ### Potions Index
 
-**URL**: `https://uipotion.com/jsonData/potions-index.json`
+**URL**: `https://uipotion.com/potions-index.json`
 
 Searchable catalog of all potions. Each entry includes:
 - `id` - Unique identifier
@@ -376,7 +376,7 @@ Searchable catalog of all potions. Each entry includes:
 
 ### Individual Guides
 
-**URL**: `https://uipotion.com/jsonData/potions/[id].json`
+**URL**: `https://uipotion.com/potions/[id].json`
 
 Detailed implementation guide for specific component. Contains complete specifications for AI to generate implementation.
 
@@ -385,7 +385,7 @@ Detailed implementation guide for specific component. Contains complete specific
 ### Example: Dashboard Layout
 
 **Human URL**: https://uipotion.com/potions/layouts/dashboard.html  
-**AI Guide URL**: https://uipotion.com/jsonData/potions/dashboard-layout.json
+**AI Guide URL**: https://uipotion.com/potions/dashboard-layout.json
 
 The dashboard layout includes:
 - Collapsible sidebar (280px expanded, 80px collapsed)
@@ -406,7 +406,7 @@ MIT License - see LICENSE file for details
 ## Links
 
 - **Website**: [uipotion.com](https://uipotion.com)
-- **AI Manifest**: [uipotion.com/jsonData/uipotion-manifest.json](https://uipotion.com/jsonData/uipotion-manifest.json)
+- **AI Manifest**: [uipotion.com/uipotion-manifest.json](https://uipotion.com/uipotion-manifest.json)
 - **GitHub**: [github.com/juliancwirko/uipotion](https://github.com/juliancwirko/uipotion)
 - **Harold SSG**: [haroldjs.com](https://haroldjs.com)
 

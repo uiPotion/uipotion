@@ -32,7 +32,7 @@ src/
 │   ├── layouts/          # Layout patterns (dashboards, landing pages, etc.)
 │   ├── components/       # Reusable components (buttons, dialogs, cards)
 │   └── features/         # Complete features (pricing tables, auth flows)
-├── jsonData/             # JSON files for AI agents
+├── statics/               # Static files (copied to root by Harold)
 │   ├── uipotion-manifest.json       # Main discovery manifest
 │   ├── potions-index.json           # Index of all potions
 │   └── potions/                     # Individual potion guides
@@ -74,7 +74,7 @@ publicationDate: '2026-01-10'                         # REQUIRED: YYYY-MM-DD for
 excerpt: 'Brief description'                          # REQUIRED: 1-2 sentences
 category: 'Layouts'                                   # REQUIRED: Layouts|Components|Features
 tags: [tag1, tag2]                                    # REQUIRED: Array of tags
-agentManifest: 'jsonData/potions/component-id.json'  # REQUIRED: Path to JSON guide
+agentManifest: 'potions/component-id.json'  # REQUIRED: Path to JSON guide (in statics/)
 ---
 ```
 
@@ -90,7 +90,7 @@ agentManifest: 'jsonData/potions/component-id.json'  # REQUIRED: Path to JSON gu
 
 ### 2. AI Agent JSON Guides
 
-**Location**: `src/jsonData/potions/`
+**Location**: `src/statics/potions/`
 
 **Format**: Comprehensive JSON files with complete specifications
 
@@ -129,9 +129,9 @@ agentManifest: 'jsonData/potions/component-id.json'  # REQUIRED: Path to JSON gu
 
 ### 3. Discovery System
 
-- **Main Manifest**: `src/jsonData/uipotion-manifest.json` - Entry point for AI agents
-- **Potions Index**: `src/jsonData/potions-index.json` - Searchable catalog of all potions
-- **Individual Guides**: `src/jsonData/potions/[id].json` - Detailed implementation guide
+- **Main Manifest**: `src/statics/uipotion-manifest.json` - Entry point for AI agents
+- **Potions Index**: `src/statics/potions-index.json` - Searchable catalog of all potions
+- **Individual Guides**: `src/statics/potions/[id].json` - Detailed implementation guide
 
 ---
 
@@ -177,7 +177,7 @@ publicationDate: '2024-01-15' # REQUIRED: YYYY-MM-DD format (string)
 excerpt: 'Brief summary'   # REQUIRED: string (for SEO)
 category: 'Layouts'        # REQUIRED: Category name
 tags: [javascript, ui]     # REQUIRED: array
-agentManifest: 'jsonData/potions/id.json' # REQUIRED: Path to JSON
+agentManifest: 'potions/id.json' # REQUIRED: Path to JSON (in statics/)
 ---
 ```
 
@@ -299,7 +299,7 @@ tags:
   - relevant
   - tags
   - here
-agentManifest: 'jsonData/potions/your-component.json'
+agentManifest: 'potions/your-component.json'
 ---
 
 # Your Component Name
@@ -343,7 +343,7 @@ Examples for different frameworks (stay agnostic).
 
 ### Step 2: Create AI Agent JSON Guide
 
-**File**: `src/jsonData/potions/your-component.json`
+**File**: `src/statics/potions/your-component.json`
 
 Use `dashboard-layout.json` as template. Must include:
 - `aiAgentInstructions` - Summary, features, steps
@@ -359,7 +359,7 @@ Use `dashboard-layout.json` as template. Must include:
 
 ### Step 3: Update Potions Index
 
-**File**: `src/jsonData/potions-index.json`
+**File**: `src/statics/potions-index.json`
 
 Add new entry to `potions` array:
 ```json
@@ -372,7 +372,7 @@ Add new entry to `potions` array:
   "complexity": "beginner|intermediate|advanced",
   "estimatedImplementationTime": "1-2 hours",
   "webUrl": "https://uipotion.com/potions/components/your-component.html",
-  "agentGuideUrl": "https://uipotion.com/jsonData/potions/your-component.json",
+  "agentGuideUrl": "https://uipotion.com/potions/your-component.json",
   "created": "2026-01-10",
   "updated": "2026-01-10"
 }
@@ -519,9 +519,9 @@ Before considering a potion complete:
 - Homepage: `/index.html`
 - About: `/about.html`
 - Potion: `/potions/[category]/[name].html`
-- AI Manifest: `/jsonData/uipotion-manifest.json`
-- Potions Index: `/jsonData/potions-index.json`
-- Potion Guide: `/jsonData/potions/[id].json`
+- AI Manifest: `/uipotion-manifest.json`
+- Potions Index: `/potions-index.json`
+- Potion Guide: `/potions/[id].json`
 
 ---
 
@@ -549,7 +549,7 @@ Before considering a potion complete:
 4. **Partials** = Reusable Handlebars components (auto-registered)
 5. **Helpers** = Functions available in templates (registered at build)
 6. **Assets** = Copied as-is to `build/assets/`
-7. **JSON Data** = Copied to `build/jsonData/` for AI agents
+7. **Statics** = Copied from `src/statics/` to `build/` root for AI agents
 
 ---
 
@@ -583,7 +583,7 @@ Before considering a potion complete:
    - Minify HTML
    - Write to build/[name].html
    ↓
-9. copyJSONData() - Copy src/jsonData/ → build/jsonData/
+9. copyStatics() - Copy src/statics/* → build/ (root)
    ↓
 10. copyStatics() - Copy src/statics/* → build/ (root)
 ```
@@ -623,7 +623,7 @@ Before considering a potion complete:
 - `src/partials/*.hbs` → Rebuild all (partials affect everything)
 - `src/potion-layouts/*.hbs` → Rebuild potions
 - `src/assets/*` → Copy assets
-- `src/jsonData/*` → Copy JSON data
+- `src/statics/*` → Copy statics to root
 
 ---
 
