@@ -5,15 +5,17 @@
   "name": "Dashboard Layout with Collapsible Sidebar",
   "category": "layouts",
   "tags": ["dashboard", "sidebar", "responsive", "admin"],
-  "description": "A responsive admin dashboard layout with collapsible sidebar navigation and fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.",
+  "description": "A responsive admin dashboard layout with collapsible sidebar navigation, fixed header, and fixed footer. Perfect for admin panels, SaaS applications, and data-driven interfaces.",
   
   "aiAgentInstructions": {
-    "summary": "Implement a three-section dashboard layout (sidebar, header, content) with collapsible sidebar functionality. The layout is framework-agnostic and should adapt to the user's chosen stack (React, Vue, Angular, Svelte, etc.) and styling approach (Tailwind, CSS Modules, Chakra UI, Material-UI, etc.).",
+    "summary": "Implement a four-section dashboard layout (sidebar, header, content, footer) with collapsible sidebar functionality. The layout is framework-agnostic and should adapt to the user's chosen stack (React, Vue, Angular, Svelte, etc.) and styling approach (Tailwind, CSS Modules, Chakra UI, Material-UI, etc.).",
     
     "keyFeatures": [
       "Fixed collapsible sidebar (280px expanded, 80px collapsed)",
-      "Fixed header that adjusts to sidebar state",
+      "Fixed header that adjusts to sidebar state (64px height)",
+      "Fixed footer that adjusts to sidebar state (60px height)",
       "Scrollable main content area with smooth transitions",
+      "Content area accounts for header and footer spacing",
       "Mobile-responsive with overlay sidebar",
       "State persistence in localStorage",
       "Full keyboard accessibility with ARIA labels",
@@ -21,13 +23,16 @@
     ],
     
     "implementationSteps": [
-      "1. Create three main layout components: Sidebar, Header, and MainContent",
+      "1. Create four main layout components: Sidebar, Header, Footer, and MainContent",
       "2. Implement state management for sidebar collapse/expand",
       "3. Add localStorage persistence for sidebar state",
       "4. Implement mobile-responsive behavior with overlay mode",
-      "5. Add smooth CSS transitions (300ms) for all state changes",
-      "6. Implement keyboard navigation and ARIA attributes",
-      "7. Style according to user's chosen CSS framework/methodology"
+      "5. Position header and footer as fixed elements (top and bottom)",
+      "6. Adjust header and footer left position based on sidebar state",
+      "7. Add margin-top and margin-bottom to content area for header/footer spacing",
+      "8. Add smooth CSS transitions (300ms) for all state changes",
+      "9. Implement keyboard navigation and ARIA attributes",
+      "10. Style according to user's chosen CSS framework/methodology"
     ]
   },
   
@@ -52,6 +57,10 @@
                 "children": ["PageContent"]
               }
             }
+          },
+          "Footer": {
+            "description": "Fixed footer, spans content area width, always at bottom",
+            "children": ["Copyright", "FooterNavigation"]
           }
         }
       }
@@ -141,14 +150,45 @@
       "dimensions": {
         "padding": "24-32px on all sides",
         "maxWidth": "Optional (e.g., 1400px)",
-        "minHeight": "Fill available viewport"
+        "minHeight": "Fill available viewport minus header and footer"
       },
       "behavior": {
-        "overflow": "overflow-y: auto",
+        "overflow": "overflow-y: auto, overflow-x: hidden",
         "marginTop": "Header height (64px)",
+        "marginBottom": "Footer height (60px)",
         "marginLeft": "Sidebar width (dynamic based on state)",
         "transition": "Smooth transition when sidebar toggles",
         "responsive": "Reduced padding on mobile (16px)"
+      }
+    },
+    
+    "Footer": {
+      "description": "Fixed footer bar at bottom of viewport",
+      "dimensions": {
+        "height": "60px",
+        "width": "100% of content area",
+        "position": "fixed at bottom"
+      },
+      "layout": "[Copyright] [spacer] [FooterNavigation]",
+      "elements": {
+        "Copyright": {
+          "fontSize": "14px",
+          "content": "© [Year] [AppName]. All rights reserved."
+        },
+        "FooterNavigation": {
+          "links": ["Privacy", "Terms", "Support"],
+          "fontSize": "14px",
+          "gap": "24px between links"
+        }
+      },
+      "behavior": {
+        "position": "Fixed at bottom, always visible even with no content",
+        "leftPosition": "Adjusts based on sidebar state (280px expanded, 80px collapsed on desktop)",
+        "mobile": "Full width (left: 0) on mobile/tablet",
+        "shadow": "Box shadow on top edge for depth",
+        "border": "Border-top for separation",
+        "transition": "Smooth 300ms transition when sidebar toggles",
+        "zIndex": "999 (same as header)"
       }
     }
   },
@@ -157,22 +197,25 @@
     "desktop": {
       "minWidth": "1024px",
       "sidebar": "Visible, expanded by default",
-      "header": "Full width minus sidebar",
-      "content": "Fills remaining space",
+      "header": "Full width minus sidebar, left: 280px (80px when collapsed)",
+      "footer": "Full width minus sidebar, left: 280px (80px when collapsed)",
+      "content": "Fills remaining space between header and footer",
       "menuToggle": "Hidden"
     },
     "tablet": {
       "minWidth": "768px",
       "maxWidth": "1023px",
       "sidebar": "Collapsed by default or overlay mode",
-      "header": "Full width",
+      "header": "Full width (left: 0)",
+      "footer": "Full width (left: 0)",
       "content": "Full width",
       "menuToggle": "Visible"
     },
     "mobile": {
       "maxWidth": "767px",
       "sidebar": "Hidden by default, fullscreen overlay when open",
-      "header": "Full width, compact mode",
+      "header": "Full width, compact mode (left: 0)",
+      "footer": "Full width, compact mode (left: 0)",
       "content": "Full width, reduced padding (16px)",
       "menuToggle": "Visible",
       "userMenu": "Simplified (avatar only)"
@@ -217,22 +260,22 @@
     "react": {
       "stateManagement": "useState for component state, useEffect for localStorage, Context API or props for sharing state",
       "example": "const [collapsed, setCollapsed] = useState(() => localStorage.getItem('sidebarCollapsed') === 'true');",
-      "componentStructure": "<DashboardLayout><Sidebar collapsed={collapsed} onToggle={handleToggle} /><MainContent><Header /><ContentArea>{children}</ContentArea></MainContent></DashboardLayout>"
+      "componentStructure": "<DashboardLayout><Sidebar collapsed={collapsed} onToggle={handleToggle} /><MainContent><Header sidebarCollapsed={collapsed} /><ContentArea>{children}</ContentArea></MainContent><Footer sidebarCollapsed={collapsed} isMobile={isMobile} /></DashboardLayout>"
     },
     "vue": {
       "stateManagement": "ref() or reactive() for state, watch() for localStorage, provide/inject for sharing",
       "example": "const isCollapsed = ref(localStorage.getItem('sidebarCollapsed') === 'true');",
-      "componentStructure": "<DashboardLayout><Sidebar :collapsed='isCollapsed' @toggle='handleToggle' /><MainContent><HeaderBar /><ContentArea><slot /></ContentArea></MainContent></DashboardLayout>"
+      "componentStructure": "<DashboardLayout><Sidebar :collapsed='isCollapsed' @toggle='handleToggle' /><MainContent><HeaderBar :sidebarCollapsed='isCollapsed' /><ContentArea><slot /></ContentArea></MainContent><Footer :sidebarCollapsed='isCollapsed' :isMobile='isMobile' /></DashboardLayout>"
     },
     "angular": {
       "stateManagement": "Component properties, RxJS BehaviorSubject for shared state, Angular services for persistence",
       "example": "private sidebarCollapsed$ = new BehaviorSubject<boolean>(localStorage.getItem('sidebarCollapsed') === 'true');",
-      "componentStructure": "<app-dashboard-layout><app-sidebar [collapsed]='isCollapsed' (toggle)='onToggle()' /><div class='main-content'><app-header /><main class='content-area'><router-outlet></router-outlet></main></div></app-dashboard-layout>"
+      "componentStructure": "<app-dashboard-layout><app-sidebar [collapsed]='isCollapsed' (toggle)='onToggle()' /><div class='main-content'><app-header [sidebarCollapsed]='isCollapsed' /><main class='content-area'><router-outlet></router-outlet></main></div><app-footer [sidebarCollapsed]='isCollapsed' [isMobile]='isMobile'></app-footer></app-dashboard-layout>"
     },
     "svelte": {
       "stateManagement": "writable stores for state, onMount for localStorage",
       "example": "import { writable } from 'svelte/store'; export const sidebarCollapsed = writable(false);",
-      "componentStructure": "<DashboardLayout><Sidebar {collapsed} on:toggle={handleToggle} /><MainContent><Header /><ContentArea><slot /></ContentArea></MainContent></DashboardLayout>"
+      "componentStructure": "<DashboardLayout><Sidebar {collapsed} on:toggle={handleToggle} /><MainContent><Header {sidebarCollapsed} /><ContentArea><slot /></ContentArea></MainContent><Footer {sidebarCollapsed} {isMobile} /></DashboardLayout>"
     }
   },
   
@@ -240,7 +283,9 @@
     "tailwindCSS": {
       "description": "Use utility classes with dynamic classes based on state",
       "sidebarExample": "class='fixed left-0 top-0 h-full w-64 bg-gray-900 text-white transition-transform duration-300' :class=\"{'w-20': collapsed}\"",
-      "contentExample": "class='transition-all duration-300 pt-16' :class=\"{'ml-64': !collapsed, 'ml-20': collapsed}\"",
+      "contentExample": "class='transition-all duration-300 pt-16 pb-15' :class=\"{'ml-64': !collapsed, 'ml-20': collapsed}\"",
+      "headerExample": "class='fixed top-0 h-16 transition-all duration-300' :class=\"{'left-64': !collapsed, 'left-20': collapsed}\"",
+      "footerExample": "class='fixed bottom-0 h-15 transition-all duration-300' :class=\"{'left-64': !collapsed, 'left-20': collapsed}\"",
       "key": "Use transition utilities and conditional classes"
     },
     "cssModules": {
@@ -266,7 +311,7 @@
     "vanillaCSS": {
       "description": "Standard CSS with class toggles",
       "approach": "Define classes with transitions, toggle via JavaScript",
-      "example": ".sidebar { width: 280px; transition: width 300ms; } .sidebar.collapsed { width: 80px; }"
+      "example": ".sidebar { width: 280px; transition: width 300ms; } .sidebar.collapsed { width: 80px; } .header { position: fixed; top: 0; left: 280px; transition: left 300ms; } .header.sidebar-collapsed { left: 80px; } .footer { position: fixed; bottom: 0; left: 280px; transition: left 300ms; } .footer.sidebar-collapsed { left: 80px; }"
     }
   },
   
@@ -274,7 +319,7 @@
     "sidebarToggle": {
       "duration": "300ms",
       "easing": "ease-in-out or cubic-bezier(0.4, 0, 0.2, 1)",
-      "properties": ["width (sidebar)", "margin-left (content)", "left (header)"]
+      "properties": ["width (sidebar)", "margin-left (content)", "left (header)", "left (footer)"]
     },
     "mobileOverlay": {
       "backdropFade": "200ms",
@@ -325,6 +370,12 @@
       "text": "Dark gray or black",
       "icons": "Medium gray, darker on hover"
     },
+    "footer": {
+      "background": "White or light gray (match header)",
+      "border": "Subtle 1px border-top or light shadow on top",
+      "text": "Dark gray or black (muted, rgba(0,0,0,0.6))",
+      "links": "Muted color, primary color on hover"
+    },
     "content": {
       "background": "Light gray (#f5f5f5) or white",
       "text": "Dark gray (#333, #1a1a1a)",
@@ -334,6 +385,8 @@
       "sidebar": "#1a1a1a",
       "content": "#121212",
       "text": "#e0e0e0",
+      "header": "#1a1a1a",
+      "footer": "#1a1a1a",
       "adjustments": "Lighter shadows, reduced saturation"
     }
   },
@@ -389,9 +442,10 @@
   
   "commonVariations": {
     "topNavigation": "Add secondary horizontal navigation below header",
-    "footer": "Footer inside content area or fixed at bottom",
+    "footerPlacement": "Footer can be inside content area (scrolls with content) or fixed at bottom (always visible). Default is fixed at bottom.",
     "multipleSidebars": "Right sidebar for contextual actions/filters",
-    "nestedNavigation": "Expandable/collapsible nav sections in sidebar"
+    "nestedNavigation": "Expandable/collapsible nav sections in sidebar",
+    "stickyFooter": "Footer sticks to bottom when content is short, scrolls when content is long"
   },
   
   "testingChecklist": [
@@ -399,23 +453,27 @@
     "Sidebar opens as overlay on mobile",
     "Mobile backdrop dismisses sidebar",
     "Content area adjusts to sidebar state",
-    "Header stays fixed on scroll",
+    "Header stays fixed on scroll and adjusts to sidebar state",
+    "Footer stays fixed at bottom and adjusts to sidebar state",
+    "Footer is always visible even with minimal content",
+    "Content area has proper spacing for header (margin-top: 64px) and footer (margin-bottom: 60px)",
     "Active navigation item is highlighted",
     "User dropdown opens and closes correctly",
     "Keyboard navigation works throughout",
     "Screen reader announces state changes",
     "Sidebar state persists on reload",
+    "No horizontal scroll when sidebar collapses",
     "Responsive at all breakpoints (mobile, tablet, desktop)",
     "Touch interactions work on mobile",
     "Animations are smooth (60fps)",
     "No layout shift or flicker on load"
   ],
   
-  "aiImplementationPrompt": "Create a responsive dashboard layout with a collapsible sidebar (280px expanded, 80px collapsed), fixed header (64px height), and scrollable content area. The sidebar should overlay on mobile (<768px) and persist its collapsed state in localStorage. Include smooth 300ms transitions, keyboard accessibility with ARIA labels, and active state highlighting for current page. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. Include mobile menu toggle, user dropdown, and notifications button in the header.",
+  "aiImplementationPrompt": "Create a responsive dashboard layout with a collapsible sidebar (280px expanded, 80px collapsed), fixed header (64px height), fixed footer (60px height), and scrollable content area. The sidebar should overlay on mobile (<768px) and persist its collapsed state in localStorage. Both header and footer should adjust their left position based on sidebar state (280px when expanded, 80px when collapsed on desktop). Content area should have margin-top: 64px and margin-bottom: 60px to account for fixed header and footer. Include smooth 300ms transitions, keyboard accessibility with ARIA labels, and active state highlighting for current page. Ensure no horizontal scroll when sidebar collapses. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. Include mobile menu toggle, user dropdown, and notifications button in the header. Footer should contain copyright and navigation links.",
   
   "meta": {
     "created": "2026-01-10",
-    "updated": "2026-01-10",
+    "updated": "2026-01-11",
     "version": "1.0.0",
     "complexity": "intermediate",
     "estimatedImplementationTime": "2-4 hours",
