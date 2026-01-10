@@ -1,62 +1,70 @@
 {{> head title=title description=excerpt }}
 
-<div class="potion-container">
-  <aside class="potion-sidebar">
-    <nav class="potion-nav">
-      <h3>Navigation</h3>
-      <ul>
-        <li><a href="{{relativePath 'index.html'}}">← All Potions</a></li>
-        <li><a href="#structure">Structure</a></li>
-        <li><a href="#specifications">Specifications</a></li>
-        <li><a href="#implementation">Implementation</a></li>
-        <li><a href="#ai-guide">AI Agent Guide</a></li>
-      </ul>
-    </nav>
-    <div class="potion-meta">
-      <div class="potion-category">{{category}}</div>
-      {{#if tags}}
-      <div class="potion-tags">
-        {{#each tags}}
-        <span class="tag">{{this}}</span>
-        {{/each}}
+<div class="potion-page">
+  <!-- Hero Header with AI Link -->
+  <header class="potion-hero">
+    <div class="potion-hero-container">
+      <div class="potion-breadcrumb">
+        <a href="{{relativePath 'index.html'}}">← All Potions</a>
+        <span>/</span>
+        <span>{{category}}</span>
       </div>
+      
+      <h1 class="potion-hero-title">{{title}}</h1>
+      
+      {{#if excerpt}}
+      <p class="potion-hero-description">{{excerpt}}</p>
       {{/if}}
-      <div class="potion-agent-link">
-        <strong>AI Agent URL:</strong>
-        <code>{{relativePath agentManifest}}</code>
-        <p class="hint">Use this URL in your AI coding assistant to automatically load this guide.</p>
+      
+      <!-- AI Agent Link - Prominently displayed -->
+      <div class="potion-ai-card">
+        <div class="potion-ai-card-header">
+          <svg class="potion-ai-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+          </svg>
+          <span>AI Agent Guide</span>
+        </div>
+        <div class="potion-ai-card-body">
+          <code class="potion-ai-url">https://uipotion.com/{{agentManifest}}</code>
+          <button class="potion-copy-btn" onclick="navigator.clipboard.writeText('https://uipotion.com/{{agentManifest}}')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            Copy
+          </button>
+        </div>
+        <p class="potion-ai-hint">
+          Use this URL with your AI coding assistant (Claude, ChatGPT, etc.) to automatically implement this component in your stack
+        </p>
+        <a href="{{relativePath agentManifest}}" class="potion-download-btn" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          Download JSON
+        </a>
+      </div>
+      
+      <!-- Meta Info -->
+      <div class="potion-meta-bar">
+        <div class="potion-category-badge">{{category}}</div>
+        {{#if tags}}
+        <div class="potion-tags-list">
+          {{#each tags}}
+          <span class="potion-tag">{{this}}</span>
+          {{/each}}
+        </div>
+        {{/if}}
       </div>
     </div>
-  </aside>
+  </header>
   
-  <main class="potion-content">
-    <article>
-      <header class="potion-header">
-        <h1>{{title}}</h1>
-        {{#if excerpt}}
-        <p class="excerpt">{{excerpt}}</p>
-        {{/if}}
-      </header>
-      
-      <div class="potion-body">
+  <!-- Main Content -->
+  <main class="potion-main">
+    <div class="potion-main-container">
+      <article class="potion-article">
         {{{content}}}
-      </div>
-      
-      <footer class="potion-footer">
-        <div class="potion-actions">
-          <a href="{{relativePath agentManifest}}" class="button primary" download>
-            Download AI Agent Guide (JSON)
-          </a>
-          <a href="{{relativePath 'index.html'}}" class="button">
-            Browse More Potions
-          </a>
-        </div>
-        <p class="potion-notice">
-          💡 <strong>Framework Agnostic:</strong> This guide works with React, Vue, Angular, Svelte, or any framework. 
-          Your AI agent will adapt it to your project's stack.
-        </p>
-      </footer>
-    </article>
+      </article>
+    </div>
   </main>
 </div>
 

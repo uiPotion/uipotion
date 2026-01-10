@@ -154,9 +154,9 @@
   }
 }
 
-/* Hero Section - Tailwind/React Email Inspired */
+/* Hero Section - Darker Theme */
 .hero {
-  background: #000000;
+  background: #0a0a0a;
   position: relative;
   overflow: hidden;
   padding: 160px 24px 120px;
@@ -245,12 +245,12 @@
   }
 }
 
-/* Sections */
+/* Sections - Pure Black Theme */
 .potions-section,
 .features,
 .how-to-use {
   padding: 120px 24px;
-  background: #ffffff;
+  background: #000000;
 
   .container {
     max-width: 1280px;
@@ -260,26 +260,30 @@
   .section-intro {
     text-align: center;
     font-size: 1.125rem;
-    color: var(--color-gray);
+    color: #71717a;
     margin-bottom: 72px;
     max-width: 700px;
     margin-left: auto;
     margin-right: auto;
     line-height: 1.7;
   }
+
+  h2 {
+    color: #ffffff;
+  }
 }
 
 .features {
-  background: var(--color-bg-secondary);
-  border-top: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
+  background: #0a0a0a;
+  border-top: 1px solid #1a1a1a;
+  border-bottom: 1px solid #1a1a1a;
 }
 
 .how-to-use {
-  background: linear-gradient(180deg, #ffffff 0%, var(--color-bg-secondary) 100%);
+  background: linear-gradient(180deg, #000000 0%, #0a0a0a 100%);
 }
 
-/* Potions Grid - Card Style */
+/* Potions Grid - Dark Card Style */
 .potions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -289,10 +293,10 @@
   .post-list-items--article,
   .potions-grid--article,
   article {
-    background: white;
+    background: #171717;
     border-radius: 12px;
     padding: 28px !important;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #262626;
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
@@ -301,8 +305,8 @@
     box-shadow: none !important;
 
     &:hover {
-      border-color: var(--color-primary);
-      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.1) !important;
+      border-color: #4f46e5;
+      box-shadow: 0 8px 24px rgba(79, 70, 229, 0.2) !important;
       transform: translateY(-2px);
     }
 
@@ -317,15 +321,15 @@
     font-size: 1.375rem !important;
     font-weight: 700 !important;
     margin-bottom: 12px !important;
-    color: var(--color-dark) !important;
+    color: #ffffff !important;
     line-height: 1.3 !important;
 
     a {
-      color: var(--color-dark) !important;
+      color: #ffffff !important;
       transition: color 0.2s;
 
       &:hover {
-        color: var(--color-primary) !important;
+        color: #818cf8 !important;
       }
     }
   }
@@ -338,14 +342,14 @@
     gap: 8px;
     margin-bottom: 16px !important;
     font-size: 0.8125rem !important;
-    color: var(--color-gray) !important;
+    color: #94a3b8 !important;
     font-weight: 500 !important;
   }
 
   .post-list-items--excerpt,
   .potions-grid--excerpt,
   .post-list-item-excerpt {
-    color: var(--color-gray) !important;
+    color: #cbd5e1 !important;
     line-height: 1.6 !important;
     margin-bottom: 20px !important;
     font-size: 0.9375rem !important;
@@ -358,7 +362,7 @@
     display: inline-flex !important;
     align-items: center;
     gap: 6px;
-    color: var(--color-primary) !important;
+    color: #60a5fa !important;
     font-weight: 600 !important;
     font-size: 0.875rem !important;
     transition: gap 0.2s;
@@ -369,6 +373,7 @@
 
     &:hover {
       gap: 10px;
+      color: #93c5fd !important;
     }
 
     &::after {
@@ -393,17 +398,22 @@
   text-align: center;
   padding: 32px 24px;
   border-radius: 12px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: #171717;
+  border: 1px solid #262626;
   transition: all 0.2s;
 
   &:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 4px 16px rgba(79, 70, 229, 0.08);
+    border-color: #4f46e5;
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
+    transform: translateY(-2px);
+  }
+
+  h3 {
+    color: #ffffff;
   }
 
   p {
-    color: var(--color-gray);
+    color: #cbd5e1;
     line-height: 1.6;
     font-size: 0.9375rem;
     margin: 0;
@@ -422,11 +432,22 @@
 .step {
   text-align: center;
   position: relative;
+  padding: 32px 24px;
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 12px;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: #4f46e5;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
+  }
 
   .step-number {
     width: 56px;
     height: 56px;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -438,8 +459,12 @@
     box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
   }
 
+  h3 {
+    color: #ffffff;
+  }
+
   p {
-    color: var(--color-gray);
+    color: #cbd5e1;
     line-height: 1.6;
     font-size: 0.9375rem;
     margin: 0;
@@ -772,20 +797,23 @@
 .about-page {
   max-width: 900px;
   margin: 0 auto;
+  padding: 80px 24px 100px;
+  background: #0f172a;
+  min-height: 100vh;
 
   .about-section {
     margin-bottom: 60px;
 
     p {
       line-height: 1.7;
-      color: #475569;
+      color: #cbd5e1;
       margin-bottom: 16px;
       font-size: 1rem;
     }
 
     ul, ol {
       line-height: 1.7;
-      color: #475569;
+      color: #cbd5e1;
       margin: 20px 0;
       padding-left: 28px;
 
@@ -795,21 +823,22 @@
     }
 
     code {
-      background: #f1f5f9;
-      color: var(--color-primary);
+      background: #1e293b;
+      color: #60a5fa;
       padding: 2px 6px;
       border-radius: 4px;
       font-size: 0.875rem;
+      border: 1px solid #334155;
       font-family: 'Monaco', 'Courier New', monospace;
     }
 
     pre {
-      background: #0f172a;
+      background: #171717;
       padding: 24px;
       border-radius: 8px;
       overflow-x: auto;
       margin: 24px 0;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #262626;
 
       code {
         background: transparent;
@@ -820,24 +849,26 @@
   }
 
   .example-box {
-    background: #eff6ff;
+    background: #171717;
     padding: 28px;
     border-radius: 8px;
-    border-left: 4px solid var(--color-primary);
+    border-left: 4px solid #4f46e5;
     margin: 24px 0;
+    border: 1px solid #262626;
 
     p {
       margin-bottom: 16px;
-      color: var(--color-dark);
+      color: #cbd5e1;
 
       strong {
-        color: var(--color-dark);
+        color: #ffffff;
         font-weight: 700;
       }
     }
 
     ol {
       margin-top: 12px;
+      color: #cbd5e1;
     }
   }
 
@@ -861,26 +892,27 @@
   }
 
   .benefit {
-    background: white;
+    background: #1e293b;
     padding: 24px;
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #334155;
     transition: all 0.2s;
 
     &:hover {
-      border-color: var(--color-primary);
-      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.08);
+      border-color: #4f46e5;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.15);
     }
 
     h4 {
       font-weight: 700;
       margin: 0 0 12px 0;
+      color: #ffffff;
     }
 
     p {
       margin: 0;
       font-size: 0.9375rem;
-      color: var(--color-gray);
+      color: #cbd5e1;
     }
   }
 }
@@ -912,3 +944,489 @@ html {
   background: var(--color-primary-light);
   color: white;
 }
+
+/* ============================================
+   NEW DARK-THEMED POTION PAGE - Tailwind Inspired
+   ============================================ */
+
+.potion-page {
+  background: #0a0a0a;
+  min-height: 100vh;
+  color: #e5e5e5;
+}
+
+/* Potion Hero Section */
+.potion-hero {
+  background: linear-gradient(to bottom, #0a0a0a 0%, #0d0d0d 100%);
+  position: relative;
+  padding: 120px 24px 80px;
+  border-bottom: 1px solid #262626;
+
+  /* Subtle grid pattern */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.5;
+  }
+}
+
+.potion-hero-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.potion-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  font-size: 0.875rem;
+  color: #94a3b8;
+
+  a {
+    color: #60a5fa;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #93c5fd;
+    }
+  }
+
+  span {
+    color: #475569;
+  }
+}
+
+.potion-hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 24px 0;
+}
+
+.potion-hero-description {
+  font-size: 1.25rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-bottom: 40px;
+  max-width: 800px;
+}
+
+/* AI Agent Card - Prominently Displayed */
+.potion-ai-card {
+  background: #171717;
+  border: 1px solid #262626;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+.potion-ai-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: #60a5fa;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  .potion-ai-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.potion-ai-card-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  background: #0a0a0a;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  padding: 12px 16px;
+
+  .potion-ai-url {
+    flex: 1;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 0.875rem;
+    color: #94a3b8;
+    overflow-x: auto;
+    white-space: nowrap;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #262626;
+      border-radius: 2px;
+    }
+  }
+
+  .potion-copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #262626;
+    border: none;
+    color: #e5e5e5;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      background: #404040;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+.potion-ai-hint {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.potion-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #4f46e5;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.2s;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  }
+}
+
+/* Meta Bar */
+.potion-meta-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.potion-category-badge {
+  display: inline-block;
+  background: #4f46e5;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.potion-tags-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  .potion-tag {
+    display: inline-block;
+    background: #262626;
+    color: #d4d4d4;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    border: 1px solid #404040;
+  }
+}
+
+/* Main Content Area */
+.potion-main {
+  background: #0a0a0a;
+  padding: 60px 24px 100px;
+}
+
+.potion-main-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.potion-article {
+  background: #171717;
+  border: 1px solid #262626;
+  border-radius: 12px;
+  padding: 48px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 16px;
+    margin-top: 0;
+  }
+
+  h2 {
+    font-size: 2rem;
+    border-bottom: 1px solid #262626;
+    padding-bottom: 12px;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+  }
+
+  p {
+    color: #cbd5e1;
+    line-height: 1.75;
+    margin-bottom: 20px;
+    font-size: 1rem;
+  }
+
+  /* Links */
+  a {
+    color: #60a5fa;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+
+    &:hover {
+      color: #93c5fd;
+      border-bottom-color: #60a5fa;
+    }
+  }
+
+  /* Lists */
+  ul, ol {
+    color: #cbd5e1;
+    margin: 20px 0;
+    padding-left: 28px;
+    line-height: 1.75;
+
+    li {
+      margin-bottom: 10px;
+    }
+  }
+
+  /* Code Blocks */
+  pre {
+    background: #0a0a0a;
+    border: 1px solid #262626;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 24px 0;
+
+    code {
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.875rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+  }
+
+  /* Inline Code */
+  code {
+    background: #0a0a0a;
+    color: #60a5fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-family: 'Monaco', 'Courier New', monospace;
+    border: 1px solid #262626;
+  }
+
+  pre code {
+    background: transparent;
+    padding: 0;
+    border: none;
+    color: #e2e8f0;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 28px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #1a1a1a;
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    th {
+      background: #000000;
+      font-weight: 600;
+      color: #ffffff;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      color: #a3a3a3;
+    }
+
+    tbody tr:hover {
+      background: #0a0a0a;
+    }
+  }
+
+  /* Blockquotes */
+  blockquote {
+    border-left: 4px solid #4f46e5;
+    padding-left: 20px;
+    margin: 24px 0;
+    color: #94a3b8;
+    font-style: italic;
+  }
+
+  /* Horizontal Rules */
+  hr {
+    border: none;
+    border-top: 1px solid #334155;
+    margin: 40px 0;
+  }
+
+  /* Checkboxes in lists */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #4f46e5;
+  }
+}
+
+/* Hide ASCII art - Target sections with "Visual Preview" or similar */
+.potion-article {
+  /* Hide h2 with "Visual" text and the next pre element */
+  h2:has(+ pre) {
+    & + pre {
+      /* Check if it contains box drawing characters */
+      &:has(code:contains('┌')),
+      &:has(code:contains('│')),
+      &:has(code:contains('└')),
+      &:has(code:contains('─')) {
+        display: none;
+      }
+    }
+  }
+
+  /* Hide the heading too if it says "Visual" */
+  h2 {
+    &:contains('Visual') {
+      & + pre {
+        display: none;
+      }
+    }
+  }
+}
+
+/* Responsive Adjustments for New Dark Design */
+@media (max-width: 1024px) {
+  .potion-hero {
+    padding: 100px 20px 60px;
+  }
+
+  .potion-article {
+    padding: 32px 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .potion-hero {
+    padding: 80px 16px 50px;
+  }
+
+  .potion-hero-title {
+    font-size: 2rem;
+  }
+
+  .potion-hero-description {
+    font-size: 1.125rem;
+  }
+
+  .potion-ai-card {
+    padding: 20px;
+  }
+
+  .potion-ai-card-body {
+    flex-direction: column;
+    align-items: stretch;
+
+    .potion-copy-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .potion-article {
+    padding: 24px 20px;
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+    }
+  }
+
+  .potion-main {
+    padding: 40px 16px 80px;
+  }
+}
+

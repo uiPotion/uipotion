@@ -16,24 +16,6 @@ agentManifest: 'jsonData/potions/dashboard-layout.json'
 
 A responsive admin dashboard layout with collapsible sidebar navigation and a fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.
 
-## Visual Preview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  [☰] Dashboard App                    [🔔] [👤] User ▾      │ ← Header (fixed)
-├─────────────┬───────────────────────────────────────────────┤
-│  📊 Dashboard│                                              │
-│  📈 Analytics│  Main Content Area                          │
-│  👥 Users    │                                              │
-│  ⚙️  Settings│  (Scrollable)                               │
-│             │                                              │
-│             │                                              │
-│  [Collapse] │                                              │
-└─────────────┴───────────────────────────────────────────────┘
-     Sidebar                    Content Area
-  (Collapsible)
-```
-
 ## Structure Specification
 
 ### Layout Hierarchy
