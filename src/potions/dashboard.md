@@ -12,7 +12,7 @@ tags:
 agentManifest: 'jsonData/potions/dashboard-layout.json'
 ---
 
-# Dashboard Layout 📊
+# Dashboard Layout
 
 A responsive admin dashboard layout with collapsible sidebar navigation and a fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.
 
@@ -20,26 +20,7 @@ A responsive admin dashboard layout with collapsible sidebar navigation and a fi
 
 ### Layout Hierarchy
 
-```
-AppContainer (Full viewport)
-├── Sidebar (Fixed, collapsible)
-│   ├── Logo/Brand Section
-│   ├── Navigation Menu
-│   │   ├── Nav Item (active state)
-│   │   ├── Nav Item
-│   │   ├── Nav Item
-│   │   └── Nav Item
-│   └── Collapse Toggle Button
-├── Main Content Wrapper
-│   ├── Header (Fixed, spans content area)
-│   │   ├── Menu Toggle Button (mobile)
-│   │   ├── Title/Breadcrumbs
-│   │   └── User Actions
-│   │       ├── Notifications Button
-│   │       └── User Menu Dropdown
-│   └── Content Area (Scrollable)
-│       └── Page Content
-```
+The layout consists of an AppContainer that holds a Sidebar component and a Main Content Wrapper. The Sidebar contains a Logo/Brand Section, Navigation Menu with multiple Nav Items (including active state support), and a Collapse Toggle Button. The Main Content Wrapper includes a fixed Header (with Menu Toggle Button for mobile, Title/Breadcrumbs, and User Actions including Notifications Button and User Menu Dropdown) and a scrollable Content Area for page content.
 
 ## Detailed Component Specifications
 
@@ -107,10 +88,8 @@ AppContainer (Full viewport)
 - Position: Fixed or sticky
 
 **Layout:**
-```
-[Menu Toggle] [Title/Breadcrumbs]          [Notifications] [User Menu]
-    (Mobile)      (Left aligned)              (Right aligned)
-```
+
+The header contains a Menu Toggle button (visible on mobile only, left-aligned), Title/Breadcrumbs section (left-aligned), and User Actions including Notifications button and User Menu (right-aligned).
 
 **Elements:**
 
@@ -127,7 +106,7 @@ AppContainer (Full viewport)
 
 #### Notifications Button
 - Size: 40px x 40px
-- Icon: Bell (🔔)
+- Icon: Bell
 - Badge: Red dot or count for unread
 - Opens dropdown/modal on click
 
@@ -170,9 +149,8 @@ AppContainer (Full viewport)
 - Position: Fixed at bottom
 
 **Layout:**
-```
-[Copyright]                    [Footer Navigation Links]
-```
+
+The footer contains a Copyright section on the left and Footer Navigation Links on the right.
 
 **Elements:**
 - Copyright: 14px font size
