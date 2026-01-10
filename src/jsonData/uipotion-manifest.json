@@ -1,0 +1,44 @@
+{
+  "$schema": "https://uipotion.com/schema/manifest.json",
+  "version": "1.0.0",
+  "name": "UIPotion",
+  "description": "AI-agent-optimized UI component guides for any framework",
+  "baseUrl": "https://uipotion.com",
+  "discovery": {
+    "manifestUrl": "https://uipotion.com/jsonData/uipotion-manifest.json",
+    "potionsIndexUrl": "https://uipotion.com/jsonData/potions-index.json"
+  },
+  "usage": {
+    "how_to_use": "AI agents can discover and load component guides by referencing this manifest. Each potion (component guide) is framework-agnostic and provides detailed specifications for implementation.",
+    "workflow": [
+      "1. Agent loads this manifest to discover available potions",
+      "2. Agent browses potions-index.json to find relevant component",
+      "3. Agent loads specific potion JSON guide (e.g., dashboard-layout.json)",
+      "4. Agent adapts the guide to user's framework and styling preferences",
+      "5. Agent implements the component based on detailed specifications"
+    ]
+  },
+  "categories": [
+    {
+      "id": "layouts",
+      "name": "Layouts",
+      "description": "Full-page layouts and structural patterns"
+    },
+    {
+      "id": "components",
+      "name": "Components",
+      "description": "Reusable UI components like buttons, dialogs, cards"
+    },
+    {
+      "id": "features",
+      "name": "Features",
+      "description": "Complete features like pricing tables, landing pages, authentication flows"
+    }
+  ],
+  "meta": {
+    "created": "2026-01-10",
+    "updated": "2026-01-10",
+    "author": "UIPotion Team",
+    "license": "MIT"
+  }
+}

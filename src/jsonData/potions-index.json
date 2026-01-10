@@ -1,0 +1,19 @@
+{
+  "potions": [
+    {
+      "id": "dashboard-layout",
+      "name": "Dashboard Layout with Collapsible Sidebar",
+      "category": "layouts",
+      "tags": ["dashboard", "sidebar", "responsive", "admin"],
+      "excerpt": "A responsive admin dashboard layout with collapsible sidebar navigation and fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.",
+      "complexity": "intermediate",
+      "estimatedImplementationTime": "2-4 hours",
+      "webUrl": "https://uipotion.com/potions/layouts/dashboard.html",
+      "agentGuideUrl": "https://uipotion.com/jsonData/potions/dashboard-layout.json",
+      "created": "2026-01-10",
+      "updated": "2026-01-10"
+    }
+  ],
+  "totalCount": 1,
+  "lastUpdated": "2026-01-10"
+}

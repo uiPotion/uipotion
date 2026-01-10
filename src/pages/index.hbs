@@ -1,0 +1,80 @@
+{{> head title="UIPotion - AI-Optimized UI Component Guides" description="Framework-agnostic UI component guides designed for AI coding assistants. No maintenance burden, just paste a link and let AI recreate beautiful components." }}
+
+<div class="hero">
+  <div class="container">
+    <h1>UI Components for AI Agents</h1>
+    <p class="tagline">Framework-agnostic guides that AI agents can understand and implement. No code to maintain, just specifications.</p>
+    <div class="hero-actions">
+      <a href="#potions" class="button primary">Browse Potions</a>
+      <a href="{{relativePath 'about.html'}}" class="button">How It Works</a>
+    </div>
+    <div class="hero-manifest">
+      <p><strong>AI Agent Discovery URL:</strong></p>
+      <code>https://uipotion.com/jsonData/uipotion-manifest.json</code>
+    </div>
+  </div>
+</div>
+
+<section id="potions" class="potions-section">
+  <div class="container">
+    <h2>Available Potions</h2>
+    <p class="section-intro">Each potion is a detailed guide that AI agents can use to recreate UI components in any framework.</p>
+    
+    {{postsList
+      perPageLimit=12
+      currentPage=1
+      className="potions-grid"
+      dateFormat='dd mmmm yyyy'
+      noDate=true
+    }}
+  </div>
+</section>
+
+<section class="features">
+  <div class="container">
+    <h2>Why UIPotion?</h2>
+    <div class="features-grid">
+      <div class="feature">
+        <h3>🤖 AI-First Design</h3>
+        <p>Guides written specifically for AI agents to understand and implement, not just copy-paste code.</p>
+      </div>
+      <div class="feature">
+        <h3>🎨 Framework Agnostic</h3>
+        <p>Works with React, Vue, Angular, Svelte, or any framework. AI adapts to your stack.</p>
+      </div>
+      <div class="feature">
+        <h3>🚀 Zero Maintenance</h3>
+        <p>No code libraries to maintain. Just specifications that never go out of date.</p>
+      </div>
+      <div class="feature">
+        <h3>📐 Detailed Specs</h3>
+        <p>Comprehensive specifications including dimensions, behaviors, accessibility, and responsive patterns.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how-to-use">
+  <div class="container">
+    <h2>How to Use</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Find a Potion</h3>
+        <p>Browse the catalog and find the UI component you need</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Share with AI</h3>
+        <p>Paste the potion URL or JSON link to your AI coding assistant</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Customize & Generate</h3>
+        <p>Tell AI your framework and styling preferences, it handles the rest</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{> footer}}

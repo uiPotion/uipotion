@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" data-hrld-root="{{hostDirName}}">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{{relativePath 'assets/images/favicon.png'}}" type="image/png" />
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <meta name="generator" content="haroldjs.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{relativePath 'styles/main.css'}}">
+</head>
+
+<body>
+  <header class="main-header">
+    <div class="container">
+      <div class="main-header-container">
+        <a href="{{relativePath 'index.html'}}" class="logo-container">
+          <span class="logo-text">UIPotion</span>
+        </a>
+        <nav class="main-menu">
+          <ul class="main-menu-list">
+            <li class="main-menu-list-item"><a href="{{relativePath 'about.html'}}">About</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>

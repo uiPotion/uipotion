@@ -1,0 +1,63 @@
+{{> head title=title description=excerpt }}
+
+<div class="potion-container">
+  <aside class="potion-sidebar">
+    <nav class="potion-nav">
+      <h3>Navigation</h3>
+      <ul>
+        <li><a href="{{relativePath 'index.html'}}">← All Potions</a></li>
+        <li><a href="#structure">Structure</a></li>
+        <li><a href="#specifications">Specifications</a></li>
+        <li><a href="#implementation">Implementation</a></li>
+        <li><a href="#ai-guide">AI Agent Guide</a></li>
+      </ul>
+    </nav>
+    <div class="potion-meta">
+      <div class="potion-category">{{category}}</div>
+      {{#if tags}}
+      <div class="potion-tags">
+        {{#each tags}}
+        <span class="tag">{{this}}</span>
+        {{/each}}
+      </div>
+      {{/if}}
+      <div class="potion-agent-link">
+        <strong>AI Agent URL:</strong>
+        <code>{{relativePath agentManifest}}</code>
+        <p class="hint">Use this URL in your AI coding assistant to automatically load this guide.</p>
+      </div>
+    </div>
+  </aside>
+  
+  <main class="potion-content">
+    <article>
+      <header class="potion-header">
+        <h1>{{title}}</h1>
+        {{#if excerpt}}
+        <p class="excerpt">{{excerpt}}</p>
+        {{/if}}
+      </header>
+      
+      <div class="potion-body">
+        {{{content}}}
+      </div>
+      
+      <footer class="potion-footer">
+        <div class="potion-actions">
+          <a href="{{relativePath agentManifest}}" class="button primary" download>
+            Download AI Agent Guide (JSON)
+          </a>
+          <a href="{{relativePath 'index.html'}}" class="button">
+            Browse More Potions
+          </a>
+        </div>
+        <p class="potion-notice">
+          💡 <strong>Framework Agnostic:</strong> This guide works with React, Vue, Angular, Svelte, or any framework. 
+          Your AI agent will adapt it to your project's stack.
+        </p>
+      </footer>
+    </article>
+  </main>
+</div>
+
+{{> footer}}

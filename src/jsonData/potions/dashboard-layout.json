@@ -1,0 +1,424 @@
+{
+  "$schema": "https://uipotion.com/schema/potion.json",
+  "id": "dashboard-layout",
+  "version": "1.0.0",
+  "name": "Dashboard Layout with Collapsible Sidebar",
+  "category": "layouts",
+  "tags": ["dashboard", "sidebar", "responsive", "admin"],
+  "description": "A responsive admin dashboard layout with collapsible sidebar navigation and fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.",
+  
+  "aiAgentInstructions": {
+    "summary": "Implement a three-section dashboard layout (sidebar, header, content) with collapsible sidebar functionality. The layout is framework-agnostic and should adapt to the user's chosen stack (React, Vue, Angular, Svelte, etc.) and styling approach (Tailwind, CSS Modules, Chakra UI, Material-UI, etc.).",
+    
+    "keyFeatures": [
+      "Fixed collapsible sidebar (280px expanded, 80px collapsed)",
+      "Fixed header that adjusts to sidebar state",
+      "Scrollable main content area with smooth transitions",
+      "Mobile-responsive with overlay sidebar",
+      "State persistence in localStorage",
+      "Full keyboard accessibility with ARIA labels",
+      "Smooth 300ms animations"
+    ],
+    
+    "implementationSteps": [
+      "1. Create three main layout components: Sidebar, Header, and MainContent",
+      "2. Implement state management for sidebar collapse/expand",
+      "3. Add localStorage persistence for sidebar state",
+      "4. Implement mobile-responsive behavior with overlay mode",
+      "5. Add smooth CSS transitions (300ms) for all state changes",
+      "6. Implement keyboard navigation and ARIA attributes",
+      "7. Style according to user's chosen CSS framework/methodology"
+    ]
+  },
+  
+  "structure": {
+    "hierarchy": {
+      "AppContainer": {
+        "description": "Root container, full viewport height",
+        "children": {
+          "Sidebar": {
+            "description": "Fixed sidebar, left-aligned, collapsible",
+            "children": ["LogoSection", "NavigationMenu", "CollapseToggle"]
+          },
+          "MainContentWrapper": {
+            "description": "Container for header and content",
+            "children": {
+              "Header": {
+                "description": "Fixed header, spans content area width",
+                "children": ["MenuToggle", "TitleBreadcrumbs", "UserActions"]
+              },
+              "ContentArea": {
+                "description": "Scrollable main content",
+                "children": ["PageContent"]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  
+  "components": {
+    "Sidebar": {
+      "description": "Fixed navigation sidebar with collapsible functionality",
+      "dimensions": {
+        "desktopExpanded": "240-280px",
+        "desktopCollapsed": "64-80px",
+        "mobile": "full screen overlay or hidden"
+      },
+      "states": ["expanded", "collapsed", "hidden", "overlay"],
+      "elements": {
+        "LogoSection": {
+          "height": "64px",
+          "content": "Logo image/text + app name",
+          "collapsedBehavior": "Show only logo icon"
+        },
+        "NavigationItems": {
+          "height": "44-48px each",
+          "padding": "12-16px horizontal, 12px vertical",
+          "iconSize": "20-24px",
+          "fontSize": "14-16px",
+          "gap": "12-16px between icon and text",
+          "activeIndicator": "Background color or left border (3-4px)",
+          "hoverState": "Subtle background color change",
+          "collapsedState": "Center icon only, show tooltip on hover"
+        },
+        "CollapseToggle": {
+          "position": "Bottom of sidebar or after nav items",
+          "size": "40px x 40px",
+          "icon": "Chevron or arrows indicating direction",
+          "behavior": "Rotates/changes icon on state change"
+        }
+      },
+      "behavior": {
+        "persistence": "Store state in localStorage",
+        "animation": "200-300ms ease-in-out transition",
+        "mobile": "Overlay with backdrop, dismissible",
+        "accessibility": "Tab navigation, Enter/Space to activate"
+      }
+    },
+    
+    "Header": {
+      "description": "Fixed header bar spanning content area",
+      "dimensions": {
+        "height": "64px",
+        "width": "100% of content area",
+        "position": "fixed or sticky"
+      },
+      "layout": "[MenuToggle] [Title/Breadcrumbs] [spacer] [Notifications] [UserMenu]",
+      "elements": {
+        "MenuToggle": {
+          "size": "40px x 40px",
+          "icon": "Hamburger (☰) or close (×)",
+          "visibility": "Hidden on desktop (≥1024px), visible on mobile",
+          "position": "Left-most"
+        },
+        "TitleBreadcrumbs": {
+          "fontSize": "20-24px (title) or 14-16px (breadcrumbs)",
+          "behavior": "Truncate with ellipsis if too long"
+        },
+        "NotificationsButton": {
+          "size": "40px x 40px",
+          "badge": "Red dot or count for unread",
+          "action": "Opens dropdown/modal"
+        },
+        "UserMenu": {
+          "avatar": "36px circle",
+          "username": "14px, optional on small screens",
+          "dropdown": ["Profile", "Settings", "Logout"]
+        }
+      },
+      "behavior": {
+        "position": "Fixed at top during scroll",
+        "shadow": "Shadow or border-bottom for depth",
+        "dropdowns": "Close on outside click or Escape key",
+        "accessibility": "Full keyboard navigation"
+      }
+    },
+    
+    "ContentArea": {
+      "description": "Main scrollable content area",
+      "dimensions": {
+        "padding": "24-32px on all sides",
+        "maxWidth": "Optional (e.g., 1400px)",
+        "minHeight": "Fill available viewport"
+      },
+      "behavior": {
+        "overflow": "overflow-y: auto",
+        "marginTop": "Header height (64px)",
+        "marginLeft": "Sidebar width (dynamic based on state)",
+        "transition": "Smooth transition when sidebar toggles",
+        "responsive": "Reduced padding on mobile (16px)"
+      }
+    }
+  },
+  
+  "responsiveBreakpoints": {
+    "desktop": {
+      "minWidth": "1024px",
+      "sidebar": "Visible, expanded by default",
+      "header": "Full width minus sidebar",
+      "content": "Fills remaining space",
+      "menuToggle": "Hidden"
+    },
+    "tablet": {
+      "minWidth": "768px",
+      "maxWidth": "1023px",
+      "sidebar": "Collapsed by default or overlay mode",
+      "header": "Full width",
+      "content": "Full width",
+      "menuToggle": "Visible"
+    },
+    "mobile": {
+      "maxWidth": "767px",
+      "sidebar": "Hidden by default, fullscreen overlay when open",
+      "header": "Full width, compact mode",
+      "content": "Full width, reduced padding (16px)",
+      "menuToggle": "Visible",
+      "userMenu": "Simplified (avatar only)"
+    }
+  },
+  
+  "stateManagement": {
+    "statesToTrack": {
+      "sidebarOpen": {
+        "type": "boolean",
+        "description": "Whether sidebar is visible (mobile)",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "sidebarCollapsed": {
+        "type": "boolean",
+        "description": "Whether sidebar is in icon-only mode (desktop)",
+        "default": false,
+        "persistence": "localStorage"
+      },
+      "activeNavItem": {
+        "type": "string",
+        "description": "Current active navigation item ID",
+        "persistence": "sync with router/URL"
+      },
+      "userMenuOpen": {
+        "type": "boolean",
+        "description": "User dropdown state",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "notificationsOpen": {
+        "type": "boolean",
+        "description": "Notifications dropdown state",
+        "default": false,
+        "persistence": "component state only"
+      }
+    }
+  },
+  
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "useState for component state, useEffect for localStorage, Context API or props for sharing state",
+      "example": "const [collapsed, setCollapsed] = useState(() => localStorage.getItem('sidebarCollapsed') === 'true');",
+      "componentStructure": "<DashboardLayout><Sidebar collapsed={collapsed} onToggle={handleToggle} /><MainContent><Header /><ContentArea>{children}</ContentArea></MainContent></DashboardLayout>"
+    },
+    "vue": {
+      "stateManagement": "ref() or reactive() for state, watch() for localStorage, provide/inject for sharing",
+      "example": "const isCollapsed = ref(localStorage.getItem('sidebarCollapsed') === 'true');",
+      "componentStructure": "<DashboardLayout><Sidebar :collapsed='isCollapsed' @toggle='handleToggle' /><MainContent><HeaderBar /><ContentArea><slot /></ContentArea></MainContent></DashboardLayout>"
+    },
+    "angular": {
+      "stateManagement": "Component properties, RxJS BehaviorSubject for shared state, Angular services for persistence",
+      "example": "private sidebarCollapsed$ = new BehaviorSubject<boolean>(localStorage.getItem('sidebarCollapsed') === 'true');",
+      "componentStructure": "<app-dashboard-layout><app-sidebar [collapsed]='isCollapsed' (toggle)='onToggle()' /><div class='main-content'><app-header /><main class='content-area'><router-outlet></router-outlet></main></div></app-dashboard-layout>"
+    },
+    "svelte": {
+      "stateManagement": "writable stores for state, onMount for localStorage",
+      "example": "import { writable } from 'svelte/store'; export const sidebarCollapsed = writable(false);",
+      "componentStructure": "<DashboardLayout><Sidebar {collapsed} on:toggle={handleToggle} /><MainContent><Header /><ContentArea><slot /></ContentArea></MainContent></DashboardLayout>"
+    }
+  },
+  
+  "stylingApproaches": {
+    "tailwindCSS": {
+      "description": "Use utility classes with dynamic classes based on state",
+      "sidebarExample": "class='fixed left-0 top-0 h-full w-64 bg-gray-900 text-white transition-transform duration-300' :class=\"{'w-20': collapsed}\"",
+      "contentExample": "class='transition-all duration-300 pt-16' :class=\"{'ml-64': !collapsed, 'ml-20': collapsed}\"",
+      "key": "Use transition utilities and conditional classes"
+    },
+    "cssModules": {
+      "description": "Scoped CSS classes with conditional class names",
+      "approach": "Define .sidebar, .sidebar.collapsed classes, toggle via className logic",
+      "transitions": "Use CSS transition property for smooth animations"
+    },
+    "styledComponents": {
+      "description": "CSS-in-JS with props",
+      "approach": "Pass collapsed prop and adjust styles dynamically",
+      "example": "const Sidebar = styled.aside`width: ${props => props.collapsed ? '80px' : '280px'}; transition: width 300ms;`"
+    },
+    "chakraUI": {
+      "components": "Use Drawer (permanent variant on desktop, temporary on mobile), Box for content",
+      "approach": "Leverage Chakra's Drawer component with variant prop",
+      "transitions": "Use theme.transitions for consistent animations"
+    },
+    "materialUI": {
+      "components": "Use MUI Drawer (persistent variant on desktop, temporary on mobile), AppBar for header",
+      "approach": "MUI Drawer with variant='permanent' on desktop, variant='temporary' on mobile",
+      "transitions": "Use theme transitions and breakpoints"
+    },
+    "vanillaCSS": {
+      "description": "Standard CSS with class toggles",
+      "approach": "Define classes with transitions, toggle via JavaScript",
+      "example": ".sidebar { width: 280px; transition: width 300ms; } .sidebar.collapsed { width: 80px; }"
+    }
+  },
+  
+  "animations": {
+    "sidebarToggle": {
+      "duration": "300ms",
+      "easing": "ease-in-out or cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": ["width (sidebar)", "margin-left (content)", "left (header)"]
+    },
+    "mobileOverlay": {
+      "backdropFade": "200ms",
+      "sidebarSlide": "300ms from left",
+      "stagger": "Backdrop starts first, sidebar follows"
+    },
+    "dropdowns": {
+      "duration": "150-200ms",
+      "easing": "ease-out",
+      "transform": "translateY(-8px) to translateY(0)",
+      "opacity": "0 to 1"
+    }
+  },
+  
+  "accessibility": {
+    "keyboardNavigation": {
+      "tabOrder": "Header → Sidebar → Content",
+      "sidebarItems": "Tab to focus, Enter/Space to activate",
+      "escapeKey": "Close dropdowns and mobile sidebar",
+      "skipLink": "Skip to content link for screen readers"
+    },
+    "ariaAttributes": {
+      "sidebar": "role='navigation', aria-label='Main navigation'",
+      "menuToggle": "aria-expanded='true/false', aria-controls='sidebar'",
+      "dropdowns": "role='menu', aria-haspopup='true'",
+      "activeNavItem": "aria-current='page'",
+      "mobileOverlay": "aria-modal='true'"
+    },
+    "screenReader": {
+      "announcements": "Announce sidebar state changes",
+      "labels": "Descriptive labels for icon-only buttons",
+      "hiddenText": "Hidden text for icon-only nav items in collapsed state",
+      "badges": "Notification badge count announced"
+    }
+  },
+  
+  "colorGuidelines": {
+    "sidebar": {
+      "background": "Darker than content (for contrast) or white with border",
+      "text": "High contrast with background",
+      "activeItem": "Primary color background (10-20% opacity) or solid",
+      "hover": "Subtle background change (5-10% opacity)",
+      "icons": "Match text color or use primary color for active"
+    },
+    "header": {
+      "background": "White or light gray",
+      "border": "Subtle 1px border or light shadow",
+      "text": "Dark gray or black",
+      "icons": "Medium gray, darker on hover"
+    },
+    "content": {
+      "background": "Light gray (#f5f5f5) or white",
+      "text": "Dark gray (#333, #1a1a1a)",
+      "contrast": "Ensure 4.5:1 contrast ratio minimum"
+    },
+    "darkMode": {
+      "sidebar": "#1a1a1a",
+      "content": "#121212",
+      "text": "#e0e0e0",
+      "adjustments": "Lighter shadows, reduced saturation"
+    }
+  },
+  
+  "dataStructures": {
+    "navigationItems": {
+      "description": "Array of navigation menu items",
+      "example": [
+        {
+          "id": "dashboard",
+          "label": "Dashboard",
+          "icon": "ChartIcon",
+          "href": "/"
+        },
+        {
+          "id": "analytics",
+          "label": "Analytics",
+          "icon": "TrendingUpIcon",
+          "href": "/analytics"
+        },
+        {
+          "id": "users",
+          "label": "Users",
+          "icon": "UsersIcon",
+          "href": "/users"
+        },
+        {
+          "id": "settings",
+          "label": "Settings",
+          "icon": "SettingsIcon",
+          "href": "/settings"
+        }
+      ]
+    },
+    "notifications": {
+      "description": "Array of notification objects",
+      "example": [
+        {
+          "id": 1,
+          "title": "New user registered",
+          "time": "5 min ago",
+          "unread": true
+        },
+        {
+          "id": 2,
+          "title": "Report generated",
+          "time": "1 hour ago",
+          "unread": false
+        }
+      ]
+    }
+  },
+  
+  "commonVariations": {
+    "topNavigation": "Add secondary horizontal navigation below header",
+    "footer": "Footer inside content area or fixed at bottom",
+    "multipleSidebars": "Right sidebar for contextual actions/filters",
+    "nestedNavigation": "Expandable/collapsible nav sections in sidebar"
+  },
+  
+  "testingChecklist": [
+    "Sidebar toggles smoothly on desktop",
+    "Sidebar opens as overlay on mobile",
+    "Mobile backdrop dismisses sidebar",
+    "Content area adjusts to sidebar state",
+    "Header stays fixed on scroll",
+    "Active navigation item is highlighted",
+    "User dropdown opens and closes correctly",
+    "Keyboard navigation works throughout",
+    "Screen reader announces state changes",
+    "Sidebar state persists on reload",
+    "Responsive at all breakpoints (mobile, tablet, desktop)",
+    "Touch interactions work on mobile",
+    "Animations are smooth (60fps)",
+    "No layout shift or flicker on load"
+  ],
+  
+  "aiImplementationPrompt": "Create a responsive dashboard layout with a collapsible sidebar (280px expanded, 80px collapsed), fixed header (64px height), and scrollable content area. The sidebar should overlay on mobile (<768px) and persist its collapsed state in localStorage. Include smooth 300ms transitions, keyboard accessibility with ARIA labels, and active state highlighting for current page. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. Include mobile menu toggle, user dropdown, and notifications button in the header.",
+  
+  "meta": {
+    "created": "2026-01-10",
+    "updated": "2026-01-10",
+    "version": "1.0.0",
+    "complexity": "intermediate",
+    "estimatedImplementationTime": "2-4 hours",
+    "webUrl": "https://uipotion.com/potions/layouts/dashboard.html"
+  }
+}

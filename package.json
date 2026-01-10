@@ -1,0 +1,29 @@
+{
+  "name": "uipotion",
+  "version": "1.0.0",
+  "description": "AI-agent-optimized UI component guides for any framework",
+  "main": "index.js",
+  "scripts": {
+    "start": "harold-scripts start",
+    "build": "harold-scripts build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juliancwirko/uipotion.git"
+  },
+  "keywords": [
+    "ui",
+    "components",
+    "ai",
+    "guides"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/juliancwirko/uipotion/issues"
+  },
+  "homepage": "https://github.com/juliancwirko/uipotion#readme",
+  "devDependencies": {
+    "harold-scripts": "^1.3.1"
+  }
+}

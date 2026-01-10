@@ -1,0 +1,645 @@
+# UIPotion + Harold - AI Assistant Rules
+
+You are working on **UIPotion**, a service that provides AI-agent-optimized UI component guides, built with **Harold** static site generator.
+
+---
+
+## 🎯 UIPotion Project Philosophy
+
+UIPotion is NOT a component library with code to copy-paste. Instead:
+- We provide **detailed specifications** for UI components ("potions")
+- Specifications are **framework-agnostic** (work with React, Vue, Angular, Svelte, etc.)
+- Specifications are **styling-agnostic** (work with Tailwind, CSS Modules, Chakra, etc.)
+- AI agents read these specs and **generate code** adapted to user's stack
+- **Zero maintenance burden** - specs don't break when frameworks update
+
+---
+
+## 🏗️ Technology Stack
+
+- **Static Site Generator**: Harold (Markdown + Handlebars + SCSS)
+- **Content**: Potions stored as Markdown files in `src/potions/`
+- **AI Discovery**: JSON manifests for programmatic access
+- **Styling**: SCSS with modular approach
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── potions/              # Markdown files for potions
+│   ├── layouts/          # Layout patterns (dashboards, landing pages, etc.)
+│   ├── components/       # Reusable components (buttons, dialogs, cards)
+│   └── features/         # Complete features (pricing tables, auth flows)
+├── jsonData/             # JSON files for AI agents
+│   ├── uipotion-manifest.json       # Main discovery manifest
+│   ├── potions-index.json           # Index of all potions
+│   └── potions/                     # Individual potion guides
+│       └── [potion-id].json
+├── potion-layouts/       # Handlebars layouts for potions
+│   └── potion.hbs        # Layout for potion pages
+├── pages/                # Site pages (Handlebars)
+│   ├── index.hbs         # Homepage
+│   └── about.hbs         # About page
+├── partials/             # Reusable Handlebars components
+│   ├── head.hbs
+│   └── footer.hbs
+├── styles/               # SCSS files
+│   ├── main.scss         # Main (compiled)
+│   ├── _basic.scss       # Basic styles
+│   ├── _page.scss        # Page-level styles
+│   └── _uipotion.scss    # UIPotion-specific styles
+├── assets/               # Images, fonts, JS
+│   └── images/
+└── build/                # Output (auto-generated, don't edit!)
+```
+
+---
+
+## 🎨 UIPotion Key Concepts
+
+### 1. Potions (UI Component Guides)
+
+**Location**: `src/potions/` (organized by category)
+
+**Format**: Markdown files with YAML front matter
+
+**Required Front Matter Fields**:
+```yaml
+---
+layout: 'potion'                                      # REQUIRED: Layout template
+title: 'Component Name'                               # REQUIRED: Descriptive name
+publicationDate: '2026-01-10'                         # REQUIRED: YYYY-MM-DD format
+excerpt: 'Brief description'                          # REQUIRED: 1-2 sentences
+category: 'Layouts'                                   # REQUIRED: Layouts|Components|Features
+tags: [tag1, tag2]                                    # REQUIRED: Array of tags
+agentManifest: 'jsonData/potions/component-id.json'  # REQUIRED: Path to JSON guide
+---
+```
+
+**Content Structure**:
+- Overview with visual representation (ASCII art)
+- Component structure and hierarchy
+- Detailed specifications (dimensions, states, behavior)
+- Responsive behavior at each breakpoint
+- Accessibility requirements
+- Animation specifications
+- Framework patterns (remain agnostic)
+- Testing checklist
+
+### 2. AI Agent JSON Guides
+
+**Location**: `src/jsonData/potions/`
+
+**Format**: Comprehensive JSON files with complete specifications
+
+**Required Structure** (see `dashboard-layout.json` as template):
+```json
+{
+  "id": "component-id",
+  "name": "Component Name",
+  "version": "1.0.0",
+  "aiAgentInstructions": {
+    "summary": "...",
+    "keyFeatures": [...],
+    "implementationSteps": [...]
+  },
+  "structure": {...},
+  "components": {...},
+  "responsiveBreakpoints": {...},
+  "stateManagement": {...},
+  "frameworkPatterns": {
+    "react": {...},
+    "vue": {...},
+    "angular": {...},
+    "svelte": {...}
+  },
+  "stylingApproaches": {
+    "tailwindCSS": {...},
+    "cssModules": {...},
+    "styledComponents": {...},
+    "chakraUI": {...}
+  },
+  "accessibility": {...},
+  "animations": {...},
+  "testingChecklist": [...]
+}
+```
+
+### 3. Discovery System
+
+- **Main Manifest**: `src/jsonData/uipotion-manifest.json` - Entry point for AI agents
+- **Potions Index**: `src/jsonData/potions-index.json` - Searchable catalog of all potions
+- **Individual Guides**: `src/jsonData/potions/[id].json` - Detailed implementation guide
+
+---
+
+## 🧪 Harold Static Site Generator
+
+### What Harold Does
+
+Harold transforms:
+- **Markdown files** (with YAML front matter) → HTML pages
+- **Handlebars templates** (.hbs) → HTML pages  
+- **SCSS files** → Minified CSS
+- **Images** → Auto-enhanced with lazy loading, dimensions
+- **JSON data** → Copied to build directory
+
+### Build Process
+
+1. Prepare directories (`build/`, `build/potions/`)
+2. Copy assets (`src/assets/` → `build/assets/`)
+3. Register Handlebars helpers (formatDate, postsList, relativePath, etc.)
+4. Generate partials (register `src/partials/*.hbs`)
+5. Generate posts/potions (Markdown → HTML via layouts)
+6. Generate styles (SCSS → CSS)
+7. Generate pages (`.hbs` → HTML)
+8. Copy JSON data to build directory
+9. Copy statics (`src/statics/*` → `build/` root)
+
+### Commands
+
+```bash
+harold-scripts build    # Full build
+harold-scripts start    # Build + dev server (localhost:3000) + watch
+npm test               # Run test suite (if applicable)
+```
+
+### Front Matter Rules (CRITICAL!)
+
+**For Potions**:
+```yaml
+---
+layout: 'potion'           # REQUIRED: Use 'potion' layout
+title: 'Post Title'        # REQUIRED: string
+publicationDate: '2024-01-15' # REQUIRED: YYYY-MM-DD format (string)
+excerpt: 'Brief summary'   # REQUIRED: string (for SEO)
+category: 'Layouts'        # REQUIRED: Category name
+tags: [javascript, ui]     # REQUIRED: array
+agentManifest: 'jsonData/potions/id.json' # REQUIRED: Path to JSON
+---
+```
+
+**Line Endings**:
+- Harold auto-normalizes CRLF → LF
+- Use LF in editor for consistency
+- Front matter parsing fails with CRLF
+
+### Creating Pages (.hbs)
+
+**Typical Structure**:
+```handlebars
+{{> head 
+  title="Homepage"
+  description="Site description"
+}}
+
+<div class="container">
+  <h1>Welcome</h1>
+  <a href="{{relativePath 'about.html'}}">About</a>
+</div>
+
+{{> footer}}
+```
+
+**Key Points**:
+- NO DOCTYPE/HTML tags in pages (added by layout)
+- ALWAYS use `{{> partialName}}` for header/footer
+- ALWAYS use `{{relativePath 'path'}}` for links
+- Pages are compiled with Handlebars + minified
+
+### Potion Layouts
+
+**Layout wraps potion content** (`src/potion-layouts/potion.hbs`):
+
+Available variables in layouts:
+- `{{title}}` - Potion title
+- `{{excerpt}}` - Potion excerpt
+- `{{publicationDate}}` - Publication date
+- `{{category}}` - Category name
+- `{{tags}}` - Array of tags
+- `{{agentManifest}}` - Path to JSON guide
+- `{{{content}}}` - Compiled markdown HTML (triple braces!)
+- All custom front matter fields
+
+### Handlebars Helpers
+
+#### 1. `relativePath` - Generate Relative Paths (ALWAYS USE THIS!)
+
+```handlebars
+<link rel="stylesheet" href="{{relativePath 'styles/main.css'}}">
+<a href="{{relativePath 'about.html'}}">About</a>
+<img src="{{relativePath 'assets/images/logo.png'}}">
+```
+
+#### 2. `hostDirName` - Subdirectory Deployment
+
+```handlebars
+<html lang="en" data-hrld-root="{{hostDirName}}">
+```
+
+#### 3. `formatDate` - Format Dates
+
+```handlebars
+{{formatDate date=publicationDate format='dd mmmm yyyy'}}
+{{formatDate date=publicationDate format='yyyy-mm-dd'}}
+```
+
+Format options: `dd`, `d`, `mmmm`, `mmm`, `mm`, `yyyy`
+
+#### 4. `responsiveImg` - Responsive Images
+
+```handlebars
+{{responsiveImg
+  src="assets/images/photo.jpg"
+  alt="Photo description"
+  width="800"
+  height="600"
+  loading="lazy"
+}}
+```
+
+#### 5. `postsList` - Render Lists (for potions)
+
+```handlebars
+{{postsList
+  perPageLimit=6
+  currentPage=1
+  byTagName="dashboard"
+  className="potions-list"
+  dateFormat="dd mmmm yyyy"
+}}
+```
+
+### SCSS Rules
+
+- **Partials**: Start with `_` (e.g., `_uipotion.scss`) - NOT compiled directly
+- **Main files**: No `_` prefix (e.g., `main.scss`) - Compiled to CSS
+- **Import order**: variables → mixins → base → components
+- **Use**: `@use` (modern) or `@import` (legacy)
+- **UIPotion styles**: Keep in `_uipotion.scss`
+
+---
+
+## ✍️ Creating a New Potion
+
+### Step 1: Create Markdown File
+
+**File**: `src/potions/[category]/your-component.md`
+
+```yaml
+---
+layout: 'potion'
+title: 'Your Component Name'
+publicationDate: '2026-01-10'
+excerpt: 'Brief description of the component (1-2 sentences)'
+category: 'Components'  # or Layouts, Features
+tags:
+  - relevant
+  - tags
+  - here
+agentManifest: 'jsonData/potions/your-component.json'
+---
+
+# Your Component Name
+
+## Overview
+
+Brief overview with visual representation (ASCII art if helpful).
+
+## Structure
+
+Component hierarchy and organization.
+
+## Components
+
+### Main Component
+- Dimensions
+- Behavior
+- States
+
+## Responsive Design
+
+- Mobile (< 768px)
+- Tablet (768px - 1024px)
+- Desktop (> 1024px)
+
+## Accessibility
+
+- Keyboard navigation
+- ARIA attributes
+- Screen reader support
+
+## Framework Patterns
+
+Examples for different frameworks (stay agnostic).
+
+## Testing Checklist
+
+- [ ] Item 1
+- [ ] Item 2
+```
+
+### Step 2: Create AI Agent JSON Guide
+
+**File**: `src/jsonData/potions/your-component.json`
+
+Use `dashboard-layout.json` as template. Must include:
+- `aiAgentInstructions` - Summary, features, steps
+- `structure` - Component hierarchy
+- `components` - Detailed specs (dimensions, behavior, states)
+- `responsiveBreakpoints` - Mobile, tablet, desktop
+- `stateManagement` - State variables needed
+- `frameworkPatterns` - React, Vue, Angular, Svelte patterns
+- `stylingApproaches` - Tailwind, CSS Modules, styled-components, etc.
+- `accessibility` - Complete accessibility specs
+- `animations` - Timing, easing, properties
+- `testingChecklist` - Verification steps
+
+### Step 3: Update Potions Index
+
+**File**: `src/jsonData/potions-index.json`
+
+Add new entry to `potions` array:
+```json
+{
+  "id": "your-component",
+  "name": "Your Component Name",
+  "category": "components",
+  "tags": ["tag1", "tag2"],
+  "excerpt": "Brief description",
+  "complexity": "beginner|intermediate|advanced",
+  "estimatedImplementationTime": "1-2 hours",
+  "webUrl": "https://uipotion.com/potions/components/your-component.html",
+  "agentGuideUrl": "https://uipotion.com/jsonData/potions/your-component.json",
+  "created": "2026-01-10",
+  "updated": "2026-01-10"
+}
+```
+
+Update `totalCount` and `lastUpdated` fields.
+
+### Step 4: Build and Test
+
+```bash
+harold-scripts build    # Build the site
+harold-scripts start    # Start dev server on http://localhost:3000
+```
+
+---
+
+## ✅ Best Practices
+
+### For Potions (Markdown)
+- ✅ Start with clear visual representation (ASCII art)
+- ✅ Specify exact dimensions and breakpoints
+- ✅ Include accessibility requirements from the start
+- ✅ Provide testing checklist
+- ✅ Show framework patterns, but remain agnostic
+- ✅ Include common variations
+- ❌ Don't provide framework-specific code
+- ❌ Don't be vague about specifications
+
+### For AI Guides (JSON)
+- ✅ Use consistent JSON structure across all potions
+- ✅ Provide code examples in `frameworkPatterns` section
+- ✅ Include multiple styling approaches in `stylingApproaches`
+- ✅ Be explicit about state management needs
+- ✅ Include complete accessibility specs
+- ✅ Provide estimated implementation time
+- ✅ Add complexity level (beginner/intermediate/advanced)
+- ❌ Don't leave ambiguous specifications
+- ❌ Don't skip responsive breakpoints
+- ❌ Don't forget animation specifications
+
+### For Styling (SCSS)
+- ✅ Keep UIPotion-specific styles in `_uipotion.scss`
+- ✅ Use semantic class names
+- ✅ Ensure responsive design
+- ✅ Maintain consistent visual language
+- ✅ Hero sections should be eye-catching
+- ✅ Import order: variables → mixins → base → components
+- ✅ Partials start with `_`, main files don't
+- ❌ Don't compile SCSS partials directly
+
+### For Handlebars
+- ✅ ALWAYS use `{{relativePath 'path'}}` for ALL links/assets
+- ✅ Use `{{> partialName}}` to include partials
+- ✅ Use semantic HTML5 elements
+- ✅ Include `{{> head}}` at top and `{{> footer}}` at bottom
+- ❌ NEVER hardcode: `/styles/main.css`
+- ❌ NEVER use absolute: `http://example.com/...`
+
+### For Images
+- ✅ Include `width` and `height`
+- ✅ Use descriptive `alt` text
+- ✅ Optimize before adding (tinypng.com)
+- ✅ Use `loading="lazy"` (automatic)
+
+### For SEO
+- ✅ Include `excerpt` in front matter
+- ✅ Use descriptive `title` and `tags`
+- ✅ Add meta tags via head partial
+- ✅ Use semantic HTML5 elements
+
+---
+
+## 📝 Content Guidelines
+
+### Writing Potions (Markdown)
+- **Audience**: Human developers browsing the site
+- **Style**: Clear, professional, comprehensive
+- **Include**: Visual ASCII diagrams, detailed specifications, examples
+- **Structure**: Overview → Structure → Components → Responsive → Accessibility → Examples
+
+### Writing AI Agent Guides (JSON)
+- **Audience**: AI coding assistants
+- **Style**: Structured, comprehensive, unambiguous
+- **Include**: Everything AI needs to implement without guessing
+- **Be Specific**: Exact dimensions, colors, timings, behaviors
+- **Framework Agnostic**: Provide patterns for multiple frameworks
+- **Styling Agnostic**: Examples for multiple CSS approaches
+- **Complete**: Accessibility, responsive, animations, state management
+
+---
+
+## 🎯 Categories
+
+1. **Layouts**: Full-page layouts (dashboards, landing pages, documentation layouts)
+2. **Components**: Reusable UI pieces (buttons, dialogs, cards, forms, navigation)
+3. **Features**: Complete features (pricing tables, hero sections, authentication flows)
+
+---
+
+## 🧪 Testing Checklist
+
+Before considering a potion complete:
+- [ ] Markdown file has correct front matter
+- [ ] JSON guide is comprehensive and follows template
+- [ ] Added to potions-index.json
+- [ ] Updated totalCount and lastUpdated in potions-index.json
+- [ ] Built successfully with `harold-scripts build`
+- [ ] Tested in dev server with `harold-scripts start`
+- [ ] Links work correctly with relativePath
+- [ ] JSON validates (proper structure)
+- [ ] Responsive on mobile/tablet/desktop
+- [ ] Content is clear and comprehensive
+- [ ] Accessibility specs included
+- [ ] Animation specs included
+- [ ] Framework patterns provided for React, Vue, Angular, Svelte
+- [ ] Styling approaches provided for Tailwind, CSS Modules, etc.
+
+---
+
+## ⚠️ Common Pitfalls
+
+### UIPotion-Specific
+- ❌ Don't provide framework-specific code in potions (keep it generic)
+- ❌ Don't forget to update potions-index.json
+- ❌ Don't skip accessibility specifications
+- ❌ Don't be vague in JSON guides (AI needs specifics)
+- ❌ Don't forget responsive breakpoints
+- ❌ Don't skip animation specifications
+
+### Harold-Specific
+- ❌ DON'T edit files in `build/` (auto-generated!)
+- ❌ DON'T skip required front matter fields
+- ❌ DON'T use absolute paths (use `relativePath`)
+- ❌ DON'T prefix partials with `_` (only SCSS!)
+- ❌ DON'T compile SCSS partials directly
+- ❌ DON'T forget to rebuild after changes
+- ❌ DON'T use wrong date format (must be YYYY-MM-DD string)
+- ❌ DON'T forget alt text on images
+
+---
+
+## 🔗 URL Structure
+
+- Homepage: `/index.html`
+- About: `/about.html`
+- Potion: `/potions/[category]/[name].html`
+- AI Manifest: `/jsonData/uipotion-manifest.json`
+- Potions Index: `/jsonData/potions-index.json`
+- Potion Guide: `/jsonData/potions/[id].json`
+
+---
+
+## 💡 Quick Reference
+
+| Task | Code |
+|------|------|
+| Build site | `harold-scripts build` |
+| Dev server | `harold-scripts start` |
+| Link to page | `{{relativePath 'about.html'}}` |
+| Link to asset | `{{relativePath 'assets/images/logo.png'}}` |
+| Format date | `{{formatDate date=publicationDate format='dd mmmm yyyy'}}` |
+| Use partial | `{{> header}}` |
+| Pass data | `{{> head title="Page"}}` |
+| Post variable | `{{title}}`, `{{excerpt}}`, `{{tags}}` |
+| Loop tags | `{{#each tags}}{{this}}{{/each}}` |
+
+---
+
+## 🧠 Key Concepts
+
+1. **Potions** = Markdown + Front Matter → processed by layout → HTML
+2. **Pages** = Handlebars → compiled → HTML
+3. **Layouts** = Handlebars templates that wrap potion content
+4. **Partials** = Reusable Handlebars components (auto-registered)
+5. **Helpers** = Functions available in templates (registered at build)
+6. **Assets** = Copied as-is to `build/assets/`
+7. **JSON Data** = Copied to `build/jsonData/` for AI agents
+
+---
+
+## 🎓 How Harold Build Works
+
+```
+1. harold-scripts build
+   ↓
+2. prepareDirectories() - Create build/potions/, etc.
+   ↓
+3. copyAssets() - Copy src/assets/ → build/assets/
+   ↓
+4. registerHelpers() - Register formatDate, relativePath, etc.
+   ↓
+5. generatePartials() - Register src/partials/*.hbs
+   ↓
+6. generatePosts() - For each .md in src/potions/:
+   - Normalize line endings (CRLF → LF)
+   - Parse front matter
+   - Validate required fields
+   - Convert markdown → HTML
+   - Enhance images
+   - Apply layout template
+   - Minify HTML
+   - Write to build/potions/[name].html
+   ↓
+7. generateStyles() - Compile SCSS → CSS → minify → build/styles/
+   ↓
+8. generatePages() - For each .hbs in src/pages/:
+   - Compile with Handlebars
+   - Minify HTML
+   - Write to build/[name].html
+   ↓
+9. copyJSONData() - Copy src/jsonData/ → build/jsonData/
+   ↓
+10. copyStatics() - Copy src/statics/* → build/ (root)
+```
+
+---
+
+## 🎉 Philosophy
+
+### UIPotion Philosophy
+- **Framework Agnostic**: Specifications work for any framework
+- **Styling Agnostic**: Specifications work for any CSS approach
+- **AI-First**: JSON guides are primary interface
+- **Zero Maintenance**: Specs don't break when frameworks update
+- **Always Current**: AI generates code using latest patterns
+
+### Harold Philosophy
+- **Simple by Design**: No complex bundlers
+- **No Framework Lock-in**: Just Markdown → HTML + CSS
+- **Fast Builds**: Optimized for speed
+- **Fast Sites**: Static output is blazing fast
+
+---
+
+## 🔄 Dev Server (harold-scripts start)
+
+1. Run initial build
+2. Start HTTP server on port 3000
+3. Serve files from `build/` directory
+4. Watch `src/` for changes (chokidar)
+5. On change: Rebuild affected files
+6. Browser auto-refreshes (via no-cache headers)
+
+**Watched**:
+- `src/potions/*.md` → Rebuild potions
+- `src/pages/*.hbs` → Rebuild pages
+- `src/styles/*.scss` → Rebuild styles
+- `src/partials/*.hbs` → Rebuild all (partials affect everything)
+- `src/potion-layouts/*.hbs` → Rebuild potions
+- `src/assets/*` → Copy assets
+- `src/jsonData/*` → Copy JSON data
+
+---
+
+## 🚀 When in Doubt
+
+1. Look at existing `dashboard-layout` potion as reference
+2. Ensure framework and styling agnosticism
+3. Provide comprehensive specifications, not just code
+4. Use `{{relativePath}}` for ALL links and assets
+5. Test with `harold-scripts build` frequently
+6. Remember: AI agents are the primary consumers of JSON guides
+7. Follow established Harold patterns
+8. Keep it simple
+
+---
+
+**You're ready to build UIPotion with Harold!** 🚀
+
+**Remember**: UIPotion provides specifications, not code. AI agents transform these specs into production-ready implementations adapted to each developer's stack.
