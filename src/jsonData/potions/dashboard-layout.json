@@ -90,7 +90,20 @@
           "gap": "12-16px between icon and text",
           "activeIndicator": "Background color or left border (3-4px)",
           "hoverState": "Subtle background color change",
-          "collapsedState": "Center icon only, show tooltip on hover"
+          "collapsedState": {
+            "display": "Center icon only",
+            "tooltip": {
+              "trigger": "hover",
+              "position": "right",
+              "delay": "200ms",
+              "fallback": "Use aria-label or sr-only text for accessibility if tooltip library not available"
+            }
+          },
+          "scrollbar": {
+            "style": "Custom thin scrollbar for better aesthetics when many items",
+            "width": "6px",
+            "color": "rgba(255, 255, 255, 0.2) for dark sidebar, rgba(0, 0, 0, 0.2) for light sidebar"
+          }
         },
         "CollapseToggle": {
           "position": "Bottom of sidebar or after nav items",
@@ -102,7 +115,11 @@
       "behavior": {
         "persistence": "Store state in localStorage",
         "animation": "200-300ms ease-in-out transition",
-        "mobile": "Overlay with backdrop, dismissible",
+        "mobile": {
+          "overlay": "Overlay with backdrop, dismissible",
+          "backdropClick": "Close sidebar when backdrop is clicked, prevent event bubbling",
+          "preventBodyScroll": "Lock body scroll when sidebar is open (document.body.style.overflow = 'hidden'), restore on close"
+        },
         "accessibility": "Tab navigation, Enter/Space to activate"
       }
     },
@@ -112,6 +129,7 @@
       "dimensions": {
         "height": "64px",
         "width": "100% of content area",
+        "widthCalculation": "calc(100% - sidebar-width) or use CSS Grid/Flexbox approach",
         "position": "fixed or sticky"
       },
       "layout": "[MenuToggle] [Title/Breadcrumbs] [spacer] [Notifications] [UserMenu]",
@@ -167,6 +185,7 @@
       "dimensions": {
         "height": "60px",
         "width": "100% of content area",
+        "widthCalculation": "calc(100% - sidebar-width) or use CSS Grid/Flexbox approach",
         "position": "fixed at bottom"
       },
       "layout": "[Copyright] [spacer] [FooterNavigation]",
@@ -219,6 +238,11 @@
       "content": "Full width, reduced padding (16px)",
       "menuToggle": "Visible",
       "userMenu": "Simplified (avatar only)"
+    },
+    "resizeHandling": {
+      "debounce": "300ms recommended",
+      "behavior": "Re-evaluate breakpoint on resize, close mobile sidebar if switching to desktop",
+      "implementation": "Add window resize listener with debounce, update breakpoint state, handle sidebar state transitions"
     }
   },
   
@@ -239,6 +263,7 @@
       "activeNavItem": {
         "type": "string",
         "description": "Current active navigation item ID",
+        "determination": "Sync with router current route or URL hash, update on navigation",
         "persistence": "sync with router/URL"
       },
       "userMenuOpen": {
@@ -253,6 +278,11 @@
         "default": false,
         "persistence": "component state only"
       }
+    },
+    "ssrConsiderations": {
+      "localStorage": "Only access localStorage in onMounted/useEffect, check for window object existence",
+      "defaultState": "Use false as default for sidebarCollapsed, update after mount to prevent hydration mismatches",
+      "implementation": "Check typeof window !== 'undefined' before accessing localStorage, initialize state after component mount"
     }
   },
   
@@ -280,46 +310,70 @@
   },
   
   "stylingApproaches": {
+    "note": "These are implementation examples showing how to apply the designSystem specifications above using different styling tools. The designSystem section contains the authoritative design values that should be implemented regardless of styling approach.",
+    
     "tailwindCSS": {
-      "description": "Use utility classes with dynamic classes based on state",
-      "sidebarExample": "class='fixed left-0 top-0 h-full w-64 bg-gray-900 text-white transition-transform duration-300' :class=\"{'w-20': collapsed}\"",
-      "contentExample": "class='transition-all duration-300 pt-16 pb-15' :class=\"{'ml-64': !collapsed, 'ml-20': collapsed}\"",
-      "headerExample": "class='fixed top-0 h-16 transition-all duration-300' :class=\"{'left-64': !collapsed, 'left-20': collapsed}\"",
-      "footerExample": "class='fixed bottom-0 h-15 transition-all duration-300' :class=\"{'left-64': !collapsed, 'left-20': collapsed}\"",
-      "key": "Use transition utilities and conditional classes"
+      "description": "Use utility classes with dynamic classes based on state. Use arbitrary values for exact pixel values matching designSystem specifications.",
+      "sidebarExample": "class='fixed left-0 top-0 h-full w-[280px] bg-gray-900 text-white transition-all duration-300' :class=\"{'w-20': collapsed}\"",
+      "contentExample": "class='transition-all duration-300 pt-16 pb-[60px]' :class=\"{'ml-[280px]': !collapsed, 'ml-20': collapsed}\"",
+      "headerExample": "class='fixed top-0 h-16 transition-all duration-300' :class=\"{'left-[280px]': !collapsed, 'left-20': collapsed}\"",
+      "footerExample": "class='fixed bottom-0 h-[60px] transition-all duration-300' :class=\"{'left-[280px]': !collapsed, 'left-20': collapsed}\"",
+      "key": "Use transition utilities and conditional classes. Use arbitrary values [280px] for exact dimensions matching designSystem specifications.",
+      "note": "Use arbitrary values like w-[280px] instead of w-64 (256px) to match exact specifications. Use pb-[60px] instead of pb-15 (which doesn't exist in Tailwind). Map designSystem color values to Tailwind color palette or use arbitrary values."
     },
     "cssModules": {
-      "description": "Scoped CSS classes with conditional class names",
-      "approach": "Define .sidebar, .sidebar.collapsed classes, toggle via className logic",
-      "transitions": "Use CSS transition property for smooth animations"
+      "description": "Scoped CSS classes with conditional class names. Apply designSystem values directly in CSS.",
+      "approach": "Define .sidebar, .sidebar.collapsed classes using designSystem color, spacing, and typography values. Toggle via className logic.",
+      "example": ".sidebar { width: 280px; background: #1f2937; color: #ffffff; transition: width 300ms; } .sidebar.collapsed { width: 80px; }",
+      "note": "Use designSystem color values, spacing scale, and typography specifications directly in your CSS."
     },
     "styledComponents": {
-      "description": "CSS-in-JS with props",
-      "approach": "Pass collapsed prop and adjust styles dynamically",
-      "example": "const Sidebar = styled.aside`width: ${props => props.collapsed ? '80px' : '280px'}; transition: width 300ms;`"
+      "description": "CSS-in-JS with props. Map designSystem values to styled component props.",
+      "approach": "Pass collapsed prop and adjust styles dynamically using designSystem specifications",
+      "example": "const Sidebar = styled.aside`width: ${props => props.collapsed ? '80px' : '280px'}; background: ${props => props.theme.colors.sidebarBg || '#1f2937'}; transition: width 300ms;`",
+      "note": "Extract designSystem values into theme or constants, then reference in styled components."
     },
     "chakraUI": {
       "components": "Use Drawer (permanent variant on desktop, temporary on mobile), Box for content",
-      "approach": "Leverage Chakra's Drawer component with variant prop",
-      "transitions": "Use theme.transitions for consistent animations"
+      "approach": "Leverage Chakra's Drawer component with variant prop. Customize colors, spacing, and typography to match designSystem specifications.",
+      "theme": "Extend Chakra theme with designSystem color values, spacing scale, and typography settings.",
+      "transitions": "Use theme.transitions for consistent animations matching designSystem animation specifications"
     },
     "materialUI": {
       "components": "Use MUI Drawer (persistent variant on desktop, temporary on mobile), AppBar for header",
-      "approach": "MUI Drawer with variant='permanent' on desktop, variant='temporary' on mobile",
-      "transitions": "Use theme transitions and breakpoints"
+      "approach": "MUI Drawer with variant='permanent' on desktop, variant='temporary' on mobile. Customize theme to match designSystem specifications.",
+      "theme": "Override MUI theme colors, spacing, and typography to match designSystem values.",
+      "transitions": "Use theme transitions and breakpoints matching designSystem animation specifications"
     },
     "vanillaCSS": {
-      "description": "Standard CSS with class toggles",
-      "approach": "Define classes with transitions, toggle via JavaScript",
-      "example": ".sidebar { width: 280px; transition: width 300ms; } .sidebar.collapsed { width: 80px; } .header { position: fixed; top: 0; left: 280px; transition: left 300ms; } .header.sidebar-collapsed { left: 80px; } .footer { position: fixed; bottom: 0; left: 280px; transition: left 300ms; } .footer.sidebar-collapsed { left: 80px; }"
+      "description": "Standard CSS with class toggles. Apply designSystem values directly.",
+      "approach": "Define classes with transitions using designSystem specifications, toggle via JavaScript",
+      "example": ".sidebar { width: 280px; background: #1f2937; color: #ffffff; transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1); } .sidebar.collapsed { width: 80px; } .header { position: fixed; top: 0; left: 280px; background: #ffffff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); transition: left 300ms; } .header.sidebar-collapsed { left: 80px; }",
+      "note": "Use designSystem color values, spacing, typography, shadows, and animation specifications directly in CSS."
+    },
+    "sass": {
+      "description": "SCSS with variables and mixins. Define designSystem values as SCSS variables.",
+      "approach": "Create SCSS variables for designSystem colors, spacing, typography. Use mixins for common patterns.",
+      "example": "$sidebar-width: 280px; $sidebar-bg: #1f2937; $sidebar-text: #ffffff; .sidebar { width: $sidebar-width; background: $sidebar-bg; color: $sidebar-text; }",
+      "note": "Map all designSystem specifications to SCSS variables for maintainability."
     }
   },
   
   "animations": {
     "sidebarToggle": {
       "duration": "300ms",
-      "easing": "ease-in-out or cubic-bezier(0.4, 0, 0.2, 1)",
-      "properties": ["width (sidebar)", "margin-left (content)", "left (header)", "left (footer)"]
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": {
+        "sidebar": ["width", "transform"],
+        "header": ["left"],
+        "footer": ["left"],
+        "content": ["margin-left"]
+      },
+      "performance": {
+        "useTransform": "Prefer transform over width/left for better performance when possible",
+        "willChange": "Set will-change: transform on animating elements",
+        "hardwareAcceleration": "Use transform3d(0,0,0) to trigger GPU acceleration if needed"
+      }
     },
     "mobileOverlay": {
       "backdropFade": "200ms",
@@ -339,7 +393,9 @@
       "tabOrder": "Header → Sidebar → Content",
       "sidebarItems": "Tab to focus, Enter/Space to activate",
       "escapeKey": "Close dropdowns and mobile sidebar",
-      "skipLink": "Skip to content link for screen readers"
+      "skipLink": "Skip to content link for screen readers",
+      "focusTrap": "Trap focus within sidebar when open on mobile (use focus-trap library or manual implementation)",
+      "focusRestoration": "Restore focus to menu toggle button when sidebar closes"
     },
     "ariaAttributes": {
       "sidebar": "role='navigation', aria-label='Main navigation'",
@@ -356,38 +412,199 @@
     }
   },
   
-  "colorGuidelines": {
-    "sidebar": {
-      "background": "Darker than content (for contrast) or white with border",
-      "text": "High contrast with background",
-      "activeItem": "Primary color background (10-20% opacity) or solid",
-      "hover": "Subtle background change (5-10% opacity)",
-      "icons": "Match text color or use primary color for active"
+  "designSystem": {
+    "note": "These design specifications are tool-agnostic and should be implemented using the project's chosen styling approach. The stylingApproaches section provides implementation examples, but these design values are the source of truth.",
+    
+    "colorGuidelines": {
+      "sidebar": {
+        "background": {
+          "light": "Dark neutral (e.g., #1f2937, #111827) or white (#ffffff) with subtle border",
+          "dark": "#1a1a1a or #0f172a",
+          "principle": "Should provide clear visual separation from content area"
+        },
+        "text": {
+          "light": "High contrast white (#ffffff) or light gray (#f3f4f6) on dark background",
+          "dark": "#e0e0e0 or #f1f5f9",
+          "contrast": "Minimum 4.5:1 contrast ratio (WCAG AA)"
+        },
+        "activeItem": {
+          "background": "Primary color at 10-20% opacity overlay, or solid primary color",
+          "text": "Primary color or white if using solid background",
+          "indicator": "Left border 3-4px in primary color, or full background"
+        },
+        "hover": {
+          "background": "Subtle background change (5-10% opacity overlay of primary or neutral)",
+          "transition": "Smooth 150ms transition"
+        },
+        "icons": {
+          "default": "Match text color",
+          "active": "Primary color or white",
+          "size": "20-24px"
+        }
+      },
+      "header": {
+        "background": {
+          "light": "White (#ffffff) or very light gray (#f9fafb)",
+          "dark": "#1a1a1a or #0f172a"
+        },
+        "border": {
+          "style": "1px solid border-bottom or subtle box-shadow",
+          "color": {
+            "light": "rgba(0, 0, 0, 0.05) to rgba(0, 0, 0, 0.1)",
+            "dark": "rgba(255, 255, 255, 0.1)"
+          }
+        },
+        "text": {
+          "light": "Dark gray (#111827, #1f2937) or black (#000000)",
+          "dark": "#e0e0e0 or #f1f5f9"
+        },
+        "icons": {
+          "default": "Medium gray (#6b7280, #9ca3af)",
+          "hover": "Darker gray (#374151) or primary color",
+          "size": "20-24px"
+        }
+      },
+      "footer": {
+        "background": {
+          "light": "White (#ffffff) or light gray (#f9fafb) - match header",
+          "dark": "#1a1a1a or #0f172a - match header"
+        },
+        "border": {
+          "style": "1px solid border-top or subtle box-shadow on top",
+          "color": {
+            "light": "rgba(0, 0, 0, 0.05) to rgba(0, 0, 0, 0.1)",
+            "dark": "rgba(255, 255, 255, 0.1)"
+          }
+        },
+        "text": {
+          "light": "Muted dark gray (rgba(0, 0, 0, 0.6) or #6b7280)",
+          "dark": "Muted light gray (rgba(255, 255, 255, 0.6) or #9ca3af)"
+        },
+        "links": {
+          "default": "Match footer text color",
+          "hover": "Primary color or darker/lighter variant"
+        }
+      },
+      "content": {
+        "background": {
+          "light": "Light gray (#f5f5f5, #f9fafb) or white (#ffffff)",
+          "dark": "#121212 or #0f172a"
+        },
+        "text": {
+          "light": "Dark gray (#111827, #1f2937, #1a1a1a)",
+          "dark": "#e0e0e0 or #f1f5f9"
+        },
+        "contrast": "Ensure 4.5:1 contrast ratio minimum (WCAG AA)"
+      },
+      "backdrop": {
+        "mobile": {
+          "background": "rgba(0, 0, 0, 0.5) to rgba(0, 0, 0, 0.75)",
+          "blur": "Optional: backdrop-filter: blur(4px) for modern browsers"
+        }
+      },
+      "notifications": {
+        "badge": {
+          "background": "Red (#ef4444, #dc2626) or primary color",
+          "text": "White (#ffffff)",
+          "size": "18-20px circle or pill shape"
+        }
+      }
     },
-    "header": {
-      "background": "White or light gray",
-      "border": "Subtle 1px border or light shadow",
-      "text": "Dark gray or black",
-      "icons": "Medium gray, darker on hover"
+    
+    "typography": {
+      "fontFamily": {
+        "note": "Use project's font stack, typically: system-ui, -apple-system, sans-serif or custom font",
+        "sidebar": {
+          "navItems": "14-16px, medium weight (500-600)",
+          "logo": "18-24px, bold (700)"
+        },
+        "header": {
+          "title": "20-24px, semibold (600) or bold (700)",
+          "breadcrumbs": "14-16px, regular (400) or medium (500)"
+        },
+        "footer": {
+          "text": "14px, regular (400)",
+          "links": "14px, regular (400)"
+        },
+        "content": {
+          "body": "16px, regular (400)",
+          "headings": "Use semantic heading sizes (h1: 32-36px, h2: 24-28px, etc.)"
+        }
+      },
+      "lineHeight": {
+        "tight": "1.25 (headings)",
+        "normal": "1.5 (body text)",
+        "relaxed": "1.75 (long-form content)"
+      }
     },
-    "footer": {
-      "background": "White or light gray (match header)",
-      "border": "Subtle 1px border-top or light shadow on top",
-      "text": "Dark gray or black (muted, rgba(0,0,0,0.6))",
-      "links": "Muted color, primary color on hover"
+    
+    "spacing": {
+      "scale": {
+        "note": "Use consistent spacing scale (4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px) or project's spacing system",
+        "sidebar": {
+          "padding": "16px horizontal, 12px vertical for nav items",
+          "gap": "12-16px between icon and text",
+          "sectionGap": "24-32px between sections"
+        },
+        "header": {
+          "padding": "16-24px horizontal",
+          "gap": "16-24px between elements"
+        },
+        "footer": {
+          "padding": "16-24px horizontal",
+          "gap": "24px between links"
+        },
+        "content": {
+          "padding": "24-32px on all sides (desktop), 16px (mobile)",
+          "maxWidth": "Optional: 1400px for better readability on large screens"
+        }
+      }
     },
-    "content": {
-      "background": "Light gray (#f5f5f5) or white",
-      "text": "Dark gray (#333, #1a1a1a)",
-      "contrast": "Ensure 4.5:1 contrast ratio minimum"
+    
+    "shadows": {
+      "elevation": {
+        "note": "Use subtle shadows for depth and separation",
+        "header": {
+          "light": "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+          "dark": "0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)"
+        },
+        "footer": {
+          "light": "0 -1px 3px rgba(0, 0, 0, 0.1), 0 -1px 2px rgba(0, 0, 0, 0.06)",
+          "dark": "0 -1px 3px rgba(0, 0, 0, 0.3), 0 -1px 2px rgba(0, 0, 0, 0.2)"
+        },
+        "dropdowns": {
+          "light": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+          "dark": "0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)"
+        },
+        "sidebar": {
+          "light": "Optional: 2px 0 8px rgba(0, 0, 0, 0.05) for light sidebar",
+          "dark": "Optional: 2px 0 8px rgba(0, 0, 0, 0.2) for dark sidebar"
+        }
+      }
     },
-    "darkMode": {
-      "sidebar": "#1a1a1a",
-      "content": "#121212",
-      "text": "#e0e0e0",
-      "header": "#1a1a1a",
-      "footer": "#1a1a1a",
-      "adjustments": "Lighter shadows, reduced saturation"
+    
+    "visualHierarchy": {
+      "principles": [
+        "Sidebar should be visually distinct from content (different background or border)",
+        "Header and footer should have subtle elevation (shadow or border) to separate from content",
+        "Active navigation items should be clearly highlighted",
+        "Hover states should provide clear feedback",
+        "Icons and text should maintain proper visual balance",
+        "Spacing should create clear grouping and hierarchy"
+      ],
+      "contrast": {
+        "minimum": "4.5:1 for text (WCAG AA)",
+        "recommended": "7:1 for important text (WCAG AAA)",
+        "interactive": "Clear visual feedback on hover/focus states"
+      }
+    },
+    
+    "borderRadius": {
+      "buttons": "6-8px",
+      "dropdowns": "8-12px",
+      "avatars": "50% (circle)",
+      "badges": "12-16px (pill shape) or 4-6px (rounded square)",
+      "cards": "8-12px (if used in content)"
     }
   },
   
@@ -448,10 +665,47 @@
     "stickyFooter": "Footer sticks to bottom when content is short, scrolls when content is long"
   },
   
+  "zIndexLayers": {
+    "backdrop": 40,
+    "sidebar": 50,
+    "header": 40,
+    "footer": 40,
+    "dropdowns": 50,
+    "tooltips": 60
+  },
+  
+  "implementationDetails": {
+    "bodyScrollLock": {
+      "when": "Mobile sidebar open",
+      "how": "document.body.style.overflow = 'hidden'",
+      "cleanup": "Restore on close (document.body.style.overflow = '')"
+    },
+    "focusManagement": {
+      "trapFocus": "Use focus-trap library or manual implementation to trap focus within sidebar when open on mobile",
+      "restoreFocus": "Return focus to trigger button (menu toggle) when sidebar closes"
+    },
+    "backdropClick": {
+      "handler": "Close sidebar when backdrop is clicked",
+      "preventBubbling": "Prevent event bubbling to avoid closing immediately after opening"
+    }
+  },
+  
+  "edgeCases": {
+    "longNavigationLabels": "Truncate with ellipsis, show tooltip on hover, maintain min-width for icons",
+    "manyNavigationItems": "Sidebar should scroll, maintain scroll position when toggling collapsed state",
+    "rapidToggling": "Debounce or disable toggle during transition to prevent animation conflicts",
+    "windowResizeDuringAnimation": "Complete current animation before re-evaluating breakpoint",
+    "verySmallScreens": "Consider further reducing padding/spacing on screens < 320px",
+    "contentOverflow": "Ensure content doesn't overflow horizontally when sidebar collapses"
+  },
+  
   "testingChecklist": [
     "Sidebar toggles smoothly on desktop",
     "Sidebar opens as overlay on mobile",
     "Mobile backdrop dismisses sidebar",
+    "Body scroll is locked when mobile sidebar is open",
+    "Focus is trapped within mobile sidebar",
+    "Focus is restored to menu toggle when sidebar closes",
     "Content area adjusts to sidebar state",
     "Header stays fixed on scroll and adjusts to sidebar state",
     "Footer stays fixed at bottom and adjusts to sidebar state",
@@ -464,9 +718,13 @@
     "Sidebar state persists on reload",
     "No horizontal scroll when sidebar collapses",
     "Responsive at all breakpoints (mobile, tablet, desktop)",
+    "Window resize handling works correctly (debounced, closes mobile sidebar on desktop switch)",
     "Touch interactions work on mobile",
     "Animations are smooth (60fps)",
-    "No layout shift or flicker on load"
+    "No layout shift or flicker on load",
+    "SSR/hydration safe (localStorage accessed after mount)",
+    "Long navigation labels are truncated properly",
+    "Many navigation items scroll correctly in sidebar"
   ],
   
   "aiImplementationPrompt": "Create a responsive dashboard layout with a collapsible sidebar (280px expanded, 80px collapsed), fixed header (64px height), fixed footer (60px height), and scrollable content area. The sidebar should overlay on mobile (<768px) and persist its collapsed state in localStorage. Both header and footer should adjust their left position based on sidebar state (280px when expanded, 80px when collapsed on desktop). Content area should have margin-top: 64px and margin-bottom: 60px to account for fixed header and footer. Include smooth 300ms transitions, keyboard accessibility with ARIA labels, and active state highlighting for current page. Ensure no horizontal scroll when sidebar collapses. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. Include mobile menu toggle, user dropdown, and notifications button in the header. Footer should contain copyright and navigation links.",

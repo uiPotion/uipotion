@@ -73,6 +73,13 @@ AppContainer (Full viewport)
 - Active state indicator: Background color or left border (3-4px)
 - Hover state: Subtle background color change
 - Collapsed state: Center icon only, show tooltip on hover
+  - Tooltip trigger: hover
+  - Tooltip position: right
+  - Tooltip delay: 200ms
+  - Fallback: Use `aria-label` or `sr-only` text if tooltip library not available
+- Scrollbar: Custom thin scrollbar (6px width) when many items
+  - Dark sidebar: `rgba(255, 255, 255, 0.2)`
+  - Light sidebar: `rgba(0, 0, 0, 0.2)`
 
 #### Collapse Toggle
 - Position: Bottom of sidebar or after nav items
@@ -84,13 +91,19 @@ AppContainer (Full viewport)
 - Persists state in localStorage/session
 - Smooth transition animation (200-300ms ease-in-out)
 - On mobile: Overlay with backdrop, dismissible
+  - Backdrop click closes sidebar (prevent event bubbling)
+  - Body scroll is locked when sidebar is open (`document.body.style.overflow = 'hidden'`)
+  - Focus is trapped within sidebar when open
+  - Focus is restored to menu toggle when sidebar closes
 - Keyboard accessible (Tab navigation, Enter/Space to activate)
+- Custom scrollbar styling for navigation menu (6px width, subtle color)
 
 ### 2. Header Component
 
 **Dimensions:**
 - Height: 64px (fixed)
 - Width: 100% of content area
+- Width calculation: `calc(100% - sidebar-width)` or use CSS Grid/Flexbox approach
 - Position: Fixed or sticky
 
 **Layout:**
@@ -143,30 +156,64 @@ AppContainer (Full viewport)
 **Behavior:**
 - Scrollable (overflow-y: auto)
 - Margin-top: Header height (64px)
+- Margin-bottom: Footer height (60px)
 - Margin-left: Sidebar width (dynamic)
 - Smooth transition when sidebar toggles
-- Responsive padding (reduces on mobile)
+- Responsive padding (reduces on mobile to 16px)
+
+### 4. Footer Component
+
+**Dimensions:**
+- Height: 60px (fixed)
+- Width: 100% of content area
+- Width calculation: `calc(100% - sidebar-width)` or use CSS Grid/Flexbox approach
+- Position: Fixed at bottom
+
+**Layout:**
+```
+[Copyright]                    [Footer Navigation Links]
+```
+
+**Elements:**
+- Copyright: 14px font size
+- Footer Navigation: Links (Privacy, Terms, Support), 14px, 24px gap between links
+
+**Behavior:**
+- Fixed at bottom, always visible even with minimal content
+- Adjusts left position based on sidebar state (280px expanded, 80px collapsed on desktop)
+- Full width (left: 0) on mobile/tablet
+- Shadow or border-top for depth
+- Smooth 300ms transition when sidebar toggles
 
 ## Responsive Breakpoints
 
 ### Desktop (≥1024px)
 - Sidebar: Visible, expanded by default
-- Header: Full width minus sidebar
-- Content: Fills remaining space
+- Header: Full width minus sidebar, left: 280px (80px when collapsed)
+- Footer: Full width minus sidebar, left: 280px (80px when collapsed)
+- Content: Fills remaining space between header and footer
 - Menu toggle: Hidden
 
 ### Tablet (768px - 1023px)
 - Sidebar: Collapsed by default or overlay mode
-- Header: Full width
+- Header: Full width (left: 0)
+- Footer: Full width (left: 0)
 - Content: Full width
 - Menu toggle: Visible
 
-### Mobile (<768px)
+### Mobile (<767px)
 - Sidebar: Hidden by default, fullscreen overlay when open
-- Header: Full width, compact mode
+- Header: Full width, compact mode (left: 0)
+- Footer: Full width, compact mode (left: 0)
 - Content: Full width, reduced padding (16px)
 - Menu toggle: Visible
 - User menu: Simplified (avatar only)
+
+### Window Resize Handling
+- **Debounce**: 300ms recommended to avoid excessive re-evaluations
+- **Behavior**: Re-evaluate breakpoint on resize, close mobile sidebar if switching to desktop
+- **Implementation**: Add window resize listener with debounce, update breakpoint state, handle sidebar state transitions
+- **Edge case**: Complete current animation before re-evaluating breakpoint on resize
 
 ## Interaction Patterns
 
@@ -197,6 +244,8 @@ AppContainer (Full viewport)
 - Sidebar items: Tab to focus, Enter/Space to activate
 - Escape key: Close dropdowns and mobile sidebar
 - Skip to content link for screen readers
+- **Focus trap**: Trap focus within sidebar when open on mobile (use focus-trap library or manual implementation)
+- **Focus restoration**: Restore focus to menu toggle button when sidebar closes
 
 ### ARIA Attributes
 - Sidebar: `role="navigation"`, `aria-label="Main navigation"`
@@ -211,25 +260,96 @@ AppContainer (Full viewport)
 - Hidden text for icon-only nav items (collapsed state)
 - Notification badge count announced
 
-## Color & Styling Guidelines
+## Design System Specifications
 
-### Sidebar
-- Background: Darker than content (for contrast) or white with border
-- Text: High contrast with background
-- Active item: Primary color background (10-20% opacity) or solid
-- Hover: Subtle background change (5-10% opacity)
-- Icons: Match text color or use primary color for active
+**Important**: The design specifications below are tool-agnostic and should be implemented using your project's chosen styling approach (Tailwind, CSS Modules, styled-components, Chakra UI, Material-UI, SCSS, etc.). The styling examples in the "Code Implementation Patterns" section show how to apply these design values, but these specifications are the source of truth for the design.
 
-### Header
-- Background: White or light gray
-- Border/Shadow: Subtle (1px border or light shadow)
-- Text: Dark gray or black
-- Icons: Medium gray, darker on hover
+### Color Guidelines
 
-### Content Area
-- Background: Light gray (#f5f5f5) or white
-- Text: Dark gray (#333, #1a1a1a)
-- Ensure 4.5:1 contrast ratio minimum
+#### Sidebar
+- **Background (Light)**: Dark neutral (e.g., #1f2937, #111827) or white (#ffffff) with subtle border
+- **Background (Dark)**: #1a1a1a or #0f172a
+- **Text (Light)**: High contrast white (#ffffff) or light gray (#f3f4f6) on dark background
+- **Text (Dark)**: #e0e0e0 or #f1f5f9
+- **Active Item**: Primary color at 10-20% opacity overlay, or solid primary color. Text in primary color or white if using solid background
+- **Hover**: Subtle background change (5-10% opacity overlay of primary or neutral) with smooth 150ms transition
+- **Icons**: Match text color by default, primary color or white when active
+- **Contrast**: Minimum 4.5:1 contrast ratio (WCAG AA)
+
+#### Header
+- **Background (Light)**: White (#ffffff) or very light gray (#f9fafb)
+- **Background (Dark)**: #1a1a1a or #0f172a
+- **Border/Shadow**: 1px solid border-bottom or subtle box-shadow (rgba(0, 0, 0, 0.05) to rgba(0, 0, 0, 0.1) for light, rgba(255, 255, 255, 0.1) for dark)
+- **Text (Light)**: Dark gray (#111827, #1f2937) or black (#000000)
+- **Text (Dark)**: #e0e0e0 or #f1f5f9
+- **Icons**: Medium gray (#6b7280, #9ca3af) by default, darker gray (#374151) or primary color on hover
+
+#### Footer
+- **Background**: Match header (white or light gray for light mode, #1a1a1a for dark mode)
+- **Border**: 1px solid border-top or subtle box-shadow on top (same colors as header)
+- **Text**: Muted dark gray (rgba(0, 0, 0, 0.6) or #6b7280) for light, muted light gray (rgba(255, 255, 255, 0.6) or #9ca3af) for dark
+- **Links**: Match footer text color by default, primary color or darker/lighter variant on hover
+
+#### Content Area
+- **Background (Light)**: Light gray (#f5f5f5, #f9fafb) or white (#ffffff)
+- **Background (Dark)**: #121212 or #0f172a
+- **Text (Light)**: Dark gray (#111827, #1f2937, #1a1a1a)
+- **Text (Dark)**: #e0e0e0 or #f1f5f9
+- **Contrast**: Ensure 4.5:1 contrast ratio minimum (WCAG AA), 7:1 recommended for important text (WCAG AAA)
+
+#### Mobile Backdrop
+- **Background**: rgba(0, 0, 0, 0.5) to rgba(0, 0, 0, 0.75)
+- **Optional**: backdrop-filter: blur(4px) for modern browsers
+
+### Typography
+
+- **Font Family**: Use project's font stack (typically: system-ui, -apple-system, sans-serif or custom font)
+- **Sidebar Nav Items**: 14-16px, medium weight (500-600)
+- **Sidebar Logo**: 18-24px, bold (700)
+- **Header Title**: 20-24px, semibold (600) or bold (700)
+- **Header Breadcrumbs**: 14-16px, regular (400) or medium (500)
+- **Footer Text**: 14px, regular (400)
+- **Content Body**: 16px, regular (400)
+- **Content Headings**: Use semantic heading sizes (h1: 32-36px, h2: 24-28px, etc.)
+- **Line Height**: 1.25 for headings, 1.5 for body text, 1.75 for long-form content
+
+### Spacing System
+
+Use consistent spacing scale (4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px) or your project's spacing system:
+
+- **Sidebar**: 16px horizontal padding, 12px vertical padding for nav items, 12-16px gap between icon and text, 24-32px gap between sections
+- **Header**: 16-24px horizontal padding, 16-24px gap between elements
+- **Footer**: 16-24px horizontal padding, 24px gap between links
+- **Content**: 24-32px padding on all sides (desktop), 16px (mobile), optional max-width 1400px for better readability
+
+### Shadows & Elevation
+
+Use subtle shadows for depth and separation:
+
+- **Header Shadow (Light)**: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)
+- **Header Shadow (Dark)**: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)
+- **Footer Shadow (Light)**: 0 -1px 3px rgba(0, 0, 0, 0.1), 0 -1px 2px rgba(0, 0, 0, 0.06)
+- **Footer Shadow (Dark)**: 0 -1px 3px rgba(0, 0, 0, 0.3), 0 -1px 2px rgba(0, 0, 0, 0.2)
+- **Dropdowns (Light)**: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)
+- **Dropdowns (Dark)**: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)
+
+### Border Radius
+
+- **Buttons**: 6-8px
+- **Dropdowns**: 8-12px
+- **Avatars**: 50% (circle)
+- **Badges**: 12-16px (pill shape) or 4-6px (rounded square)
+- **Cards**: 8-12px (if used in content)
+
+### Visual Hierarchy Principles
+
+1. Sidebar should be visually distinct from content (different background or border)
+2. Header and footer should have subtle elevation (shadow or border) to separate from content
+3. Active navigation items should be clearly highlighted
+4. Hover states should provide clear feedback
+5. Icons and text should maintain proper visual balance
+6. Spacing should create clear grouping and hierarchy
+7. Interactive elements should have clear visual feedback on hover/focus states
 
 ## State Management Considerations
 
@@ -239,6 +359,7 @@ AppContainer (Full viewport)
 1. `sidebarOpen: boolean` - Whether sidebar is visible (mobile)
 2. `sidebarCollapsed: boolean` - Whether sidebar is in icon-only mode (desktop)
 3. `activeNavItem: string` - Current active navigation item ID
+   - **Determination**: Sync with router current route or URL hash, update on navigation
 4. `userMenuOpen: boolean` - User dropdown state
 5. `notificationsOpen: boolean` - Notifications dropdown state
 6. `notifications: array` - List of notifications with unread count
@@ -247,6 +368,11 @@ AppContainer (Full viewport)
 - `sidebarCollapsed` → localStorage
 - `activeNavItem` → Sync with router/URL
 - Other dropdown states → Component state only (don't persist)
+
+### SSR/Hydration Considerations
+- **localStorage access**: Only access localStorage in `onMounted`/`useEffect`, check for `window` object existence
+- **Default state**: Use `false` as default for `sidebarCollapsed`, update after mount to prevent hydration mismatches
+- **Implementation**: Check `typeof window !== 'undefined'` before accessing localStorage, initialize state after component mount
 
 ## Code Implementation Patterns
 
@@ -319,36 +445,50 @@ AppContainer (Full viewport)
 
 ### CSS/Styling Approaches
 
+**Note**: The examples below show how to implement the design specifications using different styling tools. Always refer to the "Design System Specifications" section above for the authoritative design values, then adapt them to your project's styling approach.
+
 #### Tailwind CSS Pattern
 ```html
 <!-- Sidebar -->
-<aside class="fixed left-0 top-0 h-full w-64 bg-gray-900 text-white transition-transform duration-300 ease-in-out md:translate-x-0" 
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-gray-900 text-white transition-all duration-300 ease-in-out md:translate-x-0" 
        :class="{'w-20': collapsed, '-translate-x-full': !mobileOpen}">
   <!-- Content -->
 </aside>
 
 <!-- Header -->
 <header class="fixed top-0 h-16 bg-white shadow-sm transition-all duration-300"
-        :class="{'left-64': !collapsed, 'left-20': collapsed}">
+        :class="{'left-[280px]': !collapsed, 'left-20': collapsed}">
   <!-- Content -->
 </header>
 
+<!-- Footer -->
+<footer class="fixed bottom-0 h-[60px] bg-white shadow-sm transition-all duration-300"
+        :class="{'left-[280px]': !collapsed, 'left-20': collapsed}">
+  <!-- Content -->
+</footer>
+
 <!-- Main Content -->
-<main class="transition-all duration-300 pt-16"
-      :class="{'ml-64': !collapsed, 'ml-20': collapsed}">
+<main class="transition-all duration-300 pt-16 pb-[60px]"
+      :class="{'ml-[280px]': !collapsed, 'ml-20': collapsed}">
   <!-- Content -->
 </main>
 ```
 
+**Note**: Use arbitrary values like `w-[280px]` instead of `w-64` (256px) to match exact design specifications. Use `pb-[60px]` instead of `pb-15` (which doesn't exist in Tailwind). Map design system color values to Tailwind color palette or use arbitrary values like `bg-[#1f2937]`.
+
 #### CSS Modules Pattern
 ```css
+/* Apply design system values directly */
 .sidebar {
   position: fixed;
   left: 0;
   top: 0;
   height: 100vh;
   width: 280px;
-  transition: transform 300ms ease-in-out;
+  background: #1f2937; /* From design system */
+  color: #ffffff; /* From design system */
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05); /* From design system */
 }
 
 .sidebar.collapsed {
@@ -361,7 +501,9 @@ AppContainer (Full viewport)
   left: 280px;
   right: 0;
   height: 64px;
-  transition: left 300ms ease-in-out;
+  background: #ffffff; /* From design system */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* From design system */
+  transition: left 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header.sidebarCollapsed {
@@ -370,8 +512,11 @@ AppContainer (Full viewport)
 
 .content {
   margin-top: 64px;
+  margin-bottom: 60px;
   margin-left: 280px;
-  transition: margin-left 300ms ease-in-out;
+  padding: 24px; /* From design system spacing */
+  background: #f5f5f5; /* From design system */
+  transition: margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .content.sidebarCollapsed {
@@ -383,15 +528,25 @@ AppContainer (Full viewport)
 - Use Drawer component for sidebar (persistent variant on desktop, temporary on mobile)
 - Use AppBar for header with elevation
 - Use Box/Container for main content with appropriate margins
-- Use theme.transitions for consistent animations
+- **Extend theme** with design system color values, spacing scale, and typography settings
+- Use theme.transitions for consistent animations matching design system specifications
 - Leverage theme breakpoints for responsive behavior
+- **Customize colors, spacing, and typography** to match design system specifications
 
 ## Animation Specifications
 
 ### Sidebar Toggle Animation
 - Duration: 300ms
-- Easing: ease-in-out or cubic-bezier(0.4, 0, 0.2, 1)
-- Properties: width (sidebar), margin-left (content), left (header)
+- Easing: cubic-bezier(0.4, 0, 0.2, 1)
+- Properties:
+  - Sidebar: `width`, `transform`
+  - Header: `left`
+  - Footer: `left`
+  - Content: `margin-left`
+- Performance:
+  - Prefer `transform` over `width`/`left` for better performance when possible
+  - Set `will-change: transform` on animating elements
+  - Use `transform3d(0,0,0)` to trigger GPU acceleration if needed
 
 ### Mobile Overlay
 - Backdrop fade: 200ms
@@ -403,6 +558,53 @@ AppContainer (Full viewport)
 - Easing: ease-out
 - Transform: translateY(-8px) → translateY(0)
 - Opacity: 0 → 1
+
+## Z-Index Layer System
+
+To ensure proper layering of elements:
+- **Backdrop**: 40
+- **Sidebar**: 50
+- **Header**: 40
+- **Footer**: 40
+- **Dropdowns**: 50
+- **Tooltips**: 60
+
+## Implementation Details
+
+### Body Scroll Lock (Mobile)
+- **When**: Mobile sidebar is open
+- **How**: Set `document.body.style.overflow = 'hidden'`
+- **Cleanup**: Restore on close (`document.body.style.overflow = ''`)
+
+### Focus Management
+- **Focus trap**: Trap focus within sidebar when open on mobile (use focus-trap library or manual implementation)
+- **Focus restoration**: Return focus to trigger button (menu toggle) when sidebar closes
+
+### Backdrop Click
+- Close sidebar when backdrop is clicked
+- Prevent event bubbling to avoid closing immediately after opening
+
+## Edge Cases
+
+### Long Navigation Labels
+- Truncate with ellipsis, show tooltip on hover
+- Maintain min-width for icons
+
+### Many Navigation Items
+- Sidebar should scroll, maintain scroll position when toggling collapsed state
+- Use custom scrollbar styling (6px width, subtle color)
+
+### Rapid Toggling
+- Debounce or disable toggle during transition to prevent animation conflicts
+
+### Window Resize During Animation
+- Complete current animation before re-evaluating breakpoint
+
+### Very Small Screens
+- Consider further reducing padding/spacing on screens < 320px
+
+### Content Overflow
+- Ensure content doesn't overflow horizontally when sidebar collapses
 
 ## Common Variations
 
@@ -434,17 +636,28 @@ When implementing this layout, test:
 - [ ] Sidebar toggles smoothly on desktop
 - [ ] Sidebar opens as overlay on mobile
 - [ ] Mobile backdrop dismisses sidebar
+- [ ] Body scroll is locked when mobile sidebar is open
+- [ ] Focus is trapped within mobile sidebar
+- [ ] Focus is restored to menu toggle when sidebar closes
 - [ ] Content area adjusts to sidebar state
-- [ ] Header stays fixed on scroll
+- [ ] Header stays fixed on scroll and adjusts to sidebar state
+- [ ] Footer stays fixed at bottom and adjusts to sidebar state
+- [ ] Footer is always visible even with minimal content
+- [ ] Content area has proper spacing for header (margin-top: 64px) and footer (margin-bottom: 60px)
 - [ ] Active navigation item is highlighted
 - [ ] User dropdown opens and closes correctly
 - [ ] Keyboard navigation works throughout
 - [ ] Screen reader announces state changes
 - [ ] Sidebar state persists on reload
-- [ ] Responsive at all breakpoints
+- [ ] No horizontal scroll when sidebar collapses
+- [ ] Responsive at all breakpoints (mobile, tablet, desktop)
+- [ ] Window resize handling works correctly (debounced, closes mobile sidebar on desktop switch)
 - [ ] Touch interactions work on mobile
 - [ ] Animations are smooth (60fps)
 - [ ] No layout shift or flicker on load
+- [ ] SSR/hydration safe (localStorage accessed after mount)
+- [ ] Long navigation labels are truncated properly
+- [ ] Many navigation items scroll correctly in sidebar
 
 ## AI Agent Implementation Prompt Template
 
