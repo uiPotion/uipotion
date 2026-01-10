@@ -1,132 +1,148 @@
 {{> head title="About UIPotion" description="Learn how UIPotion works and how to use it with AI coding assistants" }}
 
-<div class="container page-container about-page">
-  <article class="page-content">
-    <h1 class="page-content-title">About UIPotion</h1>
-    
-    <section class="about-section">
-      <h2>The Problem</h2>
-      <p>Traditional UI component libraries have a fundamental problem: <strong>maintenance burden</strong>. Every framework update, every new pattern, every bug fix requires constant work. And developers still need to adapt the code to their specific project setup.</p>
-    </section>
-    
-    <section class="about-section">
-      <h2>Our Approach</h2>
-      <p>UIPotion takes a different approach: <strong>we don't provide code, we provide specifications</strong>.</p>
-      <p>Each "potion" is a comprehensive guide written specifically for AI coding assistants. It includes:</p>
-      <ul>
-        <li>Detailed component specifications (dimensions, behavior, states)</li>
-        <li>Responsive breakpoints and mobile patterns</li>
-        <li>Accessibility requirements (ARIA, keyboard navigation)</li>
-        <li>Framework-specific implementation patterns (React, Vue, Angular, etc.)</li>
-        <li>Styling approaches (Tailwind, CSS Modules, Chakra, Material-UI, etc.)</li>
-        <li>Animation specifications and timing</li>
-        <li>Testing checklists</li>
-      </ul>
-    </section>
-    
-    <section class="about-section">
-      <h2>How It Works</h2>
+<div class="about-page">
+  <!-- Hero Header -->
+  <header class="about-hero">
+    <div class="about-hero-container">
+      <div class="about-breadcrumb">
+        <a href="{{relativePath 'index.html'}}">← Home</a>
+      </div>
       
-      <h3>For Developers</h3>
-      <ol>
-        <li><strong>Browse potions</strong> on this website to find what you need (e.g., dashboard layout, pricing table, dialog)</li>
-        <li><strong>Copy the potion URL</strong> or JSON link</li>
-        <li><strong>Tell your AI assistant</strong>: "Implement the dashboard layout from this UIPotion guide" + paste link</li>
-        <li><strong>Specify your stack</strong>: "Use React with Tailwind CSS" (or whatever you're using)</li>
-        <li><strong>AI generates the code</strong> adapted to your specific framework and styling preferences</li>
-      </ol>
+      <h1 class="about-hero-title">About UIPotion</h1>
       
-      <h3>For AI Agents</h3>
-      <p>AI agents can discover potions automatically:</p>
-      <ol>
-        <li>Load the manifest: <code>https://uipotion.com/jsonData/uipotion-manifest.json</code></li>
-        <li>Browse available potions: <code>https://uipotion.com/jsonData/potions-index.json</code></li>
-        <li>Load specific guide: <code>https://uipotion.com/jsonData/potions/[potion-id].json</code></li>
-        <li>Parse specifications and adapt to user's framework/styling choices</li>
-        <li>Generate implementation code</li>
-      </ol>
-    </section>
-    
-    <section class="about-section">
-      <h2>Example Workflow</h2>
-      <div class="example-box">
-        <p><strong>Developer says:</strong></p>
-        <p>"I need a dashboard layout with collapsible sidebar. I'm using React and Tailwind CSS. Here's the guide: https://uipotion.com/potions/layouts/dashboard.html"</p>
+      <p class="about-hero-description">
+        Learn how UIPotion works and how to use it with AI coding assistants to build production-ready UI components.
+      </p>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="about-main">
+    <div class="about-main-container">
+      <article class="about-article">
+        <section class="about-section">
+          <h2>The Problem</h2>
+          <p>Traditional UI component libraries have a fundamental problem: <strong>maintenance burden</strong>. Every framework update, every new pattern, every bug fix requires constant work. And developers still need to adapt the code to their specific project setup.</p>
+        </section>
         
-        <p><strong>AI agent:</strong></p>
-        <ol>
-          <li>Loads the dashboard-layout.json guide</li>
-          <li>Understands the component structure and specifications</li>
-          <li>Adapts the patterns to React (useState, useEffect, etc.)</li>
-          <li>Uses Tailwind utility classes for styling</li>
-          <li>Generates complete, working code with proper accessibility</li>
-        </ol>
+        <section class="about-section">
+          <h2>Our Approach</h2>
+          <p>UIPotion takes a different approach: <strong>we don't provide code, we provide specifications</strong>.</p>
+          <p>Each "potion" is a comprehensive guide written specifically for AI coding assistants. It includes:</p>
+          <ul>
+            <li>Detailed component specifications (dimensions, behavior, states)</li>
+            <li>Responsive breakpoints and mobile patterns</li>
+            <li>Accessibility requirements (ARIA, keyboard navigation)</li>
+            <li>Framework-specific implementation patterns (React, Vue, Angular, etc.)</li>
+            <li>Styling approaches (Tailwind, CSS Modules, Chakra, Material-UI, etc.)</li>
+            <li>Animation specifications and timing</li>
+            <li>Testing checklists</li>
+          </ul>
+        </section>
         
-        <p><strong>Result:</strong> Production-ready dashboard layout in minutes, perfectly adapted to your stack.</p>
-      </div>
-    </section>
-    
-    <section class="about-section">
-      <h2>Framework & Styling Agnostic</h2>
-      <p>UIPotion doesn't care what tools you use. Our guides work with:</p>
-      
-      <div class="two-column">
-        <div>
-          <h4>Frameworks</h4>
-          <ul>
-            <li>React</li>
-            <li>Vue</li>
-            <li>Angular</li>
-            <li>Svelte</li>
-            <li>Solid</li>
-            <li>Any other framework</li>
-          </ul>
-        </div>
-        <div>
-          <h4>Styling</h4>
-          <ul>
-            <li>Tailwind CSS</li>
-            <li>CSS Modules</li>
-            <li>Styled Components</li>
-            <li>Chakra UI</li>
-            <li>Material-UI</li>
-            <li>Vanilla CSS</li>
-            <li>Any styling approach</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-    
-    <section class="about-section">
-      <h2>Benefits</h2>
-      <div class="benefits-list">
-        <div class="benefit">
-          <h4>Zero Maintenance</h4>
-          <p>Specifications don't break when frameworks update</p>
-        </div>
-        <div class="benefit">
-          <h4>Always Current</h4>
-          <p>AI generates code using latest framework patterns</p>
-        </div>
-        <div class="benefit">
-          <h4>Truly Flexible</h4>
-          <p>Not locked into specific framework versions or styling libraries</p>
-        </div>
-        <div class="benefit">
-          <h4>Production Quality</h4>
-          <p>Includes accessibility, responsive design, and best practices</p>
-        </div>
-        <div class="benefit">
-          <h4>Learning Resource</h4>
-          <p>Understand the "why" behind component patterns</p>
-        </div>
-      </div>
-    </section>
-    
-    <section class="about-section">
-      <h2>JSON Structure</h2>
-      <p>Each potion guide is available as a JSON file for programmatic access. Example structure:</p>
-      <pre><code>{
+        <section class="about-section">
+          <h2>How It Works</h2>
+          
+          <h3>For Developers</h3>
+          <ol>
+            <li><strong>Browse potions</strong> on this website to find what you need (e.g., dashboard layout, pricing table, dialog)</li>
+            <li><strong>Copy the potion URL</strong> or JSON link</li>
+            <li><strong>Tell your AI assistant</strong>: "Implement the dashboard layout from this UIPotion guide" + paste link</li>
+            <li><strong>Specify your stack</strong>: "Use React with Tailwind CSS" (or whatever you're using)</li>
+            <li><strong>AI generates the code</strong> adapted to your specific framework and styling preferences</li>
+          </ol>
+          
+          <h3>For AI Agents</h3>
+          <p>AI agents can discover potions automatically:</p>
+          <ol>
+            <li>Load the manifest: <code>https://uipotion.com/jsonData/uipotion-manifest.json</code></li>
+            <li>Browse available potions: <code>https://uipotion.com/jsonData/potions-index.json</code></li>
+            <li>Load specific guide: <code>https://uipotion.com/jsonData/potions/[potion-id].json</code></li>
+            <li>Parse specifications and adapt to user's framework/styling choices</li>
+            <li>Generate implementation code</li>
+          </ol>
+        </section>
+        
+        <section class="about-section">
+          <h2>Example Workflow</h2>
+          <div class="example-box">
+            <p><strong>Developer says:</strong></p>
+            <p>"I need a dashboard layout with collapsible sidebar. I'm using React and Tailwind CSS. Here's the guide: https://uipotion.com/potions/layouts/dashboard.html"</p>
+            
+            <p><strong>AI agent:</strong></p>
+            <ol>
+              <li>Loads the dashboard-layout.json guide</li>
+              <li>Understands the component structure and specifications</li>
+              <li>Adapts the patterns to React (useState, useEffect, etc.)</li>
+              <li>Uses Tailwind utility classes for styling</li>
+              <li>Generates complete, working code with proper accessibility</li>
+            </ol>
+            
+            <p><strong>Result:</strong> Production-ready dashboard layout in minutes, perfectly adapted to your stack.</p>
+          </div>
+        </section>
+        
+        <section class="about-section">
+          <h2>Framework & Styling Agnostic</h2>
+          <p>UIPotion doesn't care what tools you use. Our guides work with:</p>
+          
+          <div class="two-column">
+            <div>
+              <h4>Frameworks</h4>
+              <ul>
+                <li>React</li>
+                <li>Vue</li>
+                <li>Angular</li>
+                <li>Svelte</li>
+                <li>Solid</li>
+                <li>Any other framework</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Styling</h4>
+              <ul>
+                <li>Tailwind CSS</li>
+                <li>CSS Modules</li>
+                <li>Styled Components</li>
+                <li>Chakra UI</li>
+                <li>Material-UI</li>
+                <li>Vanilla CSS</li>
+                <li>Any styling approach</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        
+        <section class="about-section">
+          <h2>Benefits</h2>
+          <div class="benefits-list">
+            <div class="benefit">
+              <h4>Zero Maintenance</h4>
+              <p>Specifications don't break when frameworks update</p>
+            </div>
+            <div class="benefit">
+              <h4>Always Current</h4>
+              <p>AI generates code using latest framework patterns</p>
+            </div>
+            <div class="benefit">
+              <h4>Truly Flexible</h4>
+              <p>Not locked into specific framework versions or styling libraries</p>
+            </div>
+            <div class="benefit">
+              <h4>Production Quality</h4>
+              <p>Includes accessibility, responsive design, and best practices</p>
+            </div>
+            <div class="benefit">
+              <h4>Learning Resource</h4>
+              <p>Understand the "why" behind component patterns</p>
+            </div>
+          </div>
+        </section>
+        
+        <section class="about-section">
+          <h2>JSON Structure</h2>
+          <p>Each potion guide is available as a JSON file for programmatic access. Example structure:</p>
+          <pre><code>{
   "id": "dashboard-layout",
   "name": "Dashboard Layout with Collapsible Sidebar",
   "aiAgentInstructions": {
@@ -150,13 +166,15 @@
   "accessibility": {...},
   "testingChecklist": [...]
 }</code></pre>
-    </section>
+        </section>
     
-    <section class="about-section">
-      <h2>Get Started</h2>
-      <p><a href="{{relativePath 'index.html'}}" class="button primary">Browse Potions</a></p>
-    </section>
-  </article>
+        <section class="about-section">
+          <h2>Get Started</h2>
+          <p><a href="{{relativePath 'index.html'}}" class="button primary">Browse Potions</a></p>
+        </section>
+      </article>
+    </div>
+  </main>
 </div>
 
 {{> footer}}

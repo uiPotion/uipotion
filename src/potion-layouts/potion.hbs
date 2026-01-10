@@ -68,4 +68,42 @@
   </main>
 </div>
 
+<!-- Scroll to Top Button -->
+<button class="potion-scroll-top" id="potionScrollTop" aria-label="Scroll to top">
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+  </svg>
+</button>
+
+<script>
+  (function() {
+    const scrollTopBtn = document.getElementById('potionScrollTop');
+    if (!scrollTopBtn) return;
+
+    // Show/hide button based on scroll position
+    function toggleScrollTop() {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
+      }
+    }
+
+    // Smooth scroll to top
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // Event listeners
+    window.addEventListener('scroll', toggleScrollTop);
+    scrollTopBtn.addEventListener('click', scrollToTop);
+
+    // Initial check
+    toggleScrollTop();
+  })();
+</script>
+
 {{> footer}}
