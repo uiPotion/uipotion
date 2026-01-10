@@ -24,15 +24,7 @@
           </svg>
           <span>AI Agent Guide</span>
         </div>
-        <div class="potion-ai-card-body">
-          <code class="potion-ai-url">https://uipotion.com/{{agentManifest}}</code>
-          <button class="potion-copy-btn" onclick="navigator.clipboard.writeText('https://uipotion.com/{{agentManifest}}')">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-            </svg>
-            Copy
-          </button>
-        </div>
+        {{> copy-url-section path=agentManifest}}
         <p class="potion-ai-hint">
           Use this URL with your AI coding assistant (Claude, ChatGPT, etc.) to automatically implement this component in your stack
         </p>
@@ -75,35 +67,7 @@
   </svg>
 </button>
 
-<script>
-  (function() {
-    const scrollTopBtn = document.getElementById('potionScrollTop');
-    if (!scrollTopBtn) return;
-
-    // Show/hide button based on scroll position
-    function toggleScrollTop() {
-      if (window.pageYOffset > 300) {
-        scrollTopBtn.classList.add('visible');
-      } else {
-        scrollTopBtn.classList.remove('visible');
-      }
-    }
-
-    // Smooth scroll to top
-    function scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
-
-    // Event listeners
-    window.addEventListener('scroll', toggleScrollTop);
-    scrollTopBtn.addEventListener('click', scrollToTop);
-
-    // Initial check
-    toggleScrollTop();
-  })();
-</script>
+<script src="{{relativePath 'assets/js/scroll-to-top.js'}}"></script>
+<script src="{{relativePath 'assets/js/copy-button.js'}}"></script>
 
 {{> footer}}

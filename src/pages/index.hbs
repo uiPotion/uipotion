@@ -2,15 +2,15 @@
 
 <div class="hero">
   <div class="container">
-    <h1>UI Components for AI Agents</h1>
-    <p class="tagline">Framework-agnostic guides that AI agents can understand and implement. No code to maintain, just specifications.</p>
+    <h1>UI Potions That Blend with Your Stack</h1>
+    <p class="tagline">Works with any AI coding assistant and your tools. No dependencies, no installation, no library management—just paste a link and build.</p>
     <div class="hero-actions">
       <a href="#potions" class="button primary">Browse Potions</a>
       <a href="{{relativePath 'about.html'}}" class="button">How It Works</a>
     </div>
     <div class="hero-manifest">
       <p><strong>AI Agent Discovery URL:</strong></p>
-      <code>https://uipotion.com/uipotion-manifest.json</code>
+      {{> copy-url-section url="https://uipotion.com/uipotion-manifest.json"}}
     </div>
   </div>
 </div>
@@ -84,5 +84,7 @@
     </div>
   </div>
 </section>
+
+<script src="{{relativePath 'assets/js/copy-button.js'}}"></script>
 
 {{> footer}}
