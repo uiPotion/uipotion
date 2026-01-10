@@ -1,17 +1,17 @@
-# UIPotion
+# UI Potion
 
 > AI-agent-optimized UI component guides for any framework
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Built with Harold](https://img.shields.io/badge/Built%20with-Harold-orange)](https://haroldjs.com)
 
-## What is UIPotion?
+## What is UI Potion?
 
-UIPotion is a different approach to UI component libraries. Instead of providing ready-to-use code that requires constant maintenance, we provide **comprehensive specifications** that AI coding assistants can understand and implement in any framework.
+UI Potion is a different approach to UI component libraries. Instead of providing ready-to-use code that requires constant maintenance, we provide **comprehensive specifications** that AI coding assistants can understand and implement in any framework.
 
 Think of it as "recipes for AI" - detailed guides that your AI assistant reads and adapts to your exact technology stack.
 
-## Why UIPotion?
+## Why UI Potion?
 
 ### The Problem with Traditional Component Libraries
 
@@ -21,7 +21,7 @@ Think of it as "recipes for AI" - detailed guides that your AI assistant reads a
 - **Version conflicts**: Library version vs your project version
 - **Bundle bloat**: Shipping code you might not use
 
-### The UIPotion Approach
+### The UI Potion Approach
 
 - ✅ **Zero maintenance**: Specifications don't break when frameworks update
 - ✅ **Framework agnostic**: Works with React, Vue, Angular, Svelte, or anything else
@@ -37,7 +37,7 @@ Think of it as "recipes for AI" - detailed guides that your AI assistant reads a
 1. **Browse potions** at [uipotion.com](https://uipotion.com)
 2. **Find what you need** (dashboard layout, pricing table, etc.)
 3. **Copy the potion URL** or JSON guide link
-4. **Tell your AI assistant**: "Implement this component from UIPotion" + paste link
+4. **Tell your AI assistant**: "Implement this component from UI Potion" + paste link
 5. **Specify your stack**: "Use React with Tailwind CSS"
 6. **Get generated code** perfectly adapted to your project
 
@@ -97,7 +97,7 @@ const guide = await fetch('https://uipotion.com/potions/dashboard-layout.json');
 - Data Display (Tables, Cards, Lists)
 - And many more...
 
-## What Makes UIPotion Different?
+## What Makes UI Potion Different?
 
 ### Traditional Component Library
 ```javascript
@@ -115,7 +115,7 @@ import { Dashboard } from 'some-ui-lib'
 // - Adds to bundle size
 ```
 
-### UIPotion Approach
+### UI Potion Approach
 ```javascript
 // AI reads specification
 const spec = await fetch('uipotion.com/potions/dashboard-layout.json')
@@ -208,7 +208,7 @@ src/
 │   ├── main.scss      # Main stylesheet (compiled)
 │   ├── _basic.scss    # Basic/reset styles
 │   ├── _page.scss     # Page-level styles
-│   └── _uipotion.scss # UIPotion-specific styles
+│   └── _uipotion.scss # UI Potion-specific styles
 │
 └── assets/            # Static assets
     └── images/        # Images and icons
@@ -225,7 +225,7 @@ build/                 # Generated output (don't edit!)
 
 ## Contributing
 
-We welcome contributions! UIPotion grows with community input.
+We welcome contributions! UI Potion grows with community input.
 
 ### How to Contribute
 
@@ -246,7 +246,7 @@ layout: 'potion'
 title: 'Your Component Name'
 publicationDate: '2026-01-10'
 excerpt: 'Brief description (1-2 sentences)'
-category: 'Components'  # Layouts, Components, or Features
+category: 'Components'  # Layouts, Components, Features, Patterns, or Tooling
 tags:
   - relevant
   - tags
@@ -364,7 +364,7 @@ Entry point for AI agent discovery. Contains:
 Searchable catalog of all potions. Each entry includes:
 - `id` - Unique identifier
 - `name` - Human-readable name
-- `category` - layouts|components|features
+- `category` - layouts|components|features|patterns|tooling
 - `tags` - Array of tags for filtering
 - `excerpt` - Brief description
 - `complexity` - beginner|intermediate|advanced

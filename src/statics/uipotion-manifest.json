@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/manifest.json",
   "version": "1.0.0",
-  "name": "UIPotion",
+  "name": "UI Potion",
   "description": "AI-agent-optimized UI component guides for any framework",
   "baseUrl": "https://uipotion.com",
   "discovery": {
@@ -22,23 +22,33 @@
     {
       "id": "layouts",
       "name": "Layouts",
-      "description": "Full-page layouts and structural patterns"
+      "description": "Full-page layouts and structural patterns (dashboards, landing pages, documentation layouts)"
     },
     {
       "id": "components",
       "name": "Components",
-      "description": "Reusable UI components like buttons, dialogs, cards"
+      "description": "Reusable UI building blocks (buttons, dialogs, cards, forms, navigation, data tables, feedback, media players, animations)"
     },
     {
       "id": "features",
       "name": "Features",
-      "description": "Complete features like pricing tables, landing pages, authentication flows"
+      "description": "Complete user-facing features and flows (pricing tables, authentication flows, e-commerce, onboarding, search, user profiles)"
+    },
+    {
+      "id": "patterns",
+      "name": "Patterns",
+      "description": "Design and interaction patterns (drag-and-drop, infinite scroll, progressive disclosure, accessibility patterns, keyboard navigation, responsive patterns)"
+    },
+    {
+      "id": "tooling",
+      "name": "Tooling",
+      "description": "Developer tools and infrastructure (build tools, CLI utilities, third-party integrations, API patterns, performance optimization, testing strategies, deployment configs)"
     }
   ],
   "meta": {
     "created": "2026-01-10",
     "updated": "2026-01-10",
-    "author": "UIPotion Team",
+    "author": "UI Potion Team",
     "license": "MIT"
   }
 }

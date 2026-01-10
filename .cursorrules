@@ -1,12 +1,14 @@
-# UIPotion + Harold - AI Assistant Rules
+# UI Potion + Harold - AI Assistant Rules
 
-You are working on **UIPotion**, a service that provides AI-agent-optimized UI component guides, built with **Harold** static site generator.
+You are working on **UI Potion**, a service that provides AI-agent-optimized UI component guides, built with **Harold** static site generator.
+
+**IMPORTANT**: Always use "UI Potion" (with space) in all human-readable text, documentation, and website content. Use "UIPotion" or "uipotion" only for technical identifiers like file names, URLs, JSON keys, or code references.
 
 ---
 
-## 🎯 UIPotion Project Philosophy
+## 🎯 UI Potion Project Philosophy
 
-UIPotion is NOT a component library with code to copy-paste. Instead:
+UI Potion is NOT a component library with code to copy-paste. Instead:
 - We provide **detailed specifications** for UI components ("potions")
 - Specifications are **framework-agnostic** (work with React, Vue, Angular, Svelte, etc.)
 - Specifications are **styling-agnostic** (work with Tailwind, CSS Modules, Chakra, etc.)
@@ -57,7 +59,7 @@ src/
 
 ---
 
-## 🎨 UIPotion Key Concepts
+## 🎨 UI Potion Key Concepts
 
 ### 1. Potions (UI Component Guides)
 
@@ -72,7 +74,7 @@ layout: 'potion'                                      # REQUIRED: Layout templat
 title: 'Component Name'                               # REQUIRED: Descriptive name
 publicationDate: '2026-01-10'                         # REQUIRED: YYYY-MM-DD format
 excerpt: 'Brief description'                          # REQUIRED: 1-2 sentences
-category: 'Layouts'                                   # REQUIRED: Layouts|Components|Features
+category: 'Layouts'                                   # REQUIRED: Layouts|Components|Features|Patterns|Tooling
 tags: [tag1, tag2]                                    # REQUIRED: Array of tags
 agentManifest: 'potions/component-id.json'  # REQUIRED: Path to JSON guide (in statics/)
 ---
@@ -175,7 +177,7 @@ layout: 'potion'           # REQUIRED: Use 'potion' layout
 title: 'Post Title'        # REQUIRED: string
 publicationDate: '2024-01-15' # REQUIRED: YYYY-MM-DD format (string)
 excerpt: 'Brief summary'   # REQUIRED: string (for SEO)
-category: 'Layouts'        # REQUIRED: Category name
+category: 'Layouts'        # REQUIRED: Category name (Layouts|Components|Features|Patterns|Tooling)
 tags: [javascript, ui]     # REQUIRED: array
 agentManifest: 'potions/id.json' # REQUIRED: Path to JSON (in statics/)
 ---
@@ -278,7 +280,7 @@ Format options: `dd`, `d`, `mmmm`, `mmm`, `mm`, `yyyy`
 - **Main files**: No `_` prefix (e.g., `main.scss`) - Compiled to CSS
 - **Import order**: variables → mixins → base → components
 - **Use**: `@use` (modern) or `@import` (legacy)
-- **UIPotion styles**: Keep in `_uipotion.scss`
+- **UI Potion styles**: Keep in `_uipotion.scss`
 
 ---
 
@@ -294,7 +296,7 @@ layout: 'potion'
 title: 'Your Component Name'
 publicationDate: '2026-01-10'
 excerpt: 'Brief description of the component (1-2 sentences)'
-category: 'Components'  # or Layouts, Features
+category: 'Components'  # Layouts, Components, Features, Patterns, or Tooling
 tags:
   - relevant
   - tags
@@ -466,9 +468,11 @@ harold-scripts start    # Start dev server on http://localhost:3000
 
 ## 🎯 Categories
 
-1. **Layouts**: Full-page layouts (dashboards, landing pages, documentation layouts)
-2. **Components**: Reusable UI pieces (buttons, dialogs, cards, forms, navigation)
-3. **Features**: Complete features (pricing tables, hero sections, authentication flows)
+1. **Layouts**: Full-page layouts and structural patterns (dashboards, landing pages, documentation layouts, app shells)
+2. **Components**: Reusable UI building blocks (buttons, dialogs, cards, forms, navigation, data tables, feedback, media players, animations, badges, inputs)
+3. **Features**: Complete user-facing features and flows (pricing tables, authentication flows, e-commerce, onboarding, search, user profiles)
+4. **Patterns**: Design and interaction patterns (drag-and-drop, infinite scroll, progressive disclosure, accessibility patterns, keyboard navigation, focus management, responsive patterns)
+5. **Tooling**: Developer tools and infrastructure (build tools, CLI utilities, third-party integrations, API patterns, performance optimization, testing strategies, deployment configs)
 
 ---
 
@@ -494,7 +498,7 @@ Before considering a potion complete:
 
 ## ⚠️ Common Pitfalls
 
-### UIPotion-Specific
+### UI Potion-Specific
 - ❌ Don't provide framework-specific code in potions (keep it generic)
 - ❌ Don't forget to update potions-index.json
 - ❌ Don't skip accessibility specifications
@@ -592,7 +596,7 @@ Before considering a potion complete:
 
 ## 🎉 Philosophy
 
-### UIPotion Philosophy
+### UI Potion Philosophy
 - **Framework Agnostic**: Specifications work for any framework
 - **Styling Agnostic**: Specifications work for any CSS approach
 - **AI-First**: JSON guides are primary interface
@@ -640,6 +644,6 @@ Before considering a potion complete:
 
 ---
 
-**You're ready to build UIPotion with Harold!** 🚀
+**You're ready to build UI Potion with Harold!** 🚀
 
-**Remember**: UIPotion provides specifications, not code. AI agents transform these specs into production-ready implementations adapted to each developer's stack.
+**Remember**: UI Potion provides specifications, not code. AI agents transform these specs into production-ready implementations adapted to each developer's stack.
