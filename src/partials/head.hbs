@@ -8,10 +8,38 @@
   <title>{{title}}</title>
   <meta name="description" content="{{description}}">
   <meta name="generator" content="haroldjs.com" />
+  {{#if agentManifest}}
+  <!-- AI Agent Discovery: Machine-readable link to JSON guide -->
+  <link rel="alternate" type="application/json" href="https://uipotion.com/{{agentManifest}}" title="AI Agent Guide">
+  <meta name="ai-agent-guide" content="https://uipotion.com/{{agentManifest}}">
+  <meta property="og:see_also" content="https://uipotion.com/{{agentManifest}}">
+  {{/if}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{relativePath 'styles/main.css'}}">
+  {{#if agentManifest}}
+  <!-- JSON-LD Structured Data for AI Agent Discovery -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "{{title}}",
+    "description": "{{description}}",
+    "about": {
+      "@type": "SoftwareApplication",
+      "applicationCategory": "UIComponentGuide",
+      "operatingSystem": "Web"
+    },
+    "mentions": {
+      "@type": "DataDownload",
+      "contentUrl": "https://uipotion.com/{{agentManifest}}",
+      "encodingFormat": "application/json",
+      "description": "AI Agent Implementation Guide (JSON)"
+    }
+  }
+  </script>
+  {{/if}}
 </head>
 
 <body>
@@ -19,7 +47,8 @@
     <div class="container">
       <div class="main-header-container">
         <a href="{{relativePath 'index.html'}}" class="logo-container">
-          <span class="logo-text">UIPotion</span>
+          <img src="{{relativePath 'assets/images/uipotion-logo.png'}}" alt="UIPotion Logo" width="32" height="32" class="logo-image">
+          <span class="logo-text">UI Potion</span>
         </a>
         <nav class="main-menu">
           <ul class="main-menu-list">
