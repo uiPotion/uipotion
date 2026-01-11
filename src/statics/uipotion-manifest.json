@@ -13,7 +13,7 @@
     "workflow": [
       "1. Agent loads this manifest to discover available potions",
       "2. Agent browses potions-index.json to find relevant component",
-      "3. Agent loads specific potion JSON guide (e.g., dashboard-layout.json)",
+      "3. Agent loads specific potion JSON guide (e.g., layouts/dashboard.json)",
       "4. Agent adapts the guide to user's framework and styling preferences",
       "5. Agent implements the component based on detailed specifications"
     ]

@@ -45,10 +45,10 @@ Think of it as "recipes for AI" - detailed guides that your AI assistant reads a
 ```
 Developer: "I need a dashboard layout with collapsible sidebar. 
 I'm using React and Tailwind. Use this guide: 
-https://uipotion.com/potions/dashboard-layout.json"
+https://uipotion.com/potions/layouts/dashboard.json"
 
 AI Assistant:
-- Loads dashboard-layout.json
+- Loads dashboard.json
 - Understands specifications
 - Adapts to React (useState, useEffect, etc.)
 - Uses Tailwind utility classes
@@ -69,7 +69,7 @@ const manifest = await fetch('https://uipotion.com/uipotion-manifest.json');
 const potionsIndex = await fetch('https://uipotion.com/potions-index.json');
 
 // 3. Load specific guide
-const guide = await fetch('https://uipotion.com/potions/dashboard-layout.json');
+const guide = await fetch('https://uipotion.com/potions/layouts/dashboard.json');
 
 // 4. Parse specifications
 // 5. Generate implementation adapted to user's stack
@@ -118,7 +118,7 @@ import { Dashboard } from 'some-ui-lib'
 ### UI Potion Approach
 ```javascript
 // AI reads specification
-const spec = await fetch('uipotion.com/potions/dashboard-layout.json')
+const spec = await fetch('uipotion.com/potions/layouts/dashboard.json')
 
 // AI generates code adapted to YOUR stack:
 // - Your framework (React, Vue, Angular, Svelte, etc.)
@@ -191,7 +191,7 @@ src/
 │   ├── uipotion-manifest.json    # Main entry point for AI agents
 │   ├── potions-index.json        # Searchable catalog of potions
 │   └── potions/                  # Individual component guides
-│       └── dashboard-layout.json
+│       └── dashboard.json
 │
 ├── pages/             # Site pages (Handlebars templates)
 │   ├── index.hbs      # Homepage
@@ -250,7 +250,7 @@ category: 'Components'  # Layouts, Components, Features, Patterns, or Tooling
 tags:
   - relevant
   - tags
-agentManifest: 'potions/your-component.json'
+agentManifest: 'potions/components/your-component.json'
 ---
 
 # Your Component Name
@@ -260,9 +260,9 @@ Detailed human-readable documentation...
 
 #### Step 2: Create JSON Guide
 
-Create `src/statics/potions/your-component.json`:
+Create `src/statics/potions/components/your-component.json`:
 
-Use `dashboard-layout.json` as a template. Include:
+Use `dashboard.json` as a template. Include:
 - `aiAgentInstructions` - Summary and implementation steps
 - `structure` - Component hierarchy
 - `components` - Detailed specifications
@@ -288,7 +288,7 @@ Add entry to `src/statics/potions-index.json`:
   "complexity": "intermediate",
   "estimatedImplementationTime": "2-3 hours",
   "webUrl": "https://uipotion.com/potions/components/your-component.html",
-  "agentGuideUrl": "https://uipotion.com/potions/your-component.json",
+  "agentGuideUrl": "https://uipotion.com/potions/components/your-component.json",
   "created": "2026-01-10",
   "updated": "2026-01-10"
 }
@@ -376,7 +376,7 @@ Searchable catalog of all potions. Each entry includes:
 
 ### Individual Guides
 
-**URL**: `https://uipotion.com/potions/[id].json`
+**URL**: `https://uipotion.com/potions/[category]/[id].json`
 
 Detailed implementation guide for specific component. Contains complete specifications for AI to generate implementation.
 
@@ -385,7 +385,7 @@ Detailed implementation guide for specific component. Contains complete specific
 ### Example: Dashboard Layout
 
 **Human URL**: https://uipotion.com/potions/layouts/dashboard.html  
-**AI Guide URL**: https://uipotion.com/potions/dashboard-layout.json
+**AI Guide URL**: https://uipotion.com/potions/layouts/dashboard.json
 
 The dashboard layout includes:
 - Collapsible sidebar (280px expanded, 80px collapsed)

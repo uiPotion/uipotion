@@ -9,7 +9,7 @@ tags:
   - sidebar
   - responsive
   - admin
-agentManifest: 'potions/dashboard-layout.json'
+agentManifest: 'potions/layouts/dashboard.json'
 ---
 
 # Dashboard Layout

@@ -1,8 +1,5 @@
 {{> head title=title description=excerpt agentManifest=agentManifest }}
 
-<!-- Skip to main content link for keyboard users -->
-<a href="#potion-main-content" class="skip-link">Skip to main content</a>
-
 <div class="potion-page">
   <!-- Hero Header with AI Link -->
   <header class="potion-hero" role="banner">
@@ -11,6 +8,7 @@
         <a href="{{relativePath 'index.html'}}">← All Potions</a>
         <span aria-hidden="true">/</span>
         <span>{{category}}</span>
+        <a href="#potion-main-content" class="skip-link">Skip to content</a>
       </nav>
       
       <h1 class="potion-hero-title">{{title}}</h1>
