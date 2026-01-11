@@ -14,6 +14,7 @@
         "componentSpec",
         "accessibility",
         "animations",
+        "projectDetection",
         "testingChecklist"
       ],
       "properties": {

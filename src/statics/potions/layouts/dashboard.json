@@ -75,9 +75,14 @@
       "Mobile-responsive with overlay sidebar",
       "State persistence in localStorage",
       "Full keyboard accessibility with ARIA labels",
-      "Smooth animations (default 300ms)"
+      "Smooth animations (default 300ms)",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems."
     ],
     "implementationSteps": [
+      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine: (a) package.json for framework (React, Vue, Angular, Svelte) and styling dependencies (tailwindcss, styled-components, emotion, sass, etc.), (b) existing component files to see how they import styles (CSS Modules, Tailwind classes, styled-components, etc.), (c) config files (tailwind.config.js, vite.config.js, webpack.config.js, etc.), (d) existing style files and their structure. If the project uses Tailwind, use Tailwind. If SCSS/CSS, use SCSS/CSS. If styled-components, use styled-components. If nothing is configured, use the most suitable CSS approach (vanilla CSS or CSS Modules).",
+      "0a. Detect framework patterns: Check how existing components are structured (hooks in React, composition API in Vue, etc.), how state is managed, and what patterns are used.",
+      "0b. Detect styling conventions: Identify class naming (BEM, camelCase, kebab-case), how styles are imported, whether there's a design system or token system, and what utility functions exist (cn, clsx, classnames, etc.).",
+      "0c. If detection is uncertain, ask the user about their styling approach and framework before proceeding.",
       "1. Create four main layout components: Sidebar, Header, Footer, and ContentArea",
       "2. Implement state management for sidebar collapsed (desktop) and sidebar open (mobile overlay)",
       "3. Add localStorage persistence for sidebar collapsed state (desktop)",
@@ -87,7 +92,8 @@
       "7. Add padding-top and padding-bottom (or margins) to content area for header/footer spacing",
       "8. Add smooth transitions (default 300ms) for all state changes",
       "9. Implement keyboard navigation, skip link, and ARIA attributes",
-      "10. Style according to user's chosen CSS framework/methodology"
+      "10. Use ONLY the detected styling system. Do NOT add <style> blocks, inline styles, or new CSS files unless that's the project's convention. Match existing component styling patterns exactly.",
+      "11. Style according to the detected framework and styling system, using only existing project conventions"
     ]
   },
 
@@ -988,6 +994,67 @@
     }
   },
 
+  "projectDetection": {
+    "framework": {
+      "description": "Detect the project's framework by examining package.json, existing component files, and project structure. Common frameworks: React, Vue, Angular, Svelte.",
+      "detectionSteps": [
+        "Check package.json for framework dependencies (react, vue, @angular/core, svelte)",
+        "Examine existing component files for framework-specific patterns (JSX for React, .vue files for Vue, etc.)",
+        "Check build configuration (vite.config.js, webpack.config.js, angular.json, etc.)",
+        "Look for framework-specific directories (src/components, src/app, etc.)"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect the project's styling approach by examining dependencies, config files, and existing component styles. Use the detected system exclusively.",
+      "detectionSteps": [
+        "Check package.json for styling dependencies: tailwindcss, styled-components, emotion, sass, less, css-modules, etc.",
+        "Look for config files: tailwind.config.js, postcss.config.js, sass config, etc.",
+        "Examine existing component files to see how styles are imported and used",
+        "Check for style files: .css, .scss, .module.css, styled-components patterns, etc.",
+        "Identify class naming conventions and utility functions (cn, clsx, classnames, etc.)",
+        "If no styling system is detected, use vanilla CSS or CSS Modules as the most suitable approach"
+      ],
+      "adaptationRules": [
+        "If Tailwind is detected: Use Tailwind utility classes, respect existing config, use existing design tokens, follow project's class composition patterns",
+        "If SCSS/CSS is detected: Use SCSS/CSS files matching project structure, follow existing naming conventions (BEM, camelCase, etc.), import styles as the project does",
+        "If styled-components is detected: Use styled-components syntax matching project patterns, follow existing component structure",
+        "If CSS Modules is detected: Use .module.css files, follow existing module naming patterns",
+        "If no styling system: Use vanilla CSS with semantic class names, or CSS Modules if it seems appropriate for the project size"
+      ]
+    },
+    "designTokens": {
+      "description": "Identify existing design tokens, color systems, spacing scales, and typography from the project. Use these instead of inventing new values.",
+      "detectionSteps": [
+        "Check for design token files (tokens.json, theme.js, design-tokens.css, etc.)",
+        "Examine Tailwind config for theme values if using Tailwind",
+        "Look at existing components for color, spacing, and typography patterns",
+        "Check CSS variables (--color-*, --spacing-*, etc.) in global styles",
+        "If tokens exist, use them. If not, use values that match existing component styles"
+      ]
+    }
+  },
+
+  "outputConstraints": {
+    "must": [
+      "Detect and use ONLY the project's existing framework (React, Vue, Angular, Svelte) - match existing component patterns",
+      "Detect and use ONLY the project's existing styling system (Tailwind, SCSS, CSS, styled-components, etc.) - match existing styling patterns",
+      "Use project's existing design tokens, color system, and spacing scales if available",
+      "Use project's class composition utility (cn, clsx, classnames, etc.) if it exists",
+      "Follow project's naming conventions (BEM, camelCase, kebab-case, etc.)",
+      "Match the structure and patterns of existing components in the project",
+      "Maintain consistent spacing and sizing with project conventions"
+    ],
+    "mustNot": [
+      "Do NOT introduce new styling systems (if project uses Tailwind, don't add SCSS; if SCSS, don't add Tailwind)",
+      "Do NOT add <style> blocks unless that's the project's convention (e.g., Vue SFC <style> blocks)",
+      "Do NOT use inline style attributes unless necessary for dynamic values (use CSS variables if supported)",
+      "Do NOT create new CSS/SCSS files unless that's how the project structures styles",
+      "Do NOT hardcode colors/values - use project's design tokens or match existing component values",
+      "Do NOT import new UI libraries or styling dependencies",
+      "Do NOT use string concatenation for class names - use project's composition utility"
+    ]
+  },
+
   "testingChecklist": [
     "Sidebar toggles smoothly on desktop",
     "Sidebar opens as overlay on mobile/tablet (if overlay mode enabled)",
@@ -1016,7 +1083,9 @@
     "Long navigation labels are truncated properly",
     "Many navigation items scroll correctly in sidebar",
     "Prefers-reduced-motion disables or reduces non-essential animations",
-    "Safe-area padding prevents overlap on notched devices"
+    "Safe-area padding prevents overlap on notched devices",
+    "Styling uses only project conventions (no ad-hoc CSS)",
+    "All classes use tokenMapping values or existing project tokens"
   ],
 
   "aiImplementationPrompt": "Create a responsive dashboard layout with a collapsible sidebar (default 280px expanded, 80px collapsed), fixed header (64px height), fixed footer (60px height), and scrollable content area. The sidebar should overlay on mobile (<768px) and persist its collapsed state (desktop) in localStorage using key 'uipotion.dashboard.sidebarCollapsed.v1'. Both header and footer should adjust their start offset based on sidebar state (280px when expanded, 80px when collapsed on desktop). Content area should account for fixed header/footer offsets (top 64px, bottom 60px) and avoid horizontal page scrolling. Include smooth 300ms transitions, keyboard accessibility with ARIA labels and a required skip link, and active state highlighting for current page. Ensure overlay behavior includes backdrop dismissal, focus trap, focus restoration, body scroll lock, and inert background content. Respect prefers-reduced-motion and apply mobile safe-area insets. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. Include mobile menu toggle, user dropdown, and notifications button in the header. Footer should contain copyright and navigation links.",

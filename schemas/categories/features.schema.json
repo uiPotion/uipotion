@@ -13,6 +13,7 @@
       "required": [
         "featureSpec",
         "accessibility",
+        "projectDetection",
         "testingChecklist"
       ],
       "properties": {

@@ -18,6 +18,7 @@
         "stateManagement",
         "animations",
         "accessibility",
+        "projectDetection",
         "designSystem",
         "testingChecklist"
       ],

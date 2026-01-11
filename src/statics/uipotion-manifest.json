@@ -6,7 +6,8 @@
   "baseUrl": "https://uipotion.com",
   "discovery": {
     "manifestUrl": "https://uipotion.com/uipotion-manifest.json",
-    "potionsIndexUrl": "https://uipotion.com/potions-index.json"
+    "potionsIndexUrl": "https://uipotion.com/potions-index.json",
+    "projectConventionsUrl": "https://uipotion.com/project-conventions.json"
   },
   "usage": {
     "how_to_use": "AI agents can discover and load component guides by referencing this manifest. Each potion (component guide) is framework-agnostic and provides detailed specifications for implementation.",
@@ -14,9 +15,11 @@
       "1. Agent loads this manifest to discover available potions",
       "2. Agent browses potions-index.json to find relevant component",
       "3. Agent loads specific potion JSON guide (e.g., layouts/dashboard.json)",
-      "4. Agent adapts the guide to user's framework and styling preferences",
-      "5. Agent implements the component based on detailed specifications"
-    ]
+      "4. Agent detects the project's framework and styling system by examining package.json, existing components, config files, and style imports",
+      "5. Agent adapts the guide to the detected framework and styling system, using ONLY what's already in the project",
+      "6. Agent implements the component based on detailed specifications, following outputConstraints and matching existing project patterns"
+    ],
+    "stylingEnforcement": "Agents MUST detect the project's framework (React, Vue, Angular, Svelte) and styling system (Tailwind, SCSS, CSS, styled-components, etc.) BEFORE writing code. Use ONLY the detected styling system - if Tailwind is configured, use Tailwind; if SCSS, use SCSS; if nothing is configured, use the most suitable CSS approach. Match existing component patterns exactly. Do NOT introduce new styling systems or ad-hoc CSS. If detection is uncertain, ask the user about their styling approach and framework."
   },
   "categories": [
     {
