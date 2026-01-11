@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uipotion.com/schema/categories/features.schema.json",
+  "title": "UI Potion Category Schema — Features (v1)",
+  "description": "Extends the base schema for multi-screen / multi-component flows (auth, onboarding, wizards). Encourages consistent journey + screen modeling.",
+  "allOf": [
+    {
+      "$ref": "https://uipotion.com/schema/potion.base.schema.json"
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "featureSpec",
+        "accessibility",
+        "testingChecklist"
+      ],
+      "properties": {
+        "category": {
+          "const": "features"
+        },
+        "featureSpec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "goal",
+            "userJourney",
+            "screens",
+            "states",
+            "edgeCases"
+          ],
+          "properties": {
+            "goal": {
+              "type": "string",
+              "minLength": 1
+            },
+            "userJourney": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "screens": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/screenSpec"
+              }
+            },
+            "states": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "edgeCases": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "interactions": {
+              "type": "array",
+              "description": "Optional feature-level interactions (global events). Screen-specific interactions can be inside screenSpec.",
+              "items": {
+                "$ref": "https://uipotion.com/schema/contracts/interactions.contract.schema.json"
+              }
+            },
+            "stateModel": {
+              "type": "object",
+              "description": "Optional feature-level state model (in addition to screen-level states).",
+              "additionalProperties": {
+                "$ref": "https://uipotion.com/schema/contracts/state.contract.schema.json"
+              }
+            },
+            "dataContract": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "integrationPoints": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "analyticsEvents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "animations": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "$defs": {
+        "screenSpec": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "id",
+            "purpose"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "purpose": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ui": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "validation": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "states": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "interactions": {
+              "type": "array",
+              "items": {
+                "$ref": "https://uipotion.com/schema/contracts/interactions.contract.schema.json"
+              }
+            },
+            "stateModel": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "https://uipotion.com/schema/contracts/state.contract.schema.json"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

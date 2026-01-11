@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uipotion.com/schema/categories/patterns.schema.json",
+  "title": "UI Potion Category Schema — Patterns (v1)",
+  "description": "Extends the base schema for UI/UX engineering patterns (rules, guidelines, anti-patterns). Accessibility guidance is recommended via patternSpec.accessibility.",
+  "allOf": [
+    {
+      "$ref": "https://uipotion.com/schema/potion.base.schema.json"
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "patternSpec",
+        "testingChecklist"
+      ],
+      "properties": {
+        "category": {
+          "const": "patterns"
+        },
+        "patternSpec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "problem",
+            "solution",
+            "do",
+            "dont",
+            "examples",
+            "checklist"
+          ],
+          "properties": {
+            "problem": {
+              "type": "string",
+              "minLength": 1
+            },
+            "solution": {
+              "type": "string",
+              "minLength": 1
+            },
+            "do": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dont": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "examples": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "antiPatterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "checklist": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "accessibility": {
+              "$ref": "https://uipotion.com/schema/contracts/accessibility.contract.schema.json"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

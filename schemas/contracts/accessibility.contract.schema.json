@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uipotion.com/schema/contracts/accessibility.contract.schema.json",
+  "title": "UI Potion Contract — Accessibility (v1)",
+  "description": "Reusable accessibility contract for UI Potion. Designed to be strict on core guarantees (WCAG level) and flexible on implementation details.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "wcagCompliance"
+  ],
+  "properties": {
+    "wcagCompliance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "level"
+      ],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "A",
+            "AA",
+            "AAA"
+          ]
+        },
+        "requirements": {
+          "type": "object",
+          "description": "Map of WCAG success criteria IDs to implementation notes.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "keyboardNavigation": {
+      "type": "object",
+      "description": "Keyboard behavior notes (tab order, escape behavior, focus trap/restoration, skip link).",
+      "additionalProperties": true
+    },
+    "ariaAttributes": {
+      "type": "object",
+      "description": "ARIA guidance: required + optional attributes by element.",
+      "additionalProperties": true,
+      "properties": {
+        "required": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "optional": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "screenReader": {
+      "type": "object",
+      "description": "Screen reader announcements, sr-only usage, landmarks.",
+      "additionalProperties": true
+    },
+    "focusManagement": {
+      "type": "object",
+      "description": "Focus-visible rules, focus order, skip links, focus trap guidance.",
+      "additionalProperties": true
+    },
+    "colorContrast": {
+      "type": "object",
+      "description": "Contrast requirements and verification notes.",
+      "additionalProperties": true
+    },
+    "implementationChecklist": {
+      "type": "array",
+      "description": "Verifiable a11y checklist items.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

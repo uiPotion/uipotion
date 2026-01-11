@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uipotion.com/schema/potion.base.schema.json",
+  "title": "UI Potion Base Schema (v1)",
+  "description": "Shared schema for all UI Potion potions. Category schemas extend this via allOf. Contracts are referenced for consistent a11y/state/interaction modeling.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "id",
+    "version",
+    "name",
+    "category",
+    "tags",
+    "description",
+    "aiAgentInstructions",
+    "meta"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Pointer to UI Potion registry schema (not JSON Schema). Example: https://uipotion.com/schema/potion.json"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Unique potion identifier (kebab-case)."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z-.]+)?(?:\\+[0-9A-Za-z-.]+)?$",
+      "description": "Potion version (SemVer)."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "layouts",
+        "components",
+        "features",
+        "patterns",
+        "tooling"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tokens": {
+      "type": "object",
+      "description": "Optional but recommended: normalized constants referenced throughout the spec.",
+      "additionalProperties": true
+    },
+    "layoutPresets": {
+      "type": "object",
+      "description": "Optional: explicit preset variants (e.g., default/compact) for sizing or behavior.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "aiAgentInstructions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "keyFeatures",
+        "implementationSteps"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "keyFeatures": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "implementationSteps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "frameworkPatterns": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "stylingApproaches": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "animations": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "accessibility": {
+      "$ref": "https://uipotion.com/schema/contracts/accessibility.contract.schema.json"
+    },
+    "designSystem": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "dataStructures": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "commonVariations": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "edgeCases": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "testingChecklist": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "aiImplementationPrompt": {
+      "type": "string"
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "created",
+        "updated",
+        "complexity",
+        "estimatedImplementationTime",
+        "webUrl"
+      ],
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "complexity": {
+          "type": "string",
+          "enum": [
+            "beginner",
+            "intermediate",
+            "advanced"
+          ]
+        },
+        "estimatedImplementationTime": {
+          "type": "string",
+          "minLength": 1
+        },
+        "webUrl": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

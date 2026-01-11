@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uipotion.com/schema/contracts/interactions.contract.schema.json",
+  "title": "UI Potion Contract — Interactions (v1)",
+  "description": "Reusable interaction rules contract for UI Potion. Intended for components and features; layouts may also use it for overlays/menus.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event",
+    "result"
+  ],
+  "properties": {
+    "event": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Name of the event or trigger (e.g., escapeKey, overlayClick, clickNavItem)."
+    },
+    "when": {
+      "type": "string",
+      "description": "Optional condition under which the interaction applies (e.g., only when open, only on mobile)."
+    },
+    "result": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Outcome/action (e.g., closeSidebar, toggleCollapsed, navigateToRoute)."
+    },
+    "sideEffects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Optional side-effects (e.g., restoreFocusToMenuToggle, persistCollapsedState)."
+    },
+    "preventDefault": {
+      "type": "boolean",
+      "description": "Whether to prevent default browser behavior."
+    },
+    "stopPropagation": {
+      "type": "boolean",
+      "description": "Whether to stop event propagation."
+    },
+    "accessibilityNotes": {
+      "type": "string",
+      "description": "Notes about focus management, announcements, aria-expanded updates, etc."
+    }
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uipotion.com/schema/categories/layouts.schema.json",
+  "title": "UI Potion Category Schema — Layouts (v1)",
+  "description": "Extends the base schema for layout potions (dashboards, app shells, page layouts). Matches the dashboard-layout v1.0.1 structure.",
+  "allOf": [
+    {
+      "$ref": "https://uipotion.com/schema/potion.base.schema.json"
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "layoutModel",
+        "structure",
+        "components",
+        "responsiveBreakpoints",
+        "stateManagement",
+        "animations",
+        "accessibility",
+        "designSystem",
+        "testingChecklist"
+      ],
+      "properties": {
+        "category": {
+          "const": "layouts"
+        },
+        "layoutModel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "scrollRegion"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "fixed-bars",
+                "grid",
+                "stack",
+                "custom"
+              ]
+            },
+            "scrollRegion": {
+              "type": "string",
+              "enum": [
+                "page",
+                "contentArea",
+                "custom"
+              ]
+            },
+            "positioningContract": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "invariants": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "structure": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "components": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "dimensions": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "states": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "elements": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "behavior": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responsiveBreakpoints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "desktop",
+            "tablet",
+            "mobile"
+          ],
+          "properties": {
+            "desktop": {
+              "$ref": "#/$defs/breakpointSpec"
+            },
+            "tablet": {
+              "$ref": "#/$defs/breakpointSpec"
+            },
+            "mobile": {
+              "$ref": "#/$defs/breakpointSpec"
+            },
+            "resizeHandling": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "debounceMs": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "stateManagement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "statesToTrack"
+          ],
+          "properties": {
+            "statesToTrack": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "$ref": "https://uipotion.com/schema/contracts/state.contract.schema.json"
+              }
+            },
+            "ssrConsiderations": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "persistence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "storage": {
+              "type": "string",
+              "enum": [
+                "localStorage",
+                "sessionStorage",
+                "cookies",
+                "custom"
+              ]
+            },
+            "keys": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "overflowPolicy": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "zIndexLayers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "modalOverlayBehavior": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "navigationBehavior": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "internationalization": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "mobileSafeArea": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "motionPreferences": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "$defs": {
+        "breakpointSpec": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "minWidth": {
+              "type": "string"
+            },
+            "maxWidth": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

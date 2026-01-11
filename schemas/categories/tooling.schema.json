@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uipotion.com/schema/categories/tooling.schema.json",
+  "title": "UI Potion Category Schema — Tooling (v1)",
+  "description": "Extends the base schema for tooling/integration potions (CI validation, generators, token pipelines).",
+  "allOf": [
+    {
+      "$ref": "https://uipotion.com/schema/potion.base.schema.json"
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "toolingSpec",
+        "testingChecklist"
+      ],
+      "properties": {
+        "category": {
+          "const": "tooling"
+        },
+        "toolingSpec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "goal",
+            "integration",
+            "configuration",
+            "workflow"
+          ],
+          "properties": {
+            "goal": {
+              "type": "string",
+              "minLength": 1
+            },
+            "integration": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "configuration": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "workflow": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "compatibility": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "securityConsiderations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

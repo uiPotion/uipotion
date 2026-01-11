@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uipotion.com/schema/categories/components.schema.json",
+  "title": "UI Potion Category Schema — Components (v1)",
+  "description": "Extends the base schema for reusable component potions (modal, dropdown, table, form input, nav). Enforces state and interaction modeling.",
+  "allOf": [
+    {
+      "$ref": "https://uipotion.com/schema/potion.base.schema.json"
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "componentSpec",
+        "accessibility",
+        "animations",
+        "testingChecklist"
+      ],
+      "properties": {
+        "category": {
+          "const": "components"
+        },
+        "componentSpec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "goal",
+            "anatomy",
+            "stateModel",
+            "interactions"
+          ],
+          "properties": {
+            "goal": {
+              "type": "string",
+              "minLength": 1
+            },
+            "anatomy": {
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "slots"
+              ],
+              "properties": {
+                "slots": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "hierarchy": {
+                  "type": "string"
+                }
+              }
+            },
+            "stateModel": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "$ref": "https://uipotion.com/schema/contracts/state.contract.schema.json"
+              }
+            },
+            "interactions": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "https://uipotion.com/schema/contracts/interactions.contract.schema.json"
+              }
+            },
+            "responsiveBehavior": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "variants": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "dataContract": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        }
+      }
+    }
+  ]
+}

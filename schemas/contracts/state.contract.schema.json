@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uipotion.com/schema/contracts/state.contract.schema.json",
+  "title": "UI Potion Contract — State Definitions (v1)",
+  "description": "Reusable state definition contract for UI Potion (layout/component/feature state models).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "description"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "boolean",
+        "string",
+        "number",
+        "enum",
+        "object",
+        "array"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "default": {},
+    "persistence": {
+      "type": "string",
+      "description": "Where/how the state persists (e.g., component state only, localStorage, router/URL)."
+    },
+    "determination": {
+      "type": "string",
+      "description": "How the state value is derived (e.g., from router route, URL hash, media query)."
+    },
+    "allowedValues": {
+      "type": "array",
+      "description": "Allowed values for enum-like states.",
+      "items": {}
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional implementation notes."
+    }
+  }
+}
