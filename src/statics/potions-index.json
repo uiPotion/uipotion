@@ -12,8 +12,21 @@
       "agentGuideUrl": "https://uipotion.com/potions/layouts/dashboard.json",
       "created": "2026-01-10",
       "updated": "2026-01-10"
+    },
+    {
+      "id": "modal-dialog",
+      "name": "Modal Dialog (Accessible) with Focus Trap and Actions",
+      "category": "components",
+      "tags": ["modal", "dialog", "overlay", "focus-trap", "a11y", "wcag", "aria"],
+      "excerpt": "An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.",
+      "complexity": "intermediate",
+      "estimatedImplementationTime": "1-2 hours",
+      "webUrl": "https://uipotion.com/potions/components/modal-dialog.html",
+      "agentGuideUrl": "https://uipotion.com/potions/components/dialog.json",
+      "created": "2026-01-11",
+      "updated": "2026-01-11"
     }
   ],
-  "totalCount": 1,
-  "lastUpdated": "2026-01-10"
+  "totalCount": 2,
+  "lastUpdated": "2026-01-11"
 }

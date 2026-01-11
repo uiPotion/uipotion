@@ -37,13 +37,7 @@
     },
     "category": {
       "type": "string",
-      "enum": [
-        "layouts",
-        "components",
-        "features",
-        "patterns",
-        "tooling"
-      ]
+      "enum": ["layouts", "components", "features", "patterns", "tooling"]
     },
     "tags": {
       "type": "array",
@@ -73,11 +67,7 @@
     "aiAgentInstructions": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "summary",
-        "keyFeatures",
-        "implementationSteps"
-      ],
+      "required": ["summary", "keyFeatures", "implementationSteps"],
       "properties": {
         "summary": {
           "type": "string",
@@ -162,11 +152,7 @@
         },
         "complexity": {
           "type": "string",
-          "enum": [
-            "beginner",
-            "intermediate",
-            "advanced"
-          ]
+          "enum": ["beginner", "intermediate", "advanced"]
         },
         "estimatedImplementationTime": {
           "type": "string",
@@ -177,6 +163,23 @@
           "minLength": 1
         }
       }
-    }
+    },
+    "layoutModel": { "type": "object", "additionalProperties": true },
+    "structure": { "type": "object", "additionalProperties": true },
+    "components": { "type": "object", "additionalProperties": true },
+    "responsiveBreakpoints": { "type": "object", "additionalProperties": true },
+    "stateManagement": { "type": "object", "additionalProperties": true },
+    "persistence": { "type": "object", "additionalProperties": true },
+    "overflowPolicy": { "type": "object", "additionalProperties": true },
+    "zIndexLayers": { "type": "object", "additionalProperties": true },
+    "modalOverlayBehavior": { "type": "object", "additionalProperties": true },
+    "navigationBehavior": { "type": "object", "additionalProperties": true },
+    "internationalization": { "type": "object", "additionalProperties": true },
+    "mobileSafeArea": { "type": "object", "additionalProperties": true },
+    "motionPreferences": { "type": "object", "additionalProperties": true },
+    "componentSpec": { "type": "object", "additionalProperties": true },
+    "featureSpec": { "type": "object", "additionalProperties": true },
+    "patternSpec": { "type": "object", "additionalProperties": true },
+    "toolingSpec": { "type": "object", "additionalProperties": true }
   }
 }

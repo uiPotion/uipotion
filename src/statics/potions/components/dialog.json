@@ -1,0 +1,275 @@
+{
+  "$schema": "https://uipotion.com/schema/potion.json",
+  "id": "modal-dialog",
+  "version": "1.0.0",
+  "name": "Modal Dialog (Accessible) with Focus Trap and Actions",
+  "category": "components",
+  "tags": ["modal", "dialog", "overlay", "focus-trap", "a11y", "wcag", "aria"],
+
+  "description": "An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.",
+
+  "tokens": {
+    "layout": {
+      "zIndex": {
+        "overlayBackdrop": 40,
+        "dialog": 50,
+        "tooltips": 60
+      }
+    },
+    "motion": {
+      "openDurationMs": 180,
+      "closeDurationMs": 140,
+      "easing": "cubic-bezier(0.2, 0, 0, 1)"
+    }
+  },
+
+  "aiAgentInstructions": {
+    "summary": "Implement a reusable modal dialog with overlay backdrop, focus trap, and keyboard accessibility. Adapt to the user's framework and styling system. Ensure WCAG AA compliance, including Escape handling, focus restoration, and ARIA attributes.",
+    "keyFeatures": [
+      "Accessible semantics: role='dialog' or role='alertdialog', aria-modal, aria-labelledby, aria-describedby",
+      "Focus trap while open; restore focus to trigger on close",
+      "Dismiss rules: Escape closes when dismissible; optional backdrop click close",
+      "Body scroll lock while open; preserve scroll position",
+      "Responsive sizing: centered dialog on desktop; optional fullscreen on mobile",
+      "Animations with prefers-reduced-motion support",
+      "Action footer: primary/secondary buttons; loading/disabled states"
+    ],
+    "implementationSteps": [
+      "1. Build component anatomy: Trigger, Backdrop, Dialog, Header, Body, Footer",
+      "2. Implement open/close state and controlled/uncontrolled usage",
+      "3. Add focus trap (manual or library) and focus restoration to trigger",
+      "4. Add Escape and backdrop click handlers based on dismissible config",
+      "5. Add scroll locking and cleanup on close/unmount",
+      "6. Apply ARIA: aria-modal, aria-labelledby, aria-describedby; set role based on variant",
+      "7. Add animations + prefers-reduced-motion behavior",
+      "8. Provide confirm/alert variants and responsive fullscreen option",
+      "9. Provide test checklist for keyboard + screen reader flows"
+    ]
+  },
+
+  "componentSpec": {
+    "goal": "Provide a safe, accessible modal dialog for confirmations, forms, and focused tasks without leaving the current page context.",
+
+    "anatomy": {
+      "slots": [
+        "trigger",
+        "backdrop",
+        "dialog",
+        "title",
+        "description",
+        "body",
+        "footer",
+        "closeButton"
+      ],
+      "hierarchy": "Trigger → Backdrop → Dialog( Header(Title, Close), Body, Footer(Actions) )"
+    },
+
+    "stateModel": {
+      "open": {
+        "type": "boolean",
+        "description": "Whether the dialog is open.",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "loading": {
+        "type": "boolean",
+        "description": "Whether primary action is processing; disables actions and optionally shows spinner.",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "variant": {
+        "type": "enum",
+        "description": "Dialog semantics variant; alertdialog is used for urgent confirmations.",
+        "default": "dialog",
+        "allowedValues": ["dialog", "alertdialog"],
+        "persistence": "props/config"
+      },
+      "dismissible": {
+        "type": "boolean",
+        "description": "If true, Escape and (optionally) backdrop click can close the dialog.",
+        "default": true,
+        "persistence": "props/config"
+      },
+      "closeOnBackdropClick": {
+        "type": "boolean",
+        "description": "If true and dismissible=true, clicking backdrop closes the dialog.",
+        "default": true,
+        "persistence": "props/config"
+      },
+      "fullscreenOnMobile": {
+        "type": "boolean",
+        "description": "If true, dialog becomes fullscreen on small screens.",
+        "default": true,
+        "persistence": "props/config"
+      }
+    },
+
+    "interactions": [
+      {
+        "event": "triggerClick",
+        "result": "openDialog",
+        "sideEffects": [
+          "captureTriggerElementForFocusRestore",
+          "lockBodyScroll",
+          "moveFocusToInitialElement"
+        ]
+      },
+      {
+        "event": "escapeKey",
+        "when": "open && dismissible",
+        "result": "closeDialog",
+        "sideEffects": ["restoreFocusToTrigger", "unlockBodyScroll"],
+        "preventDefault": true,
+        "stopPropagation": true,
+        "accessibilityNotes": "Escape should close and return focus to the element that opened the dialog."
+      },
+      {
+        "event": "backdropClick",
+        "when": "open && dismissible && closeOnBackdropClick",
+        "result": "closeDialog",
+        "sideEffects": ["restoreFocusToTrigger", "unlockBodyScroll"],
+        "stopPropagation": true
+      },
+      {
+        "event": "closeButtonClick",
+        "when": "open",
+        "result": "closeDialog",
+        "sideEffects": ["restoreFocusToTrigger", "unlockBodyScroll"]
+      },
+      {
+        "event": "primaryActionClick",
+        "when": "open && !loading",
+        "result": "invokePrimaryAction",
+        "sideEffects": ["setLoadingTrue", "disableActions"]
+      },
+      {
+        "event": "primaryActionResolved",
+        "when": "open",
+        "result": "closeDialog",
+        "sideEffects": [
+          "setLoadingFalse",
+          "restoreFocusToTrigger",
+          "unlockBodyScroll"
+        ]
+      },
+      {
+        "event": "primaryActionRejected",
+        "when": "open",
+        "result": "keepDialogOpen",
+        "sideEffects": ["setLoadingFalse", "announceErrorOptional"]
+      }
+    ],
+
+    "responsiveBehavior": {
+      "mobile": {
+        "maxWidthPx": 767,
+        "behavior": "If fullscreenOnMobile=true, dialog uses fullscreen layout; otherwise uses near-full width with margins.",
+        "padding": "16px"
+      },
+      "desktop": {
+        "minWidthPx": 1024,
+        "maxDialogWidthPx": 640,
+        "bodyMaxHeight": "calc(100vh - 200px)",
+        "bodyOverflow": "auto"
+      }
+    },
+
+    "variants": {
+      "confirm": "Shows primary and secondary buttons. Backdrop click allowed if dismissible.",
+      "alert": "Uses role='alertdialog'. Prefer closeOnBackdropClick=false to avoid accidental dismissal."
+    }
+  },
+
+  "animations": {
+    "open": {
+      "durationMs": 180,
+      "easing": "cubic-bezier(0.2, 0, 0, 1)",
+      "backdrop": { "opacity": "0 → 1" },
+      "dialog": {
+        "opacity": "0 → 1",
+        "transform": "translateY(8px) scale(0.98) → translateY(0) scale(1)"
+      }
+    },
+    "close": {
+      "durationMs": 140,
+      "easing": "cubic-bezier(0.2, 0, 0, 1)",
+      "backdrop": { "opacity": "1 → 0" },
+      "dialog": {
+        "opacity": "1 → 0",
+        "transform": "translateY(0) scale(1) → translateY(8px) scale(0.98)"
+      }
+    }
+  },
+
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "2.1.1": "All dialog controls operable via keyboard; focus is trapped within dialog while open.",
+        "2.1.2": "No keyboard trap beyond intended focus trap; Escape exits when dismissible.",
+        "2.4.3": "Logical focus order; initial focus placed inside dialog; focus returns to trigger on close.",
+        "2.4.7": "Visible focus indicators for all interactive elements.",
+        "4.1.2": "Correct ARIA roles, names, and relationships."
+      }
+    },
+    "keyboardNavigation": {
+      "escapeKey": "Closes dialog when dismissible=true; always restore focus to trigger.",
+      "tabKey": "Trapped within dialog. Tabbing cycles through focusable elements; Shift+Tab cycles backwards.",
+      "initialFocus": "Prefer first focusable element in body, else close button, else primary action button."
+    },
+    "ariaAttributes": {
+      "required": {
+        "dialog": {
+          "role": "dialog or alertdialog (variant-dependent)",
+          "aria-modal": "true",
+          "aria-labelledby": "id of title element",
+          "aria-describedby": "id of description/body element (when present)"
+        },
+        "closeButton": { "aria-label": "Close dialog" },
+        "trigger": {
+          "aria-haspopup": "dialog",
+          "aria-expanded": "true/false"
+        }
+      },
+      "optional": {
+        "statusRegion": {
+          "role": "status",
+          "aria-live": "polite",
+          "usage": "Optional: announce loading or error messages."
+        }
+      }
+    },
+    "implementationChecklist": [
+      "Trap focus inside dialog when open",
+      "Restore focus to trigger on close (all close paths)",
+      "Escape closes dialog only if dismissible=true",
+      "Backdrop click closes only if closeOnBackdropClick=true",
+      "role and aria-* attributes present and correctly wired",
+      "Body scroll lock applied and cleaned up",
+      "prefers-reduced-motion reduces or removes transforms"
+    ]
+  },
+
+  "testingChecklist": [
+    "Dialog opens from trigger and focus moves inside dialog",
+    "Tab and Shift+Tab cycle within dialog only",
+    "Escape closes when dismissible=true and restores focus to trigger",
+    "Backdrop click closes only when enabled; does not close when disabled",
+    "Close button always closes and restores focus",
+    "role='dialog'/'alertdialog' correctly applied based on variant",
+    "aria-labelledby and aria-describedby point to existing elements",
+    "Body scroll is locked while open and restored on close",
+    "On mobile, fullscreen variant renders correctly when enabled",
+    "prefers-reduced-motion removes heavy transforms/animations"
+  ],
+
+  "aiImplementationPrompt": "Implement an accessible Modal Dialog component with overlay backdrop, focus trap, focus restoration to trigger, Escape/backdrop dismissal (configurable), and scroll lock. Support role='dialog' and role='alertdialog' variants, with aria-modal, aria-labelledby, aria-describedby, and aria-expanded on the trigger. Provide header (title + close), body, footer (primary/secondary actions) and loading state for primary action. Add open/close animations with prefers-reduced-motion support. Adapt to {{USER_FRAMEWORK}} and {{USER_STYLING_LIBRARY}}.",
+
+  "meta": {
+    "created": "2026-01-11",
+    "updated": "2026-01-11",
+    "complexity": "intermediate",
+    "estimatedImplementationTime": "1-2 hours",
+    "webUrl": "https://uipotion.com/potions/components/modal-dialog.html"
+  }
+}
