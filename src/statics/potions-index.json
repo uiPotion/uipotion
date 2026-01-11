@@ -25,8 +25,21 @@
       "agentGuideUrl": "https://uipotion.com/potions/components/dialog.json",
       "created": "2026-01-11",
       "updated": "2026-01-11"
+    },
+    {
+      "id": "navbar",
+      "name": "Navigation Bar (Responsive) with Mobile Menu",
+      "category": "components",
+      "tags": ["navbar", "navigation", "header", "responsive", "mobile-menu", "sticky", "a11y"],
+      "excerpt": "A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, and transparent-to-solid transition. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.",
+      "complexity": "intermediate",
+      "estimatedImplementationTime": "2-3 hours",
+      "webUrl": "https://uipotion.com/potions/components/navbar.html",
+      "agentGuideUrl": "https://uipotion.com/potions/components/navbar.json",
+      "created": "2026-01-12",
+      "updated": "2026-01-12"
     }
   ],
-  "totalCount": 2,
-  "lastUpdated": "2026-01-11"
+  "totalCount": 3,
+  "lastUpdated": "2026-01-12"
 }

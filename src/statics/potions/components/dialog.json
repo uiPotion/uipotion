@@ -1,5 +1,4 @@
 {
-  "$schema": "https://uipotion.com/schema/potion.json",
   "id": "modal-dialog",
   "version": "1.0.0",
   "name": "Modal Dialog (Accessible) with Focus Trap and Actions",

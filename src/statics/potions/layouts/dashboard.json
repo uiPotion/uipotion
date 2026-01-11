@@ -1,5 +1,4 @@
 {
-  "$schema": "https://uipotion.com/schema/potion.json",
   "id": "dashboard",
   "version": "1.0.0",
   "name": "Dashboard Layout with Collapsible Sidebar",
