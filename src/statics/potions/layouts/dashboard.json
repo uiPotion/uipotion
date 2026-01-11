@@ -66,7 +66,7 @@
 
   "aiAgentInstructions": {
     "summary": "Implement a four-section dashboard layout (sidebar, header, content, footer) with collapsible sidebar functionality. The layout is framework-agnostic and should adapt to the user's chosen stack (React, Vue, Angular, Svelte, etc.) and styling approach (Tailwind, CSS Modules, Chakra UI, Material-UI, etc.).",
-    "keyFeatures": [
+      "keyFeatures": [
       "Fixed collapsible sidebar (280px expanded, 80px collapsed by default)",
       "Fixed header that adjusts to sidebar state (64px height)",
       "Fixed footer that adjusts to sidebar state (60px height)",
@@ -76,7 +76,9 @@
       "State persistence in localStorage",
       "Full keyboard accessibility with ARIA labels",
       "Smooth animations (default 300ms)",
-      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems."
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems.",
+      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements. Define classes like .sidebar, .sidebar--collapsed, .header, etc. and apply them via className/class attributes.",
+      "CRITICAL: When detecting React, extract logic from useEffect hooks into separate custom hooks that do ONE thing each. For example: useSidebarState(), useLocalStorage(), useBodyScrollLock(), useFocusTrap(). This improves code organization, testability, and reusability."
     ],
     "implementationSteps": [
       "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine: (a) package.json for framework (React, Vue, Angular, Svelte) and styling dependencies (tailwindcss, styled-components, emotion, sass, etc.), (b) existing component files to see how they import styles (CSS Modules, Tailwind classes, styled-components, etc.), (c) config files (tailwind.config.js, vite.config.js, webpack.config.js, etc.), (d) existing style files and their structure. If the project uses Tailwind, use Tailwind. If SCSS/CSS, use SCSS/CSS. If styled-components, use styled-components. If nothing is configured, use the most suitable CSS approach (vanilla CSS or CSS Modules).",
@@ -91,7 +93,7 @@
       "6. Adjust header and footer start offset based on sidebar state on desktop",
       "7. Add padding-top and padding-bottom (or margins) to content area for header/footer spacing",
       "8. Add smooth transitions (default 300ms) for all state changes",
-      "9. Implement keyboard navigation, skip link, and ARIA attributes",
+      "9. Implement keyboard navigation and ARIA attributes",
       "10. Use ONLY the detected styling system. Do NOT add <style> blocks, inline styles, or new CSS files unless that's the project's convention. Match existing component styling patterns exactly.",
       "11. Style according to the detected framework and styling system, using only existing project conventions"
     ]
@@ -99,12 +101,9 @@
 
   "structure": {
     "hierarchy": {
-      "AppContainer": {
+        "AppContainer": {
         "description": "Root container, full viewport height, controls layout stacking and overflow policies",
         "children": {
-          "SkipLink": {
-            "description": "First focusable element; skips to main content"
-          },
           "Sidebar": {
             "description": "Fixed sidebar, left-aligned, collapsible (desktop) and overlay (mobile)",
             "children": ["LogoSection", "NavigationMenu", "CollapseToggle"]
@@ -391,8 +390,9 @@
 
   "frameworkPatterns": {
     "react": {
-      "stateManagement": "useState for component state, useEffect for localStorage (SSR-safe), Context API or props for sharing state",
-      "example": "const [collapsed, setCollapsed] = useState(false); useEffect(() => { if (typeof window === 'undefined') return; const v = window.localStorage.getItem('uipotion.dashboard.sidebarCollapsed.v1'); setCollapsed(v === 'true'); }, []);",
+      "stateManagement": "useState for component state, custom hooks for localStorage (SSR-safe), Context API or props for sharing state",
+      "example": "const [collapsed, setCollapsed] = useState(false); const { value: persistedCollapsed, setValue: setPersistedCollapsed } = useLocalStorage('uipotion.dashboard.sidebarCollapsed.v1', false); useEffect(() => { setCollapsed(persistedCollapsed); }, [persistedCollapsed]);",
+      "customHooks": "Extract logic into separate hooks: useLocalStorage(key, defaultValue), useBodyScrollLock(isLocked), useFocusTrap(containerRef, isActive), useSidebarState(). Each hook should handle ONE concern only.",
       "componentStructure": "<DashboardLayout><Sidebar collapsed={collapsed} onToggle={handleToggle} /><Header sidebarCollapsed={collapsed} /><ContentArea>{children}</ContentArea><Footer sidebarCollapsed={collapsed} isMobile={isMobile} /></DashboardLayout>"
     },
     "vue": {
@@ -449,9 +449,9 @@
     },
     "vanillaCSS": {
       "description": "Standard CSS with class toggles. Apply token values directly.",
-      "approach": "Define classes with transitions using token values; toggle via JS",
+      "approach": "Define classes with transitions using token values; toggle via JS. CRITICAL: ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements.",
       "example": ".sidebar{width:280px;transition:width 300ms cubic-bezier(0.4,0,0.2,1)}.sidebar--collapsed{width:80px} .header{position:fixed;inset-block-start:0;inset-inline-start:280px;transition:inset-inline-start 300ms} .header--collapsed{inset-inline-start:80px}",
-      "note": "Prefer logical inset/margin properties for RTL."
+      "note": "Prefer logical inset/margin properties for RTL. Apply classes via className/class attribute: <aside class='sidebar sidebar--collapsed'> NOT <aside style='width: 80px'>"
     },
     "sass": {
       "description": "SCSS with variables and mixins. Define token values as SCSS variables.",
@@ -499,7 +499,6 @@
         "1.4.3": "Contrast Minimum - 4.5:1 for normal text, 3:1 for large text (verify with contrast checker)",
         "2.1.1": "Keyboard - All interactive elements keyboard accessible",
         "2.1.2": "No Keyboard Trap - Focus trapping only in mobile sidebar overlay",
-        "2.4.1": "Bypass Blocks - Skip link to main content (REQUIRED)",
         "2.4.2": "Page Titled - Descriptive page title",
         "2.4.3": "Focus Order - Logical tab order throughout",
         "2.4.4": "Link Purpose - Clear link labels, icons have text or aria-label",
@@ -512,16 +511,9 @@
       }
     },
     "keyboardNavigation": {
-      "tabOrder": "Skip link → Header → Sidebar → Content → Footer",
+      "tabOrder": "Header → Sidebar → Content → Footer",
       "sidebarItems": "Tab to focus, Enter/Space to activate",
       "escapeKey": "Close dropdowns and mobile sidebar, restore focus to trigger",
-      "skipLink": {
-        "required": true,
-        "implementation": "First focusable element, hidden by default, visible on focus",
-        "target": "Main content area (id='contentArea' or id='main')",
-        "example": "<a href='#contentArea' class='skip-link'>Skip to main content</a>",
-        "css": "Position absolute, top: -40px, left: 0, z-index: 100. On :focus, top: 0"
-      },
       "focusTrap": {
         "when": "Mobile sidebar open",
         "implementation": "Use focus-trap library or manual implementation",
@@ -588,7 +580,7 @@
       "optional": {
         "mainContent": {
           "role": "main (semantic HTML <main> preferred)",
-          "id": "contentArea or main (for skip link target)"
+          "id": "contentArea or main"
         },
         "header": {
           "role": "banner (semantic HTML <header> preferred)"
@@ -639,7 +631,7 @@
       },
       "focusOrder": {
         "principle": "Logical reading order",
-        "order": "Skip link → Header → Sidebar → Main content → Footer"
+        "order": "Header → Sidebar → Main content → Footer"
       }
     },
     "colorContrast": {
@@ -658,7 +650,6 @@
       "recommendation": "Aim for 7:1 contrast for important text (WCAG AAA)"
     },
     "implementationChecklist": [
-      "Add skip link as first focusable element",
       "All buttons have aria-label or visible text",
       "All icons have aria-label or sr-only text",
       "Navigation items have aria-current='page' when active",
@@ -953,10 +944,6 @@
   },
 
   "accessibilityExamples": {
-    "skipLink": {
-      "html": "<a href=\"#contentArea\" class=\"skip-link\">Skip to main content</a>",
-      "css": ".skip-link { position: absolute; top: -40px; left: 0; background: var(--primary-color); color: white; padding: 12px 16px; z-index: 1000; } .skip-link:focus { top: 0; }"
-    },
     "sidebar": {
       "html": "<aside class=\"sidebar\" id=\"sidebar\" role=\"navigation\" aria-label=\"Main navigation\" aria-hidden=\"false\">",
       "note": "Update aria-hidden based on mobile state; consider inert background when overlay is open."
@@ -1051,7 +1038,9 @@
       "Do NOT create new CSS/SCSS files unless that's how the project structures styles",
       "Do NOT hardcode colors/values - use project's design tokens or match existing component values",
       "Do NOT import new UI libraries or styling dependencies",
-      "Do NOT use string concatenation for class names - use project's composition utility"
+      "Do NOT use string concatenation for class names - use project's composition utility",
+      "CRITICAL: When vanilla CSS is detected, NEVER use inline style attributes on HTML elements. ALWAYS create CSS classes in a stylesheet and apply them via className/class. Example: Create .sidebar { width: 280px; } in CSS, then use <aside class='sidebar'> not <aside style='width: 280px'>",
+      "CRITICAL: When React is detected, NEVER put multiple concerns in a single useEffect. ALWAYS extract logic into separate custom hooks. Example: Instead of useEffect(() => { /* localStorage + scroll lock + focus trap */ }), create useLocalStorage(), useBodyScrollLock(), useFocusTrap() hooks and use them separately"
     ]
   },
 
@@ -1088,7 +1077,7 @@
     "All classes use tokenMapping values or existing project tokens"
   ],
 
-  "aiImplementationPrompt": "Create a responsive dashboard layout with a collapsible sidebar (default 280px expanded, 80px collapsed), fixed header (64px height), fixed footer (60px height), and scrollable content area. The sidebar should overlay on mobile (<768px) and persist its collapsed state (desktop) in localStorage using key 'uipotion.dashboard.sidebarCollapsed.v1'. Both header and footer should adjust their start offset based on sidebar state (280px when expanded, 80px when collapsed on desktop). Content area should account for fixed header/footer offsets (top 64px, bottom 60px) and avoid horizontal page scrolling. Include smooth 300ms transitions, keyboard accessibility with ARIA labels and a required skip link, and active state highlighting for current page. Ensure overlay behavior includes backdrop dismissal, focus trap, focus restoration, body scroll lock, and inert background content. Respect prefers-reduced-motion and apply mobile safe-area insets. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. Include mobile menu toggle, user dropdown, and notifications button in the header. Footer should contain copyright and navigation links.",
+  "aiImplementationPrompt": "Create a responsive dashboard layout with a collapsible sidebar (default 280px expanded, 80px collapsed), fixed header (64px height), fixed footer (60px height), and scrollable content area. The sidebar should overlay on mobile (<768px) and persist its collapsed state (desktop) in localStorage using key 'uipotion.dashboard.sidebarCollapsed.v1'. Both header and footer should adjust their start offset based on sidebar state (280px when expanded, 80px when collapsed on desktop). Content area should account for fixed header/footer offsets (top 64px, bottom 60px) and avoid horizontal page scrolling. Include smooth 300ms transitions, keyboard accessibility with ARIA labels, and active state highlighting for current page. Ensure overlay behavior includes backdrop dismissal, focus trap, focus restoration, body scroll lock, and inert background content. Respect prefers-reduced-motion and apply mobile safe-area insets. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. Include mobile menu toggle, user dropdown, and notifications button in the header. Footer should contain copyright and navigation links. CRITICAL: If vanilla CSS is detected, create CSS classes in a stylesheet, never use inline styles. If React is detected, extract useEffect logic into separate custom hooks (one concern per hook).",
 
   "meta": {
     "created": "2026-01-10",

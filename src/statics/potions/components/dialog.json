@@ -33,7 +33,9 @@
       "Responsive sizing: centered dialog on desktop; optional fullscreen on mobile",
       "Animations with prefers-reduced-motion support",
       "Action footer: primary/secondary buttons; loading/disabled states",
-      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems."
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems.",
+      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements. Define classes like .dialog, .dialog--open, .backdrop, etc. and apply them via className/class attributes.",
+      "CRITICAL: When detecting React, extract logic from useEffect hooks into separate custom hooks that do ONE thing each. For example: useFocusTrap(), useBodyScrollLock(), useDialogState(). This improves code organization, testability, and reusability."
     ],
     "implementationSteps": [
       "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine: (a) package.json for framework (React, Vue, Angular, Svelte) and styling dependencies (tailwindcss, styled-components, emotion, sass, etc.), (b) existing component files to see how they import styles (CSS Modules, Tailwind classes, styled-components, etc.), (c) config files (tailwind.config.js, vite.config.js, webpack.config.js, etc.), (d) existing style files and their structure. If the project uses Tailwind, use Tailwind. If SCSS/CSS, use SCSS/CSS. If styled-components, use styled-components. If nothing is configured, use the most suitable CSS approach (vanilla CSS or CSS Modules).",
@@ -312,7 +314,9 @@
       "Do NOT create new CSS/SCSS files unless that's how the project structures styles",
       "Do NOT hardcode colors/values - use project's design tokens or match existing component values",
       "Do NOT import new UI libraries or styling dependencies",
-      "Do NOT use string concatenation for class names - use project's composition utility"
+      "Do NOT use string concatenation for class names - use project's composition utility",
+      "CRITICAL: When vanilla CSS is detected, NEVER use inline style attributes on HTML elements. ALWAYS create CSS classes in a stylesheet and apply them via className/class. Example: Create .dialog { max-width: 640px; } in CSS, then use <div class='dialog'> not <div style='max-width: 640px'>",
+      "CRITICAL: When React is detected, NEVER put multiple concerns in a single useEffect. ALWAYS extract logic into separate custom hooks. Example: Instead of useEffect(() => { /* focus trap + scroll lock + escape handler */ }), create useFocusTrap(), useBodyScrollLock(), useEscapeHandler() hooks and use them separately"
     ]
   },
 
@@ -331,7 +335,7 @@
     "All styling matches project conventions and existing patterns"
   ],
 
-  "aiImplementationPrompt": "Implement an accessible Modal Dialog component with overlay backdrop, focus trap, focus restoration to trigger, Escape/backdrop dismissal (configurable), and scroll lock. Support role='dialog' and role='alertdialog' variants, with aria-modal, aria-labelledby, aria-describedby, and aria-expanded on the trigger. Provide header (title + close), body, footer (primary/secondary actions) and loading state for primary action. Add open/close animations with prefers-reduced-motion support. Adapt to {{USER_FRAMEWORK}} and {{USER_STYLING_LIBRARY}}.",
+  "aiImplementationPrompt": "Implement an accessible Modal Dialog component with overlay backdrop, focus trap, focus restoration to trigger, Escape/backdrop dismissal (configurable), and scroll lock. Support role='dialog' and role='alertdialog' variants, with aria-modal, aria-labelledby, aria-describedby, and aria-expanded on the trigger. Provide header (title + close), body, footer (primary/secondary actions) and loading state for primary action. Add open/close animations with prefers-reduced-motion support. Adapt to {{USER_FRAMEWORK}} and {{USER_STYLING_LIBRARY}}. CRITICAL: If vanilla CSS is detected, create CSS classes in a stylesheet, never use inline styles. If React is detected, extract useEffect logic into separate custom hooks (one concern per hook).",
 
   "meta": {
     "created": "2026-01-11",

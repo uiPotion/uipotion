@@ -226,7 +226,6 @@ This dashboard layout should meet WCAG 2.1 Level AA standards. Key requirements:
 - **1.4.3 Contrast Minimum**: 4.5:1 for normal text, 3:1 for large text (verify with contrast checker)
 - **2.1.1 Keyboard**: All interactive elements keyboard accessible
 - **2.1.2 No Keyboard Trap**: Focus trapping only in mobile sidebar overlay
-- **2.4.1 Bypass Blocks**: **Skip link to main content (REQUIRED)**
 - **2.4.2 Page Titled**: Descriptive page title
 - **2.4.3 Focus Order**: Logical tab order throughout
 - **2.4.4 Link Purpose**: Clear link labels, icons have text or aria-label
@@ -237,29 +236,11 @@ This dashboard layout should meet WCAG 2.1 Level AA standards. Key requirements:
 ### Keyboard Navigation
 
 **Tab Order:**
-- Skip link (if visible) → Header → Sidebar → Content → Footer
+- Header → Sidebar → Content → Footer
 
 **Implementation:**
 - Sidebar items: Tab to focus, Enter/Space to activate
 - Escape key: Close dropdowns and mobile sidebar, restore focus to trigger
-- **Skip Link (REQUIRED)**: First focusable element, hidden by default, visible on focus
-  ```html
-  <a href="#contentArea" class="skip-link">Skip to main content</a>
-  ```
-  ```css
-  .skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: var(--primary-color);
-    color: white;
-    padding: 12px 16px;
-    z-index: 1000;
-  }
-  .skip-link:focus {
-    top: 0;
-  }
-  ```
 
 **Focus Management:**
 - **Focus trap**: Trap focus within sidebar when open on mobile (use focus-trap library or manual implementation)
@@ -402,7 +383,6 @@ a:focus,
 
 When implementing this dashboard, ensure:
 
-- [ ] Skip link added as first focusable element
 - [ ] All buttons have `aria-label` or visible text
 - [ ] All icons have `aria-label` or sr-only text
 - [ ] Navigation items have `aria-current="page"` when active
@@ -531,6 +511,28 @@ Use subtle shadows for depth and separation:
 - **localStorage access**: Only access localStorage in `onMounted`/`useEffect`, check for `window` object existence
 - **Default state**: Use `false` as default for `sidebarCollapsed`, update after mount to prevent hydration mismatches
 - **Implementation**: Check `typeof window !== 'undefined'` before accessing localStorage, initialize state after component mount
+- **React Note**: Extract localStorage logic into a `useLocalStorage` custom hook rather than putting it directly in `useEffect`
+
+## Critical Implementation Guidelines
+
+### Vanilla CSS Detection
+**CRITICAL**: When detecting vanilla CSS in the project, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements. 
+
+- Define classes like `.sidebar`, `.sidebar--collapsed`, `.header`, `.header--shifted`, etc. in your CSS file
+- Apply classes via `className`/`class` attributes: `<aside class="sidebar sidebar--collapsed">`
+- Do NOT use: `<aside style="width: 80px">`
+- This ensures maintainability, reusability, and proper separation of concerns
+
+### React Hook Patterns
+**CRITICAL**: When detecting React, extract logic from `useEffect` hooks into separate custom hooks that do ONE thing each.
+
+- Instead of one `useEffect` handling multiple concerns (localStorage + scroll lock + focus trap), create separate hooks:
+  - `useLocalStorage(key, defaultValue)` - Handles localStorage persistence only
+  - `useBodyScrollLock(isLocked)` - Handles body scroll locking only
+  - `useFocusTrap(containerRef, isActive)` - Handles focus trapping only
+  - `useSidebarState()` - Manages sidebar state only
+- This improves code organization, testability, and reusability
+- Each hook should have a single responsibility
 
 ## Code Implementation Patterns
 
@@ -634,8 +636,9 @@ Use subtle shadows for depth and separation:
 
 **Note**: Use arbitrary values like `w-[280px]` instead of `w-64` (256px) to match exact design specifications. Use `pb-[60px]` instead of `pb-15` (which doesn't exist in Tailwind). Map design system color values to Tailwind color palette or use arbitrary values like `bg-[#1f2937]`.
 
-#### CSS Modules Pattern
+#### Vanilla CSS Pattern
 ```css
+/* CRITICAL: Always create CSS classes, never use inline styles */
 /* Apply design system values directly */
 .sidebar {
   position: fixed;

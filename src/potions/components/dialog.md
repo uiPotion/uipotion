@@ -406,6 +406,27 @@ Use subtle shadows for depth and separation:
 - **Focus management**: Only access DOM elements after component mount
 - **Body scroll lock**: Only apply after component mount, check for `window` object existence
 
+## Critical Implementation Guidelines
+
+### Vanilla CSS Detection
+**CRITICAL**: When detecting vanilla CSS in the project, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements.
+
+- Define classes like `.dialog`, `.dialog--open`, `.backdrop`, `.dialog-header`, etc. in your CSS file
+- Apply classes via `className`/`class` attributes: `<div class="dialog dialog--open">`
+- Do NOT use: `<div style="max-width: 640px">`
+- This ensures maintainability, reusability, and proper separation of concerns
+
+### React Hook Patterns
+**CRITICAL**: When detecting React, extract logic from `useEffect` hooks into separate custom hooks that do ONE thing each.
+
+- Instead of one `useEffect` handling multiple concerns (focus trap + scroll lock + escape handler), create separate hooks:
+  - `useFocusTrap(containerRef, isActive)` - Handles focus trapping only
+  - `useBodyScrollLock(isLocked)` - Handles body scroll locking only
+  - `useEscapeHandler(onEscape, isActive)` - Handles Escape key only
+  - `useDialogState(initialOpen)` - Manages dialog open/close state only
+- This improves code organization, testability, and reusability
+- Each hook should have a single responsibility
+
 ## Code Implementation Patterns
 
 ### React Example Pattern
@@ -547,8 +568,9 @@ Use subtle shadows for depth and separation:
 </div>
 ```
 
-#### CSS Modules Pattern
+#### Vanilla CSS Pattern
 ```css
+/* CRITICAL: Always create CSS classes, never use inline styles */
 /* Apply design system values directly */
 .backdrop {
   position: fixed;
