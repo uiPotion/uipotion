@@ -19,7 +19,7 @@
   "properties": {
     "$schema": {
       "type": "string",
-      "description": "Pointer to UI Potion registry schema (not JSON Schema). Example: https://uipotion.com/schema/potion.json"
+      "description": "Pointer to the category-specific UI Potion schema URL for validation. Must match the potion's category. Examples: https://uipotion.com/schema/categories/layouts.schema.json (for layouts), https://uipotion.com/schema/categories/components.schema.json (for components), etc. This is NOT the JSON Schema specification URL, but rather the UI Potion category schema that validates the potion structure."
     },
     "id": {
       "type": "string",

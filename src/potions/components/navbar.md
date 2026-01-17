@@ -1,8 +1,8 @@
 ---
 layout: 'potion'
-title: 'Navigation Bar (Responsive) with Mobile Menu'
+title: 'Navigation Bar (Responsive) with Mobile Menu + Dropdowns'
 publicationDate: '2026-01-12'
-excerpt: 'A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, and transparent-to-solid transition. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.'
+excerpt: 'A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, optional transparent-to-solid transition, and first-class dropdown support. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.'
 category: 'Components'
 tags:
   - navbar
@@ -11,38 +11,40 @@ tags:
   - responsive
   - mobile-menu
   - sticky
+  - dropdown
   - a11y
 agentManifest: 'potions/components/navbar.json'
 ---
 
-# Navigation Bar (Responsive) with Mobile Menu
+# Navigation Bar (Responsive) with Mobile Menu + Dropdowns
 
-A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, and transparent-to-solid transition. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.
+A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, optional transparent-to-solid transition, and first-class dropdown support. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.
 
 ## Structure Specification
 
 ### Component Hierarchy
 
-The navbar consists of a Navbar Container that holds a Logo/Brand Section, Navigation Links (desktop), Mobile Menu Toggle Button, Action Buttons (CTA or User Menu), and an optional Mobile Menu Overlay. The Mobile Menu contains Navigation Links and Action Buttons.
+The navbar consists of a Navbar Container that holds a Logo/Brand Section, Navigation Links with Dropdown Panels (desktop), Mobile Menu Toggle Button, Action Buttons (CTA or User Menu), and a Mobile Menu Dialog. The Mobile Menu Dialog contains Navigation Links (with accordion sections for items with children) and Action Buttons.
 
 ```
-Navbar → Logo | NavLinks (desktop) | MobileToggle | Actions
+Navbar → Logo | NavLinks (desktop, includes dropdown toggles/panels) | MobileToggle | Actions
          ↓
-MobileMenu (overlay) → NavLinks | Actions
+MobileMenu (dialog) → NavLinks (accordion) | Actions
 ```
 
 ## Detailed Component Specifications
 
 ### 1. Navbar Component
 
-**Goal**: Provide a responsive navigation bar that adapts to different screen sizes, supports sticky positioning, and includes accessible mobile menu functionality.
+**Goal**: Provide a responsive navigation bar that adapts to screen sizes, supports sticky/transparent behavior, and includes accessible mobile menu and dropdown navigation.
 
 **Anatomy Slots**:
 - `logo` - Brand logo/image/text
-- `navLinks` - Navigation links (desktop visible, mobile in overlay)
+- `navLinks` - Navigation links (desktop visible, mobile in dialog)
 - `mobileToggle` - Hamburger menu button (mobile only)
 - `actions` - CTA button(s) or user menu (desktop)
-- `mobileMenu` - Overlay menu for mobile navigation
+- `dropdownPanels` - Desktop dropdown panels (disclosure pattern)
+- `mobileMenu` - Modal dialog for mobile navigation
 
 **Dimensions**:
 - Desktop: Full width, height 64-80px (default: 72px)
@@ -52,10 +54,13 @@ MobileMenu (overlay) → NavLinks | Actions
 
 **States**:
 - `variant` (enum: "marketing" | "app", default: "marketing") - Navbar style variant
-- `sticky` (boolean, default: false) - Whether navbar is sticky on scroll
-- `transparent` (boolean, default: false) - Transparent background (becomes solid on scroll)
-- `mobileMenuOpen` (boolean, default: false) - Whether mobile menu is visible
-- `scrolled` (boolean, computed) - Whether page has scrolled (for transparent→solid transition)
+- `sticky` (boolean, default: true) - Whether navbar is sticky on scroll (default true for both variants)
+- `transparent` (boolean, default: false) - Transparent background (becomes solid on scroll; recommended only for marketing variant when background contrast is sufficient)
+- `mobileMenuOpen` (boolean, default: false) - Whether mobile menu dialog is visible
+- `scrolled` (boolean, computed) - Whether page has scrolled beyond threshold (used for transparent→solid and sticky elevation)
+- `activeLink` (string) - Current active navigation link ID/route (syncs with router/URL)
+- `openDropdownId` (string, default: "") - ID of currently open desktop dropdown (prefer single open dropdown at a time)
+- `mobileExpandedItemIds` (array, default: []) - IDs of expanded accordion sections inside mobile dialog (allow multiple expanded)
 
 **Elements**:
 
@@ -71,6 +76,9 @@ MobileMenu (overlay) → NavLinks | Actions
 - Active state: Underline, color change, or background highlight
 - Hover state: Subtle color change or underline
 - Hidden on mobile (< 768px)
+- **Dropdown Support**: Items with children open disclosure dropdown panels on click (no hover-only behavior)
+- **Dropdown Toggle**: Button with `aria-haspopup="true"`, `aria-expanded`, and `aria-controls`
+- **Dropdown Panel**: Container for links (disclosure pattern; avoid `role="menu"` unless fully implementing ARIA menu semantics)
 
 #### Mobile Menu Toggle
 - Size: 40px × 40px icon button
@@ -89,47 +97,64 @@ MobileMenu (overlay) → NavLinks | Actions
   - Contains: Profile, Settings, Logout links
   - Optional: Notifications button with badge
 
-#### Mobile Menu Overlay
-- Full viewport overlay when open
+#### Desktop Dropdown Panels
+- **Pattern**: Disclosure pattern (button controls a panel of links)
+- **Position**: Below dropdown toggle, aligned to toggle or left edge
+- **Z-index**: 80 (dropdowns from tokens)
+- **Behavior**: Opens on toggle click, closes on outside click or Escape
+- **Focus**: Does not trap focus; uses normal Tab order
+- **ARIA**: Toggle has `aria-haspopup="true"`, `aria-expanded`, `aria-controls`; panel has matching `id`
+- **Animation**: 180ms open, 150ms close (opacity, transform, visibility)
+- **Note**: Avoid `role="menu"` / `role="menuitem"` unless fully implementing ARIA menu button pattern with arrow-key semantics
+
+#### Mobile Menu Dialog
+- Modal dialog overlay when open (uses `role="dialog"` with `aria-modal="true"`)
 - Background: White (light) or dark neutral (dark mode)
 - Position: Fixed, full width, slides from top or left
-- Z-index: 50 (from tokens)
-- Contains: Navigation links (vertical stack) and action buttons
-- Backdrop: Optional dark overlay behind menu
+- Z-index: 60 (mobileMenu from tokens)
+- Contains: Navigation links (vertical stack, items with children render as accordion sections) and action buttons
+- Backdrop: Optional dark overlay behind menu (z-index: 50)
 - Animation: Slide-in from top/left (300ms), fade backdrop (200ms)
+- **Accordion Sections**: Items with children expand/collapse without closing the dialog
 
 **Behavior**:
-- Sticky positioning: Fixed at top when `sticky=true` and user scrolls
-- Transparent→Solid: Background transitions from transparent to solid on scroll (when `transparent=true`)
+- Sticky positioning: Fixed at top when `sticky=true` and user scrolls (default: true)
+- Transparent→Solid: Background transitions from transparent to solid on scroll (when `transparent=true`; marketing variant only)
 - Mobile menu: Opens/closes on toggle button click
 - Mobile menu: Closes on backdrop click, Escape key, or link click
-- Focus trap: Focus trapped within mobile menu when open
+- Mobile accordion: Items with children expand/collapse as accordion sections (does not close dialog)
+- Focus trap: Focus trapped within mobile menu dialog when open
 - Focus restoration: Returns focus to toggle button when menu closes
-- Body scroll lock: Body scroll locked when mobile menu is open
-- Active link: Highlights current page/route
+- Body scroll lock: Body scroll locked when mobile menu is open (restore on close)
+- Desktop dropdowns: Open on toggle click, close on outside click or Escape (disclosure pattern)
+- Desktop dropdown focus: Does not trap focus; uses normal Tab order; Escape restores focus to toggle
+- Active link: Highlights current page/route using project's routing solution
 - Keyboard navigation: Full keyboard support for all interactive elements
 
 ## Responsive Breakpoints
 
 ### Mobile (< 768px)
 - **Layout**: Logo left, hamburger menu right
-- **Navigation**: Hidden, accessible via mobile menu overlay
-- **Actions**: Hidden in navbar, shown in mobile menu
-- **Height**: 56-60px
-- **Mobile Menu**: Full-screen overlay or slide-in from side
+- **Navigation**: Hidden, accessible via mobile menu dialog
+- **Dropdowns**: Items with children render as accordion sections inside the dialog
+- **Actions**: Shown in mobile menu
+- **Height**: 60px
+- **Mobile Menu**: Modal dialog overlay; full-screen or slide-in panel
 
 ### Tablet (768px - 1023px)
 - **Layout**: Logo left, hamburger menu right
-- **Navigation**: Hidden, accessible via mobile menu overlay (same as mobile - default behavior)
-- **Actions**: Visible in navbar or mobile menu depending on space
-- **Height**: 64-72px
-- **Default**: Use mobile menu overlay pattern (same as mobile breakpoint)
+- **Navigation**: Default to mobile menu dialog pattern
+- **Dropdowns**: Items with children still behave as accordion sections inside the dialog
+- **Actions**: May be in navbar if space allows; otherwise in mobile menu
+- **Height**: 72px
+- **Default**: Use mobile menu dialog pattern (same as mobile breakpoint)
 
 ### Desktop (≥ 1024px)
 - **Layout**: Logo left, nav links center/left, actions right
 - **Navigation**: Horizontal nav links visible
+- **Dropdowns**: Items with children open disclosure dropdown panels on click (no hover-only behavior)
 - **Actions**: Visible in navbar
-- **Height**: 72-80px
+- **Height**: 72px
 - **Mobile Menu**: Hidden (hamburger button hidden)
 
 ## Interaction Patterns
@@ -156,11 +181,33 @@ MobileMenu (overlay) → NavLinks | Actions
 4. Body scroll is unlocked
 5. Backdrop fades out
 
+### Desktop Dropdown Open
+1. User clicks dropdown toggle button
+2. Dropdown panel appears below toggle with animation (180ms)
+3. `aria-expanded` updates to `true` on toggle
+4. Panel receives focus (first link) or focus stays on toggle (product-specific)
+5. Other open dropdowns close automatically (single open at a time)
+
+### Desktop Dropdown Close
+1. User clicks outside dropdown, clicks toggle again, or presses Escape
+2. Dropdown panel closes with animation (150ms)
+3. `aria-expanded` updates to `false` on toggle
+4. Focus returns to toggle button (on Escape)
+5. Outside click does not restore focus
+
+### Mobile Accordion Toggle
+1. User clicks accordion toggle inside mobile dialog
+2. Accordion section expands/collapses with animation
+3. `aria-expanded` updates on accordion toggle
+4. Mobile dialog remains open (does not close)
+5. Focus remains within the dialog
+
 ### Active Link Highlighting
-1. Current page/route is detected
+1. Current page/route is detected using project's routing solution
 2. Active link is visually highlighted (underline, color change, or background)
 3. `aria-current="page"` is set on active link
 4. Highlight persists on page reload
+5. Route changes update active link and may close open overlays (product-specific)
 
 ## Accessibility Requirements
 
@@ -168,28 +215,33 @@ MobileMenu (overlay) → NavLinks | Actions
 
 This navbar component should meet WCAG 2.1 Level AA standards. Key requirements:
 
-- **2.1.1 Keyboard**: All navbar controls operable via keyboard; focus is trapped within mobile menu while open.
-- **2.1.2 No Keyboard Trap**: No keyboard trap beyond intended focus trap; Escape exits mobile menu.
-- **2.4.3 Focus Order**: Logical focus order; focus returns to toggle button when menu closes.
+- **2.1.1 Keyboard**: All navbar controls operable via keyboard; focus trapped within mobile dialog while open.
+- **2.1.2 No Keyboard Trap**: Escape closes mobile dialog and dropdowns; no keyboard trap beyond intended modal focus trap.
+- **2.4.3 Focus Order**: Logical focus order; focus returns to correct toggle when overlays close.
 - **2.4.7 Focus Visible**: Visible focus indicators for all interactive elements.
 - **4.1.2 Name, Role, Value**: Correct ARIA roles, names, and relationships.
 
 ### Keyboard Navigation
 
 **Tab Order**:
-- Logo → Nav Links (desktop) → Actions → Mobile Toggle (mobile)
-- Within mobile menu: Links → Actions → Close button
+- Logo → Nav Links (desktop, including dropdown toggles) → Actions → Mobile Toggle (mobile)
+- Within mobile dialog: Links → Accordion toggles → Actions → Close button
+- Desktop dropdown panels: Do not trap focus; use normal Tab order
 
 **Implementation**:
 - Tab cycles through focusable elements
 - Shift+Tab cycles backwards
-- Escape closes mobile menu and restores focus to toggle
+- Escape closes mobile dialog when open; otherwise closes open desktop dropdown
+- Escape restores focus to the corresponding toggle
 - Enter/Space activates links and buttons
 
 **Focus Management**:
-- **On Mobile Menu Open**: Move focus to first focusable element in menu
-- **On Mobile Menu Close**: Return focus to toggle button
-- **On Escape**: Close menu and restore focus to toggle
+- **On Mobile Dialog Open**: Move focus to first focusable element inside dialog (often first nav link)
+- **On Mobile Dialog Close**: Return focus to menu toggle button
+- **On Desktop Dropdown Open**: Focus may stay on toggle or move to first link (product-specific)
+- **On Desktop Dropdown Close (Escape)**: Restore focus to dropdown toggle
+- **On Desktop Dropdown Close (Outside Click)**: Focus does not change
+- **Mobile Accordion**: Focus remains within dialog when toggling accordion sections
 - **Focus Visible**: Clear focus indicators (2px solid outline, 2px offset)
 
 ### ARIA Attributes
@@ -203,24 +255,25 @@ This navbar component should meet WCAG 2.1 Level AA standards. Key requirements:
 
 2. **Mobile Menu Toggle**:
    ```html
-   <button aria-label="Toggle menu" 
+   <button id="navbar-menu-toggle"
+           aria-label="Toggle menu" 
            aria-expanded="false" 
-           aria-controls="mobile-menu">
+           aria-controls="navbar-mobile-menu">
    ```
 
 3. **Mobile Menu**:
    ```html
-   <div id="mobile-menu" 
+   <div id="navbar-mobile-menu" 
         role="dialog" 
         aria-modal="true"
-        aria-labelledby="menu-toggle"
+        aria-labelledby="navbar-menu-toggle"
         aria-hidden="true">
      <nav aria-label="Main navigation">
        <!-- Navigation links -->
      </nav>
    </div>
    ```
-   **Note**: Mobile menu uses `role="dialog"` with `aria-modal="true"` because it's a modal overlay with focus trap. Inside the dialog, use `<nav aria-label="Main navigation">` for the navigation links (not `role="menu"`).
+   **Note**: Mobile menu uses `role="dialog"` with `aria-modal="true"` because it's a modal overlay with focus trap. Inside the dialog, include `<nav aria-label="Main navigation">` for the links.
 
 4. **Active Navigation Link**:
    ```html
@@ -235,7 +288,41 @@ This navbar component should meet WCAG 2.1 Level AA standards. Key requirements:
            aria-controls="user-dropdown">
    ```
 
-6. **Notifications Button**:
+6. **Desktop Dropdown Toggle**:
+   ```html
+   <button aria-haspopup="true"
+           aria-expanded="false"
+           aria-controls="dropdown-panel-products">
+     Products
+   </button>
+   ```
+
+7. **Desktop Dropdown Panel**:
+   ```html
+   <div id="dropdown-panel-products">
+     <a href="/products/feature1">Feature 1</a>
+     <a href="/products/feature2">Feature 2</a>
+   </div>
+   ```
+   **Note**: Prefer disclosure semantics (button controls a panel of links). Avoid `role="menu"` unless fully implementing ARIA menu keyboard semantics.
+
+8. **Mobile Accordion Toggle**:
+   ```html
+   <button aria-expanded="false"
+           aria-controls="accordion-panel-products">
+     Products
+   </button>
+   ```
+
+9. **Mobile Accordion Panel**:
+   ```html
+   <div id="accordion-panel-products">
+     <a href="/products/feature1">Feature 1</a>
+     <a href="/products/feature2">Feature 2</a>
+   </div>
+   ```
+
+10. **Notifications Button**:
    ```html
    <button aria-label="Notifications: 3 unread" 
            aria-haspopup="true" 
@@ -245,10 +332,12 @@ This navbar component should meet WCAG 2.1 Level AA standards. Key requirements:
    ```
 
 **Dynamic ARIA Updates**:
-- Update `aria-expanded` on toggle when menu opens/closes
-- Update `aria-hidden` on mobile menu (false when open, true when closed)
+- Update `aria-expanded` on mobile menu toggle when dialog opens/closes
+- Update `aria-expanded` on desktop dropdown toggles when panels open/close
+- Update `aria-expanded` on mobile accordion toggles when sections expand/collapse
+- Update `aria-hidden` on mobile menu (true when closed; false/omitted when open)
 - Update `aria-modal="true"` on mobile menu when open
-- Make background content inert/aria-hidden while mobile menu is open (implementation-dependent, e.g., use `inert` attribute or `aria-hidden` on main content)
+- Make background content inert/aria-hidden while mobile dialog is open (use `inert` if available, or apply `aria-hidden` to main content)
 - Update `aria-current="page"` on active navigation link
 - Update `aria-label` on notifications button to include count
 
@@ -303,16 +392,16 @@ a:focus,
 When implementing this navbar, ensure:
 
 - [ ] All buttons have `aria-label` or visible text
-- [ ] Mobile menu toggle has `aria-expanded` and `aria-controls`
-- [ ] Mobile menu has `aria-hidden` that updates dynamically
-- [ ] Active navigation link has `aria-current="page"`
-- [ ] Focus trap implemented for mobile menu
-- [ ] Focus restored to toggle button when menu closes
-- [ ] Escape key closes mobile menu
-- [ ] Body scroll lock applied when mobile menu is open
+- [ ] Mobile menu uses `role="dialog"` + `aria-modal="true"` and contains `<nav aria-label="Main navigation">`
+- [ ] Mobile menu toggle has id, `aria-expanded`, and `aria-controls`
+- [ ] Focus trap is active only while the mobile dialog is open; focus restores to the menu toggle on close
+- [ ] Background content is inert/aria-hidden while the mobile dialog is open
+- [ ] Body scroll lock is applied when mobile dialog is open and cleaned up on close
+- [ ] Desktop dropdown toggles have `aria-expanded` + `aria-controls`; Escape closes and restores focus
+- [ ] Mobile dropdowns are accordions with `aria-expanded` + `aria-controls`; expanding does not close the dialog
+- [ ] Active link uses `aria-current="page"` correctly
 - [ ] All interactive elements have visible focus indicators
-- [ ] Logo image has descriptive `alt` text
-- [ ] Screen reader tested with NVDA, VoiceOver, or JAWS
+- [ ] Prefers-reduced-motion reduces durations and avoids transform motion where possible
 
 ## Design System Specifications
 
@@ -401,12 +490,14 @@ Use subtle shadows for depth and separation:
 ### For AI Agents to Implement
 
 **State to Track**:
-1. `mobileMenuOpen: boolean` - Whether mobile menu is visible (default: false)
-2. `scrolled: boolean` - Whether page has scrolled (computed from scroll position, default: false)
-3. `activeLink: string` - Current active navigation link ID/route (default: current route)
+1. `mobileMenuOpen: boolean` - Whether mobile menu dialog is visible (default: false)
+2. `scrolled: boolean` - Whether page has scrolled beyond threshold (computed from scroll position > `tokens.layout.scrollThresholdPx`, default: false)
+3. `activeLink: string` - Current active navigation link ID/route (syncs with router/URL)
 4. `variant: "marketing" | "app"` - Navbar style variant (default: "marketing")
-5. `sticky: boolean` - Whether navbar is sticky on scroll (default: false)
-6. `transparent: boolean` - Whether navbar starts transparent (default: false)
+5. `sticky: boolean` - Whether navbar is sticky on scroll (default: true)
+6. `transparent: boolean` - Whether navbar starts transparent (default: false; recommended only for marketing variant)
+7. `openDropdownId: string` - ID of currently open desktop dropdown (default: ""; prefer single open at a time)
+8. `mobileExpandedItemIds: array` - IDs of expanded accordion sections inside mobile dialog (default: []; allow multiple expanded)
 
 **State Persistence**:
 - All state is component-level only (no persistence needed)
@@ -418,6 +509,16 @@ Use subtle shadows for depth and separation:
 - **Implementation**: Check `typeof window !== 'undefined'` before accessing window object
 
 ## Critical Implementation Guidelines
+
+### Project Detection
+
+Before implementing, AI agents must detect:
+
+1. **Framework**: Identify React/Vue/Angular/Svelte and routing libraries by inspecting package.json and existing components
+2. **Styling System**: Detect Tailwind, SCSS, CSS Modules, styled-components, etc. and use ONLY that system
+3. **Design Tokens**: Identify existing color systems, spacing scales, and typography from the project
+
+**CRITICAL**: Use ONLY the detected styling system. Do NOT introduce new styling systems.
 
 ### Vanilla CSS Detection
 **CRITICAL**: When detecting vanilla CSS in the project, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements.
@@ -641,29 +742,41 @@ Use subtle shadows for depth and separation:
 - **Duration**: 200-300ms
 - **Easing**: `cubic-bezier(0.4, 0, 0.2, 1)`
 - **Properties**: 
-  - Background: `rgba(255, 255, 255, 0.95)` → `#ffffff`
-  - Shadow: `none` → `0 1px 3px rgba(0, 0, 0, 0.1)`
-  - Backdrop filter: `blur(8px)` → `none`
+  - Background: transparent/surface-overlay → surface-solid (use project tokens)
+  - Shadow: none → elevated shadow (use project tokens)
+  - Backdrop filter: `blur(8px)` → `none` (optional; prefer tokens)
 
 ### Mobile Menu Open
-- **Duration**: 300ms
+- **Duration**: 250-300ms (from `tokens.motion.mobileMenuOpenMs`)
 - **Easing**: `cubic-bezier(0.4, 0, 0.2, 1)`
 - **Menu**: Slide from top/left: `translateX(-100%)` → `translateX(0)` or `translateY(-100%)` → `translateY(0)`
-- **Backdrop**: Fade in: `opacity: 0` → `opacity: 1` (200ms)
+- **Backdrop**: Fade in: `opacity: 0` → `opacity: 1` (200ms from `tokens.motion.backdropFadeMs`)
 
 ### Mobile Menu Close
-- **Duration**: 250ms
+- **Duration**: 250ms (from `tokens.motion.mobileMenuCloseMs`)
 - **Easing**: `cubic-bezier(0.4, 0, 0.2, 1)`
 - **Menu**: Slide out: `translateX(0)` → `translateX(-100%)`
 - **Backdrop**: Fade out: `opacity: 1` → `opacity: 0` (150ms)
 
+### Desktop Dropdown Open
+- **Duration**: 180ms (from `tokens.motion.dropdownOpenMs`)
+- **Easing**: `cubic-bezier(0.4, 0, 0.2, 1)`
+- **Properties**: `opacity`, `transform`, `visibility`
+- **Note**: If `prefers-reduced-motion` is enabled, avoid transform and reduce durations to ≤100ms
+
+### Desktop Dropdown Close
+- **Duration**: 150ms (from `tokens.motion.dropdownCloseMs`)
+- **Easing**: `cubic-bezier(0.4, 0, 0.2, 1)`
+- **Properties**: `opacity`, `transform`, `visibility`
+- **Note**: If `prefers-reduced-motion` is enabled, avoid transform and reduce durations to ≤100ms
+
 ### Prefers-Reduced-Motion Support
 
 **When `prefers-reduced-motion` is enabled**:
-- Disable transform animations (translateX/translateY) - set `transform: none`
-- Reduce animation durations to ≤100ms (use `transition: opacity 0.1s ease, background-color 0.1s ease`)
-- Remove or reduce backdrop-filter blur transitions
-- Keep opacity transitions for essential state changes (≤100ms)
+- Disable transform-based motion where possible (avoid translate animations)
+- Reduce animation durations to ≤100ms (use `tokens.motion.reducedMotionDurationMs`)
+- Minimize backdrop-filter blur transitions
+- Allow essential opacity transitions (≤100ms)
 
 **Implementation**:
 ```css
@@ -679,7 +792,7 @@ Use subtle shadows for depth and separation:
   }
   
   .navbar--transparent {
-    backdrop-filter: none; /* Remove blur transitions */
+    backdrop-filter: none; /* Minimize blur transitions */
   }
 }
 ```
@@ -692,11 +805,11 @@ Use subtle shadows for depth and separation:
 ## Z-Index Layer System
 
 To ensure proper layering of elements:
-- **Navbar**: 50 (from tokens)
-- **Mobile Menu**: 50 (same as navbar, or 60 if above navbar)
-- **Backdrop**: 40 (from tokens)
-- **Dropdowns**: 60 (from tokens)
-- **Tooltips**: 70 (from tokens)
+- **Backdrop**: 50 (from tokens)
+- **Mobile Menu**: 60 (from tokens)
+- **Navbar**: 70 (from tokens)
+- **Dropdowns**: 80 (from tokens)
+- **Tooltips**: 90 (from tokens)
 
 ## Implementation Details
 
@@ -716,7 +829,7 @@ To ensure proper layering of elements:
 **When**: `transparent=true` or need to track scroll state
 
 **How**: 
-- Add scroll event listener (throttled/debounced - recommended: throttle with `requestAnimationFrame` or 100ms interval)
+- Add scroll event listener (throttled/debounced - recommended: `requestAnimationFrame` or ~100ms throttle)
 - Update `scrolled` state when scroll position > threshold (default: 20px, from `tokens.layout.scrollThresholdPx`)
 - Trigger background/shadow transitions
 
@@ -748,14 +861,12 @@ To ensure proper layering of elements:
 **When**: Mobile menu is open
 
 **How**: 
-- Set `document.body.style.overflow = 'hidden'`
+- Set `document.body.style.overflow = 'hidden'` (or project-standard utility)
 - **Optional: Preserve scroll position**: Use `position: fixed` with `top: -${window.scrollY}px` to prevent jump when locking scroll
-- **iOS handling**: On iOS devices, may need additional handling for overscroll behavior (e.g., prevent `touchmove` events on body element)
+- **iOS handling**: If needed, prevent body touchmove scrolling behind the dialog using project-standard approach
 
 **Cleanup**: 
-- Restore on close: `document.body.style.overflow = ''`
-- Restore scroll position if preserved: `document.body.style.position = ''` and `document.body.style.top = ''`
-- Remove iOS touch event listeners if added
+- Restore previous styles on menu close/unmount
 
 ### Escape Key Handling
 
@@ -773,9 +884,35 @@ To ensure proper layering of elements:
 **When**: Page loads or route changes
 
 **How**: 
-- Compare current URL/route with navigation link hrefs
+- Compare current URL/route with navigation link hrefs using project's routing solution
 - Set `aria-current="page"` on matching link
 - Apply active styles (underline, color change, background)
+- Route changes may close open overlays (product-specific)
+
+### Desktop Dropdown Management
+
+**When**: User interacts with dropdown toggles
+
+**How**: 
+- Track `openDropdownId` state (prefer single open dropdown at a time)
+- On toggle click: Open if closed, close if open
+- On outside click: Close open dropdown
+- On Escape: Close dropdown and restore focus to toggle
+- Update `aria-expanded` on toggle dynamically
+- Do not trap focus inside dropdown panels (use normal Tab order)
+
+**Cleanup**: Close dropdowns on unmount or route change (if required)
+
+### Mobile Accordion Management
+
+**When**: User interacts with accordion toggles inside mobile dialog
+
+**How**: 
+- Track `mobileExpandedItemIds` array (allow multiple expanded sections)
+- On accordion toggle click: Add/remove item ID from array
+- Update `aria-expanded` on accordion toggle dynamically
+- Expanding/collapsing does not close the mobile dialog
+- Focus remains within the mobile dialog
 
 ## Edge Cases
 
@@ -808,15 +945,17 @@ To ensure proper layering of elements:
 ## Common Variations
 
 ### Marketing Navbar
-- Logo + horizontal nav links + primary CTA button
-- Transparent on hero section, solid on scroll
+- Logo + horizontal nav + primary CTA
 - Sticky by default
+- Optional transparent-on-hero mode (`transparent=true`) that becomes solid on scroll
+- Dropdowns supported for grouped marketing sections
 - Simple, clean design
 
 ### App Navbar
-- Logo + horizontal nav links + user menu + notifications
-- Solid background (no transparent variant)
+- Logo + nav + notifications + user menu
+- Solid background only (`transparent` forced false)
 - Sticky by default
+- Dropdowns commonly used for user menu and nav groupings
 - More compact, functional design
 
 ### Minimal Navbar
@@ -838,47 +977,44 @@ To ensure proper layering of elements:
 When implementing this navbar, test:
 
 - [ ] Navbar renders correctly on all breakpoints
-- [ ] Mobile menu opens and closes smoothly
-- [ ] Mobile menu closes on backdrop click, Escape key, and link click
-- [ ] Focus is trapped within mobile menu when open
-- [ ] Focus is restored to toggle button when menu closes
-- [ ] Body scroll is locked when mobile menu is open and restored on close
-- [ ] Sticky positioning works correctly (if enabled)
-- [ ] Transparent→Solid transition works on scroll (if enabled)
-- [ ] Active link is highlighted correctly
+- [ ] Mobile menu dialog opens and closes via toggle, Escape, backdrop click, and link click
+- [ ] Focus is trapped within the mobile dialog while open
+- [ ] Focus is restored to the mobile toggle when the dialog closes
+- [ ] Body scroll is locked while the mobile dialog is open and restored on close
+- [ ] Sticky positioning works correctly when enabled
+- [ ] Transparent→Solid transition works on scroll when enabled (marketing only)
+- [ ] Active link is highlighted correctly and uses `aria-current="page"`
+- [ ] Desktop dropdown opens/closes on toggle click
+- [ ] Desktop dropdown closes on outside click and Escape
+- [ ] Escape on desktop dropdown restores focus to the dropdown toggle
+- [ ] Desktop dropdown does not trap focus; Tab order is logical
+- [ ] Mobile dropdown items render as accordions inside the dialog
+- [ ] Mobile accordion expand/collapse updates `aria-expanded` and does not close the dialog
+- [ ] Route changes update active link and close open overlays if required by product rules
+- [ ] Window resize closes the mobile dialog when switching to desktop breakpoint
+- [ ] Prefers-reduced-motion reduces durations and avoids transform motion where possible
 - [ ] All interactive elements have visible focus indicators
-- [ ] Keyboard navigation works throughout
-- [ ] Screen reader announces state changes
-- [ ] `aria-expanded`, `aria-hidden`, `aria-current` are correctly managed
-- [ ] Logo is clickable and links to home
-- [ ] CTA button works correctly (marketing variant)
-- [ ] User menu dropdown works correctly (app variant)
-- [ ] Notifications badge displays correctly (app variant)
-- [ ] Window resize handling works correctly (closes mobile menu on desktop switch)
-- [ ] Animations are smooth (60fps)
-- [ ] No layout shift or flicker on load
+- [ ] Screen reader announces dialog state changes and expanded/collapsed states appropriately
 - [ ] SSR/hydration safe (no DOM access before mount)
-- [ ] `prefers-reduced-motion` reduces or removes animations
-- [ ] All styling matches project conventions
 
 ## AI Agent Implementation Prompt Template
 
 Use this template when asking an AI agent to implement this navbar:
 
 ```
-Implement a responsive Navigation Bar component with mobile hamburger menu, sticky scroll behavior, and transparent-to-solid transition. Support marketing (logo + links + CTA) and app (user menu, notifications) variants. Include focus trap, focus restoration, body scroll lock, and keyboard accessibility. Add smooth animations with prefers-reduced-motion support. Adapt to {{USER_FRAMEWORK}} and {{USER_STYLING_LIBRARY}}.
+Implement a responsive Navigation Bar component with mobile hamburger menu as a modal dialog (role="dialog" aria-modal="true") including focus trap, focus restoration, inert background, and body scroll lock. Support sticky scroll behavior and optional transparent-to-solid transition (marketing recommended only). Add dropdown navigation: on desktop, implement disclosure dropdowns (button controlling a panel of links with aria-expanded/aria-controls; avoid role="menu" unless fully implementing ARIA menu semantics). On mobile/tablet, integrate dropdown items as accordion sections inside the dialog (aria-expanded/aria-controls), and expanding must not close the dialog. Close the mobile dialog on Escape/backdrop/link click. Close desktop dropdown on outside click/Escape and restore focus to its toggle. Implement smooth animations and prefers-reduced-motion (reduce durations to <= tokens.motion.reducedMotionDurationMs and avoid transform-based motion where possible). Adapt to {{USER_FRAMEWORK}} and {{USER_STYLING_LIBRARY}}.
 
 Key requirements:
-1. Responsive: Desktop shows horizontal nav links, mobile shows hamburger menu
-2. Sticky: Fixed at top when scrolling (if sticky=true)
-3. Transparent→Solid: Background transitions on scroll (if transparent=true)
-4. Mobile Menu: Full-screen overlay with focus trap and body scroll lock
-5. Accessibility: ARIA attributes, keyboard navigation, focus management
-6. Active Link: Highlights current page/route with aria-current="page"
-7. Animations: 300ms mobile menu, 200-300ms scroll transitions
-8. Variants: Marketing (CTA button) and App (user menu, notifications)
-9. Prefers-reduced-motion: Reduce or remove animations
-10. CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system.
+1. Responsive: Desktop shows horizontal nav links; mobile/tablet show hamburger menu dialog
+2. Sticky: Fixed at top when scrolling (sticky=true, default)
+3. Transparent→Solid: Background transitions on scroll (transparent=true; marketing only)
+4. Mobile Menu: Modal dialog overlay with focus trap, inert background, and body scroll lock
+5. Desktop Dropdowns: Disclosure pattern (button + panel), no focus trap, Escape restores focus to toggle
+6. Mobile Accordions: Items with children expand/collapse inside dialog without closing it
+7. Accessibility: ARIA attributes, keyboard navigation, focus management
+8. Active Link: Highlights current page/route using project's routing solution
+9. Animations: 150-300ms transitions with prefers-reduced-motion support
+10. CRITICAL: Use ONLY the detected styling system. If vanilla CSS is detected, create CSS classes in a stylesheet, never use inline style attributes. If React is detected, separate effects into single-concern hooks.
 
 Reference: UI Potion Navigation Bar Component
 ```
@@ -955,15 +1091,18 @@ function useScrollPosition(threshold = 20) {
 
 ## Summary for AI Agents
 
-This navigation bar is a responsive navbar component with mobile menu, sticky positioning, and transparent-to-solid transition. Key implementation points:
+This navigation bar is a responsive navbar component with mobile menu dialog, sticky positioning (default: true), optional transparent-to-solid transition (marketing variant only), and first-class dropdown support. Key implementation points:
 
-1. **Structure**: Logo, Navigation Links (desktop), Mobile Toggle, Actions (CTA/User Menu), Mobile Menu Overlay
-2. **State**: Track mobileMenuOpen, scrolled, activeLink, variant, sticky, transparent
-3. **Responsive**: Desktop shows horizontal nav, mobile shows hamburger menu overlay
-4. **Sticky**: Fixed at top when scrolling (if enabled)
-5. **Transparent→Solid**: Background transitions on scroll (if enabled)
-6. **Mobile Menu**: Focus trap, body scroll lock, focus restoration, Escape key handling
-7. **Accessibility**: WCAG AA compliance with proper ARIA attributes
-8. **Framework-agnostic**: Adapt patterns to any framework's component model
+1. **Structure**: Logo, Navigation Links with Dropdown Panels (desktop), Mobile Toggle, Actions (CTA/User Menu), Mobile Menu Dialog with Accordion Sections
+2. **State**: Track mobileMenuOpen, scrolled, activeLink, variant, sticky (default: true), transparent (marketing only), openDropdownId (desktop), mobileExpandedItemIds (mobile)
+3. **Responsive**: Desktop shows horizontal nav with disclosure dropdowns; mobile/tablet show hamburger menu dialog with accordion sections
+4. **Sticky**: Fixed at top when scrolling (default: true for both variants)
+5. **Transparent→Solid**: Background transitions on scroll (marketing variant only, when transparent=true)
+6. **Mobile Menu**: Modal dialog with focus trap, inert background, body scroll lock, focus restoration, Escape key handling
+7. **Desktop Dropdowns**: Disclosure pattern (button + panel), no focus trap, Escape restores focus to toggle, outside click closes
+8. **Mobile Accordions**: Items with children expand/collapse inside dialog without closing it
+9. **Accessibility**: WCAG AA compliance with proper ARIA attributes (role="dialog", aria-modal="true", disclosure semantics for dropdowns)
+10. **Project Detection**: Must detect framework, router, styling system, and design tokens before implementation
+11. **Framework-agnostic**: Adapt patterns to any framework's component model
 
-Generate clean, semantic HTML with proper component separation. Use framework-specific state management patterns and CSS methodology as specified by the user.
+Generate clean, semantic HTML with proper component separation. Use framework-specific state management patterns and CSS methodology as specified by the user. Use ONLY the detected styling system.

@@ -1,4 +1,5 @@
 {
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
   "id": "modal-dialog",
   "version": "1.0.0",
   "name": "Modal Dialog (Accessible) with Focus Trap and Actions",
