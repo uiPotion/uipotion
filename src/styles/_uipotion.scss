@@ -1260,6 +1260,13 @@
   grid-template-columns: 1fr 1fr;
   gap: 32px;
   margin-bottom: 60px;
+  align-items: stretch; // Make both columns the same height
+  
+  // Ensure grid items stretch to fill
+  > * {
+    display: flex;
+    min-height: 100%;
+  }
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
@@ -1274,18 +1281,29 @@
   border-radius: 12px;
   padding: 32px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  height: 100%; // Ensure it fills the grid cell height
+  min-height: 0; // Allow flex children to shrink below their content size
 }
 
 .validator-controls {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  flex: 1; // Allow controls to grow and fill available space
 }
 
 .validator-control-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+// Make the textarea's control group grow to fill available space
+.validator-control-group:nth-child(2) {
+  flex: 1;
+  min-height: 0;
 }
 
 .validator-label {
@@ -1334,6 +1352,7 @@
   line-height: 1.6;
   resize: vertical;
   min-height: 400px;
+  flex: 1; // Allow textarea to grow and fill available space
   transition: all 0.2s;
 
   &:hover {
@@ -1390,6 +1409,7 @@
   max-height: 600px;
   display: flex;
   flex-direction: column;
+  height: 100%; // Ensure it fills the grid cell height
 }
 
 .validator-results-header {
@@ -1437,6 +1457,7 @@
   flex: 1;
   overflow-y: auto;
   padding-right: 8px;
+  min-height: 0; // Allow flex child to shrink
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -1553,6 +1574,12 @@
   font-size: 0.9375rem;
 }
 
+/* Info Section Wrapper - Standard Container Width */
+.validator-info-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
 /* Info Section */
 .validator-info {
   background: #171717;
@@ -1611,6 +1638,10 @@
 
   .validator-results-section {
     max-height: 500px;
+  }
+  
+  .validator-info-wrapper {
+    padding: 0 16px;
   }
 }
 
