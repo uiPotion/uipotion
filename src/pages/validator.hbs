@@ -1,0 +1,99 @@
+{{> head title="Schema Validator - UI Potion" description="Validate UI Potion JSON files against schemas directly in your browser" }}
+
+<div class="validator-page">
+  <header class="validator-hero">
+    <div class="validator-hero-container">
+      <div class="validator-breadcrumb">
+        <a href="{{relativePath 'index.html'}}">← Home</a>
+      </div>
+      
+      <h1 class="validator-hero-title">Schema Validator</h1>
+      
+      <p class="validator-hero-description">
+        Validate UI Potion JSON files against schemas directly in your browser. No data is sent to any server—everything runs client-side.
+      </p>
+    </div>
+  </header>
+  
+  <main class="validator-main">
+    <div class="validator-main-container">
+      <div class="validator-layout">
+        <!-- Left: Input Section -->
+        <div class="validator-input-section">
+          <div class="validator-controls">
+            <div class="validator-control-group">
+              <label for="schema-select" class="validator-label">Select Schema Category:</label>
+              <select id="schema-select" class="validator-select">
+                <option value="">Choose a schema...</option>
+                <option value="components">Components</option>
+                <option value="layouts">Layouts</option>
+                <option value="features">Features</option>
+                <option value="patterns">Patterns</option>
+                <option value="tooling">Tooling</option>
+              </select>
+            </div>
+            
+            <div class="validator-control-group">
+              <label for="json-input" class="validator-label">Paste JSON to Validate:</label>
+              <textarea 
+                id="json-input" 
+                class="validator-textarea" 
+                placeholder='Paste your potion JSON here, e.g.:
+{
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
+  "id": "my-component",
+  "version": "1.0.0",
+  ...
+}'
+                spellcheck="false"
+              ></textarea>
+            </div>
+            
+            <button id="validate-btn" class="validator-button" disabled>Validate JSON</button>
+          </div>
+        </div>
+        
+        <!-- Right: Results Section -->
+        <div class="validator-results-section">
+          <div class="validator-results-header">
+            <h2 class="validator-results-title">Validation Results</h2>
+            <div id="validation-status" class="validator-status" style="display: none;">
+              <span class="validator-status-icon"></span>
+              <span class="validator-status-text"></span>
+            </div>
+          </div>
+          
+          <div id="validation-results" class="validator-results-content">
+            <div class="validator-placeholder">
+              <p>Select a schema category and paste your JSON, then click "Validate JSON" to see results.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Info Section -->
+      <div class="validator-info">
+        <h3>How It Works</h3>
+        <ul>
+          <li><strong>Client-Side Only:</strong> All validation happens in your browser. No data is sent to any server.</li>
+          <li><strong>Schema Support:</strong> Validates against UI Potion category schemas (Components, Layouts, Features, Patterns, Tooling).</li>
+          <li><strong>Detailed Errors:</strong> Get specific error messages with JSON paths pointing to validation issues.</li>
+          <li><strong>Schema References:</strong> Automatically resolves schema references ($ref) including base schemas and contracts.</li>
+        </ul>
+        
+        <h3>Example Usage</h3>
+        <ol>
+          <li>Select the appropriate schema category for your potion (e.g., "Components" for a navbar component)</li>
+          <li>Paste your potion JSON into the text area</li>
+          <li>Click "Validate JSON" to check for errors</li>
+          <li>Review the detailed error messages and fix any issues</li>
+        </ol>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.12.0/ajv2020.min.js"></script>
+<script src="{{relativePath 'assets/js/schema-validator.js'}}"></script>
+
+{{> footer}}

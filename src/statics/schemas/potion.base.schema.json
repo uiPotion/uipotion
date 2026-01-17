@@ -235,6 +235,16 @@
     "aiImplementationPrompt": {
       "type": "string"
     },
+    "implementationDetails": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Optional: Additional implementation details, edge cases, and technical notes for AI agents."
+    },
+    "accessibilityExamples": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Optional: Code examples demonstrating accessibility implementation patterns."
+    },
     "meta": {
       "type": "object",
       "additionalProperties": false,
