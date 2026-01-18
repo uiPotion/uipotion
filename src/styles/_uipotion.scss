@@ -296,6 +296,8 @@
     width: 100% !important;
     margin: 0 !important;
     box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
 
     &:hover {
       border-color: #4f46e5;
@@ -347,6 +349,7 @@
     margin-bottom: 20px !important;
     font-size: 0.9375rem !important;
     margin-top: 0 !important;
+    flex: 1 !important; // Grow to fill available space, pushing button to bottom
   }
 
   .post-list-items--button,
@@ -363,6 +366,7 @@
     background: none !important;
     border: none !important;
     padding: 0 !important;
+    margin-top: auto !important; // Stick to bottom when flex parent
 
     &:hover {
       gap: 10px;
@@ -1262,10 +1266,11 @@
   margin-bottom: 60px;
   align-items: stretch; // Make both columns the same height
   
-  // Ensure grid items stretch to fill
+  // Ensure grid items stretch to fill and don't overflow
   > * {
     display: flex;
     min-height: 100%;
+    min-width: 0; // CRITICAL: Prevent grid items from growing beyond their column width
   }
 
   @media (max-width: 1024px) {
@@ -1285,6 +1290,7 @@
   flex-direction: column;
   height: 100%; // Ensure it fills the grid cell height
   min-height: 0; // Allow flex children to shrink below their content size
+  min-width: 0; // Prevent growing beyond grid column width
 }
 
 .validator-controls {
@@ -1410,6 +1416,7 @@
   display: flex;
   flex-direction: column;
   height: 100%; // Ensure it fills the grid cell height
+  min-width: 0; // Prevent growing beyond grid column width
 }
 
 .validator-results-header {
@@ -1536,6 +1543,9 @@
   padding: 20px;
   font-size: 0.875rem;
   line-height: 1.6;
+  overflow-wrap: break-word; // Break long words to prevent overflow
+  word-wrap: break-word; // Legacy property for older browsers
+  word-break: break-word; // Additional breaking for URLs and paths
 
   > div {
     margin-bottom: 12px;

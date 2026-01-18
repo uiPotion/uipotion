@@ -26,11 +26,7 @@ A responsive navigation bar component with mobile hamburger menu, sticky scroll 
 
 The navbar consists of a Navbar Container that holds a Logo/Brand Section, Navigation Links with Dropdown Panels (desktop), Mobile Menu Toggle Button, Action Buttons (CTA or User Menu), and a Mobile Menu Dialog. The Mobile Menu Dialog contains Navigation Links (with accordion sections for items with children) and Action Buttons.
 
-```
-Navbar → Logo | NavLinks (desktop, includes dropdown toggles/panels) | MobileToggle | Actions
-         ↓
-MobileMenu (dialog) → NavLinks (accordion) | Actions
-```
+The navbar structure flows as: Navbar contains Logo, NavLinks (desktop with dropdown toggles/panels), MobileToggle, and Actions. The MobileMenu (dialog) contains NavLinks (with accordion behavior) and Actions.
 
 ## Detailed Component Specifications
 

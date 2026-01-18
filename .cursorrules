@@ -89,7 +89,7 @@ agentManifest: 'potions/[category]/component-id.json' # REQUIRED: Path to JSON g
 ```
 
 **Content Structure**:
-- Overview with visual representation (ASCII art)
+- Overview describing the component's purpose and key features
 - Component structure and hierarchy
 - Detailed specifications (dimensions, states, behavior)
 - Responsive behavior at each breakpoint
@@ -97,6 +97,13 @@ agentManifest: 'potions/[category]/component-id.json' # REQUIRED: Path to JSON g
 - Animation specifications
 - Framework patterns (remain agnostic)
 - Testing checklist
+
+**IMPORTANT - Visual Representations**:
+- ❌ **NEVER** use ASCII art or text-based diagrams in potion markdown files for the website
+- ❌ ASCII boxes, borders, or visual layouts look unprofessional on the rendered website
+- ✅ Use clear prose descriptions instead (e.g., "A 3-column grid layout with...")
+- ✅ Save visual diagrams for future when we add screenshot/image support
+- ✅ In JSON files for AI agents, you can include text structure if needed, but keep it minimal
 
 ### 2. AI Agent JSON Guides
 

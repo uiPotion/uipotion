@@ -25,9 +25,7 @@ An accessible modal dialog component with focus trapping, Escape/backdrop dismis
 
 The dialog consists of a Trigger element, a Backdrop overlay, and a Dialog container. The Dialog contains a Header (with Title and optional Close Button), a Body section for content, and an optional Footer with action buttons (Primary and Secondary).
 
-```
-Trigger → Backdrop → Dialog( Header(Title, Close), Body, Footer(Actions) )
-```
+The dialog structure flows as: Trigger opens the Backdrop which contains the Dialog. The Dialog includes Header (with Title and Close button), Body for content, and Footer for action buttons.
 
 ## Detailed Component Specifications
 

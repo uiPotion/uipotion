@@ -1,0 +1,1105 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/features.schema.json",
+  "id": "pricing-table-3tier",
+  "version": "1.0.0",
+  "name": "3-Tier SaaS Pricing Table with Monthly/Yearly Toggle",
+  "category": "features",
+  "tags": ["pricing", "saas", "subscription", "billing", "marketing", "responsive", "conversion"],
+  "description": "A responsive 3-tier pricing table component with monthly/yearly billing toggle, highlighted 'Most Popular' plan, and feature comparison. Perfect for SaaS marketing pages, product pages, and subscription-based services.",
+
+  "tokens": {
+    "layout": {
+      "containerMaxWidthPx": 1200,
+      "gridGapDesktopPx": 32,
+      "gridGapTabletPx": 20,
+      "gridGapMobilePx": 24,
+      "cardPaddingDesktopPx": 40,
+      "cardPaddingMobilePx": 28,
+      "zIndex": {
+        "base": 0,
+        "cards": 1,
+        "highlightedCard": 2,
+        "tooltips": 10
+      }
+    },
+    "motion": {
+      "toggleDurationMs": 200,
+      "priceChangeDurationMs": 250,
+      "cardHoverDurationMs": 180,
+      "buttonHoverDurationMs": 150,
+      "defaultEasing": "ease-in-out"
+    },
+    "breakpoints": {
+      "tabletMinPx": 768,
+      "desktopMinPx": 1024
+    }
+  },
+
+  "aiAgentInstructions": {
+    "summary": "Implement a responsive 3-tier pricing table with billing frequency toggle. The table should display three plans (Starter, Professional highlighted as 'Most Popular', and Enterprise) with pricing that updates based on monthly/yearly selection. Adapt to the user's framework and styling system.",
+    "keyFeatures": [
+      "Billing frequency toggle (monthly/yearly) with visual feedback and savings indicator",
+      "Three plan cards with clear visual hierarchy and 'Most Popular' badge",
+      "Smooth price change animations when billing frequency switches",
+      "Feature lists with checkmarks for included features and x-marks for unavailable",
+      "Prominent CTA buttons (primary for highlighted plan, secondary for others)",
+      "Responsive grid layout (3 columns desktop, stacked mobile)",
+      "Full keyboard accessibility with ARIA labels and focus management",
+      "Prefers-reduced-motion support for animations",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems.",
+      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements.",
+      "CRITICAL: When detecting React, extract logic into separate custom hooks that do ONE thing each."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine package.json, existing component files, config files, and style imports. Use ONLY the detected system.",
+      "1. Create pricing data structure with plans, features, and pricing tiers",
+      "2. Implement billing frequency state (monthly/yearly) with toggle component",
+      "3. Build three plan cards with header, pricing, CTA, and feature list",
+      "4. Implement price calculation based on billing frequency",
+      "5. Add smooth price change animations with stagger effect",
+      "6. Style 'Most Popular' plan with visual distinction (badge, shadow, scale)",
+      "7. Implement responsive grid layout (3-col desktop → 1-col mobile)",
+      "8. Add keyboard navigation and ARIA attributes for accessibility",
+      "9. Implement prefers-reduced-motion behavior",
+      "10. Use ONLY the detected styling system. Match existing component patterns exactly."
+    ]
+  },
+
+  "structure": {
+    "hierarchy": {
+      "PricingTableContainer": {
+        "description": "Root container for the pricing table section",
+        "children": {
+          "SectionHeader": {
+            "description": "Optional section title and subtitle",
+            "children": ["Title", "Subtitle"]
+          },
+          "BillingToggle": {
+            "description": "Toggle for monthly/yearly billing with savings indicator",
+            "children": ["MonthlyLabel", "ToggleSwitch", "YearlyLabel", "SavingsBadge"]
+          },
+          "PlansGrid": {
+            "description": "Grid container for plan cards",
+            "children": {
+              "PlanCard": {
+                "description": "Individual pricing plan card (3 instances: Starter, Pro, Enterprise)",
+                "children": ["Badge", "Header", "PricingSection", "CTAButton", "FeatureList"]
+              }
+            }
+          },
+          "FooterNote": {
+            "description": "Optional disclaimer or additional information",
+            "children": ["Text"]
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "PricingTableContainer": {
+      "description": "Root container for the entire pricing table section",
+      "dimensions": {
+        "maxWidthPx": 1200,
+        "paddingVerticalPx": "48-64 (desktop), 32-48 (mobile)",
+        "paddingHorizontalPx": "24-32 (desktop), 16-24 (mobile)",
+        "gapBetweenToggleAndGridPx": "48-64 (desktop), 32-40 (mobile)"
+      },
+      "behavior": {
+        "centering": "Horizontally centered with max-width constraint",
+        "background": "Neutral, gradient, or transparent (inherit from page)",
+        "responsive": "Reduce padding on smaller screens"
+      }
+    },
+
+    "BillingToggle": {
+      "description": "Toggle component for switching between monthly and yearly billing",
+      "dimensions": {
+        "containerMaxWidthPx": 400,
+        "switchWidthPx": 56,
+        "switchHeightPx": 32,
+        "thumbSizePx": 24,
+        "labelFontSizePx": 16,
+        "gapBetweenElementsPx": 16
+      },
+      "states": {
+        "monthly": {
+          "description": "Monthly billing selected",
+          "default": true,
+          "thumbPosition": "left",
+          "activeLabel": "Monthly"
+        },
+        "yearly": {
+          "description": "Yearly billing selected",
+          "default": false,
+          "thumbPosition": "right",
+          "activeLabel": "Yearly"
+        }
+      },
+      "elements": {
+        "Labels": {
+          "fontSizePx": 16,
+          "fontWeightInactive": 500,
+          "fontWeightActive": 600,
+          "colorInactive": "Muted gray (#6b7280)",
+          "colorActive": "Primary text color",
+          "transition": "Color change 150ms"
+        },
+        "ToggleSwitch": {
+          "widthPx": 56,
+          "heightPx": 32,
+          "borderRadius": "16px (pill)",
+          "backgroundInactive": "Light gray (#e5e7eb)",
+          "backgroundActive": "Primary color (#3b82f6)",
+          "thumbSizePx": 24,
+          "thumbColor": "White (#ffffff)",
+          "thumbBorderRadius": "50% (circle)",
+          "animationDurationMs": 200,
+          "animationEasing": "ease-out",
+          "animationProperty": "transform (translateX)"
+        },
+        "SavingsBadge": {
+          "paddingPx": "4px 12px",
+          "borderRadius": "12px (pill)",
+          "background": "Success/primary color at 10-20% opacity",
+          "textColor": "Primary color or success color",
+          "fontSizePx": "12-14",
+          "fontWeight": 500,
+          "content": "Save 20%",
+          "visibility": "Visible when yearly selected",
+          "icon": "Optional savings icon"
+        }
+      },
+      "behavior": {
+        "clickTarget": "Both labels and switch are clickable",
+        "keyboard": "Tab to focus, Enter/Space to toggle",
+        "onToggle": "Update billingFrequency state, trigger price change animations",
+        "persistence": "Optional session storage or component state only"
+      },
+      "accessibility": {
+        "role": "switch",
+        "ariaChecked": "true/false based on yearly selection",
+        "ariaLabel": "Switch between monthly and yearly billing",
+        "keyboardSupport": "Enter and Space keys toggle state"
+      }
+    },
+
+    "PlansGrid": {
+      "description": "Grid container for the three pricing plan cards",
+      "layout": {
+        "desktop": {
+          "columns": 3,
+          "gapPx": 32,
+          "columnLayout": "Equal width (1fr 1fr 1fr)"
+        },
+        "tablet": {
+          "columns": 3,
+          "gapPx": 20,
+          "columnLayout": "Equal width, may need smaller padding"
+        },
+        "mobile": {
+          "columns": 1,
+          "gapPx": 24,
+          "columnLayout": "Full width stacked"
+        }
+      },
+      "alignment": "Plans aligned at top (align-items: flex-start or grid-auto-rows: auto)",
+      "highlightedPlanEffect": {
+        "desktop": "Optional slight scale (102-105%) or elevated shadow",
+        "mobile": "No scale, maintain elevated shadow"
+      }
+    },
+
+    "PlanCard": {
+      "description": "Individual pricing plan card component",
+      "dimensions": {
+        "paddingPx": "32-40 (desktop), 24-32 (mobile)",
+        "borderRadiusPx": "12-16",
+        "minHeight": "Equal across all plans for visual alignment",
+        "widthDesktop": "Equal in grid (1fr)",
+        "widthMobile": "Full width minus container padding"
+      },
+      "states": {
+        "default": "Standard appearance with subtle shadow",
+        "highlighted": "Most Popular plan with enhanced visual prominence",
+        "hover": "Subtle shadow increase or slight scale (desktop only)"
+      },
+      "visualStyling": {
+        "background": {
+          "light": "White (#ffffff) or very light gray (#fafafa)",
+          "dark": "Dark neutral (#1f2937) or #1a1a1a"
+        },
+        "border": {
+          "default": "1px solid light gray (#e5e7eb) or transparent",
+          "highlighted": "Primary color (#3b82f6) or darker border"
+        },
+        "shadow": {
+          "default": "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)",
+          "highlighted": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
+          "hover": "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)"
+        }
+      },
+      "elements": {
+        "Badge": {
+          "display": "Only on highlighted plan (Most Popular)",
+          "paddingPx": "6px 16px",
+          "borderRadius": "12px (pill) or 6px (rounded)",
+          "background": "Primary color or gradient",
+          "textColor": "White or high-contrast",
+          "fontSizePx": "12-14",
+          "fontWeight": "500-600",
+          "textTransform": "Optional uppercase",
+          "position": "Top of card, centered or left-aligned",
+          "marginBottomPx": "12-16"
+        },
+        "PlanName": {
+          "fontSizePx": "24-28 (desktop), 20-24 (mobile)",
+          "fontWeight": "600-700 (semibold/bold)",
+          "color": "Primary text color",
+          "marginBottomPx": "8-12"
+        },
+        "Description": {
+          "fontSizePx": "14-16",
+          "fontWeight": 400,
+          "color": "Muted text (#6b7280)",
+          "marginBottomPx": "8",
+          "content": "Example: 'Perfect for individuals'"
+        }
+      }
+    },
+
+    "PricingSection": {
+      "description": "Section displaying the price and billing period",
+      "dimensions": {
+        "marginBottomPx": "24-32"
+      },
+      "elements": {
+        "PriceAmount": {
+          "fontSizePx": "48-56 (desktop), 40-48 (mobile)",
+          "fontWeight": "700-800 (bold/extra-bold)",
+          "color": "Primary text color",
+          "currencySymbol": {
+            "fontSize": "Same as price or 80%",
+            "position": "Before amount"
+          },
+          "decimals": {
+            "fontSize": "60-70% of price size",
+            "optional": true
+          }
+        },
+        "BillingPeriod": {
+          "fontSizePx": "16-18",
+          "fontWeight": "400-500 (regular/medium)",
+          "color": "Muted text (#6b7280)",
+          "content": "/month, /mo, /year, /yr",
+          "position": "Adjacent to price (baseline aligned) or below"
+        },
+        "DiscountIndicator": {
+          "display": "Only for yearly plans with discount",
+          "originalPrice": {
+            "textDecoration": "line-through",
+            "fontSize": "Smaller than main price",
+            "color": "Muted text"
+          },
+          "savingsText": {
+            "content": "Save $XX/year",
+            "fontSize": "14px",
+            "color": "Success green or primary",
+            "position": "Below price"
+          }
+        }
+      },
+      "animation": {
+        "durationMs": 250,
+        "easing": "ease-in-out",
+        "effect": "Fade out → change value → fade in (or slide/scale)",
+        "stagger": "Optional 50ms delay between cards",
+        "trigger": "When billingFrequency state changes"
+      }
+    },
+
+    "CTAButton": {
+      "description": "Call-to-action button for plan selection",
+      "dimensions": {
+        "width": "Full width or 80-90% of card",
+        "heightPx": "48-56 (desktop), 44-48 (mobile)",
+        "paddingPx": "12-16 vertical, 24-32 horizontal",
+        "borderRadiusPx": "8-12",
+        "marginBottomPx": "24-32"
+      },
+      "variants": {
+        "primary": {
+          "background": "Primary color (#3b82f6)",
+          "textColor": "White (#ffffff)",
+          "fontWeight": "500-600 (medium/semibold)",
+          "fontSize": "16-18px",
+          "shadow": "0 1px 2px rgba(0,0,0,0.05)",
+          "hover": {
+            "background": "Darker shade (darken 10-15%)",
+            "shadow": "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)",
+            "transform": "Optional scale(1.02)"
+          },
+          "usage": "Most Popular / highlighted plan"
+        },
+        "secondary": {
+          "variant1Outlined": {
+            "border": "2px solid primary or neutral",
+            "background": "Transparent or white",
+            "textColor": "Primary color",
+            "hover": {
+              "background": "Light fill (#f3f4f6)",
+              "borderColor": "Darker"
+            }
+          },
+          "variant2Ghost": {
+            "background": "Light gray (#f3f4f6)",
+            "textColor": "Primary text color",
+            "border": "None",
+            "hover": {
+              "background": "Darker gray"
+            }
+          },
+          "usage": "Starter and Enterprise plans"
+        }
+      },
+      "states": {
+        "default": "Normal appearance",
+        "hover": "Enhanced (shadow/scale/color)",
+        "active": "Slight press effect",
+        "focus": "Clear outline (2px solid, 2px offset)",
+        "loading": "Disabled with spinner",
+        "disabled": "Muted colors, cursor not-allowed"
+      },
+      "textExamples": {
+        "freePlan": ["Start Free", "Get Started Free"],
+        "paidPlans": ["Get Started", "Start Trial", "Subscribe"],
+        "enterprise": ["Contact Sales", "Request Demo", "Talk to Sales"]
+      },
+      "behavior": {
+        "onClick": "Navigate to signup/checkout or open modal",
+        "keyboard": "Enter/Space activates",
+        "analytics": "Track plan selection event"
+      },
+      "accessibility": {
+        "ariaLabel": "Subscribe to [Plan Name] plan",
+        "role": "button (implicit for <button>)"
+      }
+    },
+
+    "FeatureList": {
+      "description": "List of features included or unavailable in the plan",
+      "dimensions": {
+        "itemHeightPx": "36-44",
+        "iconSizePx": "20-24",
+        "gapBetweenIconAndTextPx": "12-16",
+        "gapBetweenItemsPx": "8-12",
+        "marginTopPx": "24-32 (from CTA button)"
+      },
+      "elements": {
+        "FeatureItem": {
+          "fontSizePx": "14-16",
+          "fontWeight": 400,
+          "colorIncluded": "Primary text color",
+          "colorUnavailable": "Muted text (#9ca3af) or lighter",
+          "lineHeight": 1.5,
+          "layout": "Flex row with icon + text"
+        },
+        "CheckIcon": {
+          "color": "Success green (#10b981) or primary color",
+          "style": "Solid checkmark or circle with check",
+          "strokeWidth": "Medium/bold",
+          "ariaHidden": true
+        },
+        "XMarkIcon": {
+          "color": "Muted gray (#9ca3af) or light red (#ef4444)",
+          "style": "X mark, minus sign, or grayed-out check",
+          "optional": "Strikethrough text",
+          "ariaHidden": true
+        }
+      },
+      "featureGroups": {
+        "description": "Optional grouping of features by category",
+        "groupHeader": {
+          "fontSizePx": "12-14",
+          "fontWeight": 600,
+          "textTransform": "uppercase",
+          "color": "Muted text",
+          "marginTopPx": 16
+        },
+        "divider": "1px line or extra spacing",
+        "examples": ["Core Features", "Advanced Features", "Support"]
+      },
+      "accessibility": {
+        "iconAriaHidden": true,
+        "textConveyStatus": "Included or not included status conveyed in text",
+        "screenReaderText": "<span class='sr-only'>Included</span> or <span class='sr-only'>Not included</span>",
+        "listRole": "Use <ul> with aria-label='Features included in [Plan] plan'"
+      }
+    }
+  },
+
+  "responsiveBreakpoints": {
+    "desktop": {
+      "minWidth": "1024px",
+      "plansGrid": "3 columns, equal width, 32px gap",
+      "cardPadding": "32-40px",
+      "typography": "Full size (48-56px price, 24-28px plan name)",
+      "highlightedPlan": "Optional scale 102-105% or elevated shadow",
+      "featureAlignment": "Features can align horizontally across cards",
+      "billingToggle": "Full size with spacing"
+    },
+    "tablet": {
+      "minWidth": "768px",
+      "maxWidth": "1023px",
+      "plansGrid": "3 columns maintained, reduced gap (20px)",
+      "cardPadding": "28-32px",
+      "typography": "Slightly smaller",
+      "highlightedPlan": "Elevated shadow only, no scale",
+      "alternative": "2+1 layout (2 top, 1 bottom) if cards too narrow"
+    },
+    "mobile": {
+      "maxWidth": "767px",
+      "plansGrid": "Single column, stacked, 24px gap",
+      "cardPadding": "24-32px",
+      "cardWidth": "Full width minus 16px margins",
+      "typography": "Reduced (40-48px price, 20-24px plan name)",
+      "highlightedPlan": "First in stack or maintain order with elevated shadow",
+      "featureLists": "Full list or top 5-7 with expand option",
+      "ctaButton": "Full width, optional sticky behavior"
+    },
+    "smallMobile": {
+      "maxWidth": "374px",
+      "cardPadding": "16-24px",
+      "typography": "Further reduced",
+      "buttonSize": "Slightly smaller"
+    }
+  },
+
+  "stateManagement": {
+    "statesToTrack": {
+      "billingFrequency": {
+        "type": "enum",
+        "values": ["monthly", "yearly"],
+        "default": "monthly",
+        "description": "Current billing period selection",
+        "persistence": "Session storage (optional) or component state only"
+      },
+      "selectedPlan": {
+        "type": "string | null",
+        "default": null,
+        "description": "Plan ID that user clicked (for analytics)",
+        "persistence": "Not persisted, used for tracking only"
+      },
+      "loading": {
+        "type": "boolean",
+        "default": false,
+        "description": "Loading state for CTA buttons (if async action)",
+        "persistence": "Component state only"
+      }
+    },
+    "computedValues": {
+      "currentPrices": "Calculated based on billingFrequency",
+      "discountAmounts": "Yearly price savings vs monthly * 12",
+      "featureAvailability": "Static data per plan"
+    }
+  },
+
+  "dataStructures": {
+    "pricingPlans": {
+      "description": "Array of plan objects with pricing and features",
+      "example": [
+        {
+          "id": "starter",
+          "name": "Starter",
+          "description": "Perfect for individuals",
+          "monthlyPrice": 9,
+          "yearlyPrice": 89,
+          "yearlyDiscount": 17,
+          "highlighted": false,
+          "badge": null,
+          "features": [
+            { "name": "Up to 5 projects", "included": true },
+            { "name": "1 GB storage", "included": true },
+            { "name": "Basic support", "included": true },
+            { "name": "Advanced analytics", "included": false },
+            { "name": "Custom domain", "included": false }
+          ],
+          "cta": {
+            "text": "Start Free",
+            "action": "/signup?plan=starter"
+          }
+        },
+        {
+          "id": "professional",
+          "name": "Professional",
+          "description": "Perfect for small teams",
+          "monthlyPrice": 29,
+          "yearlyPrice": 279,
+          "yearlyDiscount": 20,
+          "highlighted": true,
+          "badge": "Most Popular",
+          "features": [
+            { "name": "Unlimited projects", "included": true },
+            { "name": "10 GB storage", "included": true },
+            { "name": "Priority support", "included": true },
+            { "name": "Advanced analytics", "included": true },
+            { "name": "Custom domain", "included": true },
+            { "name": "API access", "included": false }
+          ],
+          "cta": {
+            "text": "Get Started",
+            "action": "/signup?plan=pro"
+          }
+        },
+        {
+          "id": "enterprise",
+          "name": "Enterprise",
+          "description": "Perfect for large organizations",
+          "monthlyPrice": 99,
+          "yearlyPrice": 990,
+          "yearlyDiscount": 17,
+          "highlighted": false,
+          "badge": null,
+          "features": [
+            { "name": "Unlimited everything", "included": true },
+            { "name": "Unlimited storage", "included": true },
+            { "name": "24/7 dedicated support", "included": true },
+            { "name": "Advanced analytics", "included": true },
+            { "name": "Custom domain", "included": true },
+            { "name": "API access", "included": true },
+            { "name": "SSO & SAML", "included": true }
+          ],
+          "cta": {
+            "text": "Contact Sales",
+            "action": "/contact?plan=enterprise"
+          }
+        }
+      ]
+    }
+  },
+
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "useState for billingFrequency, useMemo for computed prices",
+      "example": "const [billingFrequency, setBillingFrequency] = useState('monthly'); const currentPrice = useMemo(() => billingFrequency === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice, [billingFrequency, plan]);",
+      "componentStructure": "<PricingTable><BillingToggle frequency={billingFrequency} onToggle={toggleBilling} /><div className='plans-grid'>{pricingPlans.map(plan => <PlanCard key={plan.id} plan={plan} billingFrequency={billingFrequency} />)}</div></PricingTable>",
+      "customHooks": "Optional: usePricing(billingFrequency) hook to encapsulate pricing logic",
+      "animation": "Use CSS transitions or react-spring for price changes"
+    },
+    "vue": {
+      "stateManagement": "ref() for billingFrequency, computed() for current prices",
+      "example": "const billingFrequency = ref('monthly'); const currentPrice = computed(() => billingFrequency.value === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice);",
+      "componentStructure": "<PricingTable><BillingToggle :frequency='billingFrequency' @toggle='toggleBilling' /><div class='plans-grid'><PlanCard v-for='plan in pricingPlans' :key='plan.id' :plan='plan' :billing-frequency='billingFrequency' /></div></PricingTable>",
+      "animation": "Use transition component or CSS transitions"
+    },
+    "angular": {
+      "stateManagement": "Component properties for billingFrequency, getter methods for computed values",
+      "example": "billingFrequency: 'monthly' | 'yearly' = 'monthly'; getCurrentPrice(plan: Plan) { return this.billingFrequency === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice; }",
+      "componentStructure": "<app-pricing-table><app-billing-toggle [frequency]='billingFrequency' (toggle)='toggleBilling()' /><div class='plans-grid'><app-plan-card *ngFor='let plan of pricingPlans' [plan]='plan' [billingFrequency]='billingFrequency' /></div></app-pricing-table>",
+      "animation": "Use Angular animations module"
+    },
+    "svelte": {
+      "stateManagement": "let billingFrequency = 'monthly'; reactive statements for computed values",
+      "example": "let billingFrequency = 'monthly'; $: currentPrice = billingFrequency === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice;",
+      "componentStructure": "<PricingTable><BillingToggle {billingFrequency} on:toggle={toggleBilling} /><div class='plans-grid'>{#each pricingPlans as plan}<PlanCard {plan} {billingFrequency} />{/each}</div></PricingTable>",
+      "animation": "Use Svelte transitions (fade, slide, scale)"
+    }
+  },
+
+  "stylingApproaches": {
+    "note": "These are implementation examples. The designSystem section contains authoritative design values.",
+    "tailwindCSS": {
+      "description": "Use utility classes with dynamic classes based on state",
+      "containerExample": "class='max-w-[1200px] mx-auto px-6 py-16'",
+      "gridExample": "class='grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8'",
+      "cardExample": "class='bg-white rounded-2xl shadow-md p-8 transition-all duration-200' :class=\"{'ring-2 ring-blue-500 scale-105': highlighted}\"",
+      "buttonPrimaryExample": "class='w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors'",
+      "buttonSecondaryExample": "class='w-full border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors'",
+      "priceAnimationExample": "Use transition-opacity and transition-transform classes"
+    },
+    "cssModules": {
+      "description": "Scoped CSS classes with conditional class names",
+      "approach": "Define .card, .cardHighlighted, .buttonPrimary, .buttonSecondary with design token values",
+      "example": ".card { background: white; border-radius: 16px; padding: 40px; transition: all 200ms; } .cardHighlighted { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transform: scale(1.05); }"
+    },
+    "styledComponents": {
+      "description": "CSS-in-JS with props for dynamic styling",
+      "approach": "Pass highlighted and billingFrequency props to styled components",
+      "example": "const Card = styled.div`background: white; padding: ${p => p.mobile ? '24px' : '40px'}; box-shadow: ${p => p.highlighted ? '0 10px 15px -3px rgba(0,0,0,0.1)' : '0 1px 3px rgba(0,0,0,0.1)'};`"
+    },
+    "chakraUI": {
+      "components": "Use Box for cards, Button for CTAs, Badge for 'Most Popular', Stack for feature lists",
+      "approach": "Leverage Chakra's responsive props and color modes",
+      "theme": "Extend Chakra theme with pricing-specific styles",
+      "example": "<Box bg='white' p={{ base: 6, md: 10 }} borderRadius='2xl' shadow={highlighted ? 'xl' : 'md'}>"
+    },
+    "materialUI": {
+      "components": "Use Card, CardContent, Button, List for structure",
+      "approach": "Override MUI theme for pricing-specific styles",
+      "theme": "Use MUI's sx prop for inline styling or styled() API",
+      "example": "<Card sx={{ p: { xs: 3, md: 5 }, borderRadius: 4, boxShadow: highlighted ? 6 : 2 }}>"
+    },
+    "vanillaCSS": {
+      "description": "Standard CSS with class toggles. CRITICAL: ALWAYS create CSS classes, NEVER use inline styles.",
+      "approach": "Define classes with design token values, toggle via JS",
+      "example": ".pricing-card { background: #fff; border-radius: 16px; padding: 40px; transition: all 200ms; } .pricing-card--highlighted { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transform: scale(1.05); } .btn-primary { background: #3b82f6; color: #fff; padding: 12px 24px; border-radius: 8px; } .btn-secondary { border: 2px solid #e5e7eb; color: #374151; }",
+      "note": "Apply classes via className: <div class='pricing-card pricing-card--highlighted'> NOT <div style='box-shadow: ...'>"
+    },
+    "sass": {
+      "description": "SCSS with variables and mixins for design tokens",
+      "approach": "Create SCSS variables for all design values, use mixins for transitions",
+      "example": "$card-padding-desktop: 40px; $card-padding-mobile: 24px; .pricing-card { padding: $card-padding-desktop; @media (max-width: 768px) { padding: $card-padding-mobile; } }"
+    }
+  },
+
+  "animations": {
+    "billingToggle": {
+      "durationMs": 200,
+      "easing": "ease-in-out",
+      "properties": {
+        "switch": ["transform (translateX)", "background-color"],
+        "labels": ["color"]
+      }
+    },
+    "priceChange": {
+      "durationMs": 250,
+      "easing": "ease-in-out",
+      "effectOptions": [
+        { "name": "fade", "properties": ["opacity"] },
+        { "name": "slide", "properties": ["opacity", "transform (translateY)"] },
+        { "name": "scale", "properties": ["opacity", "transform (scale)"] }
+      ],
+      "stagger": {
+        "enabled": true,
+        "delayBetweenCardMs": 50,
+        "order": "Left to right (Starter → Pro → Enterprise)"
+      },
+      "implementation": "On billingFrequency change: fade out old price → update value → fade in new price"
+    },
+    "cardHover": {
+      "durationMs": 180,
+      "easing": "ease-out",
+      "properties": {
+        "shadow": "Increase elevation",
+        "transform": "translateY(-4px) or scale(1.02)"
+      },
+      "note": "Keep subtle to avoid distraction from main CTAs"
+    },
+    "buttonHover": {
+      "durationMs": 150,
+      "easing": "ease-out",
+      "properties": {
+        "backgroundColor": "Darken by 10-15%",
+        "shadow": "Increase elevation",
+        "transform": "Optional scale(1.02)"
+      }
+    },
+    "prefersReducedMotion": {
+      "behavior": "Respect user preference for reduced motion",
+      "rules": [
+        "Disable card hover transforms (translateY, scale)",
+        "Disable price change slide/scale (use only fade with opacity)",
+        "Keep toggle switch animation (functional, minimal)",
+        "Reduce all animation durations to <100ms or instant"
+      ],
+      "implementation": "@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }"
+    }
+  },
+
+  "projectDetection": {
+    "framework": {
+      "description": "Detect the project's framework by examining package.json, existing component files, and project structure. Common frameworks: React, Vue, Angular, Svelte.",
+      "detectionSteps": [
+        "Check package.json for framework dependencies (react, vue, @angular/core, svelte)",
+        "Examine existing component files for framework-specific patterns (JSX for React, .vue files for Vue, etc.)",
+        "Check build configuration (vite.config.js, webpack.config.js, angular.json, etc.)",
+        "Look for framework-specific directories (src/components, src/app, etc.)"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect the project's styling approach by examining dependencies, config files, and existing component styles. Use the detected system exclusively.",
+      "detectionSteps": [
+        "Check package.json for styling dependencies: tailwindcss, styled-components, emotion, sass, less, css-modules, etc.",
+        "Look for config files: tailwind.config.js, postcss.config.js, sass config, etc.",
+        "Examine existing component files to see how styles are imported and used",
+        "Check for style files: .css, .scss, .module.css, styled-components patterns, etc.",
+        "Identify class naming conventions and utility functions (cn, clsx, classnames, etc.)",
+        "If no styling system is detected, use vanilla CSS or CSS Modules as the most suitable approach"
+      ],
+      "adaptationRules": [
+        "If Tailwind is detected: Use Tailwind utility classes, respect existing config, use existing design tokens, follow project's class composition patterns",
+        "If SCSS/CSS is detected: Use SCSS/CSS files matching project structure, follow existing naming conventions (BEM, camelCase, etc.), import styles as the project does",
+        "If styled-components is detected: Use styled-components syntax matching project patterns, follow existing component structure",
+        "If CSS Modules is detected: Use .module.css files, follow existing module naming patterns",
+        "If no styling system: Use vanilla CSS with semantic class names, or CSS Modules if it seems appropriate for the project size"
+      ]
+    },
+    "designTokens": {
+      "description": "Identify existing design tokens, color systems, spacing scales, and typography from the project. Use these instead of inventing new values.",
+      "detectionSteps": [
+        "Check for design token files (tokens.json, theme.js, design-tokens.css, etc.)",
+        "Examine Tailwind config for theme values if using Tailwind",
+        "Look at existing components for color, spacing, and typography patterns",
+        "Check CSS variables (--color-*, --spacing-*, etc.) in global styles",
+        "If tokens exist, use them. If not, use values that match existing component styles"
+      ]
+    }
+  },
+
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Info and Relationships - Semantic HTML (section, article, ul, button)",
+        "1.4.3": "Contrast Minimum - 4.5:1 for text, 3:1 for interactive elements",
+        "2.1.1": "Keyboard - All interactive elements keyboard accessible",
+        "2.4.3": "Focus Order - Logical tab order (toggle → CTAs)",
+        "2.4.7": "Focus Visible - Clear focus indicators on all interactive elements",
+        "4.1.2": "Name, Role, Value - Proper ARIA attributes for toggle and features"
+      }
+    },
+    "keyboardNavigation": {
+      "tabOrder": "Billing toggle → Plan 1 CTA → Plan 2 CTA → Plan 3 CTA",
+      "toggleActivation": "Enter or Space key toggles billing frequency",
+      "buttonActivation": "Enter or Space key activates CTA buttons",
+      "focusVisible": "All interactive elements show clear focus indicators"
+    },
+    "ariaAttributes": {
+      "billingToggle": {
+        "role": "switch (or radiogroup with radio buttons)",
+        "ariaChecked": "true when yearly selected, false when monthly",
+        "ariaLabel": "Switch between monthly and yearly billing",
+        "example": "<button role='switch' aria-checked='false' aria-label='Switch to yearly billing'>"
+      },
+      "planCard": {
+        "element": "article or section",
+        "ariaLabelledby": "Points to plan name heading ID",
+        "example": "<article aria-labelledby='plan-pro-name'><h3 id='plan-pro-name'>Professional</h3></article>"
+      },
+      "badge": {
+        "role": "status (optional)",
+        "ariaLabel": "Most popular plan",
+        "example": "<span class='badge' role='status' aria-label='Most popular plan'>Most Popular</span>"
+      },
+      "featureList": {
+        "element": "ul",
+        "ariaLabel": "Features included in [Plan Name] plan",
+        "example": "<ul aria-label='Features included in Professional plan'>"
+      },
+      "featureItem": {
+        "iconAriaHidden": true,
+        "screenReaderText": "<span class='sr-only'>Included</span> or <span class='sr-only'>Not included</span>",
+        "example": "<li><svg aria-hidden='true'>...</svg><span>Unlimited projects</span><span class='sr-only'>Included</span></li>"
+      },
+      "ctaButton": {
+        "ariaLabel": "Subscribe to [Plan Name] plan (if button text is ambiguous)",
+        "example": "<button aria-label='Subscribe to Professional plan'>Get Started</button>"
+      }
+    },
+    "screenReader": {
+      "announcements": {
+        "priceChange": "Optional aria-live region to announce price changes",
+        "implementation": "<div aria-live='polite' class='sr-only'>Prices updated to yearly billing</div>"
+      },
+      "hiddenText": {
+        "purpose": "Convey icon meaning to screen readers",
+        "css": ".sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }",
+        "usage": "Add sr-only spans next to icons: <span class='sr-only'>Included</span>"
+      }
+    },
+    "colorContrast": {
+      "requirement": "WCAG AA: 4.5:1 for text, 3:1 for interactive elements",
+      "verification": "Use WebAIM Contrast Checker or browser DevTools",
+      "criticalAreas": [
+        "Price text on card background",
+        "Button text on button background",
+        "Feature text on card background",
+        "Badge text on badge background",
+        "Focus indicators on all backgrounds"
+      ]
+    },
+    "focusIndicators": {
+      "implementation": "button:focus-visible, a:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }",
+      "requirement": "Visible on all interactive elements (buttons, toggle)"
+    }
+  },
+
+  "designSystem": {
+    "note": "Tool-agnostic design specifications. Implement using project's styling approach.",
+    "colors": {
+      "cards": {
+        "background": {
+          "light": "White (#ffffff) or very light gray (#fafafa)",
+          "dark": "Dark neutral (#1f2937) or #1a1a1a"
+        },
+        "border": {
+          "default": "Light gray (#e5e7eb) or transparent",
+          "highlighted": "Primary color (#3b82f6) or darker (#1f2937)"
+        },
+        "shadow": {
+          "default": "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)",
+          "highlighted": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
+          "hover": "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)"
+        }
+      },
+      "text": {
+        "primary": {
+          "light": "Dark gray (#111827, #1f2937)",
+          "dark": "Light gray (#f9fafb, #e5e7eb)"
+        },
+        "muted": {
+          "light": "Medium gray (#6b7280, #9ca3af)",
+          "dark": "Medium gray (#9ca3af, #6b7280)"
+        },
+        "price": "Emphasis color, darker/bolder than primary"
+      },
+      "buttons": {
+        "primary": {
+          "background": "Primary color (#3b82f6, #10b981)",
+          "text": "White (#ffffff)",
+          "hover": "Darker shade (darken 10-15%)"
+        },
+        "secondary": {
+          "border": "Primary color or neutral (#e5e7eb)",
+          "text": "Primary color or primary text",
+          "background": "Transparent or white",
+          "hover": "Light background (#f3f4f6)"
+        }
+      },
+      "badge": {
+        "background": "Primary color or gradient",
+        "text": "White or high-contrast",
+        "alternative": "Primary color at 10-20% opacity with primary text"
+      },
+      "toggle": {
+        "labelInactive": "Muted text (#6b7280)",
+        "labelActive": "Primary text",
+        "switchOff": "Light gray (#e5e7eb)",
+        "switchOn": "Primary color (#3b82f6)",
+        "thumb": "White (#ffffff)"
+      },
+      "features": {
+        "checkmark": "Success green (#10b981) or primary color",
+        "xMark": "Light gray (#9ca3af) or muted red (#ef4444)"
+      }
+    },
+    "typography": {
+      "fontFamily": "Use project's font stack (system-ui, -apple-system, sans-serif or custom)",
+      "sizes": {
+        "sectionTitle": "32-40px, bold (700)",
+        "planName": "24-28px (desktop), 20-24px (mobile), semibold/bold (600-700)",
+        "price": "48-56px (desktop), 40-48px (mobile), bold/extra-bold (700-800)",
+        "billingPeriod": "16-18px, regular/medium (400-500)",
+        "ctaButton": "16-18px, medium/semibold (500-600)",
+        "features": "14-16px, regular (400)",
+        "badge": "12-14px, medium/semibold (500-600)",
+        "description": "14-16px, regular (400)"
+      },
+      "lineHeights": {
+        "headings": "1.2-1.3",
+        "body": "1.5",
+        "features": "1.5"
+      }
+    },
+    "spacing": {
+      "scale": "Use 4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px or project's scale",
+      "container": "48-64px vertical, 24-32px horizontal (desktop); 32-48px vertical, 16-24px horizontal (mobile)",
+      "cardPadding": "32-40px (desktop), 24-32px (mobile)",
+      "gridGap": "24-32px (desktop), 24px (mobile)",
+      "elementSpacing": "24-32px between major sections, 16-24px between related",
+      "featureItems": "8-12px gap between items"
+    },
+    "borderRadius": {
+      "cards": "12-16px",
+      "buttons": "8-12px",
+      "badges": "12px (pill) or 6px (rounded)",
+      "toggle": "16px (pill)"
+    },
+    "shadows": {
+      "card": "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)",
+      "cardHighlighted": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
+      "cardHover": "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
+      "buttonPrimary": "0 1px 2px rgba(0,0,0,0.05)",
+      "buttonHover": "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)"
+    }
+  },
+
+  "edgeCases": {
+    "longFeatureNames": "Wrap to multiple lines, maintain consistent height across cards, consider tooltip",
+    "manyFeatures": "Show top 7-10, add 'Show all features' expand button or link to comparison",
+    "priceChangesDuringView": "Handle real-time updates with smooth transition",
+    "currencyConversion": "Support multiple currencies with currency selector",
+    "fractionalPricing": "Handle decimals ($9.99 vs $10), consistent formatting, cents in smaller font"
+  },
+
+  "commonVariations": {
+    "twoTier": "Remove middle plan, adjust grid to 2 columns",
+    "fourPlusTier": "Horizontal scroll on mobile or tabs/accordion",
+    "featureComparisonTable": "Separate section below cards with full matrix",
+    "annualDiscountBadge": "Prominent 'Save 20%' badge on yearly",
+    "freeTrialCTA": "'Start 14-day free trial' emphasis",
+    "tieredFeatures": "Group features by category with headers",
+    "customEnterprise": "'Contact us' with hidden pricing"
+  },
+
+  "featureSpec": {
+    "goal": "Enable users to compare pricing tiers and select the plan that best fits their needs, maximizing conversion through clear value proposition and transparent feature comparison.",
+    "userJourney": [
+      "User lands on pricing page",
+      "User reviews available plans and features",
+      "User toggles between monthly and yearly billing to compare prices",
+      "User evaluates features across different tiers",
+      "User clicks CTA button to proceed with plan selection",
+      "User is directed to signup/checkout flow"
+    ],
+    "screens": [
+      {
+        "id": "pricing-table",
+        "purpose": "Display pricing options with billing toggle, plan comparison, and conversion CTAs",
+        "ui": {
+          "sections": ["billing-toggle", "plans-grid"],
+          "planCards": 3,
+          "layout": "3-column grid (desktop) to stacked (mobile)"
+        },
+        "states": ["monthly", "yearly", "plan-selected", "loading"],
+        "interactions": [
+          {
+            "event": "billingToggleClick",
+            "result": "updateAllPlanPrices",
+            "sideEffects": ["showYearlySavingsBadge", "animatePriceTransition"],
+            "accessibilityNotes": "Announce price changes to screen readers via aria-live region"
+          },
+          {
+            "event": "ctaButtonClick",
+            "result": "navigateToSignupCheckout",
+            "sideEffects": ["setSelectedPlanState", "trackAnalyticsEvent"],
+            "accessibilityNotes": "Focus should remain on CTA button or move to next screen"
+          },
+          {
+            "event": "cardHover",
+            "when": "desktop only (min-width: 1024px)",
+            "result": "increaseCardElevation",
+            "sideEffects": ["applyScaleTransform"],
+            "accessibilityNotes": "Hover effects are visual only, keyboard users activate via Enter/Space on CTA"
+          }
+        ],
+        "stateModel": {
+          "billingFrequency": {
+            "type": "enum",
+            "description": "Current billing period selection (monthly or yearly)",
+            "default": "monthly",
+            "allowedValues": ["monthly", "yearly"],
+            "persistence": "session storage or component state"
+          },
+          "selectedPlan": {
+            "type": "string",
+            "description": "ID of the plan user clicked (null if none selected)",
+            "default": null,
+            "persistence": "none - used for tracking only"
+          },
+          "loading": {
+            "type": "boolean",
+            "description": "Loading state for CTA buttons during async actions",
+            "default": false,
+            "persistence": "none - component state only"
+          }
+        }
+      }
+    ],
+    "states": [
+      "monthly-billing-selected",
+      "yearly-billing-selected",
+      "plan-card-hover",
+      "cta-button-hover",
+      "cta-button-loading",
+      "price-transition-animating"
+    ],
+    "edgeCases": [
+      "Very long feature names that wrap to multiple lines",
+      "Many features requiring scrollable list or truncation",
+      "Real-time price changes during user's view session",
+      "Currency conversion for multiple locales",
+      "Fractional pricing ($9.99 vs $10.00) formatting",
+      "Custom enterprise pricing ('Contact us' instead of fixed price)",
+      "User rapidly toggling billing frequency during animation",
+      "Browser window resize during animation",
+      "Screen reader navigation through all pricing options",
+      "Keyboard-only navigation and selection flow"
+    ],
+    "interactions": [
+      {
+        "event": "billingToggle",
+        "result": "updateAllPlanPrices",
+        "sideEffects": ["showYearlySavingsBadges", "animatePriceTransitions", "updateToggleSwitchPosition"],
+        "accessibilityNotes": "Announce billing frequency change and price updates to screen readers. Update aria-checked on toggle switch."
+      },
+      {
+        "event": "planSelection",
+        "result": "navigateToSignupCheckout",
+        "sideEffects": ["setSelectedPlanState", "triggerLoadingState", "trackAnalyticsEvent"],
+        "accessibilityNotes": "Loading state should be announced to screen readers. Focus management when navigating to next screen."
+      }
+    ],
+    "analyticsEvents": [
+      "pricing_table_viewed",
+      "billing_frequency_toggled",
+      "plan_card_hovered",
+      "plan_cta_clicked",
+      "plan_selected"
+    ]
+  },
+
+  "outputConstraints": {
+    "must": [
+      "Detect and use ONLY project's existing framework and styling system",
+      "Use existing design tokens, color system, and spacing scales",
+      "Match existing component patterns and naming conventions",
+      "Implement smooth price change animations",
+      "Ensure keyboard accessibility and ARIA attributes",
+      "Respect prefers-reduced-motion preference",
+      "Maintain responsive grid layout (3-col → 1-col)"
+    ],
+    "mustNot": [
+      "Do NOT introduce new styling systems",
+      "Do NOT add <style> blocks unless project convention",
+      "Do NOT use inline styles (use CSS classes)",
+      "Do NOT hardcode colors (use design tokens or existing values)",
+      "Do NOT import new UI libraries",
+      "CRITICAL: When vanilla CSS detected, NEVER use inline style attributes. ALWAYS create CSS classes.",
+      "CRITICAL: When React detected, extract useEffect logic into separate custom hooks."
+    ]
+  },
+
+  "testingChecklist": [
+    "Billing toggle switches between monthly and yearly",
+    "All plan prices update simultaneously",
+    "Price change animations are smooth",
+    "Most Popular plan visually distinct",
+    "CTA buttons functional and properly styled",
+    "Feature lists display correctly with icons",
+    "Cards stack properly on mobile",
+    "Responsive at all breakpoints",
+    "Keyboard navigation works (Tab, Enter, Space)",
+    "Screen reader announces prices correctly",
+    "Focus indicators visible on interactive elements",
+    "Color contrast meets WCAG AA (4.5:1)",
+    "Hover states work on cards and buttons",
+    "Touch interactions work on mobile",
+    "No layout shift when prices change",
+    "Feature icons accessible (aria-hidden + text)",
+    "Toggle has proper ARIA attributes",
+    "Animations respect prefers-reduced-motion",
+    "Long feature text wraps properly",
+    "Badges readable and accessible"
+  ],
+
+  "aiImplementationPrompt": "Create a responsive 3-tier SaaS pricing table with billing frequency toggle (monthly/yearly). Display three plans: Starter ($9/mo, $89/yr), Professional ($29/mo, $279/yr, highlighted as 'Most Popular'), and Enterprise ($99/mo, $990/yr). Each plan card should include a name, description, animated pricing that updates smoothly when billing changes, a prominent CTA button (primary for Professional, secondary for others), and a feature list with checkmarks and x-marks. Use a CSS Grid layout (3 columns desktop, 1 column mobile with 24px gap). Implement smooth animations for price changes (250ms fade/slide with optional 50ms stagger) and card hover effects. Ensure keyboard accessibility with ARIA labels, focus indicators, and proper tab order. Respect prefers-reduced-motion. The billing toggle should be a switch with savings badge ('Save 20%' for yearly). Adapt to {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}, using ONLY existing project conventions. CRITICAL: If vanilla CSS, create CSS classes, never inline styles. If React, use separate custom hooks for concerns.",
+
+  "meta": {
+    "created": "2026-01-18",
+    "updated": "2026-01-18",
+    "complexity": "intermediate",
+    "estimatedImplementationTime": "2-3 hours",
+    "webUrl": "https://uipotion.com/potions/features/pricing-table.html"
+  }
+}
