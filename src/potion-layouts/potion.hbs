@@ -5,9 +5,13 @@
   <header class="potion-hero" role="banner">
     <div class="potion-hero-container">
       <nav class="potion-breadcrumb" aria-label="Breadcrumb navigation">
-        <a href="{{relativePath 'index.html'}}">← All Potions</a>
+        <a href="{{relativePath 'index.html'}}">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="{{relativePath 'potions.html'}}">All Potions</a>
         <span aria-hidden="true">/</span>
         <span>{{category}}</span>
+        <span aria-hidden="true">/</span>
+        <span>{{title}}</span>
         <a href="#potion-main-content" class="skip-link">Skip to content</a>
       </nav>
       

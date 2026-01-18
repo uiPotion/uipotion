@@ -5,6 +5,7 @@ publicationDate: '2026-01-18'
 excerpt: 'A comprehensive data table component with sorting, pagination, filtering, row selection, and responsive behavior. Includes loading, empty, and error states with full keyboard navigation support.'
 category: 'Components'
 tags:
+  - components
   - data-table
   - table
   - sortable

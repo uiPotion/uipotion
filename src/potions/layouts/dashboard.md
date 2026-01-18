@@ -5,6 +5,7 @@ publicationDate: '2026-01-10'
 excerpt: 'A responsive admin dashboard layout with collapsible sidebar navigation and fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.'
 category: 'Layouts'
 tags:
+  - layouts
   - dashboard
   - sidebar
   - responsive

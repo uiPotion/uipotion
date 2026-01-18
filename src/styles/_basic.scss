@@ -35,6 +35,57 @@ article, aside, footer, header, nav, section {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+}
+
+/* Mobile Menu Toggle Button */
+.mobile-menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  position: relative;
+  z-index: 1001;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .hamburger-line {
+    width: 24px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+
+    &:not(:last-child) {
+      margin-bottom: 5px;
+    }
+  }
+
+  &.active {
+    .hamburger-line:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-line:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .hamburger-line:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+  }
 }
 
 .main-menu-list {
@@ -63,6 +114,58 @@ article, aside, footer, header, nav, section {
       color: rgba(255, 255, 255, 1);
       background: rgba(255, 255, 255, 0.1);
     }
+  }
+}
+
+/* Mobile Responsive Menu */
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  .main-menu {
+    position: fixed;
+    top: 64px;
+    right: 0;
+    width: 100%;
+    max-width: 300px;
+    height: calc(100vh - 64px);
+    background: #0a0a0a;
+    border-left: 1px solid #1a1a1a;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+
+    &.active {
+      transform: translateX(0);
+    }
+  }
+
+  .main-menu-list {
+    flex-direction: column;
+    gap: 0;
+    padding: 16px;
+  }
+
+  .main-menu-list-item {
+    font-size: 16px;
+    border-bottom: 1px solid #1a1a1a;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    a {
+      padding: 16px 12px;
+      border-radius: 0;
+      width: 100%;
+    }
+  }
+
+  /* Prevent body scroll when menu is open */
+  body.menu-open {
+    overflow: hidden;
   }
 }
 

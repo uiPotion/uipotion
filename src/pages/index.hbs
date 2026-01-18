@@ -21,12 +21,16 @@
     <p class="section-intro">Each potion is a detailed guide that AI agents can use to recreate UI components in any framework.</p>
     
     {{postsList
-      perPageLimit=12
+      perPageLimit=6
       currentPage=1
       className="potions-grid"
       dateFormat='dd mmmm yyyy'
       noDate=true
     }}
+
+    <div class="view-all-potions">
+      <a href="{{relativePath 'potions.html'}}" class="button primary">View All Potions</a>
+    </div>
   </div>
 </section>
 

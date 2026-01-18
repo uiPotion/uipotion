@@ -1,0 +1,104 @@
+{{> head title="All Potions - UI Potion" description="Browse our complete catalog of AI-optimized UI component guides. Framework-agnostic specifications for layouts, components, features, and more." }}
+
+<div class="potions-catalog-page">
+  <div class="potions-catalog-hero">
+    <div class="container">
+      <nav class="potions-breadcrumb">
+        <a href="{{relativePath 'index.html'}}">Home</a>
+        <span>/</span>
+        <span>All Potions</span>
+      </nav>
+      <h1>Complete Potions Catalog</h1>
+      <p class="potions-catalog-description">
+        Browse our full collection of AI-optimized UI component guides. Each potion provides comprehensive specifications that AI agents can use to recreate components in any framework and styling system.
+      </p>
+    </div>
+  </div>
+
+  <section class="potions-catalog-content">
+    <div class="container">
+      <!-- Layouts Category -->
+      <div class="potions-category-section">
+        <div class="potions-category-header">
+          <h2>Layouts</h2>
+          <p>Full-page layouts and structural patterns for dashboards, landing pages, documentation layouts, and app shells.</p>
+        </div>
+        {{postsList
+          className="potions-grid"
+          dateFormat='dd mmmm yyyy'
+          noDate=true
+          byTagName="layouts"
+        }}
+      </div>
+
+      <!-- Components Category -->
+      <div class="potions-category-section">
+        <div class="potions-category-header">
+          <h2>Components</h2>
+          <p>Reusable UI building blocks including buttons, dialogs, cards, forms, navigation, data tables, and more.</p>
+        </div>
+        {{postsList
+          className="potions-grid"
+          dateFormat='dd mmmm yyyy'
+          noDate=true
+          byTagName="components"
+        }}
+      </div>
+
+      <!-- Features Category -->
+      <div class="potions-category-section">
+        <div class="potions-category-header">
+          <h2>Features</h2>
+          <p>Complete user-facing features and flows like pricing tables, authentication, e-commerce, onboarding, and search.</p>
+        </div>
+        {{postsList
+          className="potions-grid"
+          dateFormat='dd mmmm yyyy'
+          noDate=true
+          byTagName="features"
+        }}
+      </div>
+
+      <!-- Patterns Category -->
+      <div class="potions-category-section">
+        <div class="potions-category-header">
+          <h2>Patterns</h2>
+          <p>Design and interaction patterns including drag-and-drop, infinite scroll, accessibility patterns, and responsive behaviors.</p>
+        </div>
+        {{postsList
+          className="potions-grid"
+          dateFormat='dd mmmm yyyy'
+          noDate=true
+          byTagName="patterns"
+        }}
+      </div>
+
+      <!-- Tooling Category -->
+      <div class="potions-category-section">
+        <div class="potions-category-header">
+          <h2>Tooling</h2>
+          <p>Developer tools and infrastructure including build tools, CLI utilities, third-party integrations, and API patterns.</p>
+        </div>
+        {{postsList
+          className="potions-grid"
+          dateFormat='dd mmmm yyyy'
+          noDate=true
+          byTagName="tooling"
+        }}
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="potions-catalog-cta">
+    <div class="container">
+      <div class="potions-cta-card">
+        <h2>Don't See What You Need?</h2>
+        <p>We're constantly adding new potions. Have a suggestion for a component guide?</p>
+        <a href="{{relativePath 'contribute.html'}}" class="button primary">Contribute a Potion</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+{{> footer}}

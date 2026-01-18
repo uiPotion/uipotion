@@ -827,22 +827,7 @@
 }
 
 .about-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  font-size: 0.875rem;
-  color: #94a3b8;
-
-  a {
-    color: #60a5fa;
-    text-decoration: none;
-    transition: color 0.2s;
-
-    &:hover {
-      color: #93c5fd;
-    }
-  }
+  /* Styles moved to consolidated breadcrumb section */
 }
 
 .about-hero-title {
@@ -1213,22 +1198,7 @@
 }
 
 .validator-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  font-size: 0.875rem;
-  color: #94a3b8;
-
-  a {
-    color: #60a5fa;
-    text-decoration: none;
-    transition: color 0.2s;
-
-    &:hover {
-      color: #93c5fd;
-    }
-  }
+  /* Styles moved to consolidated breadcrumb section */
 }
 
 .validator-hero-title {
@@ -1762,26 +1732,7 @@ html {
 }
 
 .potion-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  font-size: 0.875rem;
-  color: #94a3b8;
-
-  a {
-    color: #60a5fa;
-    text-decoration: none;
-    transition: color 0.2s;
-
-    &:hover {
-      color: #93c5fd;
-    }
-  }
-
-  span {
-    color: #475569;
-  }
+  /* Styles moved to consolidated breadcrumb section */
 }
 
 .potion-hero-title {
@@ -2188,6 +2139,101 @@ html {
   }
 }
 
+/* ============================================
+   BREADCRUMB RESPONSIVE STYLES
+   ============================================ */
+
+.potion-breadcrumb,
+.potions-breadcrumb,
+.about-breadcrumb,
+.validator-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  flex-wrap: wrap;
+
+  a {
+    color: #60a5fa;
+    text-decoration: none;
+    transition: color 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+      color: #93c5fd;
+    }
+  }
+
+  span {
+    color: #475569;
+    
+    &[aria-hidden="true"] {
+      user-select: none;
+    }
+  }
+}
+
+/* Responsive Breadcrumbs */
+@media (max-width: 768px) {
+  .potion-breadcrumb,
+  .potions-breadcrumb,
+  .about-breadcrumb,
+  .validator-breadcrumb {
+    font-size: 0.8125rem;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .potion-breadcrumb {
+    /* On mobile, hide middle items and show: Home / ... / Current */
+    span:nth-last-child(4), /* Hide "All Potions" separator */
+    span:nth-last-child(5), /* Hide "All Potions" link text but keep as link */
+    span:nth-last-child(6), /* Hide Category separator */
+    span:nth-last-child(7) { /* Hide Category text */
+      display: none;
+    }
+    
+    a:nth-child(3) { /* All Potions link */
+      display: none;
+    }
+    
+    span:nth-child(5) { /* Category */
+      display: none;
+    }
+    
+    /* Add ellipsis after Home */
+    a:first-child::after {
+      content: ' / ...';
+      color: #475569;
+      margin-left: 8px;
+    }
+    
+    /* Hide the separator after Home since we're adding it in the ::after */
+    span:nth-child(2) {
+      display: none;
+    }
+    
+    /* Truncate the final title if too long */
+    span:last-of-type:not(.skip-link) {
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .potion-breadcrumb {
+    /* On very small screens, make title even shorter */
+    span:last-of-type:not(.skip-link) {
+      max-width: 140px;
+    }
+  }
+}
+
 /* Responsive Adjustments for New Dark Design */
 @media (max-width: 1024px) {
   .potion-hero {
@@ -2304,3 +2350,226 @@ html {
     }
   }
 }
+
+/* ============================================
+   ALL POTIONS CATALOG PAGE
+   ============================================ */
+
+.potions-catalog-page {
+  background: #0a0a0a;
+  min-height: 100vh;
+  color: #e5e5e5;
+}
+
+/* Potions Catalog Hero */
+.potions-catalog-hero {
+  background: linear-gradient(to bottom, #0a0a0a 0%, #0d0d0d 100%);
+  position: relative;
+  padding: 120px 24px 80px;
+  border-bottom: 1px solid #262626;
+
+  /* Subtle grid pattern */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.5;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 0 0 24px 0;
+  }
+
+  .potions-catalog-description {
+    font-size: 1.25rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin-bottom: 0;
+    max-width: 800px;
+  }
+}
+
+.potions-breadcrumb {
+  /* Styles moved to consolidated breadcrumb section */
+}
+
+/* Potions Catalog Content */
+.potions-catalog-content {
+  background: #000000;
+  padding: 80px 24px;
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+}
+
+.potions-category-section {
+  margin-bottom: 100px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.potions-category-header {
+  margin-bottom: 48px;
+
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0 0 12px 0;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #262626;
+  }
+
+  p {
+    font-size: 1.0625rem;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 800px;
+  }
+}
+
+/* Call to Action */
+.potions-catalog-cta {
+  background: #0a0a0a;
+  border-top: 1px solid #262626;
+  padding: 80px 24px;
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+}
+
+.potions-cta-card {
+  background: #171717;
+  border: 1px solid #262626;
+  border-radius: 16px;
+  padding: 48px;
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+
+  h2 {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 16px 0;
+  }
+
+  p {
+    font-size: 1.125rem;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin: 0 0 32px 0;
+  }
+
+  .button {
+    font-size: 1rem;
+    padding: 14px 32px;
+  }
+}
+
+/* View All Potions Button on Homepage */
+.view-all-potions {
+  text-align: center;
+  margin-top: 48px;
+
+  .button {
+    font-size: 1rem;
+    padding: 14px 32px;
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .potions-catalog-hero {
+    padding: 100px 20px 60px;
+  }
+
+  .potions-catalog-content,
+  .potions-catalog-cta {
+    padding: 60px 20px;
+  }
+
+  .potions-category-section {
+    margin-bottom: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .potions-catalog-hero {
+    padding: 80px 16px 50px;
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .potions-catalog-description {
+      font-size: 1.0625rem;
+    }
+  }
+
+  .potions-catalog-content,
+  .potions-catalog-cta {
+    padding: 50px 16px;
+  }
+
+  .potions-category-section {
+    margin-bottom: 60px;
+  }
+
+  .potions-category-header {
+    margin-bottom: 32px;
+
+    h2 {
+      font-size: 1.75rem;
+      padding-bottom: 12px;
+    }
+
+    p {
+      font-size: 0.9375rem;
+    }
+  }
+
+  .potions-cta-card {
+    padding: 32px 24px;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    p {
+      font-size: 1rem;
+      margin-bottom: 24px;
+    }
+  }
+
+  .view-all-potions {
+    margin-top: 40px;
+  }
+}
+

@@ -5,6 +5,7 @@ publicationDate: '2026-01-18'
 excerpt: 'A responsive 3-tier pricing table component with monthly/yearly billing toggle, highlighted "Most Popular" plan, and feature comparison. Perfect for SaaS marketing pages, product pages, and subscription-based services.'
 category: 'Features'
 tags:
+  - features
   - pricing
   - saas
   - subscription

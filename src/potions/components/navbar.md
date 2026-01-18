@@ -5,6 +5,7 @@ publicationDate: '2026-01-12'
 excerpt: 'A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, optional transparent-to-solid transition, and first-class dropdown support. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.'
 category: 'Components'
 tags:
+  - components
   - navbar
   - navigation
   - header

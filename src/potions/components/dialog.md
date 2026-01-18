@@ -5,6 +5,7 @@ publicationDate: '2026-01-11'
 excerpt: 'An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.'
 category: 'Components'
 tags:
+  - components
   - modal
   - dialog
   - overlay

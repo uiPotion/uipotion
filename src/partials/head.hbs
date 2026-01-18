@@ -50,8 +50,18 @@
           <img src="{{relativePath 'assets/images/uipotion-logo.png'}}" alt="UI Potion Logo" width="32" height="32" class="logo-image">
           <span class="logo-text">UI Potion</span>
         </a>
-        <nav class="main-menu">
+        
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        
+        <!-- Desktop & Mobile Menu -->
+        <nav class="main-menu" id="mainMenu">
           <ul class="main-menu-list">
+            <li class="main-menu-list-item"><a href="{{relativePath 'potions.html'}}">All Potions</a></li>
             <li class="main-menu-list-item"><a href="{{relativePath 'about.html'}}">About</a></li>
             <li class="main-menu-list-item"><a href="{{relativePath 'contribute.html'}}">Contribute</a></li>
           </ul>
@@ -59,3 +69,32 @@
       </div>
     </div>
   </header>
+  
+  <script>
+    // Mobile menu toggle
+    (function() {
+      const toggle = document.getElementById('mobileMenuToggle');
+      const menu = document.getElementById('mainMenu');
+      
+      if (toggle && menu) {
+        toggle.addEventListener('click', function() {
+          const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', !isExpanded);
+          toggle.classList.toggle('active');
+          menu.classList.toggle('active');
+          document.body.classList.toggle('menu-open');
+        });
+        
+        // Close menu when clicking on a link
+        const menuLinks = menu.querySelectorAll('a');
+        menuLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.classList.remove('active');
+            menu.classList.remove('active');
+            document.body.classList.remove('menu-open');
+          });
+        });
+      }
+    })();
+  </script>
