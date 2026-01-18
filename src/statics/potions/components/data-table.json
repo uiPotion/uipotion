@@ -1,0 +1,1133 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
+  "id": "data-table",
+  "version": "1.0.0",
+  "name": "Data Table (Sortable, Paginated, Filterable)",
+  "category": "components",
+  "tags": [
+    "data-table",
+    "table",
+    "sortable",
+    "pagination",
+    "filtering",
+    "selection",
+    "responsive",
+    "a11y",
+    "wcag",
+    "admin",
+    "dashboard"
+  ],
+  "description": "A comprehensive data table component with sorting, pagination, filtering, row selection, and responsive behavior. Includes loading, empty, and error states with full keyboard navigation support.",
+
+  "tokens": {
+    "layout": {
+      "tableMinWidthPx": 800,
+      "rowHeightPx": 52,
+      "headerHeightPx": 56,
+      "cellPaddingHorizontalPx": 16,
+      "cellPaddingVerticalPx": 12,
+      "paginationHeightPx": 64,
+      "cardGapMobilePx": 16,
+      "zIndex": {
+        "base": 0,
+        "stickyHeader": 10,
+        "selectionToolbar": 20,
+        "dropdowns": 30
+      }
+    },
+    "motion": {
+      "sortTransitionMs": 200,
+      "rowHoverMs": 150,
+      "selectionTransitionMs": 180,
+      "defaultEasing": "cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    "breakpoints": {
+      "tabletMinPx": 768,
+      "desktopMinPx": 1024
+    }
+  },
+
+  "projectDetection": {
+    "framework": {
+      "description": "Identify the UI framework to match existing component patterns and data flow.",
+      "detectionSteps": [
+        "Inspect package.json for framework dependencies (react, vue, @angular/core, svelte)",
+        "Examine existing components for state management patterns (hooks, composition API, RxJS, stores)",
+        "Check for data fetching patterns (fetch, axios, react-query, apollo, etc.)",
+        "Identify component structure conventions (HOCs, hooks, composables, directives)"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect the project's styling approach and use ONLY that approach.",
+      "detectionSteps": [
+        "Inspect package.json for tailwindcss, sass, styled-components, @emotion/*, css-modules",
+        "Check existing components for style imports and class name patterns",
+        "Identify utility functions (cn, clsx, classnames) for conditional class composition",
+        "Look for design system or component library usage (MUI, Chakra, Ant Design, etc.)"
+      ],
+      "adaptationRules": [
+        "If Tailwind detected: Use utility classes, follow existing responsive patterns, use project's color/spacing tokens",
+        "If CSS Modules detected: Create .module.css file, follow existing naming conventions",
+        "If SCSS detected: Create component SCSS file, use existing mixins and variables",
+        "If styled-components/emotion detected: Use tagged templates, follow existing component patterns",
+        "If vanilla CSS detected: Create semantic CSS classes, never use inline styles"
+      ]
+    },
+    "designTokens": {
+      "description": "Use existing color schemes, spacing scales, and typography systems.",
+      "detectionSteps": [
+        "Check for theme files (theme.js, tokens.json, design-tokens.css)",
+        "Examine Tailwind config or CSS variables for color/spacing definitions",
+        "Review existing table or data components for styling patterns",
+        "Identify icon system (SVG, icon font, component library)"
+      ]
+    }
+  },
+
+  "outputConstraints": {
+    "must": [
+      "Match existing framework patterns for state management and data flow",
+      "Use ONLY the detected styling system (no new styling approaches)",
+      "Implement full keyboard accessibility with ARIA attributes",
+      "Support responsive behavior with mobile card layout",
+      "Handle loading, empty, and error states gracefully",
+      "Provide clear visual feedback for sorting, selection, and hover states",
+      "Respect prefers-reduced-motion for animations"
+    ],
+    "mustNot": [
+      "Do not introduce new styling systems or libraries",
+      "Do not use inline style attributes (use CSS classes)",
+      "Do not hardcode colors or spacing (use design tokens)",
+      "Do not break keyboard navigation or screen reader support",
+      "Do not add unnecessary dependencies",
+      "Do not implement server-side features if project uses client-side data"
+    ]
+  },
+
+  "aiAgentInstructions": {
+    "summary": "Implement a data table component with sorting, pagination, and row selection. The table should display data in a standard table layout on desktop and adapt to a card-based layout on mobile. Support loading, empty, and error states. Ensure full keyboard accessibility and ARIA compliance. Adapt to the user's framework and styling system.",
+    "keyFeatures": [
+      "Column sorting with ascending/descending/unsorted states (click to cycle)",
+      "Client-side pagination with configurable page sizes (10, 25, 50, 100)",
+      "Row selection (single, multi-select, select all, range with Shift+Click)",
+      "Selection toolbar with bulk action buttons and clear selection",
+      "Responsive card layout on mobile (<768px) maintaining functionality",
+      "Loading state with skeleton rows matching page size",
+      "Empty state with message and optional CTA",
+      "Error state with retry button",
+      "Keyboard navigation (Tab, Space, Enter, Arrow keys)",
+      "Full ARIA attributes and screen reader support",
+      "Smooth animations with prefers-reduced-motion support",
+      "CRITICAL: Styling MUST match project's existing conventions. Detect framework and styling system first, then use ONLY that system.",
+      "CRITICAL: When vanilla CSS detected, create CSS classes in stylesheet, NEVER inline styles.",
+      "CRITICAL: When React detected, extract table logic into custom hooks (useTableSort, useTablePagination, useTableSelection)."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect framework + styling system + design tokens using projectDetection before writing code.",
+      "1. Define column configuration structure (id, header, accessor, sortable, width, align, hidden)",
+      "2. Implement sorting state (sortColumn, sortDirection: 'asc'|'desc'|null) with toggle logic",
+      "3. Implement pagination state (currentPage, pageSize, totalItems) with navigation logic",
+      "4. Implement selection state (selectedRows: Set, selectAll, toggleRow, clearSelection)",
+      "5. Implement derived data: sorted → paginated → current page rows",
+      "6. Build table header with sortable column headers (aria-sort, click handlers)",
+      "7. Build table body with data rows, checkboxes, and cell rendering",
+      "8. Add selection toolbar (appears when rows selected) with count and action buttons",
+      "9. Add pagination controls (prev/next, page numbers, size selector, info text)",
+      "10. Implement loading state (skeleton rows), empty state (message), error state (retry)",
+      "11. Implement responsive mobile card layout (<768px breakpoint)",
+      "12. Add keyboard navigation (Space for selection, Enter for sort/actions)",
+      "13. Add ARIA attributes (role, aria-sort, aria-selected, aria-label, aria-live)",
+      "14. Implement smooth animations with prefers-reduced-motion behavior",
+      "15. Use ONLY detected styling system matching project conventions exactly"
+    ]
+  },
+
+  "componentSpec": {
+    "goal": "Provide a comprehensive data table for displaying, sorting, filtering, and managing tabular data with full accessibility and responsive support.",
+    "anatomy": {
+      "slots": [
+        "tableContainer",
+        "selectionToolbar",
+        "tableHeader",
+        "tableBody",
+        "paginationControls"
+      ],
+      "hierarchy": "DataTableContainer → SelectionToolbar (conditional) → Table → TableHeader (columns) + TableBody (rows | loading | empty | error) → PaginationControls"
+    },
+    "stateModel": {
+      "sortColumn": {
+        "type": "string",
+        "description": "ID of currently sorted column (null if unsorted)",
+        "default": null,
+        "persistence": "component state only or URL query param"
+      },
+      "sortDirection": {
+        "type": "enum",
+        "description": "Current sort direction",
+        "default": null,
+        "allowedValues": ["asc", "desc", null],
+        "persistence": "component state only or URL query param",
+        "notes": "Null means unsorted"
+      },
+      "currentPage": {
+        "type": "number",
+        "description": "Current page index (0-based or 1-based depending on implementation)",
+        "default": 1,
+        "persistence": "component state only or URL query param"
+      },
+      "pageSize": {
+        "type": "number",
+        "description": "Number of rows per page",
+        "default": 10,
+        "allowedValues": [10, 25, 50, 100],
+        "persistence": "localStorage or component state"
+      },
+      "selectedRows": {
+        "type": "array",
+        "description": "Array or Set of selected row IDs",
+        "default": [],
+        "persistence": "component state only",
+        "notes": "Use Set for O(1) lookup performance"
+      },
+      "dataState": {
+        "type": "enum",
+        "description": "Current data loading state",
+        "default": "idle",
+        "allowedValues": ["idle", "loading", "success", "error"],
+        "persistence": "component state only"
+      },
+      "columns": {
+        "type": "array",
+        "description": "Column configuration array defining table structure",
+        "default": [],
+        "persistence": "props/config",
+        "notes": "Each column has: id, header, accessor, sortable, width, align, hidden"
+      },
+      "data": {
+        "type": "array",
+        "description": "Array of data rows to display",
+        "default": [],
+        "persistence": "props or fetched data"
+      }
+    },
+    "interactions": [
+      {
+        "event": "columnHeaderClick",
+        "when": "column is sortable",
+        "result": "toggleSort",
+        "sideEffects": [
+          "updateSortColumn",
+          "updateSortDirection",
+          "resetToFirstPage",
+          "updateAriaSortAttribute"
+        ],
+        "accessibilityNotes": "Update aria-sort on column header, announce sort change to screen readers"
+      },
+      {
+        "event": "rowCheckboxClick",
+        "result": "toggleRowSelection",
+        "sideEffects": [
+          "updateSelectedRows",
+          "updateHeaderCheckboxState",
+          "showSelectionToolbar"
+        ],
+        "accessibilityNotes": "Update aria-selected on row, announce selection count change"
+      },
+      {
+        "event": "headerCheckboxClick",
+        "result": "toggleSelectAll",
+        "sideEffects": [
+          "selectAllRowsOnPage",
+          "deselectAllRows",
+          "updateAllRowCheckboxes",
+          "showSelectionToolbar"
+        ],
+        "accessibilityNotes": "Update aria-checked (checked, unchecked, mixed), announce count"
+      },
+      {
+        "event": "rowShiftClick",
+        "when": "shift key held + previous selection exists",
+        "result": "selectRange",
+        "sideEffects": [
+          "selectRowsBetweenLastAndCurrent",
+          "updateHeaderCheckboxState",
+          "showSelectionToolbar"
+        ],
+        "accessibilityNotes": "Announce range selection count"
+      },
+      {
+        "event": "pageSizeChange",
+        "result": "updatePageSize",
+        "sideEffects": [
+          "resetToFirstPage",
+          "recalculateTotalPages",
+          "updatePaginationInfo"
+        ],
+        "accessibilityNotes": "Announce page info update via aria-live"
+      },
+      {
+        "event": "pageNavigationClick",
+        "result": "changePage",
+        "sideEffects": [
+          "updateCurrentPage",
+          "scrollToTop",
+          "updatePaginationButtons",
+          "updatePaginationInfo"
+        ],
+        "accessibilityNotes": "Announce page change and info via aria-live"
+      },
+      {
+        "event": "spaceKeyOnRow",
+        "when": "row has focus",
+        "result": "toggleRowSelection",
+        "preventDefault": true,
+        "sideEffects": [
+          "updateSelectedRows",
+          "updateCheckbox"
+        ],
+        "accessibilityNotes": "Allow keyboard selection without mouse"
+      },
+      {
+        "event": "clearSelectionClick",
+        "result": "clearAllSelections",
+        "sideEffects": [
+          "resetSelectedRows",
+          "hideSelectionToolbar",
+          "updateAllCheckboxes"
+        ],
+        "accessibilityNotes": "Announce selection cleared"
+      }
+    ],
+    "responsiveBehavior": {
+      "desktop": {
+        "minWidthPx": 1024,
+        "layout": "Standard table with all columns visible",
+        "features": "Full functionality, sticky header optional, horizontal scroll if needed"
+      },
+      "tablet": {
+        "minWidthPx": 768,
+        "maxWidthPx": 1023,
+        "layout": "Table layout with fewer columns based on column hidden property",
+        "features": "Simplified view, non-essential columns hidden"
+      },
+      "mobile": {
+        "maxWidthPx": 767,
+        "layout": "Card-based layout, each row becomes a card with vertical field display",
+        "features": "Sorting via dropdown, pagination simplified (prev/next only), selection checkboxes in card headers"
+      }
+    },
+    "variants": {
+      "basic": "Simple table with sorting and pagination",
+      "selectable": "Adds row selection with checkboxes and bulk actions",
+      "filterable": "Adds column filters (future enhancement)",
+      "expandable": "Rows can expand to show detail panel (future enhancement)"
+    },
+    "dataContract": {
+      "columns": {
+        "description": "Array of column configuration objects",
+        "shape": {
+          "id": "string (unique identifier)",
+          "header": "string (display text)",
+          "accessor": "string | function (key or render function)",
+          "sortable": "boolean (default: true)",
+          "width": "string | number (optional, e.g., '150px' or 150)",
+          "align": "enum: 'left' | 'center' | 'right' (default: 'left')",
+          "hidden": "object { mobile: boolean, tablet: boolean } (optional)"
+        }
+      },
+      "data": {
+        "description": "Array of data row objects",
+        "shape": {
+          "id": "string | number (unique row identifier)",
+          "[columnKey]": "any (values for each column accessor)"
+        }
+      },
+      "pagination": {
+        "description": "Pagination configuration",
+        "shape": {
+          "currentPage": "number (1-based or 0-based)",
+          "pageSize": "number",
+          "totalItems": "number",
+          "pageSizeOptions": "number[] (e.g., [10, 25, 50, 100])"
+        }
+      }
+    }
+  },
+
+  "components": {
+    "DataTableContainer": {
+      "description": "Root container managing table layout and responsive behavior",
+      "dimensions": {
+        "width": "100% of parent",
+        "minHeight": "400px or auto",
+        "overflow": "overflow-x: auto for horizontal scroll on desktop"
+      },
+      "behavior": {
+        "responsive": "Switches from table to card layout at mobile breakpoint",
+        "scrolling": "Horizontal scroll for wide tables on desktop"
+      }
+    },
+
+    "SelectionToolbar": {
+      "description": "Toolbar that appears above table when rows are selected",
+      "visibility": "Visible only when selectedRows.length > 0",
+      "dimensions": {
+        "height": "56-64px",
+        "padding": "12-16px horizontal"
+      },
+      "elements": {
+        "SelectionCount": {
+          "content": "{count} row(s) selected",
+          "fontSize": "14-16px",
+          "fontWeight": 500
+        },
+        "ActionButtons": {
+          "examples": ["Delete", "Export", "Archive", "Assign"],
+          "style": "Secondary or ghost buttons",
+          "spacing": "12px gap between buttons"
+        },
+        "ClearButton": {
+          "content": "Clear selection",
+          "style": "Text button or icon button",
+          "position": "Right-aligned"
+        }
+      }
+    },
+
+    "TableHeader": {
+      "description": "Table header row with column headers",
+      "dimensions": {
+        "height": "56px",
+        "cellPadding": "16px horizontal, 12px vertical",
+        "borderBottom": "1px or 2px solid divider color"
+      },
+      "elements": {
+        "SelectionCheckbox": {
+          "size": "20px",
+          "states": ["unchecked", "checked", "indeterminate"],
+          "behavior": "Indeterminate when some (not all) rows selected",
+          "ariaLabel": "Select all rows on this page"
+        },
+        "ColumnHeader": {
+          "fontSize": "14-16px",
+          "fontWeight": "600-700 (semibold/bold)",
+          "textTransform": "Optional uppercase",
+          "color": "Primary text color",
+          "sortable": {
+            "cursor": "pointer",
+            "hoverState": "Background color change or underline",
+            "sortIndicator": {
+              "unsorted": "Both arrows gray or single icon",
+              "ascending": "Up arrow highlighted",
+              "descending": "Down arrow highlighted",
+              "size": "16px",
+              "position": "Right of text with 8px gap"
+            }
+          }
+        }
+      },
+      "accessibility": {
+        "role": "columnheader",
+        "ariaSortAttribute": "ascending | descending | none",
+        "ariaLabel": "Sort by {columnName}"
+      }
+    },
+
+    "TableBody": {
+      "description": "Container for data rows or state displays",
+      "states": {
+        "withData": "Displays data rows",
+        "loading": "Displays skeleton rows",
+        "empty": "Displays empty state message",
+        "error": "Displays error message with retry"
+      },
+      "rowElements": {
+        "DataRow": {
+          "height": "52px",
+          "padding": "12px vertical, 16px horizontal per cell",
+          "borderBottom": "1px solid divider color",
+          "hover": {
+            "background": "Light gray overlay",
+            "transition": "150ms"
+          },
+          "selected": {
+            "background": "Primary color at 5-10% opacity",
+            "borderLeft": "Optional 3-4px primary color accent"
+          },
+          "accessibility": {
+            "ariaSelected": "true when selected",
+            "tabIndex": "0 for keyboard navigation (optional)",
+            "role": "row"
+          }
+        },
+        "Checkbox": {
+          "size": "20px",
+          "margin": "0 16px 0 0",
+          "states": ["unchecked", "checked"],
+          "ariaLabel": "Select row"
+        },
+        "Cell": {
+          "fontSize": "14-16px",
+          "fontWeight": 400,
+          "color": "Primary text color",
+          "alignment": "Based on column config (left/center/right)",
+          "overflow": "text-overflow: ellipsis for long content",
+          "role": "cell"
+        }
+      },
+      "skeletonRows": {
+        "count": "Matches pageSize",
+        "animation": "Pulse or shimmer animation",
+        "dimensions": "Match real row dimensions",
+        "accessibility": {
+          "ariaLabel": "Loading table data",
+          "ariaBusy": "true on table container"
+        }
+      }
+    },
+
+    "EmptyState": {
+      "description": "Displayed when no data is available",
+      "layout": "Centered vertically and horizontally in table body",
+      "elements": {
+        "Icon": {
+          "size": "48-64px",
+          "color": "Muted gray",
+          "examples": "Empty box, magnifying glass, document"
+        },
+        "Message": {
+          "fontSize": "16-18px",
+          "fontWeight": 500,
+          "color": "Primary text color",
+          "content": "No data available or No results found"
+        },
+        "Description": {
+          "fontSize": "14px",
+          "color": "Muted text",
+          "content": "Try adjusting your filters or check back later"
+        },
+        "ActionButton": {
+          "optional": true,
+          "content": "Add new item or Reload",
+          "style": "Primary or secondary button"
+        }
+      }
+    },
+
+    "ErrorState": {
+      "description": "Displayed when data fetching fails",
+      "layout": "Centered in table body",
+      "elements": {
+        "Icon": {
+          "size": "48-64px",
+          "color": "Error red",
+          "style": "Alert triangle or X circle"
+        },
+        "Message": {
+          "fontSize": "16-18px",
+          "fontWeight": 500,
+          "color": "Error red or primary text",
+          "content": "Failed to load data"
+        },
+        "Description": {
+          "fontSize": "14px",
+          "color": "Muted text",
+          "content": "An error occurred while fetching data"
+        },
+        "RetryButton": {
+          "content": "Retry or Try again",
+          "style": "Primary button",
+          "action": "Trigger data refetch"
+        }
+      }
+    },
+
+    "PaginationControls": {
+      "description": "Navigation controls at bottom of table",
+      "dimensions": {
+        "height": "64px",
+        "padding": "16px horizontal",
+        "borderTop": "Optional 1px solid divider"
+      },
+      "layout": "[Page Info] [Spacer] [Navigation] [Page Size Selector]",
+      "elements": {
+        "PageInfo": {
+          "content": "Showing {start}-{end} of {total} results",
+          "fontSize": "14px",
+          "color": "Muted text"
+        },
+        "NavigationButtons": {
+          "PreviousButton": {
+            "content": "Previous or chevron left",
+            "disabled": "When currentPage === 1",
+            "ariaLabel": "Go to previous page"
+          },
+          "PageNumbers": {
+            "display": "Desktop only (hidden on mobile)",
+            "currentPage": {
+              "background": "Primary color",
+              "textColor": "White",
+              "fontWeight": 600
+            },
+            "otherPages": {
+              "background": "Transparent or light gray",
+              "textColor": "Primary text",
+              "hover": "Light gray background"
+            },
+            "ellipsis": "... for skipped page ranges"
+          },
+          "NextButton": {
+            "content": "Next or chevron right",
+            "disabled": "When currentPage === totalPages",
+            "ariaLabel": "Go to next page"
+          }
+        },
+        "PageSizeSelector": {
+          "label": "Rows per page:",
+          "options": [10, 25, 50, 100],
+          "style": "Dropdown select or button group",
+          "ariaLabel": "Select number of rows per page"
+        }
+      },
+      "accessibility": {
+        "ariaLive": "polite region for page info",
+        "ariaLabel": "Table pagination"
+      }
+    },
+
+    "MobileCardLayout": {
+      "description": "Card-based layout for mobile screens (<768px)",
+      "dimensions": {
+        "cardGap": "16px",
+        "cardPadding": "16-20px",
+        "cardBorderRadius": "8-12px"
+      },
+      "elements": {
+        "Card": {
+          "background": "White or surface color",
+          "border": "1px solid divider or shadow",
+          "shadow": "0 1px 3px rgba(0,0,0,0.1)",
+          "structure": "Header (checkbox + key field) + Body (fields list)"
+        },
+        "CardHeader": {
+          "display": "flex row",
+          "align": "center",
+          "gap": "12px",
+          "marginBottom": "12px",
+          "elements": ["Checkbox", "PrimaryField (bold, larger)"]
+        },
+        "CardBody": {
+          "display": "Stack of field rows",
+          "fieldRow": {
+            "display": "flex row",
+            "justifyContent": "space-between",
+            "gap": "12px",
+            "marginBottom": "8px"
+          },
+          "fieldLabel": {
+            "fontSize": "12-14px",
+            "fontWeight": 600,
+            "color": "Muted text"
+          },
+          "fieldValue": {
+            "fontSize": "14px",
+            "fontWeight": 400,
+            "color": "Primary text"
+          }
+        }
+      }
+    }
+  },
+
+  "responsiveBreakpoints": {
+    "desktop": {
+      "minWidth": "1024px",
+      "layout": "Standard table layout with all configured columns",
+      "pagination": "Full pagination with page numbers",
+      "selection": "Checkboxes in table cells",
+      "sorting": "Click column headers to sort"
+    },
+    "tablet": {
+      "minWidth": "768px",
+      "maxWidth": "1023px",
+      "layout": "Table layout with hidden columns based on config",
+      "pagination": "Full pagination",
+      "selection": "Checkboxes maintained",
+      "sorting": "Click column headers"
+    },
+    "mobile": {
+      "maxWidth": "767px",
+      "layout": "Card-based layout, each row is a vertical card",
+      "pagination": "Simplified prev/next only",
+      "selection": "Checkboxes in card headers",
+      "sorting": "Dropdown or modal selector",
+      "cards": "16px gap between cards",
+      "features": "Maintains all functionality in adapted layout"
+    }
+  },
+
+  "stateManagement": {
+    "statesToTrack": {
+      "sortColumn": {
+        "type": "string",
+        "description": "ID of currently sorted column",
+        "default": null,
+        "persistence": "component state or URL query"
+      },
+      "sortDirection": {
+        "type": "enum",
+        "values": ["asc", "desc", null],
+        "default": null,
+        "persistence": "component state or URL query"
+      },
+      "currentPage": {
+        "type": "number",
+        "default": 1,
+        "persistence": "component state or URL query"
+      },
+      "pageSize": {
+        "type": "number",
+        "default": 10,
+        "persistence": "localStorage"
+      },
+      "selectedRows": {
+        "type": "array",
+        "default": [],
+        "persistence": "component state only"
+      },
+      "dataState": {
+        "type": "enum",
+        "values": ["idle", "loading", "success", "error"],
+        "default": "idle",
+        "persistence": "component state only"
+      }
+    },
+    "computedValues": {
+      "sortedData": "Data array sorted by sortColumn and sortDirection",
+      "paginatedData": "Sorted data sliced for current page",
+      "totalPages": "Math.ceil(data.length / pageSize)",
+      "startIndex": "(currentPage - 1) * pageSize + 1",
+      "endIndex": "Math.min(currentPage * pageSize, data.length)",
+      "isAllSelected": "selectedRows.length === paginatedData.length",
+      "isSomeSelected": "selectedRows.length > 0 && !isAllSelected"
+    }
+  },
+
+  "dataStructures": {
+    "columns": {
+      "description": "Array of column configuration objects",
+      "example": [
+        {
+          "id": "name",
+          "header": "Name",
+          "accessor": "name",
+          "sortable": true,
+          "width": "200px",
+          "align": "left"
+        },
+        {
+          "id": "email",
+          "header": "Email",
+          "accessor": "email",
+          "sortable": true,
+          "width": "250px",
+          "hidden": { "mobile": true }
+        },
+        {
+          "id": "status",
+          "header": "Status",
+          "accessor": "status",
+          "sortable": true,
+          "width": "120px",
+          "align": "center"
+        },
+        {
+          "id": "createdAt",
+          "header": "Created",
+          "accessor": "createdAt",
+          "sortable": true,
+          "width": "150px",
+          "hidden": { "mobile": true, "tablet": false }
+        }
+      ]
+    },
+    "data": {
+      "description": "Array of data row objects",
+      "example": [
+        {
+          "id": "1",
+          "name": "John Doe",
+          "email": "john@example.com",
+          "status": "Active",
+          "createdAt": "2026-01-15"
+        },
+        {
+          "id": "2",
+          "name": "Jane Smith",
+          "email": "jane@example.com",
+          "status": "Inactive",
+          "createdAt": "2026-01-10"
+        }
+      ]
+    }
+  },
+
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "useState for sort/page/selection state, useMemo for sorted/paginated data",
+      "customHooks": "Extract into: useTableSort(data, columns), useTablePagination(data, pageSize), useTableSelection(data)",
+      "example": "const { sortColumn, sortDirection, sortData } = useTableSort(data, columns); const { currentPage, pageSize, paginatedData, goToPage } = useTablePagination(sortedData, 10); const { selectedRows, toggleRow, selectAll, clearSelection } = useTableSelection(paginatedData);",
+      "componentStructure": "<DataTable columns={columns} data={data} pageSize={10} onRowSelect={handleSelect} />"
+    },
+    "vue": {
+      "stateManagement": "ref() for state, computed() for sorted/paginated data",
+      "composables": "useTableSort(data, columns), useTablePagination(data, pageSize), useTableSelection(data)",
+      "example": "const sortedData = computed(() => sortData(data.value, sortColumn.value, sortDirection.value)); const paginatedData = computed(() => paginateData(sortedData.value, currentPage.value, pageSize.value));",
+      "componentStructure": "<DataTable :columns='columns' :data='data' :page-size='10' @row-select='handleSelect' />"
+    },
+    "angular": {
+      "stateManagement": "Component properties, getter methods for transformations",
+      "services": "TableService for reusable logic, data fetching",
+      "example": "get sortedData() { return this.sortData(this.data, this.sortColumn, this.sortDirection); } get paginatedData() { return this.paginateData(this.sortedData, this.currentPage, this.pageSize); }",
+      "componentStructure": "<app-data-table [columns]='columns' [data]='data' [pageSize]='10' (rowSelect)='handleSelect($event)'></app-data-table>"
+    },
+    "svelte": {
+      "stateManagement": "Reactive statements for derived data",
+      "example": "let sortColumn = null; let sortDirection = null; $: sortedData = sortData(data, sortColumn, sortDirection); $: paginatedData = paginateData(sortedData, currentPage, pageSize);",
+      "componentStructure": "<DataTable {columns} {data} pageSize={10} on:rowSelect={handleSelect} />"
+    }
+  },
+
+  "stylingApproaches": {
+    "note": "Implementation examples. Use designSystem values as source of truth.",
+    "tailwindCSS": {
+      "table": "class='min-w-full divide-y divide-gray-200'",
+      "header": "class='bg-gray-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'",
+      "row": "class='hover:bg-gray-50' :class=\"{'bg-blue-50': selected}\"",
+      "cell": "class='px-4 py-3 text-sm text-gray-900'",
+      "pagination": "class='flex items-center justify-between px-4 py-3 border-t'"
+    },
+    "cssModules": {
+      "approach": "Create .module.css with .table, .header, .row, .cell, .pagination classes",
+      "example": ".row { height: 52px; } .row:hover { background: rgba(0,0,0,0.02); } .rowSelected { background: rgba(59, 130, 246, 0.08); }"
+    },
+    "styledComponents": {
+      "approach": "Styled components with props for selected/hover states",
+      "example": "const Row = styled.tr`height: 52px; background: ${p => p.selected ? 'rgba(59, 130, 246, 0.08)' : 'white'}; &:hover { background: rgba(0,0,0,0.02); }`"
+    },
+    "vanillaCSS": {
+      "approach": "Semantic CSS classes, NEVER inline styles",
+      "example": ".data-table { width: 100%; } .data-table__header { height: 56px; font-weight: 600; } .data-table__row { height: 52px; } .data-table__row:hover { background: #f9fafb; } .data-table__row--selected { background: rgba(59, 130, 246, 0.08); }"
+    }
+  },
+
+  "animations": {
+    "sortTransition": {
+      "durationMs": 200,
+      "easing": "ease-in-out",
+      "properties": ["opacity", "transform"],
+      "effect": "Subtle fade or slide when data reorders"
+    },
+    "rowHover": {
+      "durationMs": 150,
+      "easing": "ease-out",
+      "properties": ["background-color"],
+      "effect": "Smooth background color transition"
+    },
+    "selectionTransition": {
+      "durationMs": 180,
+      "easing": "ease-in-out",
+      "properties": ["background-color", "border-color"],
+      "effect": "Smooth highlight transition"
+    },
+    "skeletonPulse": {
+      "durationMs": 1500,
+      "easing": "ease-in-out",
+      "infinite": true,
+      "effect": "Opacity pulse or shimmer animation"
+    },
+    "prefersReducedMotion": {
+      "behavior": "Disable or reduce all non-essential animations",
+      "rules": [
+        "Disable sort transitions",
+        "Disable row hover animations",
+        "Keep selection feedback (instant state change)",
+        "Reduce animation durations to <100ms"
+      ]
+    }
+  },
+
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Info and Relationships - Use semantic table elements or ARIA roles",
+        "1.4.3": "Contrast Minimum - 4.5:1 for text, 3:1 for interactive elements",
+        "2.1.1": "Keyboard - All interactive elements keyboard accessible",
+        "2.1.2": "No Keyboard Trap - Focus can move through entire table",
+        "2.4.3": "Focus Order - Logical tab order through headers, rows, pagination",
+        "2.4.7": "Focus Visible - Clear focus indicators on all interactive elements",
+        "4.1.2": "Name, Role, Value - Proper ARIA for table, sort state, selection"
+      }
+    },
+    "keyboardNavigation": {
+      "tab": "Navigate between column headers, checkboxes, rows, pagination controls",
+      "space": "Toggle row selection when row or checkbox focused",
+      "enter": "Activate sort on column header, activate buttons",
+      "shift+click": "Range selection from last selected row",
+      "arrowKeys": "Optional: Navigate between cells for advanced keyboard users"
+    },
+    "ariaAttributes": {
+      "required": {
+        "table": {
+          "role": "table (or use semantic <table>)",
+          "ariaLabel": "Data table or descriptive name",
+          "ariaBusy": "true during loading state"
+        },
+        "columnHeader": {
+          "role": "columnheader",
+          "ariaSort": "ascending | descending | none",
+          "ariaLabel": "Sort by {columnName} (if icon-only)"
+        },
+        "row": {
+          "role": "row",
+          "ariaSelected": "true when selected, false otherwise"
+        },
+        "cell": {
+          "role": "cell"
+        },
+        "checkbox": {
+          "ariaLabel": "Select row or Select all rows",
+          "ariaChecked": "true | false | mixed (for header when some selected)"
+        },
+        "paginationInfo": {
+          "ariaLive": "polite",
+          "ariaAtomic": "true"
+        },
+        "pageButton": {
+          "ariaLabel": "Go to page {number} or Previous page/Next page",
+          "ariaDisabled": "true when disabled"
+        }
+      }
+    },
+    "screenReader": {
+      "announcements": {
+        "sortChange": "Announce column and direction: 'Sorted by Name, ascending'",
+        "selectionChange": "Announce count: '3 rows selected'",
+        "pageChange": "Announce page info: 'Showing 11-20 of 100 results'"
+      },
+      "implementation": "Use aria-live regions for dynamic updates"
+    },
+    "focusManagement": {
+      "focusVisible": {
+        "required": true,
+        "implementation": "Visible outline on all interactive elements",
+        "css": ":focus-visible { outline: 2px solid primary-color; outline-offset: 2px; }"
+      },
+      "focusPreservation": "Maintain focus position during data updates where possible"
+    },
+    "colorContrast": {
+      "requirement": "WCAG AA: 4.5:1 for text, 3:1 for interactive",
+      "criticalAreas": [
+        "Header text on header background",
+        "Cell text on row background",
+        "Selected row text on selected background",
+        "Checkbox borders and checkmarks",
+        "Sort indicators",
+        "Pagination button text",
+        "Focus indicators"
+      ]
+    },
+    "implementationChecklist": [
+      "Table uses semantic HTML or proper ARIA roles",
+      "All column headers have aria-sort attribute",
+      "Selected rows have aria-selected='true'",
+      "Checkboxes have descriptive aria-label",
+      "Header checkbox shows mixed state (indeterminate) when some selected",
+      "Pagination info in aria-live region",
+      "All buttons and links keyboard accessible",
+      "Space key toggles row selection",
+      "Enter key activates sort and buttons",
+      "Focus indicators visible on all interactive elements",
+      "Screen reader announces sort, selection, and page changes",
+      "Loading state has aria-busy='true'",
+      "Empty and error states have appropriate messaging",
+      "Color contrast verified for all text and interactive elements",
+      "Mobile card layout maintains accessibility"
+    ]
+  },
+
+  "designSystem": {
+    "note": "Tool-agnostic design values. Implement using project's styling approach.",
+    "colors": {
+      "table": {
+        "headerBackground": {
+          "light": "Light gray (#f9fafb, #f3f4f6)",
+          "dark": "Dark gray (#1f2937, #111827)"
+        },
+        "rowBackground": {
+          "light": "White (#ffffff)",
+          "dark": "Dark gray (#1a1a1a, #0f172a)"
+        },
+        "rowHover": {
+          "light": "Very light gray (#f9fafb)",
+          "dark": "Slightly lighter gray (rgba(255,255,255,0.05))"
+        },
+        "rowSelected": {
+          "light": "Primary at 5-10% opacity (rgba(59, 130, 246, 0.08))",
+          "dark": "Primary at 10-15% opacity"
+        },
+        "border": {
+          "light": "Light gray (#e5e7eb, #d1d5db)",
+          "dark": "Medium gray (rgba(255,255,255,0.1))"
+        }
+      },
+      "text": {
+        "header": {
+          "light": "Dark gray (#374151, #1f2937)",
+          "dark": "Light gray (#f3f4f6, #e5e7eb)"
+        },
+        "cell": {
+          "light": "Dark gray (#111827, #1f2937)",
+          "dark": "Light gray (#e5e7eb, #d1d5db)"
+        },
+        "muted": {
+          "light": "Medium gray (#6b7280, #9ca3af)",
+          "dark": "Medium gray (#9ca3af, #6b7280)"
+        }
+      },
+      "sortIndicator": {
+        "inactive": "Medium gray (#9ca3af)",
+        "active": "Primary color (#3b82f6) or dark gray (#374151)"
+      },
+      "pagination": {
+        "activeBackground": "Primary color (#3b82f6)",
+        "activeText": "White (#ffffff)",
+        "inactiveBackground": "Transparent or light gray",
+        "inactiveText": "Primary text color",
+        "disabledText": "Light gray (#d1d5db)"
+      }
+    },
+    "typography": {
+      "fontFamily": "Use project font stack (system-ui, sans-serif, or custom)",
+      "header": {
+        "fontSize": "14-16px",
+        "fontWeight": "600-700",
+        "textTransform": "Optional uppercase",
+        "letterSpacing": "Optional wider"
+      },
+      "cell": {
+        "fontSize": "14-16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5
+      },
+      "pagination": {
+        "fontSize": "14px",
+        "fontWeight": "400-500"
+      }
+    },
+    "spacing": {
+      "cellPadding": "12-16px horizontal, 12px vertical",
+      "rowGap": "0 (use borders)",
+      "paginationPadding": "16px horizontal, 16px vertical",
+      "cardGap": "16px (mobile)",
+      "cardPadding": "16-20px (mobile)"
+    },
+    "borders": {
+      "headerBottom": "1-2px solid divider color",
+      "rowBottom": "1px solid divider color",
+      "tableOutline": "Optional 1px solid divider"
+    },
+    "shadows": {
+      "table": "Optional: 0 1px 3px rgba(0,0,0,0.1)",
+      "card": "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)"
+    },
+    "borderRadius": {
+      "table": "8-12px (optional)",
+      "card": "8-12px"
+    }
+  },
+
+  "edgeCases": {
+    "emptyData": "Display empty state with helpful message",
+    "singleRow": "Pagination controls may be hidden or disabled",
+    "longCellContent": "Use text-overflow: ellipsis or wrap based on column config",
+    "manyColumns": "Horizontal scroll on desktop, hide columns on mobile/tablet",
+    "largePage": "Virtual scrolling for 1000+ rows (future enhancement)",
+    "selectAllAcrossPages": "Current implementation: select all on current page only",
+    "sortingDuringSelection": "Preserve selection when sort changes",
+    "pageSizeChangeDuringSelection": "Clear selection or preserve based on UX decision"
+  },
+
+  "commonVariations": {
+    "serverPagination": "Pagination controlled by server, pass page/size to API",
+    "serverSorting": "Sorting handled by server, pass sortColumn/direction to API",
+    "columnFilters": "Add filter inputs to column headers",
+    "expandableRows": "Click row to show detail panel below",
+    "editableRows": "Inline editing with save/cancel actions",
+    "dragReorder": "Drag rows to reorder (with drag handle)",
+    "columnResize": "Drag column borders to resize widths",
+    "columnReorder": "Drag column headers to reorder columns",
+    "stickyHeader": "Header remains visible during vertical scroll",
+    "stickyFirstColumn": "First column remains visible during horizontal scroll"
+  },
+
+  "testingChecklist": [
+    "Columns render with correct headers and data",
+    "Sorting works for all sortable columns (asc, desc, unsorted)",
+    "Only one column sorted at a time",
+    "Clicking sorted column cycles through states",
+    "Sort indicator shows correct state",
+    "Pagination controls navigate correctly",
+    "Page size selector changes rows per page",
+    "Page info displays correct range and total",
+    "Previous button disabled on first page",
+    "Next button disabled on last page",
+    "Row selection works (single click)",
+    "Multi-select works (multiple clicks)",
+    "Select all checkbox selects all rows on page",
+    "Header checkbox shows indeterminate when some selected",
+    "Shift+click range selection works",
+    "Selection toolbar appears when rows selected",
+    "Selection count displays correctly",
+    "Clear selection works",
+    "Selected rows maintain visual highlight",
+    "Loading state displays skeleton rows",
+    "Skeleton row count matches page size",
+    "Empty state displays when no data",
+    "Error state displays with retry button",
+    "Retry button triggers data reload",
+    "Mobile card layout renders correctly (<768px)",
+    "Cards display all visible fields",
+    "Selection works in card layout",
+    "Responsive breakpoints transition smoothly",
+    "Keyboard tab order is logical",
+    "Space key toggles row selection",
+    "Enter key activates sort and buttons",
+    "Screen reader announces sort changes",
+    "Screen reader announces selection changes",
+    "Screen reader announces page changes",
+    "aria-sort attribute updates correctly",
+    "aria-selected attribute updates correctly",
+    "aria-busy attribute present during loading",
+    "Focus indicators visible on all interactive elements",
+    "Color contrast meets WCAG AA (4.5:1)",
+    "Hover states work on desktop",
+    "Touch interactions work on mobile",
+    "No layout shift during data updates",
+    "Animations smooth (if enabled)",
+    "Prefers-reduced-motion disables animations",
+    "No horizontal page scroll (table scrolls internally)",
+    "Long content handles overflow correctly"
+  ],
+
+  "aiImplementationPrompt": "Create a data table component with sorting, pagination, and row selection. Columns should be sortable (click to cycle through unsorted → ascending → descending). Implement client-side pagination with page sizes [10, 25, 50, 100] and navigation controls (prev/next, page numbers, info text). Add row selection with checkboxes (single, multi-select, select all, shift+click range selection) and selection toolbar with count and action buttons. Support loading state (skeleton rows), empty state (message + optional CTA), and error state (message + retry button). On mobile (<768px), switch to card-based layout maintaining all functionality. Ensure full keyboard accessibility with Tab, Space (toggle selection), Enter (activate), and arrow key navigation. Add ARIA attributes: role='table', aria-sort on headers, aria-selected on rows, aria-live for pagination. Use smooth animations (200ms) with prefers-reduced-motion support. Adapt to {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. CRITICAL: If vanilla CSS, create classes in stylesheet, never inline styles. If React, extract logic into custom hooks (useTableSort, useTablePagination, useTableSelection).",
+
+  "meta": {
+    "created": "2026-01-18",
+    "updated": "2026-01-18",
+    "complexity": "intermediate",
+    "estimatedImplementationTime": "3-5 hours",
+    "webUrl": "https://uipotion.com/potions/components/data-table.html"
+  }
+}

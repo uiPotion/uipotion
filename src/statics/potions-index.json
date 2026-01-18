@@ -51,8 +51,21 @@
       "agentGuideUrl": "https://uipotion.com/potions/features/pricing-table.json",
       "created": "2026-01-18",
       "updated": "2026-01-18"
+    },
+    {
+      "id": "data-table",
+      "name": "Data Table (Sortable, Paginated, Filterable)",
+      "category": "components",
+      "tags": ["data-table", "table", "sortable", "pagination", "filtering", "selection", "responsive", "a11y", "wcag", "admin", "dashboard"],
+      "excerpt": "A comprehensive data table component with sorting, pagination, filtering, row selection, and responsive behavior. Includes loading, empty, and error states with full keyboard navigation support.",
+      "complexity": "intermediate",
+      "estimatedImplementationTime": "3-5 hours",
+      "webUrl": "https://uipotion.com/potions/components/data-table.html",
+      "agentGuideUrl": "https://uipotion.com/potions/components/data-table.json",
+      "created": "2026-01-18",
+      "updated": "2026-01-18"
     }
   ],
-  "totalCount": 4,
+  "totalCount": 5,
   "lastUpdated": "2026-01-18"
 }
