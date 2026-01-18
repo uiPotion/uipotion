@@ -33,12 +33,20 @@ src/
 ├── potions/              # Markdown files for potions
 │   ├── layouts/          # Layout patterns (dashboards, landing pages, etc.)
 │   ├── components/       # Reusable components (buttons, dialogs, cards)
-│   └── features/         # Complete features (pricing tables, auth flows)
+│   ├── features/         # Create when needed
+│   ├── patterns/         # Create when needed
+│   └── tooling/          # Create when needed
 ├── statics/               # Static files (copied to root by Harold)
 │   ├── uipotion-manifest.json       # Main discovery manifest
 │   ├── potions-index.json           # Index of all potions
-│   └── potions/                     # Individual potion guides
-│       └── [potion-id].json
+│   ├── potions/                     # Individual potion guides (JSON)
+│   │   ├── layouts/
+│   │   ├── components/
+│   │   ├── features/
+│   │   ├── patterns/
+│   │   └── tooling/
+│   ├── schemas/                     # JSON schemas and contracts
+│   └── skills/                      # Agent Skills packages (SKILL.md)
 ├── potion-layouts/       # Handlebars layouts for potions
 │   └── potion.hbs        # Layout for potion pages
 ├── pages/                # Site pages (Handlebars)
@@ -51,7 +59,7 @@ src/
 │   ├── main.scss         # Main (compiled)
 │   ├── _basic.scss       # Basic styles
 │   ├── _page.scss        # Page-level styles
-│   └── _uipotion.scss    # UIPotion-specific styles
+│   └── _uipotion.scss    # UI Potion-specific styles
 ├── assets/               # Images, fonts, JS
 │   └── images/
 └── build/                # Output (auto-generated, don't edit!)
@@ -76,7 +84,7 @@ publicationDate: '2026-01-10'                         # REQUIRED: YYYY-MM-DD for
 excerpt: 'Brief description'                          # REQUIRED: 1-2 sentences
 category: 'Layouts'                                   # REQUIRED: Layouts|Components|Features|Patterns|Tooling
 tags: [tag1, tag2]                                    # REQUIRED: Array of tags
-agentManifest: 'potions/component-id.json'  # REQUIRED: Path to JSON guide (in statics/)
+agentManifest: 'potions/[category]/component-id.json' # REQUIRED: Path to JSON guide (in statics/)
 ---
 ```
 
@@ -92,11 +100,11 @@ agentManifest: 'potions/component-id.json'  # REQUIRED: Path to JSON guide (in s
 
 ### 2. AI Agent JSON Guides
 
-**Location**: `src/statics/potions/`
+**Location**: `src/statics/potions/[category]/`
 
 **Format**: Comprehensive JSON files with complete specifications
 
-**Required Structure** (see `dashboard-layout.json` as template):
+**Required Structure** (see `src/statics/potions/layouts/dashboard.json` or a same-category guide as template):
 ```json
 {
   "id": "component-id",
@@ -133,7 +141,21 @@ agentManifest: 'potions/component-id.json'  # REQUIRED: Path to JSON guide (in s
 
 - **Main Manifest**: `src/statics/uipotion-manifest.json` - Entry point for AI agents
 - **Potions Index**: `src/statics/potions-index.json` - Searchable catalog of all potions
-- **Individual Guides**: `src/statics/potions/[id].json` - Detailed implementation guide
+- **Individual Guides**: `src/statics/potions/[category]/[id].json` - Detailed implementation guide
+- **Agent Skills**: `src/statics/skills/[skill-name]/SKILL.md` - Optional skills for compatible agents
+
+### 4. Potion Usage (Best Approach)
+
+**For AI agents implementing from a potion:**
+1. Start from manifest → index → guide (JSON is the source of truth).
+2. Read `aiAgentInstructions` and, if present, `tokens`, `designSystem`, and `outputConstraints`.
+3. Detect framework + styling from the repo, then map specs to existing tokens/conventions.
+4. Implement using only the detected framework and styling system; document assumptions.
+5. Use the Markdown potion page for human context, not implementation details.
+
+**For humans requesting a potion:**
+- Share the JSON guide URL and your stack details (framework + styling).
+- Use the Markdown page to review behavior, accessibility, and edge cases.
 
 ---
 
@@ -158,7 +180,7 @@ Harold transforms:
 6. Generate styles (SCSS → CSS)
 7. Generate pages (`.hbs` → HTML)
 8. Copy JSON data to build directory
-9. Copy statics (`src/statics/*` → `build/` root)
+9. Copy statics (`src/statics/**/*` → `build/` root)
 
 ### Commands
 
@@ -177,9 +199,9 @@ layout: 'potion'           # REQUIRED: Use 'potion' layout
 title: 'Post Title'        # REQUIRED: string
 publicationDate: '2024-01-15' # REQUIRED: YYYY-MM-DD format (string)
 excerpt: 'Brief summary'   # REQUIRED: string (for SEO)
-category: 'Layouts'        # REQUIRED: Category name (Layouts|Components|Features|Patterns|Tooling)
-tags: [javascript, ui]     # REQUIRED: array
-agentManifest: 'potions/id.json' # REQUIRED: Path to JSON (in statics/)
+category: 'Layouts'             # REQUIRED: Category name (Layouts|Components|Features|Patterns|Tooling)
+tags: [javascript, ui]          # REQUIRED: array
+agentManifest: 'potions/[category]/id.json' # REQUIRED: Path to JSON (in statics/)
 ---
 ```
 
@@ -301,7 +323,7 @@ tags:
   - relevant
   - tags
   - here
-agentManifest: 'potions/your-component.json'
+agentManifest: 'potions/[category]/your-component.json'
 ---
 
 # Your Component Name
@@ -345,9 +367,9 @@ Examples for different frameworks (stay agnostic).
 
 ### Step 2: Create AI Agent JSON Guide
 
-**File**: `src/statics/potions/your-component.json`
+**File**: `src/statics/potions/[category]/your-component.json`
 
-Use `dashboard-layout.json` as template. Must include:
+Use `src/statics/potions/layouts/dashboard.json` (or a same-category guide) as template. Must include:
 - `aiAgentInstructions` - Summary, features, steps
 - `structure` - Component hierarchy
 - `components` - Detailed specs (dimensions, behavior, states)
@@ -374,13 +396,20 @@ Add new entry to `potions` array:
   "complexity": "beginner|intermediate|advanced",
   "estimatedImplementationTime": "1-2 hours",
   "webUrl": "https://uipotion.com/potions/components/your-component.html",
-  "agentGuideUrl": "https://uipotion.com/potions/your-component.json",
+  "agentGuideUrl": "https://uipotion.com/potions/components/your-component.json",
   "created": "2026-01-10",
   "updated": "2026-01-10"
 }
 ```
 
 Update `totalCount` and `lastUpdated` fields.
+
+### Places to Update When Adding a Potion
+- `src/potions/[category]/[slug].md` (front matter `agentManifest` matches JSON path)
+- `src/statics/potions/[category]/[slug].json`
+- `src/statics/potions-index.json` (add entry, update `totalCount` and `lastUpdated`)
+- `src/statics/uipotion-manifest.json` (update `meta.updated`; update categories only if introducing a new one)
+- No manual homepage listing needed (potions are rendered from Markdown)
 
 ### Step 4: Build and Test
 
@@ -416,7 +445,7 @@ harold-scripts start    # Start dev server on http://localhost:3000
 - ❌ Don't forget animation specifications
 
 ### For Styling (SCSS)
-- ✅ Keep UIPotion-specific styles in `_uipotion.scss`
+- ✅ Keep UI Potion-specific styles in `_uipotion.scss`
 - ✅ Use semantic class names
 - ✅ Ensure responsive design
 - ✅ Maintain consistent visual language
@@ -525,7 +554,8 @@ Before considering a potion complete:
 - Potion: `/potions/[category]/[name].html`
 - AI Manifest: `/uipotion-manifest.json`
 - Potions Index: `/potions-index.json`
-- Potion Guide: `/potions/[id].json`
+- Potion Guide: `/potions/[category]/[id].json`
+- Skills: `/skills/[skill-name]/SKILL.md`
 
 ---
 
@@ -538,7 +568,7 @@ Before considering a potion complete:
 | Link to page | `{{relativePath 'about.html'}}` |
 | Link to asset | `{{relativePath 'assets/images/logo.png'}}` |
 | Format date | `{{formatDate date=publicationDate format='dd mmmm yyyy'}}` |
-| Use partial | `{{> header}}` |
+| Use partial | `{{> head}}` / `{{> footer}}` |
 | Pass data | `{{> head title="Page"}}` |
 | Post variable | `{{title}}`, `{{excerpt}}`, `{{tags}}` |
 | Loop tags | `{{#each tags}}{{this}}{{/each}}` |
@@ -553,7 +583,7 @@ Before considering a potion complete:
 4. **Partials** = Reusable Handlebars components (auto-registered)
 5. **Helpers** = Functions available in templates (registered at build)
 6. **Assets** = Copied as-is to `build/assets/`
-7. **Statics** = Copied from `src/statics/` to `build/` root for AI agents
+7. **Statics** = Copied from `src/statics/` to `build/` root (manifests, schemas, skills)
 
 ---
 
@@ -570,7 +600,7 @@ Before considering a potion complete:
    ↓
 5. generatePartials() - Register src/partials/*.hbs
    ↓
-6. generatePosts() - For each .md in src/potions/:
+6. generatePosts() - For each .md in src/potions/**:
    - Normalize line endings (CRLF → LF)
    - Parse front matter
    - Validate required fields
@@ -578,7 +608,7 @@ Before considering a potion complete:
    - Enhance images
    - Apply layout template
    - Minify HTML
-   - Write to build/potions/[name].html
+  - Write to build/potions/[category]/[name].html
    ↓
 7. generateStyles() - Compile SCSS → CSS → minify → build/styles/
    ↓
@@ -587,9 +617,7 @@ Before considering a potion complete:
    - Minify HTML
    - Write to build/[name].html
    ↓
-9. copyStatics() - Copy src/statics/* → build/ (root)
-   ↓
-10. copyStatics() - Copy src/statics/* → build/ (root)
+9. copyStatics() - Copy src/statics/**/* → build/ (root)
 ```
 
 ---
@@ -621,19 +649,19 @@ Before considering a potion complete:
 6. Browser auto-refreshes (via no-cache headers)
 
 **Watched**:
-- `src/potions/*.md` → Rebuild potions
+- `src/potions/**/*.md` → Rebuild potions
 - `src/pages/*.hbs` → Rebuild pages
 - `src/styles/*.scss` → Rebuild styles
 - `src/partials/*.hbs` → Rebuild all (partials affect everything)
 - `src/potion-layouts/*.hbs` → Rebuild potions
-- `src/assets/*` → Copy assets
-- `src/statics/*` → Copy statics to root
+- `src/assets/**/*` → Copy assets
+- `src/statics/**/*` → Copy statics to root
 
 ---
 
 ## 🚀 When in Doubt
 
-1. Look at existing `dashboard-layout` potion as reference
+1. Look at `src/potions/layouts/dashboard.md` and `src/statics/potions/layouts/dashboard.json` as reference
 2. Ensure framework and styling agnosticism
 3. Provide comprehensive specifications, not just code
 4. Use `{{relativePath}}` for ALL links and assets
