@@ -1,4 +1,2 @@
-{
-  "mdFilesDirName": "potions",
-  "mdFilesLayoutsDirName": "potion-layouts"
-}
+mdFilesDirName: potions
+mdFilesLayoutsDirName: potion-layouts

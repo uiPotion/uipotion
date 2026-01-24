@@ -1,0 +1,25 @@
+# UI Potion - Robots.txt
+User-agent: *
+Allow: /
+
+# AI Agents - Feel free to crawl everything
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Sitemaps
+Sitemap: https://uipotion.com/sitemap.xml
+
+# Performance: Crawl-delay to be nice to server
+Crawl-delay: 1

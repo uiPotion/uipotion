@@ -1,0 +1,41 @@
+{
+  "name": "UI Potion",
+  "short_name": "UI Potion",
+  "description": "AI-agent-optimized UI component guides for any framework",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8B5CF6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/images/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["development", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Browse Potions",
+      "short_name": "Potions",
+      "description": "Browse all available UI component guides",
+      "url": "/potions.html",
+      "icons": [{ "src": "/assets/images/favicon-32x32.png", "sizes": "32x32" }]
+    },
+    {
+      "name": "About",
+      "short_name": "About",
+      "description": "Learn about UI Potion",
+      "url": "/about.html",
+      "icons": [{ "src": "/assets/images/favicon-32x32.png", "sizes": "32x32" }]
+    }
+  ]
+}

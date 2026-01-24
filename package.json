@@ -4,12 +4,13 @@
   "description": "AI-agent-optimized UI component guides for any framework",
   "main": "index.js",
   "scripts": {
-    "start": "harold-scripts start",
-    "build": "harold-scripts build"
+    "start": "npm run sitemap && harold-scripts start",
+    "build": "npm run sitemap && harold-scripts build",
+    "sitemap": "node generate-sitemap.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/juliancwirko/uipotion.git"
+    "url": "git+https://github.com/uiPotion/uipotion.git"
   },
   "keywords": [
     "ui",
@@ -17,12 +18,12 @@
     "ai",
     "guides"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Julian Ćwirko",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/juliancwirko/uipotion/issues"
+    "url": "https://github.com/uiPotion/uipotion/issues"
   },
-  "homepage": "https://github.com/juliancwirko/uipotion#readme",
+  "homepage": "https://uipotion.com",
   "devDependencies": {
     "harold-scripts": "^1.4.0"
   }

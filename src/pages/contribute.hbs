@@ -1,4 +1,4 @@
-{{> head title="Contribute to UI Potion" description="Learn how to contribute your own potions to UI Potion through pull requests" }}
+{{> head title="Contribute to UI Potion" description="Learn how to contribute your own potions to UI Potion through pull requests" currentPath="contribute.html" }}
 
 <div class="about-page">
   <!-- Hero Header -->
@@ -30,9 +30,12 @@
             <li><strong>Fork the repository</strong> on GitHub</li>
             <li><strong>Create your potion</strong> following the schema guidelines (see below)</li>
             <li><strong>Validate your potion</strong> using our <a href="{{relativePath 'validator.html'}}">Schema Validator</a></li>
+            <li><strong>Update sitemap</strong> by running <code>npm run sitemap</code> (automatic!)</li>
             <li><strong>Submit a pull request</strong> with your new potion</li>
             <li><strong>Wait for review</strong> - we'll check that it follows the schema and guidelines</li>
           </ol>
+          
+          <p><strong>Note:</strong> The sitemap.xml is automatically generated! Just run <code>npm run sitemap</code> after adding your potion files, and it will scan all markdown files and update the sitemap for you.</p>
         </section>
         
         <section class="about-section">
@@ -327,7 +330,7 @@ agentManifest: 'potions/components/your-potion-name.json'
           <h2>Resources</h2>
           <ul>
             <li><a href="{{relativePath 'validator.html'}}">Schema Validator</a> - Validate your potions before submitting</li>
-            <li><a href="https://github.com/juliancwirko/uipotion" target="_blank" rel="noopener">GitHub Repository</a> - View the codebase and submit PRs</li>
+            <li><a href="https://github.com/uiPotion" target="_blank" rel="noopener">GitHub Repository</a> - View the codebase and submit PRs</li>
             <li><a href="{{relativePath 'about.html'}}">About UI Potion</a> - Learn more about the project</li>
           </ul>
         </section>
@@ -337,7 +340,7 @@ agentManifest: 'potions/components/your-potion-name.json'
           <p>Ready to contribute? Start by exploring the schemas and validating your first potion!</p>
           <div style="margin-top: 24px;">
             <a href="{{relativePath 'validator.html'}}" class="button primary">Validate a Potion</a>
-            <a href="https://github.com/juliancwirko/uipotion" target="_blank" rel="noopener" class="button" style="margin-left: 12px;">View on GitHub</a>
+            <a href="https://github.com/uiPotion" target="_blank" rel="noopener" class="button" style="margin-left: 12px;">View on GitHub</a>
           </div>
         </section>
       </article>

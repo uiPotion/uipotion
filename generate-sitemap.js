@@ -1,0 +1,162 @@
+#!/usr/bin/env node
+/**
+ * Generate sitemap.xml automatically from potions markdown files
+ * Run: node generate-sitemap.js
+ * Or add to package.json scripts: "sitemap": "node generate-sitemap.js"
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// Configuration
+const POTIONS_DIR = 'src/potions';
+const OUTPUT_FILE = 'src/statics/sitemap.xml';
+const BASE_URL = 'https://uipotion.com';
+
+// Static pages with their priorities
+const STATIC_PAGES = [
+  { path: '/', priority: '1.0', changefreq: 'weekly' },
+  { path: '/about.html', priority: '0.8', changefreq: 'monthly' },
+  { path: '/potions.html', priority: '0.9', changefreq: 'weekly' },
+  { path: '/contribute.html', priority: '0.7', changefreq: 'monthly' },
+  { path: '/validator.html', priority: '0.6', changefreq: 'monthly' },
+  { path: '/legal.html', priority: '0.3', changefreq: 'yearly' },
+];
+
+// API/Discovery endpoints
+const API_ENDPOINTS = [
+  { path: '/uipotion-manifest.json', priority: '0.9', changefreq: 'weekly' },
+  { path: '/potions-index.json', priority: '0.9', changefreq: 'weekly' },
+];
+
+function getFileLastModified(filepath) {
+  try {
+    const stats = fs.statSync(filepath);
+    return stats.mtime.toISOString().split('T')[0];
+  } catch (err) {
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
+function findPotions() {
+  const potions = [];
+  const categories = ['components', 'features', 'layouts', 'patterns', 'tooling'];
+
+  categories.forEach(category => {
+    const categoryDir = path.join(POTIONS_DIR, category);
+    if (!fs.existsSync(categoryDir)) return;
+
+    const files = fs.readdirSync(categoryDir);
+    files.forEach(filename => {
+      if (filename.endsWith('.md')) {
+        const filepath = path.join(categoryDir, filename);
+        const slug = filename.replace('.md', '');
+
+        potions.push({
+          category,
+          slug,
+          path: `/potions/${category}/${slug}.html`,
+          priority: '0.8',
+          changefreq: 'monthly',
+          lastmod: getFileLastModified(filepath)
+        });
+      }
+    });
+  });
+
+  return potions.sort((a, b) => {
+    if (a.category !== b.category) return a.category.localeCompare(b.category);
+    return a.slug.localeCompare(b.slug);
+  });
+}
+
+function generateSitemap() {
+  const today = new Date().toISOString().split('T')[0];
+  const potions = findPotions();
+
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Static Pages -->
+`;
+
+  // Add static pages
+  STATIC_PAGES.forEach(page => {
+    xml += `  <url>
+    <loc>${BASE_URL}${page.path}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>
+
+`;
+  });
+
+  // Add potions
+  xml += `  <!-- Individual Potions -->
+`;
+
+  potions.forEach(potion => {
+    xml += `  <url>
+    <loc>${BASE_URL}${potion.path}</loc>
+    <lastmod>${potion.lastmod}</lastmod>
+    <changefreq>${potion.changefreq}</changefreq>
+    <priority>${potion.priority}</priority>
+  </url>
+
+`;
+  });
+
+  // Add API/Discovery endpoints
+  xml += `  <!-- API/Discovery Endpoints for AI Agents -->
+`;
+
+  API_ENDPOINTS.forEach(endpoint => {
+    xml += `  <url>
+    <loc>${BASE_URL}${endpoint.path}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${endpoint.changefreq}</changefreq>
+    <priority>${endpoint.priority}</priority>
+  </url>
+
+`;
+  });
+
+  xml += `</urlset>
+`;
+
+  return { xml, potions };
+}
+
+function main() {
+  console.log('🗺️  Generating sitemap.xml...\n');
+
+  const { xml, potions } = generateSitemap();
+
+  // Show summary
+  console.log(`Found ${potions.length} potions:`);
+  ['components', 'features', 'layouts', 'patterns', 'tooling'].forEach(category => {
+    const count = potions.filter(p => p.category === category).length;
+    if (count > 0) {
+      console.log(`  - ${category}: ${count}`);
+    }
+  });
+
+  // Write to file
+  const outputDir = path.dirname(OUTPUT_FILE);
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  fs.writeFileSync(OUTPUT_FILE, xml, 'utf-8');
+
+  console.log(`\n✅ Sitemap generated successfully!`);
+  console.log(`📁 Saved to: ${OUTPUT_FILE}`);
+  console.log(`📊 Total URLs: ${STATIC_PAGES.length + potions.length + API_ENDPOINTS.length}`);
+}
+
+main();

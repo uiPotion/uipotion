@@ -1,0 +1,168 @@
+# Contributing to UI Potion
+
+Thank you for your interest in contributing to UI Potion! This guide will help you add new UI component specifications to our collection.
+
+## Quick Start
+
+1. Fork this repository at https://github.com/uiPotion/uipotion
+2. Create your potion (Markdown + JSON)
+3. Validate using the [Schema Validator](https://uipotion.com/validator.html)
+4. Run `npm run sitemap` to update sitemap (automatic!)
+5. Submit a pull request
+
+## Creating a Potion
+
+Each potion consists of **two files**:
+
+1. **Markdown file** (`src/potions/[category]/your-potion.md`) - Human-readable web version
+2. **JSON file** (`src/statics/potions/[category]/your-potion.json`) - AI-readable guide
+
+### Categories
+
+Choose the appropriate category:
+- **layouts** - Full-page layouts (dashboards, landing pages, app shells)
+- **components** - Reusable UI elements (buttons, dialogs, forms, cards)
+- **features** - Complete user flows (authentication, onboarding, checkout)
+- **patterns** - Design patterns and guidelines
+- **tooling** - Developer tools and infrastructure
+
+### Step 1: Create JSON File
+
+Create `src/statics/potions/[category]/your-potion.json`
+
+Use an existing potion as template (e.g., `navbar.json` for components, `dashboard.json` for layouts).
+
+Required structure:
+```json
+{
+  "id": "your-potion-id",
+  "name": "Your Potion Name",
+  "version": "1.0.0",
+  "category": "components",
+  "tags": ["tag1", "tag2"],
+  "description": "Brief description",
+  "aiAgentInstructions": {
+    "summary": "...",
+    "keyFeatures": [...],
+    "implementationSteps": [...]
+  },
+  "frameworkPatterns": { ... },
+  "stylingApproaches": { ... },
+  "accessibility": { ... },
+  "testingChecklist": [ ... ]
+}
+```
+
+### Step 2: Create Markdown File
+
+Create `src/potions/[category]/your-potion.md`
+
+Required front matter:
+```yaml
+---
+layout: 'potion'
+title: 'Your Potion Name'
+publicationDate: '2026-01-24'
+excerpt: 'Brief description (1-2 sentences)'
+category: 'Components'
+tags:
+  - components
+  - tag1
+  - tag2
+agentManifest: 'potions/components/your-potion.json'
+---
+```
+
+Then write comprehensive specifications in the body (see existing potions for format).
+
+### Step 3: Validate
+
+Visit https://uipotion.com/validator.html and validate your JSON file.
+
+### Step 4: Update Sitemap (Automatic!)
+
+After creating your potion files, run:
+
+```bash
+npm run sitemap
+```
+
+This automatically scans all markdown files and updates `src/statics/sitemap.xml`. No manual editing needed!
+
+### Step 5: Update Potions Index
+
+Add your potion to `src/statics/potions-index.json`:
+
+```json
+{
+  "id": "your-potion-id",
+  "name": "Your Potion Name",
+  "category": "components",
+  "tags": ["tag1", "tag2"],
+  "excerpt": "Brief description",
+  "complexity": "intermediate",
+  "estimatedImplementationTime": "1-2 hours",
+  "webUrl": "https://uipotion.com/potions/components/your-potion.html",
+  "agentGuideUrl": "https://uipotion.com/potions/components/your-potion.json",
+  "created": "2026-01-24",
+  "updated": "2026-01-24"
+}
+```
+
+Update `totalCount` and `lastUpdated` fields at the top.
+
+## Testing Locally
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm start
+
+# Build for production
+npm run build
+
+# Update sitemap
+npm run sitemap
+```
+
+Visit http://localhost:3000 to preview your changes.
+
+## Pull Request Guidelines
+
+**Before submitting:**
+- ✅ JSON validates with no errors
+- ✅ Markdown has correct front matter
+- ✅ Ran `npm run sitemap`
+- ✅ Updated `potions-index.json`
+- ✅ Tested locally with `npm start`
+- ✅ Followed existing potion format
+
+**PR Description should include:**
+- Category and potion name
+- Brief description of what it provides
+- Confirmation that it passes validation
+- Example use case
+
+## Content Guidelines
+
+- **Be comprehensive**: Include all necessary details for AI to implement
+- **Be framework-agnostic**: Avoid framework-specific code in descriptions
+- **Include accessibility**: WCAG compliance, ARIA, keyboard navigation
+- **Include responsive specs**: Mobile, tablet, desktop breakpoints
+- **Include testing checklist**: What to verify after implementation
+
+## Questions?
+
+- Check existing potions for examples
+- Review the [.cursorrules](/.cursorrules) file for detailed guidelines
+- Ask in your pull request if unsure
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the MIT License.
+
+---
+
+**Thank you for contributing to UI Potion!** 🧪✨

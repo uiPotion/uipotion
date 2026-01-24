@@ -4,20 +4,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="{{relativePath 'assets/images/favicon.png'}}" type="image/png" />
+  
+  <!-- Title & Description -->
   <title>{{title}}</title>
   <meta name="description" content="{{description}}">
-  <meta name="generator" content="haroldjs.com" />
+  
+  <!-- Favicon Suite -->
+  <link rel="icon" type="image/png" sizes="32x32" href="{{relativePath 'assets/images/favicon-32x32.png'}}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{relativePath 'assets/images/favicon-16x16.png'}}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{relativePath 'assets/images/apple-touch-icon.png'}}">
+  <link rel="manifest" href="{{relativePath 'site.webmanifest'}}">
+  <meta name="theme-color" content="#8B5CF6">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{else}}index.html{{/if}}">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="{{#if agentManifest}}article{{else}}website{{/if}}">
+  <meta property="og:url" content="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{else}}index.html{{/if}}">
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:description" content="{{description}}">
+  <meta property="og:image" content="https://uipotion.com/assets/images/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="UI Potion">
+  <meta property="og:locale" content="en_US">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{else}}index.html{{/if}}">
+  <meta name="twitter:title" content="{{title}}">
+  <meta name="twitter:description" content="{{description}}">
+  <meta name="twitter:image" content="https://uipotion.com/assets/images/og-image.png">
+  <meta name="twitter:image:alt" content="{{title}} - UI Potion">
+  
+  <!-- Additional Meta -->
+  <meta name="author" content="UI Potion Team">
+  <meta name="robots" content="index, follow">
+  <meta name="generator" content="haroldjs.com">
+  <meta name="keywords" content="{{#if tags}}{{#each tags}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}UI components, AI coding assistant, framework-agnostic, component guides{{/if}}">
+  
   {{#if agentManifest}}
   <!-- AI Agent Discovery: Machine-readable link to JSON guide -->
   <link rel="alternate" type="application/json" href="https://uipotion.com/{{agentManifest}}" title="AI Agent Guide">
   <meta name="ai-agent-guide" content="https://uipotion.com/{{agentManifest}}">
   <meta property="og:see_also" content="https://uipotion.com/{{agentManifest}}">
   {{/if}}
+  
+  <!-- Performance: DNS Prefetch & Preconnect -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Fonts with display=swap for better performance -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="{{relativePath 'styles/main.css'}}">
+  
   {{#if agentManifest}}
   <!-- JSON-LD Structured Data for AI Agent Discovery -->
   <script type="application/ld+json">
@@ -26,6 +71,27 @@
     "@type": "TechArticle",
     "headline": "{{title}}",
     "description": "{{description}}",
+    "author": {
+      "@type": "Organization",
+      "name": "UI Potion Team",
+      "url": "https://uipotion.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "UI Potion",
+      "url": "https://uipotion.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://uipotion.com/assets/images/uipotion-logo.png"
+      }
+    },
+    "datePublished": "{{publicationDate}}",
+    "dateModified": "{{publicationDate}}",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://uipotion.com/{{currentPath}}"
+    },
+    "image": "https://uipotion.com/assets/images/og-image.png",
     "about": {
       "@type": "SoftwareApplication",
       "applicationCategory": "UIComponentGuide",
@@ -36,6 +102,32 @@
       "contentUrl": "https://uipotion.com/{{agentManifest}}",
       "encodingFormat": "application/json",
       "description": "AI Agent Implementation Guide (JSON)"
+    }{{#if tags}},
+    "keywords": "{{#each tags}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}"
+    {{/if}}
+  }
+  </script>
+  {{else}}
+  <!-- JSON-LD Structured Data for Website -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "UI Potion",
+    "url": "https://uipotion.com",
+    "description": "AI-agent-optimized UI component guides for any framework",
+    "publisher": {
+      "@type": "Organization",
+      "name": "UI Potion Team",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://uipotion.com/assets/images/uipotion-logo.png"
+      }
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://uipotion.com/potions.html?q={search_term_string}",
+      "query-input": "required name=search_term_string"
     }
   }
   </script>
@@ -61,7 +153,7 @@
         <!-- Desktop & Mobile Menu -->
         <nav class="main-menu" id="mainMenu">
           <ul class="main-menu-list">
-            <li class="main-menu-list-item"><a href="{{relativePath 'potions.html'}}">All Potions</a></li>
+            <li class="main-menu-list-item"><a href="{{relativePath 'potions.html'}}">Potions</a></li>
             <li class="main-menu-list-item"><a href="{{relativePath 'about.html'}}">About</a></li>
             <li class="main-menu-list-item"><a href="{{relativePath 'contribute.html'}}">Contribute</a></li>
           </ul>
