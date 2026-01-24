@@ -77,8 +77,21 @@
       "agentGuideUrl": "https://uipotion.com/potions/components/toast-notifications.json",
       "created": "2026-01-24",
       "updated": "2026-01-24"
+    },
+    {
+      "id": "landing-page",
+      "name": "Landing Page Layout (Marketing)",
+      "category": "layouts",
+      "tags": ["landing-page", "marketing", "hero", "features", "testimonials", "cta", "responsive", "conversion"],
+      "excerpt": "A conversion-optimized marketing landing page layout with hero section, feature highlights, social proof, and multiple CTAs. Perfect for product launches, SaaS marketing, and lead generation campaigns.",
+      "complexity": "intermediate",
+      "estimatedImplementationTime": "3-4 hours",
+      "webUrl": "https://uipotion.com/potions/layouts/landing-page.html",
+      "agentGuideUrl": "https://uipotion.com/potions/layouts/landing-page.json",
+      "created": "2026-01-24",
+      "updated": "2026-01-24"
     }
   ],
-  "totalCount": 6,
+  "totalCount": 7,
   "lastUpdated": "2026-01-24"
 }
