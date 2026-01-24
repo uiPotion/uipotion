@@ -880,6 +880,19 @@ const notifications = [
 
 ---
 
+## See Also
+
+This dashboard layout commonly uses these components:
+
+- **[Navbar Component](/potions/components/navbar.html)** - For the header navigation bar
+- **[Data Table Component](/potions/components/data-table.html)** - For displaying tabular data in the main content area
+- **[Dialog Component](/potions/components/dialog.html)** - For modals and action confirmations
+- **[Toast Notifications](/potions/components/toast-notifications.html)** - For user feedback messages
+
+These are examples of components that pair well with dashboards. The layout works with any content you choose.
+
+---
+
 ## Summary for AI Agents
 
 This dashboard layout is a standard three-section layout (sidebar, header, content) with collapsible sidebar functionality. Key implementation points:

@@ -98,12 +98,14 @@ agentManifest: 'potions/[category]/component-id.json' # REQUIRED: Path to JSON g
 - Framework patterns (remain agnostic)
 - Testing checklist
 
-**IMPORTANT - Visual Representations**:
+**IMPORTANT - Visual Representations & Content Formatting**:
 - ❌ **NEVER** use ASCII art or text-based diagrams in potion markdown files for the website
+- ❌ **NEVER** use emojis (✅ ❌ ✓ ✗ etc.) in potion markdown files for the website
 - ❌ ASCII boxes, borders, or visual layouts look unprofessional on the rendered website
 - ✅ Use clear prose descriptions instead (e.g., "A 3-column grid layout with...")
 - ✅ Save visual diagrams for future when we add screenshot/image support
 - ✅ In JSON files for AI agents, you can include text structure if needed, but keep it minimal
+- ✅ Use plain text for lists and examples (e.g., "Good:", "Bad:" instead of emojis)
 
 ### 2. AI Agent JSON Guides
 
@@ -337,7 +339,7 @@ agentManifest: 'potions/[category]/your-component.json'
 
 ## Overview
 
-Brief overview with visual representation (ASCII art if helpful).
+Brief overview with clear prose descriptions.
 
 ## Structure
 
@@ -425,12 +427,102 @@ harold-scripts build    # Build the site
 harold-scripts start    # Start dev server on http://localhost:3000
 ```
 
+### Step 5: Cross-Reference Related Potions (CRITICAL!)
+
+**IMPORTANT**: After creating a new potion, add helpful cross-references to related potions. These are **optional hints and tips**, not strict dependencies. Each potion must work independently.
+
+**Philosophy**:
+- ✅ Each potion is **self-contained** and fully functional on its own
+- ✅ Cross-references are **suggestions** for complementary potions
+- ✅ AI agents can implement a potion **without** needing other potions
+- ✅ References help humans **discover** related content
+- ❌ Don't make one potion **depend** on another potion
+- ❌ Don't require AI agents to implement multiple potions
+
+**Why This Matters**:
+- Creates a discoverable network of related components
+- Helps users find complementary potions
+- Improves AI agent context (optional, not required)
+- Maintains independence of each potion
+
+**When to Add Cross-References** (as hints):
+
+1. **New Component → Mention in Feature/Layout that could use it**
+   - Example: Text Input component? Add tip in Forms feature: "Consider using Text Input component pattern"
+   - Example: Sidebar component? Add tip in Dashboard layout: "Works well with Sidebar component"
+
+2. **New Feature → Mention Components/Patterns that complement it**
+   - Example: Forms feature? Add tip: "See Text Input component and Form Validation pattern"
+
+3. **New Pattern → Mention Components/Features it applies to**
+   - Example: Form Validation pattern? Add tip: "Works with Text Input component"
+
+4. **New Layout → Mention Components that fit well**
+   - Example: Dashboard layout? Add tip: "Commonly uses Navbar, Data Table, Sidebar components"
+
+**Where to Add Cross-References**:
+
+In the **Markdown file** (for humans):
+- Add a "Related Potions" or "See Also" section at the end (optional)
+- Use phrases like "Works well with", "Consider using", "See also", "Complements"
+- Make it clear these are suggestions, not requirements
+
+Example:
+```markdown
+## See Also
+
+The Text Input component works well with these potions:
+- **[Form Validation Pattern](/potions/patterns/form-validation.html)** - Apply validation UX best practices
+- **[Forms Feature](/potions/features/form.html)** - Complete form implementation using this input
+
+These are suggestions - Text Input works independently and can be used in any context.
+```
+
+In the **JSON file** (for AI agents) - OPTIONAL:
+- Add a `relatedPotions` array in `meta` section (optional, informational only):
+  ```json
+  "meta": {
+    "relatedPotions": [
+      {
+        "id": "form-validation",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "Optional: Apply Form Validation pattern for better UX",
+        "required": false
+      }
+    ]
+  }
+  ```
+- Or add a note in `aiAgentInstructions.keyFeatures`: "TIP: Works well with Form Validation pattern (optional)"
+- Always make it clear the reference is optional
+
+**Tone for Cross-References**:
+- ✅ "Works well with..."
+- ✅ "Consider using..."
+- ✅ "See also..."
+- ✅ "Complements..."
+- ✅ "Commonly paired with..."
+- ❌ "Requires..."
+- ❌ "Must use..."
+- ❌ "Depends on..."
+- ❌ "You need..."
+
+**Checklist for Cross-Referencing**:
+- [ ] Identified 2-3 related potions that complement this one
+- [ ] Added lightweight "See Also" section to Markdown (optional)
+- [ ] References use suggestive language ("works well with", "consider")
+- [ ] Made it clear these are hints, not requirements
+- [ ] Verified each potion still works independently
+- [ ] (Optional) Added relatedPotions array to JSON meta with `required: false`
+
+**Note**: Focus on the 2-3 most helpful suggestions. Keep it light and informational.
+
 ---
 
 ## ✅ Best Practices
 
 ### For Potions (Markdown)
-- ✅ Start with clear visual representation (ASCII art)
+- ✅ Use clear prose descriptions (no ASCII art, no emojis)
 - ✅ Specify exact dimensions and breakpoints
 - ✅ Include accessibility requirements from the start
 - ✅ Provide testing checklist
@@ -488,7 +580,7 @@ harold-scripts start    # Start dev server on http://localhost:3000
 ### Writing Potions (Markdown)
 - **Audience**: Human developers browsing the site
 - **Style**: Clear, professional, comprehensive
-- **Include**: Visual ASCII diagrams, detailed specifications, examples
+- **Include**: Prose descriptions, detailed specifications, examples (NO ASCII art, NO emojis)
 - **Structure**: Overview → Structure → Components → Responsive → Accessibility → Examples
 
 ### Writing AI Agent Guides (JSON)
@@ -516,6 +608,7 @@ harold-scripts start    # Start dev server on http://localhost:3000
 
 Before considering a potion complete:
 - [ ] Markdown file has correct front matter
+- [ ] Markdown file includes category tag (e.g., `components`, `layouts`, `patterns`) as first tag for postsList helper
 - [ ] JSON guide is comprehensive and follows template
 - [ ] Added to potions-index.json
 - [ ] Updated totalCount and lastUpdated in potions-index.json
@@ -529,12 +622,16 @@ Before considering a potion complete:
 - [ ] Animation specs included
 - [ ] Framework patterns provided for React, Vue, Angular, Svelte
 - [ ] Styling approaches provided for Tailwind, CSS Modules, etc.
+- [ ] **(Optional) Cross-referenced 2-3 related potions** as helpful suggestions (not requirements)
+- [ ] **(Optional) "See Also" section added to Markdown** with suggestive language
+- [ ] **(Optional) RelatedPotions array in JSON meta** with `required: false` flag
 
 ---
 
 ## ⚠️ Common Pitfalls
 
 ### UI Potion-Specific
+- ❌ Don't use ASCII art or emojis in potion markdown files
 - ❌ Don't provide framework-specific code in potions (keep it generic)
 - ❌ Don't forget to update potions-index.json
 - ❌ Don't skip accessibility specifications

@@ -1082,8 +1082,6 @@
   "meta": {
     "created": "2026-01-10",
     "updated": "2026-01-11",
-    "complexity": "intermediate",
-    "estimatedImplementationTime": "2-4 hours",
     "webUrl": "https://uipotion.com/potions/layouts/dashboard.html"
   }
 }

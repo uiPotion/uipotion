@@ -1126,8 +1126,6 @@
   "meta": {
     "created": "2026-01-18",
     "updated": "2026-01-18",
-    "complexity": "intermediate",
-    "estimatedImplementationTime": "3-5 hours",
     "webUrl": "https://uipotion.com/potions/components/data-table.html"
   }
 }

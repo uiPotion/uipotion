@@ -1,0 +1,615 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/features.schema.json",
+  "id": "form-login-register",
+  "version": "1.0.0",
+  "name": "Login & Registration Forms with Validation",
+  "category": "features",
+  "tags": ["features", "form", "authentication", "login", "registration", "validation", "accessibility", "forms"],
+  "description": "Complete authentication forms (login and registration) with real-time validation, error handling, password strength, and accessibility. Demonstrates best practices for form validation UX, field states, and user feedback.",
+
+  "tokens": {
+    "layout": {
+      "formMaxWidthPx": 420,
+      "formPaddingDesktopPx": 48,
+      "formPaddingMobilePx": 24,
+      "inputHeightPx": 48,
+      "fieldGapPx": 24,
+      "buttonHeightPx": 48
+    },
+    "motion": {
+      "errorShakeDurationMs": 300,
+      "transitionDurationMs": 200,
+      "loadingSpinnerMs": 1000,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    "breakpoints": {
+      "mobileMaxPx": 767,
+      "tabletMinPx": 768
+    }
+  },
+
+  "aiAgentInstructions": {
+    "summary": "Implement login and registration forms with comprehensive validation, error handling, and accessibility. Apply Form Validation Pattern principles for validation timing. Use Text Input Component pattern for input fields. Adapt to the user's framework and styling system.",
+    "keyFeatures": [
+      "Login form: email + password with 'Remember me' and 'Forgot password' options",
+      "Registration form: name, email, password, password confirmation with password strength indicator",
+      "Real-time validation following Form Validation Pattern (on-blur for most, real-time for password confirmation)",
+      "Clear, actionable error messages positioned inline below fields",
+      "Success states with checkmarks for validated fields",
+      "Loading states for submit buttons with spinner",
+      "Password visibility toggle (eye icon)",
+      "Password strength meter for registration (weak/medium/strong)",
+      "Form switching: Toggle between login and registration",
+      "Full keyboard accessibility with proper ARIA attributes",
+      "CRITICAL: TIP: Consider using Text Input Component pattern for consistent input styling and behavior (optional)",
+      "CRITICAL: TIP: Apply Form Validation Pattern for optimal validation UX timing (optional)",
+      "CRITICAL: Styling MUST match project's existing conventions. Detect framework and styling system first.",
+      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes. NEVER use inline styles."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect framework and styling system BEFORE writing code. Use ONLY the detected system.",
+      "1. TIP: Review Form Validation Pattern for validation timing best practices (optional reference)",
+      "2. TIP: Review Text Input Component for input field patterns (optional reference)",
+      "3. Create form state management: loginForm and registerForm with field values, errors, touched states",
+      "4. Implement login form: email (validate on blur), password (validate on blur), remember me checkbox",
+      "5. Implement registration form: name, email, password (with strength), password confirmation (real-time)",
+      "6. Add validation timing: on-blur for email/name/password, real-time for password confirmation",
+      "7. Implement password strength calculator (weak: <8 chars, medium: 8+ with letters+numbers, strong: 8+ with special chars)",
+      "8. Add password visibility toggles with eye icons",
+      "9. Implement submit handlers with loading states and error handling",
+      "10. Add form switching toggle (Login ↔ Register)",
+      "11. Style form cards with proper spacing, shadows, and responsive behavior",
+      "12. Add ARIA attributes: aria-invalid, aria-describedby, aria-live for errors",
+      "13. Implement keyboard navigation and focus management",
+      "14. Add 'Forgot password' and 'Sign in with Google' options (UI only, backend integration not included)",
+      "15. Test with keyboard and screen readers"
+    ]
+  },
+
+  "featureSpec": {
+    "goal": "Provide complete, accessible authentication forms (login and registration) that follow validation UX best practices, handle errors gracefully, and guide users to successful submission.",
+
+    "userJourney": [
+      "User lands on authentication page (default: login form)",
+      "User fills in email field, validation triggers on blur",
+      "User fills in password field, validation triggers on blur",
+      "User clicks Submit button",
+      "If validation fails: errors displayed, focus moves to first invalid field",
+      "If validation passes: button shows loading state, form submits",
+      "On success: navigate to dashboard or show success message",
+      "On server error: show error message, re-enable form",
+      "Alternatively: User clicks 'Create account' to switch to registration form",
+      "Registration form: User fills name, email, password, password confirmation",
+      "Password strength updates in real-time as user types",
+      "Password confirmation validates in real-time",
+      "Submit registration with same validation and error handling flow"
+    ],
+
+    "screens": [
+      {
+        "id": "login-form",
+        "purpose": "Allow existing users to authenticate with email and password",
+        "ui": {
+          "title": "Welcome Back",
+          "subtitle": "Sign in to your account",
+          "fields": ["email", "password"],
+          "extras": ["rememberMe", "forgotPassword"],
+          "cta": "Sign In",
+          "switchPrompt": "Don't have an account? Create one"
+        },
+        "validation": {
+          "email": {
+            "required": true,
+            "format": "Valid email format",
+            "timing": "on-blur",
+            "messages": {
+              "required": "Email is required",
+              "invalid": "Please enter a valid email address (e.g., name@example.com)"
+            }
+          },
+          "password": {
+            "required": true,
+            "minLength": 8,
+            "timing": "on-blur",
+            "messages": {
+              "required": "Password is required",
+              "minLength": "Password must be at least 8 characters"
+            }
+          }
+        },
+        "states": ["idle", "validating", "valid", "invalid", "submitting", "success", "error"],
+        "interactions": [
+          {
+            "event": "emailBlur",
+            "result": "validateEmail",
+            "sideEffects": ["setTouchedEmail", "showErrorIfInvalid"],
+            "accessibilityNotes": "Error announced via aria-live region"
+          },
+          {
+            "event": "passwordBlur",
+            "result": "validatePassword",
+            "sideEffects": ["setTouchedPassword", "showErrorIfInvalid"]
+          },
+          {
+            "event": "submitClick",
+            "result": "validateAllFields",
+            "sideEffects": ["setLoadingTrue", "disableForm", "focusFirstError"],
+            "accessibilityNotes": "Focus moves to first invalid field if validation fails"
+          },
+          {
+            "event": "forgotPasswordClick",
+            "result": "navigateToPasswordReset",
+            "sideEffects": []
+          },
+          {
+            "event": "switchToRegister",
+            "result": "showRegisterForm",
+            "sideEffects": ["resetFormState", "focusFirstField"]
+          }
+        ],
+        "stateModel": {
+          "email": {
+            "type": "string",
+            "description": "User's email address",
+            "default": ""
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "default": ""
+          },
+          "rememberMe": {
+            "type": "boolean",
+            "description": "Whether to keep user logged in",
+            "default": false
+          },
+          "touched": {
+            "type": "object",
+            "description": "Tracks which fields user has interacted with",
+            "default": {}
+          },
+          "errors": {
+            "type": "object",
+            "description": "Validation errors for each field",
+            "default": {}
+          },
+          "isSubmitting": {
+            "type": "boolean",
+            "description": "Whether form is currently submitting",
+            "default": false
+          }
+        }
+      },
+      {
+        "id": "register-form",
+        "purpose": "Allow new users to create an account",
+        "ui": {
+          "title": "Create Account",
+          "subtitle": "Get started for free",
+          "fields": ["name", "email", "password", "passwordConfirm"],
+          "extras": ["passwordStrength", "termsCheckbox"],
+          "cta": "Create Account",
+          "switchPrompt": "Already have an account? Sign in"
+        },
+        "validation": {
+          "name": {
+            "required": true,
+            "minLength": 2,
+            "timing": "on-blur",
+            "messages": {
+              "required": "Name is required",
+              "minLength": "Name must be at least 2 characters"
+            }
+          },
+          "email": {
+            "required": true,
+            "format": "Valid email format",
+            "timing": "on-blur",
+            "asyncCheck": "Email availability (optional)",
+            "messages": {
+              "required": "Email is required",
+              "invalid": "Please enter a valid email address",
+              "taken": "This email is already registered"
+            }
+          },
+          "password": {
+            "required": true,
+            "minLength": 8,
+            "strength": "Weak/Medium/Strong indicator",
+            "timing": "on-blur (validation), real-time (strength)",
+            "messages": {
+              "required": "Password is required",
+              "minLength": "Password must be at least 8 characters",
+              "weak": "Password is weak (add numbers or special characters)"
+            }
+          },
+          "passwordConfirm": {
+            "required": true,
+            "match": "Must match password field",
+            "timing": "real-time (as user types)",
+            "messages": {
+              "required": "Please confirm your password",
+              "mismatch": "Passwords must match"
+            }
+          }
+        },
+        "states": ["idle", "validating", "valid", "invalid", "submitting", "success", "error"],
+        "interactions": [
+          {
+            "event": "nameBlur",
+            "result": "validateName",
+            "sideEffects": ["setTouchedName", "showErrorIfInvalid"]
+          },
+          {
+            "event": "emailBlur",
+            "result": "validateEmail",
+            "sideEffects": ["setTouchedEmail", "checkEmailAvailability", "showErrorIfInvalid"]
+          },
+          {
+            "event": "passwordInput",
+            "result": "calculatePasswordStrength",
+            "sideEffects": ["updateStrengthMeter"]
+          },
+          {
+            "event": "passwordBlur",
+            "result": "validatePassword",
+            "sideEffects": ["setTouchedPassword", "showErrorIfInvalid"]
+          },
+          {
+            "event": "passwordConfirmInput",
+            "result": "validatePasswordMatch",
+            "sideEffects": ["showErrorIfMismatch", "showSuccessIfMatch"]
+          },
+          {
+            "event": "submitClick",
+            "result": "validateAllFields",
+            "sideEffects": ["setLoadingTrue", "disableForm", "focusFirstError"]
+          },
+          {
+            "event": "switchToLogin",
+            "result": "showLoginForm",
+            "sideEffects": ["resetFormState", "focusFirstField"]
+          }
+        ],
+        "stateModel": {
+          "name": {
+            "type": "string",
+            "description": "User's full name",
+            "default": ""
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email address",
+            "default": ""
+          },
+          "password": {
+            "type": "string",
+            "description": "User's chosen password",
+            "default": ""
+          },
+          "passwordConfirm": {
+            "type": "string",
+            "description": "Password confirmation",
+            "default": ""
+          },
+          "passwordStrength": {
+            "type": "enum",
+            "description": "Calculated password strength",
+            "default": "none",
+            "allowedValues": ["none", "weak", "medium", "strong"]
+          },
+          "agreeToTerms": {
+            "type": "boolean",
+            "description": "Whether user agreed to terms",
+            "default": false
+          },
+          "touched": {
+            "type": "object",
+            "description": "Tracks which fields user has interacted with",
+            "default": {}
+          },
+          "errors": {
+            "type": "object",
+            "description": "Validation errors for each field",
+            "default": {}
+          },
+          "isSubmitting": {
+            "type": "boolean",
+            "description": "Whether form is currently submitting",
+            "default": false
+          }
+        }
+      }
+    ],
+
+    "states": [
+      "login-form-active",
+      "register-form-active",
+      "field-focused",
+      "field-blurred-valid",
+      "field-blurred-invalid",
+      "password-strength-weak",
+      "password-strength-medium",
+      "password-strength-strong",
+      "form-submitting",
+      "form-success",
+      "form-error"
+    ],
+
+    "edgeCases": [
+      "User switches forms mid-validation (reset state)",
+      "User submits with Enter key from any field (trigger validation)",
+      "Server returns generic error (display in form-level error message)",
+      "Email already registered (show specific error, suggest password reset)",
+      "Very long email or name (truncate or wrap, test with max-length)",
+      "Password contains special characters (ensure proper escaping)",
+      "User rapidly types in password confirmation (debounce validation)",
+      "Network timeout on submission (show timeout error, allow retry)",
+      "Screen reader navigation through all form states",
+      "Keyboard-only form completion and submission"
+    ],
+
+    "interactions": [
+      {
+        "event": "formSwitch",
+        "result": "toggleBetweenLoginAndRegister",
+        "sideEffects": ["resetFormState", "clearErrors", "focusFirstField"],
+        "accessibilityNotes": "Focus should move to first field of newly displayed form"
+      },
+      {
+        "event": "fieldValidation",
+        "result": "validateField",
+        "sideEffects": ["updateErrorState", "updateFieldVisualState", "announceErrorToScreenReader"],
+        "accessibilityNotes": "Errors announced via aria-live, field marked with aria-invalid"
+      },
+      {
+        "event": "formSubmission",
+        "result": "validateAndSubmit",
+        "sideEffects": ["showLoadingState", "disableInputs", "scrollToError"],
+        "accessibilityNotes": "Focus management for errors, loading state announced"
+      }
+    ],
+
+    "dataContract": {
+      "loginPayload": {
+        "email": "string (validated email format)",
+        "password": "string (min 8 chars)",
+        "rememberMe": "boolean"
+      },
+      "registerPayload": {
+        "name": "string (min 2 chars)",
+        "email": "string (validated email format)",
+        "password": "string (min 8 chars, strength checked)",
+        "agreeToTerms": "boolean (required true)"
+      },
+      "apiResponse": {
+        "success": {
+          "status": "success",
+          "token": "string (JWT or session token)",
+          "user": "object (user details)"
+        },
+        "error": {
+          "status": "error",
+          "message": "string (error message)",
+          "field": "string (optional field-specific error)"
+        }
+      }
+    },
+
+    "analyticsEvents": [
+      "form_login_viewed",
+      "form_register_viewed",
+      "form_switched",
+      "field_validation_error",
+      "password_strength_calculated",
+      "form_submitted",
+      "form_submission_success",
+      "form_submission_error",
+      "forgot_password_clicked"
+    ]
+  },
+
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Labels programmatically associated with inputs via for/id",
+        "1.3.5": "Input purpose identified via autocomplete and type attributes",
+        "1.4.3": "Text and border colors maintain 4.5:1 contrast",
+        "2.1.1": "All form controls keyboard operable",
+        "2.4.3": "Logical focus order through form fields",
+        "2.4.7": "Visible focus indicators on all interactive elements",
+        "3.2.2": "No unexpected context changes on input",
+        "3.3.1": "Errors clearly identified in text",
+        "3.3.2": "Labels and required indicators provided",
+        "3.3.3": "Error messages provide guidance on fixing",
+        "3.3.4": "User can review before final submission",
+        "4.1.2": "Inputs have accessible names, roles, and states",
+        "4.1.3": "Error messages announced via aria-live"
+      }
+    },
+    "keyboardNavigation": {
+      "Tab": "Move through fields, checkboxes, links, and button in logical order",
+      "Shift+Tab": "Move backward through form",
+      "Enter": "Submit form from any field (except checkbox/link)",
+      "Space": "Toggle checkbox, activate button",
+      "Escape": "Optional: Clear current field"
+    },
+    "ariaAttributes": {
+      "required": {
+        "inputs": {
+          "aria-labelledby": "Points to label element ID",
+          "aria-describedby": "Points to hint and/or error element IDs",
+          "aria-invalid": "true when error, false when valid",
+          "aria-required": "true for required fields",
+          "autocomplete": "email, name, current-password, new-password"
+        },
+        "errorMessages": {
+          "id": "Unique ID for aria-describedby reference",
+          "role": "alert",
+          "aria-live": "polite"
+        },
+        "formContainer": {
+          "role": "form",
+          "aria-labelledby": "Points to form title/heading"
+        },
+        "submitButton": {
+          "aria-busy": "true when submitting",
+          "aria-disabled": "true when loading"
+        }
+      }
+    },
+    "screenReader": {
+      "formTitle": "Announced when form loads or switches",
+      "fieldLabels": "Announced when field receives focus",
+      "requiredIndicators": "Conveyed via aria-required, not just asterisk",
+      "errors": "Announced via aria-live when they appear",
+      "passwordStrength": "Announced as user types password",
+      "loadingState": "Announced when form submits",
+      "successMessage": "Announced via role=status or aria-live"
+    },
+    "focusManagement": {
+      "onLoad": "First field receives focus",
+      "onSwitch": "First field of new form receives focus",
+      "onError": "First invalid field receives focus after submit",
+      "onSuccess": "Focus moves to success message or next screen"
+    }
+  },
+
+  "animations": {
+    "errorShake": {
+      "durationMs": 300,
+      "easing": "ease-in-out",
+      "transform": "translateX(0) → translateX(-4px) → translateX(4px) → translateX(0)",
+      "trigger": "When error appears on field",
+      "optional": true
+    },
+    "errorFade": {
+      "durationMs": 200,
+      "easing": "ease-out",
+      "opacity": "0 → 1",
+      "trigger": "When error message appears"
+    },
+    "successFade": {
+      "durationMs": 200,
+      "easing": "ease-out",
+      "opacity": "0 → 1",
+      "trigger": "When success checkmark appears"
+    },
+    "formSwitch": {
+      "durationMs": 300,
+      "easing": "ease-in-out",
+      "effect": "Fade out current form → Fade in new form",
+      "alternative": "Slide animation (optional)"
+    },
+    "buttonLoading": {
+      "spinner": "Rotating spinner icon",
+      "durationMs": "Continuous rotation",
+      "trigger": "When form is submitting"
+    },
+    "prefersReducedMotion": {
+      "behavior": "Disable shake animation, use instant state changes",
+      "fadeOnly": "Keep fade animations but reduce to 100ms"
+    }
+  },
+
+  "projectDetection": {
+    "framework": {
+      "description": "Detect framework for form state management patterns",
+      "detectionSteps": [
+        "Check package.json for react, vue, @angular/core, svelte",
+        "Check for existing form components to match patterns",
+        "Identify state management approach (hooks, composition API, services, stores)"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect styling system to match existing form styles",
+      "detectionSteps": [
+        "Check for tailwindcss, styled-components, emotion, sass in package.json",
+        "Look for existing form styling patterns",
+        "Identify class naming conventions (BEM, camelCase, kebab-case)",
+        "Check for utility functions (cn, clsx, classnames)"
+      ]
+    },
+    "formLibraries": {
+      "description": "TIP: Check for existing form libraries to integrate with",
+      "detectionSteps": [
+        "Check for react-hook-form, formik, vee-validate, @angular/forms",
+        "If found, use library's validation and state management",
+        "If not found, implement vanilla form state management",
+        "TIP: See Form Validation Pattern for best practices (optional)"
+      ]
+    },
+    "designTokens": {
+      "description": "Use existing design tokens for consistent styling",
+      "detectionSteps": [
+        "Check for form-specific colors (error-red, success-green, focus-blue)",
+        "Look for input height, padding, border radius tokens",
+        "Check for existing focus ring styling",
+        "Use project's typography and spacing scales"
+      ]
+    }
+  },
+
+  "testingChecklist": [
+    "Login form displays with email and password fields",
+    "Registration form displays with name, email, password, confirm password",
+    "Email validation triggers on blur, shows specific error",
+    "Password validation triggers on blur, shows specific error",
+    "Password confirmation validates in real-time as user types",
+    "Password strength meter updates as user types password",
+    "Success checkmarks appear on valid fields",
+    "Error messages appear below invalid fields",
+    "Submit button enables before validation",
+    "Submit button disables with spinner during submission",
+    "Form validates all fields on submit",
+    "Focus moves to first invalid field on submit error",
+    "All errors visible and scrolled into view",
+    "Form switch (Login ↔ Register) works, resets state",
+    "Password visibility toggle works (eye icon)",
+    "Remember me checkbox works (login)",
+    "Terms checkbox required (registration)",
+    "Forgot password link navigates correctly",
+    "Tab key moves through fields in logical order",
+    "Shift+Tab moves backward correctly",
+    "Enter key submits form from any field",
+    "aria-invalid set on invalid fields",
+    "aria-describedby links errors to fields",
+    "aria-required on required fields",
+    "aria-live announces errors",
+    "aria-busy set during submission",
+    "Screen reader announces form title",
+    "Screen reader announces field labels",
+    "Screen reader announces errors when they appear",
+    "Screen reader announces password strength",
+    "Screen reader announces loading state",
+    "Focus ring visible on all interactive elements",
+    "Error messages clear, specific, actionable",
+    "Input font size 16px minimum on mobile (prevents zoom)",
+    "Form responsive on mobile and desktop",
+    "Styling matches project conventions",
+    "No inline styles (uses classes)"
+  ],
+
+  "meta": {
+    "created": "2026-01-24",
+    "updated": "2026-01-24",
+    "webUrl": "https://uipotion.com/potions/features/form-login-register.html",
+    "relatedPotions": [
+      {
+        "id": "text-input",
+        "category": "components",
+        "relationship": "uses",
+        "description": "TIP: Consider using Text Input component pattern for consistent input fields (optional)",
+        "required": false
+      },
+      {
+        "id": "form-validation",
+        "category": "patterns",
+        "relationship": "applies",
+        "description": "TIP: Apply Form Validation pattern for optimal validation timing and UX (optional)",
+        "required": false
+      }
+    ]
+  }
+}

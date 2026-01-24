@@ -1,0 +1,463 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/patterns.schema.json",
+  "id": "form-validation",
+  "version": "1.0.0",
+  "name": "Form Validation Pattern - UX and Timing Strategies",
+  "category": "patterns",
+  "tags": ["validation", "forms", "ux", "accessibility", "error-handling", "progressive-disclosure", "patterns", "user-experience"],
+  "description": "A comprehensive UX pattern for form validation covering timing strategies (when to show errors), error display patterns, async validation, accessibility, and integration with form libraries. Teaches principles that work with any framework or validation library.",
+
+  "aiAgentInstructions": {
+    "summary": "Apply form validation best practices to create user-friendly forms with appropriate error timing, clear messaging, and full accessibility. First detect the project's framework and existing form/validation libraries, then apply these principles using the detected tools. If no form library exists, suggest framework-appropriate options and implement validation following these UX patterns.",
+    "keyFeatures": [
+      "Validation timing strategies (on blur, on submit, real-time) based on field type and user interaction",
+      "Progressive error disclosure - avoid showing errors too early",
+      "Clear, actionable error messages with specific guidance",
+      "Async validation patterns (username availability, email checks)",
+      "Field dependency validation (password confirmation, conditional required fields)",
+      "Accessible error announcements using ARIA live regions",
+      "Success state feedback for valid fields",
+      "Multi-step form validation with per-step and global validation",
+      "Framework detection to suggest appropriate form and schema validation libraries",
+      "Integration patterns for popular validation tools (Zod, Yup, Joi, etc.)"
+    ],
+    "implementationSteps": [
+      "1. CRITICAL: Detect project framework (React, Vue, Angular, Svelte) by checking package.json",
+      "2. CRITICAL: Check for existing form libraries (React Hook Form, Formik, VeeValidate, Angular Forms, etc.)",
+      "3. CRITICAL: Check for existing schema validation libraries (Zod, Yup, Joi, Ajv, class-validator, etc.)",
+      "4. If NO form library exists, suggest framework-appropriate options from ecosystemTools",
+      "5. Apply validation timing principles: on blur for most fields, real-time for confirmations, on submit for final check",
+      "6. Implement error state management (per-field errors, touched fields, submission state)",
+      "7. Add ARIA attributes: aria-invalid, aria-describedby linking to error messages, aria-live for dynamic errors",
+      "8. Implement async validation with debouncing for server-side checks",
+      "9. Show field-level errors inline, consider error summary for complex forms",
+      "10. Add success indicators for validated fields (checkmarks, green borders)",
+      "11. Handle form submission state (disable while submitting, show loading, re-enable on error)",
+      "12. Test with keyboard navigation and screen readers"
+    ]
+  },
+
+  "patternSpec": {
+    "problem": "Form validation UX is difficult to get right. Show errors too early and users feel frustrated before they finish typing. Show them too late and users waste time filling invalid forms. Generic error messages confuse users. Missing accessibility features lock out screen reader users. Poor validation timing, unclear messaging, and lack of accessibility are common pain points that degrade user experience and form completion rates.",
+
+    "solution": "Apply progressive validation strategies based on user interaction patterns. Use on-blur validation for most fields to wait until the user has finished input. Employ real-time validation for dependent fields like password confirmation. Validate everything on submit attempt. Provide specific, actionable error messages. Use ARIA live regions to announce errors to screen readers. Show success states for valid fields. Detect and leverage existing form/validation libraries in the project, or suggest framework-appropriate tools if none exist. This pattern works with any form library or vanilla approach while maintaining best UX practices.",
+
+    "do": [
+      "Detect existing form libraries (React Hook Form, Formik, VeeValidate, etc.) and use them if present",
+      "Detect existing schema validation (Zod, Yup, Joi) and integrate with it",
+      "Show validation errors AFTER user leaves the field (on blur) - this waits until they're done typing",
+      "Mark required fields clearly with asterisk (*) or 'required' label BEFORE any interaction",
+      "Provide specific, actionable error messages: 'Email must include @' instead of 'Invalid email'",
+      "Use ARIA live regions (aria-live='polite') to announce errors to screen readers",
+      "Associate errors with fields using aria-describedby pointing to error element ID",
+      "Mark invalid fields with aria-invalid='true'",
+      "Show success states (checkmarks, green borders) for successfully validated fields",
+      "Allow users to attempt form submission, THEN show all validation errors if any exist",
+      "Disable submit button ONLY while actively submitting (loading state), not before validation",
+      "Keep error messages visible until the field passes validation",
+      "Use real-time validation for dependent fields (password confirmation updates as user types confirmation)",
+      "Debounce async validation (username availability) to avoid excessive server calls",
+      "Scroll to first error on submit if validation fails",
+      "Preserve user input when showing errors - don't clear the field",
+      "Use native HTML5 validation attributes (required, type='email', pattern) as progressive enhancement",
+      "Provide password strength indicators as the user types (helpful, not blocking)",
+      "For multi-step forms, validate current step before allowing next step"
+    ],
+
+    "dont": [
+      "Show errors while user is actively typing (too aggressive and frustrating)",
+      "Use generic error messages like 'Invalid' or 'Error' without explanation",
+      "Disable submit button before user attempts to submit (blocks discovery of validation errors)",
+      "Rely only on color to indicate errors - use icons, text, and borders",
+      "Hide error messages when user refocuses the field - keep them visible until fixed",
+      "Block form submission without showing which fields have errors and why",
+      "Clear the field value when showing an error - preserve user input",
+      "Show all errors immediately on page load before user interaction",
+      "Use red asterisks (*) to indicate required fields - they're commonly misunderstood as errors",
+      "Force specific input formats without showing an example (e.g., phone number format)",
+      "Use browser alert() dialogs for validation errors - use inline messages",
+      "Validate on every keystroke for text fields (except password confirmation or username availability)",
+      "Require users to scroll to find error messages - make them visible in context",
+      "Use technical error messages from validation libraries without making them user-friendly",
+      "Forget to clear errors when field becomes valid",
+      "Mix validation error styles with other UI elements like warnings or info messages"
+    ],
+
+    "examples": [
+      "Email field: Validate format on blur. If invalid, show 'Please enter a valid email address (e.g., name@example.com)' below the field with red border and X icon. When user corrects it and blurs again, show green border with checkmark.",
+      "Required field: Mark with 'Required' label or asterisk before interaction. On blur from empty field, show 'This field is required'. Don't show error while typing.",
+      "Password confirmation: Validate in real-time as user types. If passwords don't match, show 'Passwords must match' immediately as they type the confirmation.",
+      "Username availability (async): Wait 500ms after user stops typing, then check server. Show loading spinner during check. If taken, show 'This username is already taken. Try username123'. If available, show green checkmark.",
+      "Multi-step form: Validate Step 1 fields on blur. When user clicks 'Next', validate entire Step 1. If errors exist, show them and don't advance. Only proceed if Step 1 is fully valid.",
+      "Form submission: User clicks Submit. Run final validation on all fields. If any errors, show all error messages, focus first invalid field, scroll to it, disable submit button with loading spinner. On server error, re-enable button and show error message.",
+      "Credit card number: Show format hint '1234 5678 9012 3456' as placeholder. Validate format on blur. Use library like 'card-validator' for Luhn algorithm check.",
+      "Conditional validation: If 'Other' is selected in dropdown, make text field required. If user selects different option, remove required validation and error from text field.",
+      "Phone number: Accept multiple formats (123-456-7890, (123) 456-7890, 1234567890). Validate on blur. Show accepted formats in hint text.",
+      "Date of birth: Use native date picker when available. For manual entry, validate format and reasonable date range (not future, not impossibly old). Show format example: 'MM/DD/YYYY'."
+    ],
+
+    "antiPatterns": [
+      "Aggressive real-time validation: Showing 'Email is invalid' as soon as user types first character is frustrating. Wait for blur.",
+      "Hidden submit button: Disabling or hiding submit until all fields are valid prevents users from discovering what needs fixing.",
+      "Error on focus: Showing error immediately when user clicks into a field before typing is premature.",
+      "No error recovery: User fixes error but message stays visible, making them think it's still wrong.",
+      "Validation on page load: Form appears with red error messages before user has interacted.",
+      "Auto-clearing fields: User makes typo, error shows, field clears. User must re-type everything.",
+      "Cryptic errors: 'Validation failed on field_email_address' doesn't help the user.",
+      "Submit-only validation: No field-level feedback until submit creates 'form whack-a-mole' where users fix errors one by one.",
+      "Accessibility failure: Error messages not associated with fields, no ARIA attributes, no announcements to screen readers.",
+      "Inconsistent timing: Email validates on blur, but password validates on every keystroke. Use consistent patterns."
+    ],
+
+    "checklist": [
+      "Required fields are clearly marked with visible indicator (not just asterisk)",
+      "Validation triggers on blur for most fields (user has finished input)",
+      "Password confirmation field validates in real-time while typing",
+      "Async validation (if any) is debounced and shows loading state",
+      "Error messages are specific and actionable (tell user how to fix)",
+      "Success states are shown for valid fields (visual confirmation)",
+      "Submit button is enabled and clickable before validation",
+      "Submit button only disables while actually submitting",
+      "On submit failure, first error field receives focus",
+      "All errors are visible on screen (no need to scroll to find them)",
+      "Error messages use aria-live='polite' for screen reader announcements",
+      "Invalid fields have aria-invalid='true' attribute",
+      "Error messages are associated with fields via aria-describedby",
+      "Errors persist until field passes validation (don't hide on refocus)",
+      "Color is not the only indicator (use icons, text, borders)",
+      "Form is fully navigable by keyboard (tab order is logical)",
+      "Required validation works (empty required fields show errors)",
+      "Format validation works (email, phone, URL formats validated)",
+      "Range validation works (min/max length, numeric ranges)",
+      "Custom business rules work (age requirement, date ranges)",
+      "Multi-step forms validate per step before proceeding",
+      "Server-side validation errors are displayed in the same style as client-side",
+      "Form can be submitted with Enter key when appropriate",
+      "Validation works in all target browsers",
+      "Screen readers announce errors and validation state changes"
+    ],
+
+    "accessibility": {
+      "wcagCompliance": {
+        "level": "AA",
+        "requirements": {
+          "1.3.1": "Info and Relationships - Form labels and error messages are programmatically associated with fields",
+          "1.3.5": "Identify Input Purpose - Input types and autocomplete attributes used appropriately",
+          "2.1.1": "Keyboard - All form fields and submit are operable via keyboard",
+          "2.4.3": "Focus Order - Tab order follows logical form field sequence",
+          "2.4.7": "Focus Visible - Focus indicators visible on all interactive elements",
+          "3.2.2": "On Input - Changing field values does not cause unexpected context changes",
+          "3.3.1": "Error Identification - Validation errors are identified in text",
+          "3.3.2": "Labels or Instructions - Labels and required indicators provided",
+          "3.3.3": "Error Suggestion - Actionable guidance provided for fixing errors",
+          "3.3.4": "Error Prevention - User can review and correct before final submission",
+          "4.1.2": "Name, Role, Value - Form controls have accessible names and states",
+          "4.1.3": "Status Messages - Validation errors announced via aria-live"
+        }
+      },
+      "keyboardNavigation": {
+        "description": "Form must be fully accessible via keyboard with logical tab order.",
+        "requirements": [
+          "Tab key moves through all form fields in logical order",
+          "Shift+Tab moves backward through fields",
+          "Error messages should not break tab order",
+          "First invalid field receives focus after submit failure",
+          "Submit can be triggered with Enter key when appropriate"
+        ]
+      },
+      "screenReaderSupport": {
+        "description": "Screen readers must announce validation state and errors clearly.",
+        "requirements": [
+          "Use aria-invalid='true' on fields with errors",
+          "Use aria-invalid='false' on valid fields (or omit attribute)",
+          "Associate error messages with fields using aria-describedby='error-id'",
+          "Required fields use aria-required='true' or required attribute",
+          "Use aria-live='polite' on error message containers for dynamic announcements",
+          "Use role='alert' for critical form-level errors",
+          "Field labels are properly associated with inputs via for/id or aria-labelledby",
+          "Hint text is associated with fields via aria-describedby",
+          "Success states should be announced (aria-live region or status role)"
+        ]
+      },
+      "ariaAttributes": {
+        "required": {
+          "aria-invalid": "Mark fields as invalid when they fail validation",
+          "aria-describedby": "Link fields to their error messages and hint text",
+          "aria-required": "Mark required fields"
+        },
+        "optional": {
+          "aria-live": "Error containers should use aria-live='polite' for announcements",
+          "role-alert": "Use for urgent error messages that need immediate attention",
+          "role-status": "Use for success messages and non-urgent updates"
+        }
+      },
+      "focusManagement": {
+        "description": "Proper focus handling enhances keyboard and screen reader UX.",
+        "requirements": [
+          "On submit failure, move focus to first invalid field",
+          "Focus ring must be visible on all interactive elements",
+          "Don't remove focus from field when showing error",
+          "For multi-step forms, focus should move to first field of next step"
+        ]
+      }
+    }
+  },
+
+  "ecosystemTools": {
+    "description": "Detect existing form and validation libraries in the project. If none exist, suggest framework-appropriate options.",
+    "react": {
+      "formLibraries": {
+        "recommended": [
+          {
+            "name": "React Hook Form",
+            "package": "react-hook-form",
+            "why": "Performant, minimal re-renders, great DX, TypeScript support, works well with Zod/Yup",
+            "detectionPattern": "react-hook-form in package.json dependencies"
+          },
+          {
+            "name": "Formik",
+            "package": "formik",
+            "why": "Popular, mature, extensive ecosystem, good documentation",
+            "detectionPattern": "formik in package.json dependencies"
+          },
+          {
+            "name": "TanStack Form",
+            "package": "@tanstack/react-form",
+            "why": "Framework-agnostic core, excellent TypeScript support, powerful validation adapters",
+            "detectionPattern": "@tanstack/react-form in package.json dependencies"
+          }
+        ],
+        "vanilla": {
+          "approach": "Use React's built-in useState for form state, implement validation manually with validation functions",
+          "when": "Simple forms, learning purposes, minimal dependencies"
+        }
+      },
+      "schemaValidation": {
+        "recommended": [
+          {
+            "name": "Zod",
+            "package": "zod",
+            "why": "TypeScript-first, runtime type safety, great DX, works with React Hook Form",
+            "detectionPattern": "zod in package.json dependencies"
+          },
+          {
+            "name": "Yup",
+            "package": "yup",
+            "why": "Mature, extensive, works with Formik out of the box",
+            "detectionPattern": "yup in package.json dependencies"
+          }
+        ]
+      }
+    },
+    "vue": {
+      "formLibraries": {
+        "recommended": [
+          {
+            "name": "VeeValidate",
+            "package": "vee-validate",
+            "why": "Vue-native, composition API support, Zod/Yup integration, i18n support",
+            "detectionPattern": "vee-validate in package.json dependencies"
+          },
+          {
+            "name": "Vuelidate",
+            "package": "@vuelidate/core",
+            "why": "Lightweight, functional validators, composition API support",
+            "detectionPattern": "@vuelidate/core in package.json dependencies"
+          }
+        ],
+        "vanilla": {
+          "approach": "Use Vue's reactive ref/reactive for form state, computed for validation, watchers for real-time validation",
+          "when": "Simple forms, custom validation logic"
+        }
+      },
+      "schemaValidation": {
+        "recommended": [
+          {
+            "name": "Zod",
+            "package": "zod",
+            "why": "TypeScript-first, works with VeeValidate",
+            "detectionPattern": "zod in package.json dependencies"
+          },
+          {
+            "name": "Yup",
+            "package": "yup",
+            "why": "Works with VeeValidate, mature ecosystem",
+            "detectionPattern": "yup in package.json dependencies"
+          }
+        ]
+      }
+    },
+    "angular": {
+      "formLibraries": {
+        "builtin": {
+          "name": "Angular Reactive Forms",
+          "module": "@angular/forms",
+          "why": "Built-in, reactive, powerful validation system, TypeScript support",
+          "detectionPattern": "@angular/forms imported in components"
+        },
+        "recommended": [
+          {
+            "name": "ngx-sub-form",
+            "package": "ngx-sub-form",
+            "why": "Better TypeScript support for nested forms",
+            "detectionPattern": "ngx-sub-form in package.json dependencies"
+          }
+        ]
+      },
+      "schemaValidation": {
+        "recommended": [
+          {
+            "name": "class-validator",
+            "package": "class-validator",
+            "why": "Decorator-based, works well with Angular's TypeScript classes",
+            "detectionPattern": "class-validator in package.json dependencies"
+          }
+        ]
+      }
+    },
+    "svelte": {
+      "formLibraries": {
+        "recommended": [
+          {
+            "name": "svelte-forms-lib",
+            "package": "svelte-forms-lib",
+            "why": "Svelte-native, small bundle, Yup integration",
+            "detectionPattern": "svelte-forms-lib in package.json dependencies"
+          },
+          {
+            "name": "Felte",
+            "package": "felte",
+            "why": "Extensible, multi-framework (including Svelte), Zod/Yup integration",
+            "detectionPattern": "felte in package.json dependencies"
+          }
+        ],
+        "vanilla": {
+          "approach": "Use Svelte's built-in reactivity with stores, implement validation in stores or components",
+          "when": "Simple forms, custom validation"
+        }
+      },
+      "schemaValidation": {
+        "recommended": [
+          {
+            "name": "Zod",
+            "package": "zod",
+            "why": "Works with Felte, TypeScript-first",
+            "detectionPattern": "zod in package.json dependencies"
+          },
+          {
+            "name": "Yup",
+            "package": "yup",
+            "why": "Works with svelte-forms-lib",
+            "detectionPattern": "yup in package.json dependencies"
+          }
+        ]
+      }
+    },
+    "detectionStrategy": {
+      "steps": [
+        "1. Check package.json dependencies and devDependencies for form libraries",
+        "2. Check package.json for schema validation libraries (Zod, Yup, Joi, Ajv, class-validator)",
+        "3. If form library found, use it and apply these validation patterns within that library's API",
+        "4. If schema validation found, use it for defining validation rules",
+        "5. If no libraries found, suggest framework-appropriate option from recommended list",
+        "6. When suggesting, explain WHY that library fits the project (e.g., 'React Hook Form works well with your existing Zod schema validation')"
+      ]
+    }
+  },
+
+  "integrationPatterns": {
+    "reactHookForm": {
+      "description": "Apply validation timing patterns with React Hook Form",
+      "validationTiming": "Use mode: 'onBlur' for initial validation, mode: 'onChange' after first error for real-time feedback",
+      "schemaIntegration": "Use resolver from @hookform/resolvers/zod or @hookform/resolvers/yup",
+      "asyncValidation": "Use validate function in register() with async logic and AbortController for debouncing"
+    },
+    "formik": {
+      "description": "Apply validation timing patterns with Formik",
+      "validationTiming": "Set validateOnBlur={true} and validateOnChange={false} initially, then enable validateOnChange after first submit",
+      "schemaIntegration": "Use validationSchema prop with Yup schema",
+      "asyncValidation": "Use validate prop with async function, implement debouncing with setTimeout"
+    },
+    "veeValidate": {
+      "description": "Apply validation timing patterns with VeeValidate",
+      "validationTiming": "Use @blur event for validation, set mode to 'lazy' for on-blur validation",
+      "schemaIntegration": "Use toTypedSchema() with Zod or Yup schemas",
+      "asyncValidation": "Create custom validators with async logic and debouncing"
+    },
+    "angularForms": {
+      "description": "Apply validation timing patterns with Angular Reactive Forms",
+      "validationTiming": "Use updateOn: 'blur' in FormControl options for on-blur validation",
+      "schemaIntegration": "Create Validators from class-validator decorators or custom validator functions",
+      "asyncValidation": "Use AsyncValidator interface with debounceTime RxJS operator"
+    },
+    "vanillaApproach": {
+      "description": "Apply validation timing patterns without form libraries",
+      "validationTiming": "Listen to blur events on form fields, set touched state, run validation function, store errors in state",
+      "schemaIntegration": "Use Zod/Yup's parse/validate methods directly with try/catch",
+      "asyncValidation": "Use debounce function (lodash.debounce or custom) with fetch/axios for server validation"
+    }
+  },
+
+  "testingChecklist": [
+    "Framework detection works correctly (checks package.json)",
+    "Existing form library detection works (React Hook Form, Formik, VeeValidate, etc.)",
+    "Existing schema validation detection works (Zod, Yup, Joi, etc.)",
+    "Required field validation: Empty required field shows error on blur",
+    "Required field validation: Error clears when field becomes valid",
+    "Email validation: Invalid format shows specific error message",
+    "Email validation: Valid email shows success state (checkmark)",
+    "Password confirmation: Real-time validation while typing confirmation",
+    "Password confirmation: Error appears immediately if mismatch, clears when match",
+    "Async validation: Username availability check triggers after typing stops",
+    "Async validation: Loading indicator shows during server check",
+    "Async validation: Error shows if username taken, success if available",
+    "Submit button: Enabled and clickable before validation",
+    "Submit button: Disables with loading state only while submitting",
+    "Submit validation: Clicking submit validates all fields",
+    "Submit validation: Focus moves to first invalid field",
+    "Submit validation: All error messages are visible",
+    "Error visibility: Errors persist until field passes validation",
+    "Error visibility: Errors don't disappear on refocus",
+    "Success states: Valid fields show visual confirmation",
+    "Keyboard navigation: Tab moves through all fields logically",
+    "Keyboard navigation: Shift+Tab moves backward correctly",
+    "Keyboard navigation: Enter key submits form when appropriate",
+    "ARIA attributes: aria-invalid='true' on invalid fields",
+    "ARIA attributes: aria-describedby links fields to error messages",
+    "ARIA attributes: aria-required='true' on required fields",
+    "Screen reader: Error messages are announced via aria-live",
+    "Screen reader: Field labels are properly associated",
+    "Screen reader: Validation state changes are announced",
+    "Multi-step validation: Current step validates before proceeding",
+    "Multi-step validation: Errors prevent advancing to next step",
+    "Conditional validation: Required field becomes optional when condition changes",
+    "Error messages: Clear, specific, actionable (not generic)",
+    "Error recovery: Fixing error removes error message and styling",
+    "Visual indicators: Not relying only on color (icons, text, borders)",
+    "No errors on page load before user interaction",
+    "No aggressive real-time validation while typing (except confirmation fields)",
+    "User input preserved when showing errors (fields don't clear)"
+  ],
+
+  "meta": {
+    "created": "2026-01-24",
+    "updated": "2026-01-24",
+    "webUrl": "https://uipotion.com/potions/patterns/form-validation.html",
+    "relatedPotions": [
+      {
+        "id": "text-input",
+        "category": "components",
+        "relationship": "applies-to",
+        "description": "Optional: Text Input component provides foundation for form inputs with built-in error/success states",
+        "required": false
+      },
+      {
+        "id": "form-login-register",
+        "category": "features",
+        "relationship": "demonstrated-in",
+        "description": "Optional: Login & Registration Forms demonstrate this pattern in complete form implementation",
+        "required": false
+      }
+    ]
+  }
+}

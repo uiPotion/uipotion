@@ -294,6 +294,15 @@
     "componentSpec": { "type": "object", "additionalProperties": true },
     "featureSpec": { "type": "object", "additionalProperties": true },
     "patternSpec": { "type": "object", "additionalProperties": true },
-    "toolingSpec": { "type": "object", "additionalProperties": true }
+    "toolingSpec": { "type": "object", "additionalProperties": true },
+    "installation": { "type": "object", "additionalProperties": true },
+    "versionDetection": { "type": "object", "additionalProperties": true },
+    "templates": { "type": "object", "additionalProperties": true },
+    "scripts": { "type": "object", "additionalProperties": true },
+    "editorIntegration": { "type": "object", "additionalProperties": true },
+    "cicdIntegration": { "type": "object", "additionalProperties": true },
+    "troubleshooting": { "type": "object", "additionalProperties": true },
+    "ecosystemTools": { "type": "object", "additionalProperties": true },
+    "integrationPatterns": { "type": "object", "additionalProperties": true }
   }
 }

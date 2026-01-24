@@ -1,0 +1,659 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
+  "id": "text-input",
+  "version": "1.0.0",
+  "name": "Text Input Field (Accessible) with Label, Error, and Success States",
+  "category": "components",
+  "tags": ["input", "form", "text-field", "validation", "a11y", "wcag", "aria", "form-control"],
+  "description": "An accessible text input component with label, hint text, error display, success indicator, and comprehensive state management. Foundation for all form inputs with full keyboard and screen reader support.",
+
+  "tokens": {
+    "layout": {
+      "inputHeightPx": 44,
+      "inputPaddingXPx": 14,
+      "inputPaddingYPx": 11,
+      "borderWidthPx": 1,
+      "borderRadiusPx": 6,
+      "labelMarginBottomPx": 6,
+      "hintMarginTopPx": 6,
+      "errorMarginTopPx": 6,
+      "iconSizePx": 20,
+      "iconPaddingPx": 12
+    },
+    "typography": {
+      "labelFontSizePx": 14,
+      "labelFontWeight": 500,
+      "inputFontSizePx": 16,
+      "hintFontSizePx": 14,
+      "errorFontSizePx": 14
+    },
+    "motion": {
+      "focusTransitionMs": 150,
+      "errorShakeDurationMs": 300,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+    }
+  },
+
+  "aiAgentInstructions": {
+    "summary": "Implement a fully accessible text input component with label, optional hint text, error messages, success indicators, and all validation states. Adapt to the user's framework and styling system. Ensure WCAG AA compliance with proper ARIA attributes, keyboard navigation, and focus management.",
+    "keyFeatures": [
+      "Label with required indicator and optional tooltip",
+      "Input field with placeholder support",
+      "Optional hint text for additional guidance",
+      "Error message display with icon and ARIA announcements",
+      "Success indicator for validated fields",
+      "Disabled and readonly states",
+      "Leading and trailing icons/buttons (password toggle, clear button)",
+      "Keyboard accessible with proper focus states",
+      "Screen reader support with ARIA attributes",
+      "Multiple size variants (small, medium, large)",
+      "Full width or fixed width options",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system.",
+      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes.",
+      "CRITICAL: Error messages must be associated with input via aria-describedby and announced via aria-live regions."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine package.json, existing components, config files, and style patterns.",
+      "0a. Detect framework patterns: Check for React hooks, Vue composition API, Angular decorators, or Svelte syntax.",
+      "0b. Detect styling conventions: Identify Tailwind, SCSS, CSS Modules, styled-components, or vanilla CSS usage.",
+      "0c. Detect design tokens: Check for existing color systems, spacing scales, typography, and form patterns.",
+      "1. Build component anatomy: Container, Label, Input, HintText, ErrorMessage, SuccessIcon",
+      "2. Implement controlled/uncontrolled input patterns appropriate for detected framework",
+      "3. Add required indicator (*) to label when field is required",
+      "4. Wire aria-labelledby from input to label ID",
+      "5. Wire aria-describedby from input to hint text and/or error message IDs",
+      "6. Implement error state: set aria-invalid='true', show error message, apply error styling",
+      "7. Implement success state: set aria-invalid='false', show checkmark icon, apply success styling",
+      "8. Add disabled state: disable input, gray out label, apply disabled styling",
+      "9. Add readonly state: make input readonly, apply readonly styling",
+      "10. Implement focus state with visible focus ring and transition",
+      "11. Add optional leading/trailing icons or buttons (search icon, password toggle, clear button)",
+      "12. Implement size variants (small, medium, large) with appropriate heights and padding",
+      "13. Add optional character counter (current/max)",
+      "14. Ensure keyboard navigation works (Tab, Shift+Tab, Escape for clear)",
+      "15. Use ONLY the detected styling system. Do NOT add new CSS approaches.",
+      "16. Test with keyboard and screen readers"
+    ]
+  },
+
+  "componentSpec": {
+    "goal": "Provide a fully accessible, reusable text input field that handles all common form input states (default, focus, error, success, disabled, readonly) with proper labeling, error display, and screen reader support.",
+
+    "anatomy": {
+      "slots": [
+        "container",
+        "label",
+        "requiredIndicator",
+        "labelTooltip",
+        "inputWrapper",
+        "leadingIcon",
+        "input",
+        "trailingIcon",
+        "hintText",
+        "errorMessage",
+        "successIcon",
+        "characterCounter"
+      ],
+      "hierarchy": "Container( Label(Text, RequiredIndicator?, Tooltip?), InputWrapper(LeadingIcon?, Input, TrailingIcon?), HintText?, ErrorMessage?, CharacterCounter? )"
+    },
+
+    "stateModel": {
+      "value": {
+        "type": "string",
+        "description": "Current input value. Can be controlled (passed via props) or uncontrolled (internal state).",
+        "default": "",
+        "persistence": "component state or parent state"
+      },
+      "focused": {
+        "type": "boolean",
+        "description": "Whether input currently has focus.",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "touched": {
+        "type": "boolean",
+        "description": "Whether user has interacted with field (typically set on blur). Used for validation timing.",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "error": {
+        "type": "string",
+        "description": "Error message to display. Empty string or null means no error.",
+        "default": "",
+        "persistence": "props/parent state",
+        "notes": "Can be null or empty string to indicate no error. Only show error when value is truthy."
+      },
+      "success": {
+        "type": "boolean",
+        "description": "Whether field is in success state (validated and valid). Shows checkmark indicator.",
+        "default": false,
+        "persistence": "props/parent state"
+      },
+      "disabled": {
+        "type": "boolean",
+        "description": "Whether input is disabled (not interactive).",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "readonly": {
+        "type": "boolean",
+        "description": "Whether input is readonly (visible but not editable).",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "required": {
+        "type": "boolean",
+        "description": "Whether field is required. Shows asterisk (*) indicator in label.",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "size": {
+        "type": "enum",
+        "description": "Size variant affecting height, padding, and font size.",
+        "allowedValues": ["small", "medium", "large"],
+        "default": "medium",
+        "persistence": "props/config"
+      }
+    },
+
+    "interactions": [
+      {
+        "event": "focus",
+        "result": "setFocusedTrue",
+        "sideEffects": [
+          "Apply focus styling (border color, ring)",
+          "Transition border and ring with animation"
+        ]
+      },
+      {
+        "event": "blur",
+        "result": "setFocusedFalse_setTouchedTrue",
+        "sideEffects": [
+          "Remove focus styling",
+          "Set touched=true (enables validation feedback)",
+          "Trigger validation if onBlur validation is configured"
+        ]
+      },
+      {
+        "event": "input",
+        "result": "updateValue",
+        "sideEffects": [
+          "Update value state (controlled or uncontrolled)",
+          "Call onChange callback if provided",
+          "Clear error if field becomes valid (optional real-time validation)"
+        ]
+      },
+      {
+        "event": "clearButtonClick",
+        "when": "trailingIcon is clear button and value is not empty",
+        "result": "clearValue",
+        "sideEffects": [
+          "Set value to empty string",
+          "Call onChange with empty value",
+          "Move focus back to input",
+          "Clear error if present"
+        ]
+      },
+      {
+        "event": "passwordToggleClick",
+        "when": "type is password and trailing icon is toggle button",
+        "result": "togglePasswordVisibility",
+        "sideEffects": [
+          "Toggle input type between 'password' and 'text'",
+          "Update toggle icon (eye → eye-off)",
+          "Maintain focus on input",
+          "Update aria-label on toggle button"
+        ]
+      },
+      {
+        "event": "escapeKey",
+        "when": "focused and value is not empty",
+        "result": "clearValue",
+        "sideEffects": ["Clear value", "Keep focus on input"],
+        "preventDefault": false
+      },
+      {
+        "event": "labelClick",
+        "result": "focusInput",
+        "sideEffects": ["Move focus to input element"]
+      }
+    ],
+
+    "responsiveBehavior": {
+      "mobile": {
+        "maxWidthPx": 767,
+        "behavior": "Full width by default, font size minimum 16px to prevent zoom on iOS",
+        "touchTargets": "Input height minimum 44px, trailing icons minimum 44px",
+        "inputFontSize": "16px minimum (prevents iOS zoom)"
+      },
+      "desktop": {
+        "minWidthPx": 1024,
+        "behavior": "Fixed or constrained width based on context, default 100% of parent",
+        "hover": "Show border color change on hover (if not disabled)"
+      }
+    },
+
+    "variants": {
+      "small": {
+        "height": "36px",
+        "paddingX": "12px",
+        "paddingY": "8px",
+        "fontSize": "14px",
+        "labelFontSize": "13px"
+      },
+      "medium": {
+        "height": "44px",
+        "paddingX": "14px",
+        "paddingY": "11px",
+        "fontSize": "16px",
+        "labelFontSize": "14px"
+      },
+      "large": {
+        "height": "52px",
+        "paddingX": "16px",
+        "paddingY": "14px",
+        "fontSize": "18px",
+        "labelFontSize": "16px"
+      }
+    },
+
+    "dataContract": {
+      "props": {
+        "label": { "type": "string", "required": true },
+        "name": { "type": "string", "required": true },
+        "id": { "type": "string", "required": false, "default": "generated from name" },
+        "value": { "type": "string", "required": false, "controlled": true },
+        "defaultValue": { "type": "string", "required": false, "uncontrolled": true },
+        "placeholder": { "type": "string", "required": false },
+        "type": { "type": "string", "required": false, "default": "text", "options": ["text", "email", "password", "tel", "url", "search", "number"] },
+        "error": { "type": "string | null", "required": false },
+        "success": { "type": "boolean", "required": false },
+        "hint": { "type": "string", "required": false },
+        "required": { "type": "boolean", "required": false },
+        "disabled": { "type": "boolean", "required": false },
+        "readonly": { "type": "boolean", "required": false },
+        "size": { "type": "'small' | 'medium' | 'large'", "required": false },
+        "leadingIcon": { "type": "ReactNode | string", "required": false },
+        "trailingIcon": { "type": "ReactNode | string", "required": false },
+        "maxLength": { "type": "number", "required": false },
+        "showCharacterCount": { "type": "boolean", "required": false },
+        "fullWidth": { "type": "boolean", "required": false, "default": true },
+        "onChange": { "type": "(value: string) => void", "required": false },
+        "onBlur": { "type": "() => void", "required": false },
+        "onFocus": { "type": "() => void", "required": false },
+        "className": { "type": "string", "required": false },
+        "inputClassName": { "type": "string", "required": false },
+        "autoComplete": { "type": "string", "required": false },
+        "autoFocus": { "type": "boolean", "required": false }
+      },
+      "events": {
+        "onChange": "Fired when input value changes",
+        "onBlur": "Fired when input loses focus",
+        "onFocus": "Fired when input receives focus"
+      }
+    }
+  },
+
+  "animations": {
+    "focus": {
+      "durationMs": 150,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": {
+        "border": "Transition from default color to focus color",
+        "ring": "Fade in focus ring (box-shadow) at 0 opacity → 1 opacity",
+        "label": "Optional: transition label color to primary color"
+      }
+    },
+    "errorShake": {
+      "durationMs": 300,
+      "easing": "ease-in-out",
+      "transform": "Subtle horizontal shake (translateX: 0 → -4px → 4px → 0) when error appears",
+      "usage": "Optional animation when error message first appears"
+    },
+    "errorFade": {
+      "durationMs": 200,
+      "opacity": "Error message fades in when appearing",
+      "implementation": "Use CSS transition on opacity or framework transition component"
+    },
+    "successFade": {
+      "durationMs": 200,
+      "opacity": "Success checkmark fades in when appearing",
+      "implementation": "Use CSS transition on opacity"
+    },
+    "reducedMotion": {
+      "behavior": "Disable shake animation, use instant state changes",
+      "implementation": "@media (prefers-reduced-motion: reduce) { /* disable transforms, use instant transitions */ }"
+    }
+  },
+
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Label is programmatically associated with input via for/id or aria-labelledby",
+        "1.3.5": "Input purpose identified via autocomplete attribute and input type",
+        "1.4.3": "Text and border colors maintain 4.5:1 contrast ratio with background",
+        "2.1.1": "Input is fully keyboard operable (Tab, Shift+Tab)",
+        "2.4.3": "Focus order is logical (label → input → trailing icon/button)",
+        "2.4.7": "Visible focus indicator on input and interactive icons",
+        "3.2.2": "Focus on input does not cause unexpected context change",
+        "3.3.1": "Error messages clearly identify the error",
+        "3.3.2": "Labels and required indicators provided",
+        "3.3.3": "Error messages provide guidance on how to fix",
+        "4.1.2": "Input has accessible name (label), role (implicit), and state (aria-invalid, aria-required)",
+        "4.1.3": "Error messages announced to screen readers via aria-live"
+      }
+    },
+    "keyboardNavigation": {
+      "Tab": "Moves focus to input from previous focusable element",
+      "Shift+Tab": "Moves focus away from input to previous element",
+      "Escape": "Clears input value (optional behavior)",
+      "Enter": "Submits form if input is in a form (native behavior)",
+      "initialFocus": "Can be auto-focused via autoFocus prop (use sparingly)",
+      "trailingButton": "If trailing icon is a button (clear, password toggle), Tab moves focus to it after input"
+    },
+    "ariaAttributes": {
+      "required": {
+        "input": {
+          "id": "Unique ID for input element",
+          "name": "Name attribute for form submission",
+          "type": "Input type (text, email, password, etc.)",
+          "aria-labelledby": "Points to label element ID (alternative: use label's for attribute)",
+          "aria-describedby": "Points to hint text and/or error message element IDs (space-separated)",
+          "aria-invalid": "true when error exists, false or omitted when valid",
+          "aria-required": "true when field is required"
+        },
+        "label": {
+          "for": "Points to input element ID (native association)",
+          "id": "ID for aria-labelledby reference"
+        },
+        "errorMessage": {
+          "id": "Unique ID for aria-describedby reference",
+          "role": "alert",
+          "aria-live": "polite or assertive (use polite for form errors)"
+        },
+        "hintText": {
+          "id": "Unique ID for aria-describedby reference"
+        }
+      },
+      "optional": {
+        "trailingButton": {
+          "aria-label": "Descriptive label (e.g., 'Clear input', 'Toggle password visibility')",
+          "type": "button"
+        },
+        "requiredIndicator": {
+          "aria-hidden": "true (asterisk is visual only, required conveyed via aria-required)"
+        }
+      }
+    },
+    "screenReader": {
+      "label": "Label text is announced first when input receives focus",
+      "required": "Required state announced via aria-required='true'",
+      "hint": "Hint text announced after label via aria-describedby",
+      "error": "Error message announced after label and hint via aria-describedby",
+      "errorAnnouncement": "New errors announced via aria-live region (polite for form errors)",
+      "placeholder": "Placeholder is NOT a substitute for label (use label + optional hint instead)",
+      "characterCount": "Announce character count updates via aria-live='polite' (optional, can be verbose)"
+    },
+    "focusManagement": {
+      "focusRing": "Visible focus ring (outline or box-shadow) with sufficient contrast (3:1 minimum)",
+      "focusColor": "Focus border color distinct from default state",
+      "neverRemoveFocus": "Never use outline: none without providing alternative focus indicator",
+      "clearButton": "When clear button clicked, return focus to input",
+      "passwordToggle": "When password toggle clicked, maintain focus on input (don't lose user's place)"
+    },
+    "implementationChecklist": [
+      "Label is associated with input via for/id or aria-labelledby",
+      "Required indicator (*) shown when required=true",
+      "aria-required='true' on input when required",
+      "aria-invalid='true' on input when error exists",
+      "aria-invalid='false' or omitted when no error",
+      "aria-describedby references hint text ID when hint provided",
+      "aria-describedby references error message ID when error exists",
+      "Error message has role='alert' or aria-live='polite'",
+      "Error message ID is unique",
+      "Focus ring visible and meets contrast requirements",
+      "Tab key moves to input, Shift+Tab moves away",
+      "Input font size is 16px minimum on mobile (prevents iOS zoom)",
+      "Trailing icon/button is keyboard accessible if interactive",
+      "Trailing icon/button has descriptive aria-label",
+      "Placeholder does NOT replace label",
+      "Screen reader announces label, required state, hint, and error in order"
+    ]
+  },
+
+  "projectDetection": {
+    "framework": {
+      "description": "Detect the project's framework to use appropriate patterns for controlled/uncontrolled inputs, state management, and event handling.",
+      "detectionSteps": [
+        "Check package.json for framework dependencies (react, vue, @angular/core, svelte)",
+        "Examine existing form components to see how they handle value, onChange, onBlur",
+        "Check for existing input components as reference",
+        "Identify state management patterns (hooks, composition API, services, stores)"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect styling approach to match existing form components and ensure consistency.",
+      "detectionSteps": [
+        "Check package.json for styling dependencies",
+        "Look for existing form components and their styling approach",
+        "Identify class naming conventions for form states (error, success, disabled)",
+        "Check for utility functions (cn, clsx) for conditional class composition",
+        "Look for form-specific design tokens or CSS variables"
+      ],
+      "adaptationRules": [
+        "If Tailwind: Use ring utilities for focus, border-red-500 for error, border-green-500 for success",
+        "If SCSS/CSS: Create .input class with state modifiers (.input--error, .input--success, .input--disabled)",
+        "If styled-components: Use props for state styling, theme for colors",
+        "If CSS Modules: Create input.module.css with state classes"
+      ]
+    },
+    "designTokens": {
+      "description": "Use existing form design tokens for colors, spacing, typography, and states.",
+      "detectionSteps": [
+        "Check for form-specific color tokens (error-red, success-green, focus-blue)",
+        "Look for spacing tokens for input padding and margins",
+        "Check for typography tokens for label and input font sizes",
+        "Look for border radius and border width tokens",
+        "Check for existing focus ring styling (box-shadow or outline)",
+        "Identify disabled state colors (usually gray palette)"
+      ]
+    }
+  },
+
+  "outputConstraints": {
+    "must": [
+      "Detect and use ONLY the project's existing framework and styling system",
+      "Use project's design tokens for colors, spacing, and typography",
+      "Create stylesheet classes for vanilla CSS/SCSS (no inline styles)",
+      "Implement proper ARIA attributes (aria-labelledby, aria-describedby, aria-invalid, aria-required)",
+      "Show required indicator (*) in label when required=true",
+      "Associate error messages with input via aria-describedby",
+      "Provide visible focus ring meeting contrast requirements",
+      "Support both controlled and uncontrolled usage patterns (framework-appropriate)",
+      "Set input font size to 16px minimum on mobile to prevent iOS zoom",
+      "Make trailing icons/buttons keyboard accessible with aria-label",
+      "Use for/id association or aria-labelledby for label-input connection"
+    ],
+    "mustNot": [
+      "Introduce new styling systems or dependencies",
+      "Use inline style attributes (use classes instead)",
+      "Use placeholder as a substitute for label",
+      "Forget aria-describedby when hint or error present",
+      "Remove focus ring without providing alternative focus indicator",
+      "Hardcode colors (use design tokens or match existing components)",
+      "Make required indicator interactive or focusable",
+      "Use small font sizes on mobile (<16px for input text)",
+      "Forget role='alert' or aria-live on error messages",
+      "Make trailing icons keyboard-inaccessible when they're interactive"
+    ]
+  },
+
+  "testingChecklist": [
+    "Label displays correctly and is associated with input",
+    "Required indicator (*) appears when required=true",
+    "Hint text displays below input when provided",
+    "Error message displays when error prop is provided",
+    "Error styling applied (red border, red text)",
+    "Success styling applied when success=true (green border, checkmark)",
+    "Disabled state prevents interaction and applies gray styling",
+    "Readonly state prevents editing but allows selection",
+    "Focus ring appears when input focused",
+    "Focus ring has sufficient contrast (3:1 minimum)",
+    "Tab key moves focus to input",
+    "Shift+Tab moves focus away from input",
+    "Trailing icon/button is keyboard accessible",
+    "Clear button clears value and refocuses input",
+    "Password toggle changes input type between password and text",
+    "Escape key clears value (if implemented)",
+    "Placeholder displays when value is empty",
+    "Character counter updates as user types (if enabled)",
+    "onChange callback fires on input change",
+    "onBlur callback fires when input loses focus",
+    "onFocus callback fires when input receives focus",
+    "aria-invalid='true' when error exists",
+    "aria-invalid='false' when no error",
+    "aria-required='true' when required",
+    "aria-describedby references hint text ID when hint provided",
+    "aria-describedby references error message ID when error provided",
+    "aria-describedby includes both hint and error IDs when both present",
+    "Error message has role='alert' or aria-live='polite'",
+    "Screen reader announces label when input focused",
+    "Screen reader announces required state when input focused",
+    "Screen reader announces hint text when input focused",
+    "Screen reader announces error message when input focused",
+    "Screen reader announces new errors via aria-live",
+    "Input font size is 16px minimum on mobile",
+    "Touch target for trailing button is 44px minimum on mobile",
+    "Small, medium, large size variants work correctly",
+    "Full width and fixed width options work",
+    "Styling matches project conventions (Tailwind, SCSS, etc.)",
+    "All colors use project design tokens (no hardcoded values)"
+  ],
+
+  "frameworkPatterns": {
+    "react": {
+      "controlled": "const [value, setValue] = useState(''); <TextInput value={value} onChange={setValue} />",
+      "uncontrolled": "<TextInput defaultValue='initial' name='username' />",
+      "stateManagement": "Use useState for value, touched, focused. Pass error from parent (e.g., from form validation state).",
+      "customHook": "Optional: Create useTextInput hook for focus, touched, and local state management",
+      "example": "<TextInput label='Email' name='email' type='email' required error={errors.email} success={isValid.email} hint='We will never share your email' />"
+    },
+    "vue": {
+      "vModel": "<TextInput v-model='email' label='Email' name='email' type='email' :required='true' :error='errors.email' />",
+      "stateManagement": "Use ref for value, error from parent (reactive or ref)",
+      "composable": "Optional: Create useTextInput composable for common input logic",
+      "example": "<TextInput v-model='form.email' label='Email' :error='validationErrors.email' :success='validatedFields.includes('email')' />"
+    },
+    "angular": {
+      "formControl": "<app-text-input [label]='Email' [formControl]='emailControl' [error]='emailControl.errors?.email' [required]='true'></app-text-input>",
+      "stateManagement": "Use FormControl from Reactive Forms, error from FormControl.errors",
+      "example": "emailControl = new FormControl('', [Validators.required, Validators.email]);"
+    },
+    "svelte": {
+      "binding": "<TextInput bind:value={email} label='Email' name='email' type='email' required error={errors.email} />",
+      "stateManagement": "Use let for value, reactive statements for computed properties",
+      "example": "<TextInput bind:value={form.email} label='Email' {required} error={$errors.email} success={$valid.email} />"
+    }
+  },
+
+  "stylingApproaches": {
+    "tailwindCSS": {
+      "container": "space-y-2",
+      "label": "block text-sm font-medium text-gray-700 dark:text-gray-300",
+      "required": "text-red-500 ml-0.5",
+      "inputWrapper": "relative",
+      "input": "block w-full px-3.5 py-2.5 text-base border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed",
+      "inputError": "border-red-500 focus:ring-red-500 focus:border-red-500",
+      "inputSuccess": "border-green-500 focus:ring-green-500 focus:border-green-500",
+      "hint": "text-sm text-gray-500",
+      "error": "text-sm text-red-600 flex items-center gap-1",
+      "successIcon": "absolute right-3 top-1/2 -translate-y-1/2 text-green-500 w-5 h-5"
+    },
+    "cssModules": "Create input.module.css with .container, .label, .required, .inputWrapper, .input, .input--error, .input--success, .input--disabled, .hint, .error classes",
+    "styledComponents": "Create styled.div components with props for state styling (error, success, disabled)",
+    "scss": "Create _input.scss with BEM classes (.input, .input__label, .input__field, .input__field--error) or nested SCSS"
+  },
+
+  "commonVariations": {
+    "searchInput": {
+      "description": "Search input with search icon and optional clear button",
+      "leadingIcon": "SearchIcon (magnifying glass)",
+      "trailingIcon": "Clear button (X icon) when value not empty",
+      "type": "search"
+    },
+    "passwordInput": {
+      "description": "Password input with toggle visibility button",
+      "type": "password",
+      "trailingIcon": "Toggle button (eye/eye-off icon)",
+      "behavior": "Click toggles between type='password' and type='text'"
+    },
+    "emailInput": {
+      "description": "Email input with @ icon",
+      "type": "email",
+      "leadingIcon": "@ icon or envelope icon",
+      "validation": "HTML5 email validation + custom validation"
+    },
+    "phoneInput": {
+      "description": "Phone input with phone icon",
+      "type": "tel",
+      "leadingIcon": "Phone icon",
+      "pattern": "Optional: pattern attribute for format validation"
+    },
+    "numberInput": {
+      "description": "Number input with increment/decrement buttons",
+      "type": "number",
+      "trailingIcon": "Up/down buttons for increment/decrement",
+      "attributes": "min, max, step"
+    }
+  },
+
+  "edgeCases": {
+    "longLabel": {
+      "issue": "Very long label text",
+      "solution": "Allow label to wrap, ensure sufficient line-height"
+    },
+    "longError": {
+      "issue": "Very long error message",
+      "solution": "Allow error to wrap, use max-width if needed"
+    },
+    "multipleErrors": {
+      "issue": "Multiple validation errors for one field",
+      "solution": "Show first error, or combine into single message"
+    },
+    "dynamicErrors": {
+      "issue": "Error appears while user is typing",
+      "solution": "Only show errors after blur (touched=true), unless using real-time validation pattern"
+    },
+    "requiredWithoutLabel": {
+      "issue": "Field is required but label not provided",
+      "solution": "Require label prop to be mandatory, enforce with TypeScript or PropTypes"
+    },
+    "bothHintAndError": {
+      "issue": "Both hint and error need to display",
+      "solution": "Show error below input, optionally hide hint when error present, or show both with error taking priority visually"
+    }
+  },
+
+  "meta": {
+    "created": "2026-01-24",
+    "updated": "2026-01-24",
+    "webUrl": "https://uipotion.com/potions/components/text-input.html",
+    "relatedPotions": [
+      {
+        "id": "form-validation",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "Optional: Apply Form Validation pattern for validation timing and error display best practices",
+        "required": false
+      },
+      {
+        "id": "form-login-register",
+        "category": "features",
+        "relationship": "used-in",
+        "description": "Optional: See Login & Registration Forms for complete form example using Text Input",
+        "required": false
+      }
+    ]
+  }
+}

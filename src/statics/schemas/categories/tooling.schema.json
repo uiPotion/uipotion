@@ -1,15 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://uipotion.com/schema/categories/tooling.schema.json",
-  "title": "UI Potion Category Schema — Tooling (v1)",
-  "description": "Extends the base schema for tooling/integration potions (CI validation, generators, token pipelines).",
+  "title": "UI Potion Category Schema — Tooling (v2)",
+  "description": "Extends the base schema for tooling/integration potions (config generators, CI/CD setup, build tools, dev tools, etc.). Provides structured properties for installation, configuration templates, version detection, and integration with IDEs/editors/CI systems.",
   "allOf": [
     {
       "$ref": "https://uipotion.com/schema/potion.base.schema.json"
     },
     {
       "type": "object",
-      "additionalProperties": true,
       "required": [
         "toolingSpec",
         "testingChecklist"
@@ -30,15 +29,18 @@
           "properties": {
             "goal": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "description": "High-level goal of this tooling potion. What does it help developers accomplish?"
             },
             "integration": {
               "type": "object",
-              "additionalProperties": true
+              "additionalProperties": true,
+              "description": "How this tool integrates with the project (detection methods, framework compatibility, etc.)"
             },
             "configuration": {
               "type": "object",
-              "additionalProperties": true
+              "additionalProperties": true,
+              "description": "Configuration details, examples, and templates for the tool"
             },
             "workflow": {
               "type": "array",
@@ -46,19 +48,57 @@
               "items": {
                 "type": "string",
                 "minLength": 1
-              }
+              },
+              "description": "Step-by-step workflow for implementing this tool"
             },
             "compatibility": {
               "type": "object",
-              "additionalProperties": true
+              "additionalProperties": true,
+              "description": "Compatibility information (supported versions, frameworks, environments, etc.)"
             },
             "securityConsiderations": {
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "description": "Security considerations when using this tool"
             }
           }
+        },
+        "installation": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Package installation commands and dependency requirements (npm, yarn, pnpm commands for different scenarios)"
+        },
+        "versionDetection": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Critical logic for detecting tool versions, project setup, or configuration format requirements. Essential for tools with breaking changes between versions (e.g., ESLint v9+ flat config vs legacy)"
+        },
+        "templates": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Configuration file templates and examples for different frameworks, formats, or scenarios"
+        },
+        "troubleshooting": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Common issues, error messages, and their solutions"
+        },
+        "editorIntegration": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "IDE/editor integration details (VS Code, WebStorm, Vim, etc.) including extension IDs, settings, and configuration"
+        },
+        "cicdIntegration": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "CI/CD integration examples (GitHub Actions, GitLab CI, CircleCI, etc.)"
+        },
+        "scripts": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "npm/package.json scripts to add for this tool (e.g., lint, format, test, build scripts)"
         }
       }
     }

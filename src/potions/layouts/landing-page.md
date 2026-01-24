@@ -1138,6 +1138,17 @@ If the mobile hamburger menu works intermittently or not at all, check:
 
 ---
 
+## See Also
+
+This landing page layout commonly uses these components:
+
+- **[Navbar Component](/potions/components/navbar.html)** - For the header navigation
+- **[Pricing Table Feature](/potions/features/pricing-table.html)** - For the pricing section
+
+These are examples of components that work well with landing pages. The layout is flexible and works with any content sections you choose.
+
+---
+
 ## Summary for AI Agents
 
 This landing page layout is a conversion-optimized marketing page with sequential stacked sections. Key implementation points:

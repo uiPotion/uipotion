@@ -536,8 +536,6 @@
   "meta": {
     "created": "2026-01-12",
     "updated": "2026-01-17",
-    "complexity": "intermediate",
-    "estimatedImplementationTime": "2-4 hours",
     "webUrl": "https://uipotion.com/potions/components/navbar.html"
   }
 }
