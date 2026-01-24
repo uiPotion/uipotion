@@ -64,8 +64,21 @@
       "agentGuideUrl": "https://uipotion.com/potions/components/data-table.json",
       "created": "2026-01-18",
       "updated": "2026-01-18"
+    },
+    {
+      "id": "toast-notifications",
+      "name": "Toast Notifications (Accessible) with Queue System",
+      "category": "components",
+      "tags": ["toast", "notifications", "snackbar", "feedback", "alerts", "a11y", "wcag", "aria", "queue", "auto-dismiss"],
+      "excerpt": "A non-blocking toast notification system with success/error/warning/info variants, queue management, auto-dismiss, keyboard navigation, and screen reader announcements. Perfect for user feedback after actions.",
+      "complexity": "intermediate",
+      "estimatedImplementationTime": "3-5 hours",
+      "webUrl": "https://uipotion.com/potions/components/toast-notifications.html",
+      "agentGuideUrl": "https://uipotion.com/potions/components/toast-notifications.json",
+      "created": "2026-01-24",
+      "updated": "2026-01-24"
     }
   ],
-  "totalCount": 5,
-  "lastUpdated": "2026-01-18"
+  "totalCount": 6,
+  "lastUpdated": "2026-01-24"
 }

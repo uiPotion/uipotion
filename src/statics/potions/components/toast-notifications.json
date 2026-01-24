@@ -1,0 +1,655 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
+  "id": "toast-notifications",
+  "version": "1.0.0",
+  "name": "Toast Notifications (Accessible) with Queue System",
+  "category": "components",
+  "tags": [
+    "toast",
+    "notifications",
+    "snackbar",
+    "feedback",
+    "alerts",
+    "a11y",
+    "wcag",
+    "aria",
+    "queue",
+    "auto-dismiss"
+  ],
+  "description": "A non-blocking toast notification system with success/error/warning/info variants, queue management, auto-dismiss, keyboard navigation, and screen reader announcements. Perfect for user feedback after actions.",
+
+  "tokens": {
+    "layout": {
+      "toastWidthDesktopPx": 380,
+      "toastWidthMobilePx": "calc(100vw - 32px)",
+      "toastMinHeightPx": 60,
+      "toastPaddingPx": 16,
+      "toastGapPx": 12,
+      "containerMarginPx": 20,
+      "iconSizePx": 22,
+      "dismissButtonSizePx": 32,
+      "borderRadiusPx": 10,
+      "progressBarHeightPx": 3,
+      "zIndex": {
+        "toastContainer": 9999,
+        "toastItem": 10000
+      }
+    },
+    "motion": {
+      "enterDurationMs": 250,
+      "exitDurationMs": 200,
+      "stackAnimationMs": 200,
+      "enterEasing": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "exitEasing": "cubic-bezier(0.4, 0, 1, 1)",
+      "stackEasing": "cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    "durations": {
+      "successMs": 4000,
+      "errorMs": 7000,
+      "warningMs": 6000,
+      "infoMs": 5000,
+      "persistentMs": 0
+    },
+    "breakpoints": {
+      "tabletMinPx": 768,
+      "desktopMinPx": 1024
+    }
+  },
+
+  "aiAgentInstructions": {
+    "summary": "Implement a reusable toast notification system with queue management, auto-dismiss, and full accessibility. Adapt to the user's framework and styling system. Ensure WCAG AA compliance including keyboard navigation, screen reader announcements, and reduced motion support.",
+    "keyFeatures": [
+      "Four variants: success, error, warning, info with semantic colors and icons",
+      "Queue system: Max visible toasts (default 3), overflow queued, FIFO dismissal",
+      "Auto-dismiss: Configurable durations per variant, pause on hover/focus",
+      "Keyboard accessible: Escape to dismiss, Tab navigation, focus management",
+      "Screen reader: aria-live regions (polite/assertive), role=status/alert, atomic announcements",
+      "Progress bar: Optional visual countdown for auto-dismiss timer",
+      "Action buttons: Support for Undo, Reload, or custom actions",
+      "Responsive: Fixed width on desktop, full width on mobile, swipe-to-dismiss",
+      "Animations: Slide in/out, stack adjustments, prefers-reduced-motion support",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems.",
+      "CRITICAL: When detecting vanilla CSS or SCSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes. Define classes like .toast, .toast--success, .toast-container, etc.",
+      "CRITICAL: Extract complex logic into reusable hooks/composables (useToastTimer, useToastQueue, useToastState) for better organization and testability."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine: (a) package.json for framework and styling dependencies, (b) existing component files to see styling patterns, (c) config files (tailwind.config.js, vite.config.js, etc.), (d) existing style files and their structure.",
+      "0a. Detect framework patterns: Check how state is managed (hooks, composition API, services, stores), how components are structured, and what patterns are used.",
+      "0b. Detect styling conventions: Identify class naming (BEM, camelCase, kebab-case), how styles are imported, whether there's a design system or token system, utility functions (cn, clsx), and color variables.",
+      "0c. If detection is uncertain, ask the user about their framework and styling approach before proceeding.",
+      "1. Build toast state management: Create toast store/context with queue, timers, and CRUD operations",
+      "2. Implement ToastContainer component with position variants (top-right, bottom-center, etc.)",
+      "3. Build ToastItem component with variant styles (success, error, warning, info)",
+      "4. Add icon mapping per variant (checkmark, X, warning triangle, info circle)",
+      "5. Implement queue system: maxVisible enforcement, FIFO logic, queue processing on dismiss",
+      "6. Add auto-dismiss timers: Start on mount, pause on hover/focus, resume on blur/mouseleave, cancel on dismiss",
+      "7. Implement manual dismiss: X button with onClick handler, keyboard Escape support",
+      "8. Add optional action button support (e.g., Undo) with callback execution",
+      "9. Implement progress bar (optional): Linear animation from 0-100% over duration, pause sync with timer",
+      "10. Add keyboard navigation: Tab between action/dismiss, Escape to close, focus management",
+      "11. Implement ARIA: aria-live (polite/assertive), role (status/alert), aria-atomic, button labels",
+      "12. Add entry/exit animations: Slide + fade for enter/exit. CRITICAL: Coordinate exit animation with stack repositioning - exiting toast slides out WHILE remaining toasts smoothly animate to fill gap. Use TransitionGroup (Vue), AnimatePresence (React), or framework equivalent for coordinated animations.",
+      "13. CRITICAL - Implement coordinated stack animation using WRAPPER PATTERN: Wrap each toast in a container div that handles height collapse. When exiting: (1) Wrapper animates max-height to 0 and margin-bottom to 0 over 200-250ms, (2) Inner toast slides out simultaneously. This prevents jumping and allows smooth repositioning of remaining toasts. DO NOT use position:absolute on toast without capturing current position first - use wrapper pattern instead.",
+      "14. Add prefers-reduced-motion fallback: Disable slide/scale, use simple fade (100-150ms opacity transition)",
+      "15. Make responsive: Full width on mobile, swipe-to-dismiss gesture (optional), adjust touch targets",
+      "16. Expose global API: toast.success(), toast.error(), toast.warning(), toast.info(), toast.dismiss(), toast.dismissAll()",
+      "17. Provide test checklist for keyboard, screen reader, and visual testing",
+      "18. Use ONLY the detected styling system. Do NOT add <style> blocks, inline styles, or new CSS files unless that's the project's convention. Match existing component styling patterns exactly."
+    ]
+  },
+
+  "componentSpec": {
+    "goal": "Provide non-blocking user feedback for actions (save, delete, errors, warnings) without interrupting workflow or requiring manual acknowledgment.",
+
+    "anatomy": {
+      "slots": [
+        "container",
+        "toast",
+        "icon",
+        "content",
+        "title",
+        "description",
+        "action",
+        "dismiss",
+        "progressBar"
+      ],
+      "hierarchy": "Container( Toast( Icon, Content(Title, Description), Action?, Dismiss, ProgressBar? ) )"
+    },
+
+    "stateModel": {
+      "toasts": {
+        "type": "array",
+        "description": "Array of active toast objects currently visible or in queue. Each item contains: {id: string, variant: 'success'|'error'|'warning'|'info', title: string, description?: string, duration: number, action?: object, dismissible: boolean, timestamp: number, paused: boolean}",
+        "default": [],
+        "persistence": "component state only"
+      },
+      "queue": {
+        "type": "array",
+        "description": "Pending toasts waiting for available display slot.",
+        "default": [],
+        "persistence": "component state only"
+      },
+      "position": {
+        "type": "enum",
+        "description": "Container position on screen.",
+        "allowedValues": ["top-right", "top-left", "top-center", "bottom-right", "bottom-left", "bottom-center"],
+        "default": "top-right",
+        "persistence": "config"
+      },
+      "maxVisible": {
+        "type": "number",
+        "description": "Maximum toasts visible simultaneously.",
+        "default": 3,
+        "persistence": "config"
+      },
+      "pauseOnHover": {
+        "type": "boolean",
+        "description": "Pause auto-dismiss when mouse hovers over toast.",
+        "default": true,
+        "persistence": "config"
+      },
+      "pauseOnFocusWithin": {
+        "type": "boolean",
+        "description": "Pause auto-dismiss when toast or its buttons have focus.",
+        "default": true,
+        "persistence": "config"
+      }
+    },
+
+    "interactions": [
+      {
+        "event": "toast.success() / toast.error() / etc. called",
+        "result": "addToastToQueueOrActive",
+        "sideEffects": [
+          "If active toasts < maxVisible: add to active array and start timer",
+          "If active toasts >= maxVisible: add to queue array",
+          "Generate unique ID for toast",
+          "Trigger enter animation"
+        ]
+      },
+      {
+        "event": "dismissButtonClick",
+        "when": "toast is visible",
+        "result": "removeToast",
+        "sideEffects": [
+          "Trigger exit animation",
+          "Cancel auto-dismiss timer",
+          "Remove toast from active array after animation",
+          "Process queue: move next queued toast to active"
+        ]
+      },
+      {
+        "event": "escapeKey",
+        "when": "toast is focused or container has focus",
+        "result": "dismissFocusedToastOrAll",
+        "sideEffects": [
+          "If a toast has focus: dismiss only that toast",
+          "If no toast has focus: optionally dismiss all toasts",
+          "Cancel timers for dismissed toasts",
+          "Process queue after dismissal"
+        ],
+        "preventDefault": true,
+        "accessibilityNotes": "Escape should dismiss the focused toast, providing keyboard users an exit path."
+      },
+      {
+        "event": "mouseEnterToast",
+        "when": "pauseOnHover is true",
+        "result": "pauseTimer",
+        "sideEffects": ["Set toast.paused = true", "Pause auto-dismiss timer", "Pause progress bar animation if visible"]
+      },
+      {
+        "event": "mouseLeaveToast",
+        "when": "pauseOnHover is true and toast.paused is true",
+        "result": "resumeTimer",
+        "sideEffects": ["Set toast.paused = false", "Resume auto-dismiss timer from remaining time", "Resume progress bar animation"]
+      },
+      {
+        "event": "focusWithinToast",
+        "when": "pauseOnFocusWithin is true",
+        "result": "pauseTimer",
+        "sideEffects": ["Set toast.paused = true", "Pause auto-dismiss timer", "Pause progress bar animation"]
+      },
+      {
+        "event": "blurFromToast",
+        "when": "pauseOnFocusWithin is true and toast.paused is true",
+        "result": "resumeTimer",
+        "sideEffects": ["Set toast.paused = false", "Resume auto-dismiss timer", "Resume progress bar animation"]
+      },
+      {
+        "event": "actionButtonClick",
+        "when": "toast has action button",
+        "result": "invokeActionCallback",
+        "sideEffects": [
+          "Execute action.onClick callback",
+          "Optionally dismiss toast after action completes",
+          "Cancel timer if toast dismissed"
+        ]
+      },
+      {
+        "event": "timerExpired",
+        "when": "duration > 0 and not paused",
+        "result": "autoDismissToast",
+        "sideEffects": [
+          "Trigger exit animation",
+          "Remove toast from active array",
+          "Process queue: show next queued toast"
+        ]
+      },
+      {
+        "event": "Tab key",
+        "when": "toast is visible with action and/or dismiss buttons",
+        "result": "navigateBetweenButtons",
+        "sideEffects": ["Move focus between action button and dismiss button", "Pause timer on focus"],
+        "accessibilityNotes": "Tab cycles through focusable elements within toast (action button, dismiss button)"
+      }
+    ],
+
+    "responsiveBehavior": {
+      "mobile": {
+        "maxWidthPx": 767,
+        "toastWidth": "calc(100vw - 32px)",
+        "position": "bottom-center (recommended for mobile)",
+        "maxVisible": 1,
+        "touchTargets": "44×44px minimum for dismiss and action buttons",
+        "swipeToDismiss": "Optional: swipe left/right to dismiss",
+        "padding": "16px"
+      },
+      "tablet": {
+        "minWidthPx": 768,
+        "maxWidthPx": 1023,
+        "toastWidth": "360px",
+        "position": "Same as desktop (top-right default)",
+        "maxVisible": "2-3",
+        "touchFriendly": "Larger button hit areas"
+      },
+      "desktop": {
+        "minWidthPx": 1024,
+        "toastWidth": "380px",
+        "position": "top-right, bottom-right, or custom",
+        "maxVisible": "3-5",
+        "hoverEnabled": true
+      }
+    },
+
+    "variants": {
+      "success": {
+        "icon": "CheckCircle",
+        "defaultDuration": 4000,
+        "ariaRole": "status",
+        "ariaLive": "polite",
+        "colors": "Green palette (bg: green-50, border: green-300, text: green-900, icon: green-600)"
+      },
+      "error": {
+        "icon": "XCircle or AlertCircle",
+        "defaultDuration": 7000,
+        "ariaRole": "alert",
+        "ariaLive": "assertive",
+        "colors": "Red palette (bg: red-50, border: red-300, text: red-900, icon: red-600)"
+      },
+      "warning": {
+        "icon": "AlertTriangle",
+        "defaultDuration": 6000,
+        "ariaRole": "alert",
+        "ariaLive": "assertive",
+        "colors": "Amber palette (bg: amber-50, border: amber-300, text: amber-900, icon: amber-700)"
+      },
+      "info": {
+        "icon": "InfoCircle",
+        "defaultDuration": 5000,
+        "ariaRole": "status",
+        "ariaLive": "polite",
+        "colors": "Blue palette (bg: blue-50, border: blue-300, text: blue-900, icon: blue-600)"
+      }
+    }
+  },
+
+  "animations": {
+    "enter": {
+      "durationMs": 250,
+      "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "transform": "Slide in from container edge (translateX(100%) or translateY(-100%) → translate(0))",
+      "opacity": "0 → 1",
+      "description": "Toast slides in from edge and fades in smoothly",
+      "implementation": "Use CSS transition or framework animation on mount. For Vue: use TransitionGroup enter transition. For React: use CSS transition on component mount or animation library."
+    },
+    "exit": {
+      "durationMs": 200,
+      "easing": "cubic-bezier(0.4, 0, 1, 1)",
+      "transform": "Slide out to edge + slight scale down (translate(0) scale(1) → translateX(100%) scale(0.95))",
+      "opacity": "1 → 0",
+      "description": "Toast slides out and fades out with subtle scale when dismissed (manually or auto-dismiss)",
+      "implementation": "Trigger exit animation before removing from DOM. Set exiting state, apply exit styles, then remove after animation completes.",
+      "timing": "Wait for animation duration (200ms) before removing toast from state/DOM to ensure smooth exit"
+    },
+    "stackAdjustment": {
+      "durationMs": 200,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "description": "When a toast is dismissed, remaining toasts smoothly slide to fill the gap",
+      "implementation": "Use CSS transition on transform property for remaining toasts. In Vue: TransitionGroup handles this automatically with move class. In React: use react-transition-group or Framer Motion with layout animations.",
+      "behavior": "As one toast exits, remaining toasts animate their vertical position to close the gap",
+      "technique": "Position: relative on remaining items with transition on transform. When a toast is removed, other toasts move up/down smoothly.",
+      "coordinatedAnimation": "Exit animation and stack adjustment should happen simultaneously - exiting toast slides out while others move to close gap",
+      "notes": "Ensure leaving toast is positioned absolutely during exit to allow remaining toasts to flow naturally and animate to new positions",
+      "criticalImplementationDetails": {
+        "commonMistake": "Setting position:absolute on exiting toast WITHOUT preserving its current position causes it to jump to top:0 before animating",
+        "wrapperPattern": {
+          "solution": "Use a WRAPPER element around each toast that handles the height collapse animation",
+          "structure": "Wrapper (relative, handles height/margin collapse) -> Toast (handles slide out animation)",
+          "wrapperAnimation": "Animate max-height from current height to 0px AND margin-bottom from 12px to 0px over 200-250ms",
+          "toastAnimation": "Animate translateX and opacity for slide out effect over 200-250ms",
+          "why": "Wrapper stays in layout flow and collapses, allowing remaining toasts to smoothly slide up. Toast inside wrapper can slide out without jumping.",
+          "implementation": "Apply isExiting state to wrapper: maxHeight: '0px', marginBottom: '0px', opacity: 0. Apply slide animation to inner toast element.",
+          "transitionTiming": "Both wrapper collapse and toast slide should have same duration (200-250ms) to stay synchronized"
+        },
+        "withoutWrapper": {
+          "problem": "If you set position:absolute on toast directly, it jumps to a wrong position before animating",
+          "wrongApproach": "position: isExiting ? 'absolute' : 'relative' // Will jump to top:0",
+          "whyItFails": "Absolute positioning removes element from flow, but top:0 is wrong - it should be the element's CURRENT position",
+          "complexFix": "Capture element's current position with getBoundingClientRect() before making it absolute, then set top to that exact position",
+          "betterSolution": "Use the wrapper pattern instead - it's simpler and more reliable"
+        },
+        "keyPrinciple": "Exiting toast must smoothly slide out FROM ITS CURRENT POSITION while remaining toasts smoothly slide up to fill the gap - no jumping or instant repositioning"
+      }
+    },
+    "progressBar": {
+      "animation": "Linear progression from 0% to 100% width over duration",
+      "pauseBehavior": "Animation pauses when timer pauses (hover/focus)",
+      "resumeBehavior": "Animation resumes from current position",
+      "implementation": "Use CSS transition on width property or JavaScript interval updating width percentage. Sync pause/resume with timer state."
+    },
+    "reducedMotion": {
+      "behavior": "Disable slide/scale animations when @media (prefers-reduced-motion: reduce)",
+      "fallback": "Use simple fade (opacity only) or instant show/hide",
+      "implementation": "Wrap animations in @media (prefers-reduced-motion: reduce) query. Reduce duration to 100-150ms and remove transform animations, keeping only opacity fade."
+    },
+    "coordinationDetails": {
+      "enterAndStack": "New toasts should enter with slide animation while existing toasts may shift to make room",
+      "exitAndStack": "Critical: Exiting toast must slide out WHILE remaining toasts animate to new positions simultaneously. This creates smooth, natural flow.",
+      "overlappingAnimations": "Exit (200ms) and stack adjustment (200ms) run in parallel for seamless transition",
+      "layoutShift": "Use position: absolute on exiting toast to remove it from layout flow, allowing remaining toasts to fill space",
+      "frameworkSpecifics": {
+        "vue": "TransitionGroup with name='toast-list' provides enter-active, leave-active, and move classes automatically",
+        "react": "Use react-transition-group with TransitionGroup or Framer Motion's AnimatePresence with layout prop",
+        "angular": "Use Angular animations with :enter, :leave, and query/stagger for move",
+        "svelte": "Use svelte/transition with fly for enter/exit and flip for repositioning"
+      }
+    }
+  },
+
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.4.3": "Text and icons maintain 4.5:1 contrast ratio with background for all variants.",
+        "2.1.1": "All toast controls (dismiss, action buttons) operable via keyboard.",
+        "2.1.2": "No keyboard trap; Escape key provides exit from toast interaction.",
+        "2.4.3": "Logical focus order: action button → dismiss button within each toast.",
+        "2.4.7": "Visible focus indicators on action and dismiss buttons.",
+        "3.2.1": "Toasts do NOT steal focus on appear (non-intrusive).",
+        "4.1.2": "Toasts use correct ARIA roles (status/alert), aria-live, and aria-atomic.",
+        "4.1.3": "Status messages announced via screen readers without requiring user action."
+      }
+    },
+    "keyboardNavigation": {
+      "Tab": "Navigate between action and dismiss buttons within toast",
+      "Shift+Tab": "Navigate backwards through buttons",
+      "Escape": "Dismiss focused toast, or dismiss all if none focused",
+      "Enter/Space": "Activate focused button (action or dismiss)",
+      "focusOrder": "Action button (if present) → Dismiss button",
+      "focusVisibility": "Clear focus ring on buttons for keyboard users"
+    },
+    "ariaAttributes": {
+      "required": {
+        "container": {
+          "aria-live": "polite (for success/info) or assertive (for error/warning)",
+          "aria-relevant": "additions text"
+        },
+        "toast": {
+          "role": "status (success/info) or alert (error/warning)",
+          "aria-atomic": "true"
+        },
+        "dismissButton": {
+          "aria-label": "Dismiss notification or Dismiss [variant] notification",
+          "type": "button"
+        }
+      },
+      "optional": {
+        "actionButton": {
+          "aria-label": "Descriptive label based on action (e.g., 'Undo delete action', 'Reload page')"
+        }
+      }
+    },
+    "screenReader": {
+      "announcements": "Title and description read together atomically",
+      "successInfo": "Polite announcements via aria-live='polite' (doesn't interrupt)",
+      "errorWarning": "Assertive announcements via aria-live='assertive' (interrupts current speech)",
+      "multipleToasts": "Queue announcements to avoid overlapping speech",
+      "dismissFeedback": "Optionally announce 'Notification dismissed' on manual dismiss"
+    },
+    "focusManagement": {
+      "noFocusSteal": "Toasts do NOT steal focus when they appear (non-intrusive design)",
+      "keyboardAccess": "Keyboard users can Tab to reach toasts if needed",
+      "focusRestoration": "Focus returns to trigger element if applicable (e.g., after action button click)"
+    },
+    "implementationChecklist": [
+      "Container has correct aria-live attribute (polite or assertive based on content)",
+      "Each toast has correct role (status or alert) and aria-atomic='true'",
+      "Dismiss button has descriptive aria-label",
+      "Action button has descriptive aria-label (if present)",
+      "Tab key navigates between action and dismiss buttons",
+      "Escape key dismisses focused toast or all toasts",
+      "Enter/Space activates focused button",
+      "No focus steal on toast appearance",
+      "Focus visible indicators on all buttons",
+      "Screen reader announces new toasts without user action",
+      "Multiple rapid toasts don't cause announcement overlap",
+      "prefers-reduced-motion disables slide/scale animations"
+    ]
+  },
+
+  "projectDetection": {
+    "framework": {
+      "description": "Detect the project's framework by examining package.json, existing component files, and project structure. Common frameworks: React, Vue, Angular, Svelte.",
+      "detectionSteps": [
+        "Check package.json for framework dependencies (react, vue, @angular/core, svelte)",
+        "Examine existing component files for framework-specific patterns (JSX for React, .vue files for Vue, etc.)",
+        "Check build configuration (vite.config.js, webpack.config.js, angular.json, etc.)",
+        "Look for framework-specific directories and state management patterns"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect the project's styling approach by examining dependencies, config files, and existing component styles. Use the detected system exclusively.",
+      "detectionSteps": [
+        "Check package.json for styling dependencies: tailwindcss, styled-components, emotion, sass, less, css-modules, etc.",
+        "Look for config files: tailwind.config.js, postcss.config.js, sass config, etc.",
+        "Examine existing component files to see how styles are imported and used",
+        "Check for style files: .css, .scss, .module.css, styled-components patterns, etc.",
+        "Identify class naming conventions and utility functions (cn, clsx, classnames, etc.)"
+      ],
+      "adaptationRules": [
+        "If Tailwind is detected: Use Tailwind utility classes, respect existing config, use existing design tokens, follow project's class composition patterns",
+        "If SCSS/CSS is detected: Create .scss or .css file matching project structure, follow existing naming conventions (BEM, camelCase, kebab-case), import styles as the project does",
+        "If styled-components is detected: Use styled-components syntax matching project patterns, follow existing component structure",
+        "If CSS Modules is detected: Use .module.css files, follow existing module naming patterns",
+        "If no styling system: Use vanilla CSS with semantic class names in a dedicated stylesheet"
+      ]
+    },
+    "designTokens": {
+      "description": "Identify existing design tokens, color systems, spacing scales, and typography from the project. Use these instead of inventing new values.",
+      "detectionSteps": [
+        "Check for design token files (tokens.json, theme.js, design-tokens.css, etc.)",
+        "Examine Tailwind config for theme values if using Tailwind",
+        "Look at existing components for color, spacing, and typography patterns",
+        "Check CSS variables (--color-*, --spacing-*, etc.) in global styles",
+        "If tokens exist, map toast variants to existing semantic colors (success → green, error → red, etc.)"
+      ]
+    }
+  },
+
+  "testingChecklist": [
+    "Success, error, warning, info variants display correct colors, icons, and semantics",
+    "Toasts appear in correct container position (top-right, bottom-center, etc.)",
+    "Auto-dismiss works with correct durations (success: 4s, error: 7s, warning: 6s, info: 5s)",
+    "Manual dismiss (X button) removes toast with smooth exit animation (slide out + fade + scale)",
+    "CRITICAL TEST: Create 3 toasts, dismiss the MIDDLE one - it should slide out smoothly WITHOUT jumping to a different position first",
+    "CRITICAL TEST: When middle toast exits, the bottom toast should WAIT and smoothly slide up (not jump instantly)",
+    "CRITICAL: When toast exits, remaining toasts smoothly slide to fill the gap (coordinated animation)",
+    "Exit animation (200ms) and stack repositioning (200ms) happen simultaneously, not sequentially",
+    "Hover on toast pauses auto-dismiss timer (if pauseOnHover enabled)",
+    "Focus on action or dismiss button pauses auto-dismiss timer (if pauseOnFocusWithin enabled)",
+    "Timer resumes when hover/focus ends",
+    "Queue enforces maxVisible limit (default: 3 toasts visible)",
+    "New toasts added to queue when maxVisible reached",
+    "Oldest toast dismissed first when queue is full (FIFO)",
+    "Queue processed correctly when toast dismissed or times out",
+    "Multiple toasts stack vertically with 12px spacing",
+    "Toasts slide to fill gap when one dismissed (stack animation)",
+    "Escape key dismisses focused toast or all toasts if none focused",
+    "Tab key navigates between action button and dismiss button",
+    "Enter/Space activates focused button",
+    "Focus order follows visual stacking order for multiple toasts",
+    "Screen reader announces new toasts with correct role (status for success/info, alert for error/warning)",
+    "aria-live region configured correctly (polite for success/info, assertive for error/warning)",
+    "Title and description read together atomically by screen readers",
+    "Dismiss button has descriptive aria-label",
+    "Action button has descriptive aria-label (if present)",
+    "Entry animation: Slide in from edge + fade in (250ms)",
+    "Exit animation: Slide out to edge + fade out + slight scale down (200ms)",
+    "prefers-reduced-motion disables slide/scale, uses simple fade or instant show/hide",
+    "Progress bar (if enabled) animates from 0-100% over duration",
+    "Progress bar pauses when timer paused",
+    "Action button executes onClick callback",
+    "Action button optionally dismisses toast after callback",
+    "Mobile: Toasts are full width minus 32px margins",
+    "Mobile: Position switches to bottom-center (recommended)",
+    "Mobile: Touch targets are 44×44px minimum for buttons",
+    "Mobile: Only 1 toast visible at a time (maxVisible: 1)",
+    "Tablet: Toasts are 360px wide with touch-friendly buttons",
+    "Desktop: Toasts are 380px wide at configured position",
+    "Dark mode: Colors adapt with sufficient contrast for all variants",
+    "Rapid toast creation doesn't cause performance issues or queue overflow",
+    "toast.dismissAll() clears all active toasts and queue",
+    "Toast IDs are unique across all toasts",
+    "Timers cleaned up on unmount/dismiss (no memory leaks)",
+    "Container z-index (9999) places toasts above most UI but below modals",
+    "Long titles/descriptions wrap properly without truncation",
+    "Toast height adjusts automatically based on content length"
+  ],
+
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "Context API with useToast hook, or custom hooks with useState/useReducer",
+      "customHooks": "useToastTimer (timer logic), useToastQueue (queue management), useToastState (CRUD operations)",
+      "portal": "ReactDOM.createPortal to render container in document.body",
+      "animations": "Use react-transition-group's TransitionGroup component or Framer Motion's AnimatePresence with layout prop. For coordinated animations, ensure exiting items have position: absolute. Framer Motion example: <AnimatePresence mode='popLayout'> with layout animations on toast items.",
+      "animationPattern": "RECOMMENDED: Use wrapper pattern - outer div handles height collapse (max-height, margin), inner div handles slide animation. Set isExiting state on wrapper to trigger: {maxHeight: '0px', marginBottom: '0px', opacity: 0}. Apply slide-out animation class to inner toast. Both should have same 200-250ms duration.",
+      "example": "const { success, error } = useToast(); success('Saved!', { action: { label: 'Undo', onClick: undo } });"
+    },
+    "vue": {
+      "stateManagement": "Composition API with provide/inject or Pinia store",
+      "composables": "useToastTimer, useToastQueue, useToastState with reactive/ref",
+      "teleport": "Use <Teleport to='body'> for container rendering",
+      "animations": "Use <TransitionGroup name='toast-list'> for coordinated enter/exit/move animations. Vue automatically handles move transitions when items reorder. Add .toast-list-enter-active, .toast-list-leave-active, .toast-list-move CSS classes. IMPORTANT: Set position: absolute on .toast-list-leave-active to remove from layout during exit.",
+      "example": "const { success, error } = useToast(); success('Saved!', { action: { label: 'Undo', onClick: undo } });"
+    },
+    "angular": {
+      "stateManagement": "Injectable ToastService with BehaviorSubject",
+      "services": "ToastService (main), ToastQueueService, ToastTimerService",
+      "portal": "Use CDK Portal for dynamic rendering",
+      "example": "constructor(private toast: ToastService) {} this.toast.success('Saved!');"
+    },
+    "svelte": {
+      "stateManagement": "Writable stores with custom API functions",
+      "stores": "toastStore (active toasts), queueStore (pending), toastAPI (methods)",
+      "transitions": "Use Svelte transition directives for animations",
+      "example": "import { toast } from './toast'; toast.success('Saved!');"
+    }
+  },
+
+  "stylingApproaches": {
+    "tailwindCSS": "Use utility classes: fixed z-[9999] top-4 right-4, w-[380px] rounded-lg shadow-lg border p-4, variant colors via bg-green-50 border-green-300, etc.",
+    "cssModules": "Create toast.module.css with .container, .toast, .success, .error, .icon, .content, .action, .dismiss classes",
+    "styledComponents": "Use styled.div with props for variants, keyframes for animations",
+    "scss": "Create _toast.scss with BEM or nested classes, @keyframes for animations, mixin for variants"
+  },
+
+  "commonVariations": {
+    "loadingToast": {
+      "description": "Show spinner while async operation completes, update to success/error",
+      "implementation": "const id = toast.loading('Saving...'); later: toast.success('Saved!', { id });"
+    },
+    "undoPattern": {
+      "description": "Show success toast with Undo action to reverse operation",
+      "implementation": "toast.success('Deleted', { action: { label: 'Undo', onClick: restore } });"
+    },
+    "promisePattern": {
+      "description": "Automatically show loading → success/error based on promise result",
+      "implementation": "toast.promise(apiCall(), { loading: 'Saving...', success: 'Saved!', error: 'Failed' });"
+    },
+    "customIcon": {
+      "description": "Use custom icon instead of variant defaults (e.g., user avatar)",
+      "implementation": "toast.custom({ icon: <CustomIcon />, title: 'Custom notification' });"
+    },
+    "multiAction": {
+      "description": "Support multiple action buttons (e.g., Save and Discard)",
+      "implementation": "Add secondary action button in toast layout with separate callback"
+    }
+  },
+
+  "edgeCases": {
+    "rapidCreation": {
+      "issue": "Many toasts created in quick succession",
+      "solution": "Debounce identical messages within 500ms, enforce max queue size (10-20)"
+    },
+    "longMessages": {
+      "issue": "Very long title or description text",
+      "solution": "Auto-adjust height, wrap text properly, consider max-height with scroll"
+    },
+    "networkState": {
+      "issue": "Offline/online state changes",
+      "solution": "Show persistent offline toast, auto-dismiss when online"
+    },
+    "routeChanges": {
+      "issue": "User navigates to different page",
+      "solution": "Optionally dismiss all toasts on navigation (configurable)"
+    },
+    "zIndexConflicts": {
+      "issue": "Toast appears behind modals or other overlays",
+      "solution": "Set toast z-index high (9999) but below modals/dialogs if both can be open"
+    }
+  },
+
+  "outputConstraints": {
+    "must": [
+      "Use the detected styling system exclusively (Tailwind if present, SCSS if present, etc.)",
+      "Create stylesheet with classes if using CSS/SCSS (no inline styles)",
+      "Implement queue system with maxVisible enforcement",
+      "Add auto-dismiss timers with pause/resume on hover/focus",
+      "Support keyboard navigation (Tab, Escape, Enter/Space)",
+      "Implement proper ARIA attributes (aria-live, role, aria-atomic, aria-label)",
+      "Add enter/exit animations with prefers-reduced-motion support",
+      "CRITICAL: Use wrapper pattern for coordinated animations - wrapper handles height collapse, inner toast handles slide. NO jumping or instant repositioning when dismissing middle toast.",
+      "Make fully responsive (mobile full-width, desktop fixed-width)",
+      "Expose global API methods (success, error, warning, info, dismiss, dismissAll)",
+      "Clean up timers on unmount to prevent memory leaks"
+    ],
+    "mustNot": [
+      "Introduce new styling system not already in the project",
+      "Use inline style attributes on elements (use classes instead)",
+      "Steal focus when toast appears (must be non-intrusive)",
+      "Create infinite queue (enforce max queue size)",
+      "Hardcode colors (use design tokens or CSS variables if available)",
+      "Block user interaction (toasts must be non-blocking)",
+      "Skip accessibility attributes (ARIA is required)",
+      "Forget to clean up timers (causes memory leaks)"
+    ]
+  },
+
+  "meta": {
+    "created": "2026-01-24",
+    "updated": "2026-01-24",
+    "complexity": "intermediate",
+    "estimatedImplementationTime": "3-5 hours",
+    "webUrl": "https://uipotion.com/potions/components/toast-notifications.html"
+  }
+}
