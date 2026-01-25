@@ -4,9 +4,10 @@
   "description": "AI-agent-optimized UI component guides for any framework",
   "main": "index.js",
   "scripts": {
-    "start": "npm run sitemap && harold-scripts start",
-    "build": "npm run sitemap && harold-scripts build",
-    "sitemap": "node generate-sitemap.js"
+    "start": "npm run validate && npm run sitemap && harold-scripts start",
+    "build": "npm run validate && npm run sitemap && harold-scripts build",
+    "sitemap": "node generate-sitemap.js",
+    "validate": "node validate-potions.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,8 @@
   },
   "homepage": "https://uipotion.com",
   "devDependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
     "harold-scripts": "^1.4.0"
   }
 }

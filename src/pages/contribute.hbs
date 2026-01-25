@@ -142,14 +142,34 @@ The agentManifest should point to: potions/components/your-potion-name.json</cod
         
         <section class="about-section">
           <h2>Validate Your Potion</h2>
-          <p>Before submitting a pull request, always validate your potion JSON against the appropriate schema:</p>
+          <p>Before submitting a pull request, always validate your potion JSON against the appropriate schema. You can use either the web-based validator or the CLI script:</p>
           
+          <h3>Web-Based Validator</h3>
           <div class="validator-cta">
             <a href="{{relativePath 'validator.html'}}" class="button primary">Open Schema Validator</a>
             <p>Select the correct category schema and paste your JSON to check for errors.</p>
           </div>
           
-          <p>The validator will:</p>
+          <h3>CLI Validation Script</h3>
+          <p>For contributors working locally, you can also use the Node.js CLI validation script that validates all potions at once:</p>
+          <div class="example-box">
+            <pre><code># Validate all potions
+npm run validate
+
+# Or run directly
+node validate-potions.js</code></pre>
+          </div>
+          <p>The CLI script:</p>
+          <ul>
+            <li>Automatically finds all potion JSON files</li>
+            <li>Detects the category from the file path or <code>$schema</code> field</li>
+            <li>Validates each potion against its category schema</li>
+            <li>Shows detailed error messages for any issues</li>
+            <li>Runs automatically before <code>npm run build</code> and <code>npm start</code></li>
+            <li>Exits with error code if validation fails (useful for CI/CD)</li>
+          </ul>
+          
+          <p>Both validators will:</p>
           <ul>
             <li>Check that all required fields are present</li>
             <li>Verify data types and formats</li>
@@ -256,7 +276,7 @@ agentManifest: 'potions/components/your-potion-name.json'
           </ul>
           
           <h3>Step 5: Validate</h3>
-          <p>Use the <a href="{{relativePath 'validator.html'}}">Schema Validator</a> to ensure your JSON is correct before submitting. Make sure both your JSON and Markdown files are properly formatted and the <code>agentManifest</code> path in the Markdown file correctly points to your JSON file.</p>
+          <p>Use the <a href="{{relativePath 'validator.html'}}">web-based Schema Validator</a> or run <code>npm run validate</code> to ensure your JSON is correct before submitting. Make sure both your JSON and Markdown files are properly formatted and the <code>agentManifest</code> path in the Markdown file correctly points to your JSON file.</p>
         </section>
         
         <section class="about-section">
@@ -264,7 +284,7 @@ agentManifest: 'potions/components/your-potion-name.json'
           
           <h3>Before Submitting</h3>
           <ul>
-            <li>✅ Validate your potion JSON using the validator</li>
+            <li>✅ Validate your potion JSON using the <a href="{{relativePath 'validator.html'}}">web validator</a> or run <code>npm run validate</code></li>
             <li>✅ Ensure all required fields are present in JSON</li>
             <li>✅ Check that your potion follows the schema structure</li>
             <li>✅ Test that the JSON is valid (no syntax errors)</li>

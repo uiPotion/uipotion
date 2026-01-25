@@ -168,6 +168,12 @@ npm start
 # Build for production
 npm run build
 
+# Validate all potions against their schemas
+npm run validate
+
+# Generate sitemap.xml
+npm run sitemap
+
 # The build output will be in the `build/` directory
 ```
 
@@ -294,12 +300,15 @@ Add entry to `src/statics/potions-index.json`:
 
 Don't forget to update `totalCount` and `lastUpdated`!
 
-#### Step 4: Test
+#### Step 4: Validate and Test
 
 ```bash
+npm run validate # Validate all potions (runs automatically on build/start)
 npm run build    # Build the site
 npm start        # Test in dev server
 ```
+
+The validation script automatically checks all potion JSON files against their category schemas. It runs automatically before `npm run build` and `npm start`, but you can also run it manually with `npm run validate`.
 
 Visit http://localhost:3000 to verify everything works.
 
