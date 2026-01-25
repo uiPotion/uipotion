@@ -251,8 +251,6 @@
       "required": [
         "created",
         "updated",
-        "complexity",
-        "estimatedImplementationTime",
         "webUrl"
       ],
       "properties": {
@@ -263,14 +261,6 @@
         "updated": {
           "type": "string",
           "format": "date"
-        },
-        "complexity": {
-          "type": "string",
-          "enum": ["beginner", "intermediate", "advanced"]
-        },
-        "estimatedImplementationTime": {
-          "type": "string",
-          "minLength": 1
         },
         "webUrl": {
           "type": "string",

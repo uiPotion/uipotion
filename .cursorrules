@@ -402,8 +402,6 @@ Add new entry to `potions` array:
   "category": "components",
   "tags": ["tag1", "tag2"],
   "excerpt": "Brief description",
-  "complexity": "beginner|intermediate|advanced",
-  "estimatedImplementationTime": "1-2 hours",
   "webUrl": "https://uipotion.com/potions/components/your-component.html",
   "agentGuideUrl": "https://uipotion.com/potions/components/your-component.json",
   "created": "2026-01-10",
@@ -537,8 +535,6 @@ In the **JSON file** (for AI agents) - OPTIONAL:
 - ✅ Include multiple styling approaches in `stylingApproaches`
 - ✅ Be explicit about state management needs
 - ✅ Include complete accessibility specs
-- ✅ Provide estimated implementation time
-- ✅ Add complexity level (beginner/intermediate/advanced)
 - ❌ Don't leave ambiguous specifications
 - ❌ Don't skip responsive breakpoints
 - ❌ Don't forget animation specifications

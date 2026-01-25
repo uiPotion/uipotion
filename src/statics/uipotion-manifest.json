@@ -6,8 +6,7 @@
   "baseUrl": "https://uipotion.com",
   "discovery": {
     "manifestUrl": "https://uipotion.com/uipotion-manifest.json",
-    "potionsIndexUrl": "https://uipotion.com/potions-index.json",
-    "projectConventionsUrl": "https://uipotion.com/project-conventions.json"
+    "potionsIndexUrl": "https://uipotion.com/potions-index.json"
   },
   "usage": {
     "how_to_use": "AI agents can discover and load component guides by referencing this manifest. Each potion (component guide) is framework-agnostic and provides detailed specifications for implementation.",

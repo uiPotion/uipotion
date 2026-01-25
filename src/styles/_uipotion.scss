@@ -1033,6 +1033,10 @@
     padding: 24px;
     border-radius: 8px;
     transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
 
     &:hover {
       border-color: #4f46e5;
@@ -1046,9 +1050,24 @@
     }
 
     p {
-      margin: 0;
+      margin: 0 0 16px 0;
       font-size: 0.9375rem;
       color: #cbd5e1;
+      flex: 1;
+    }
+
+    .button {
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      width: fit-content;
     }
   }
 

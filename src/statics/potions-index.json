@@ -1,7 +1,7 @@
 {
   "potions": [
     {
-      "id": "dashboard-layout",
+      "id": "dashboard",
       "name": "Dashboard Layout with Collapsible Sidebar",
       "category": "layouts",
       "tags": ["dashboard", "sidebar", "responsive", "admin"],
@@ -12,12 +12,12 @@
       "updated": "2026-01-10"
     },
     {
-      "id": "modal-dialog",
+      "id": "dialog",
       "name": "Modal Dialog (Accessible) with Focus Trap and Actions",
       "category": "components",
       "tags": ["modal", "dialog", "overlay", "focus-trap", "a11y", "wcag", "aria"],
       "excerpt": "An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.",
-      "webUrl": "https://uipotion.com/potions/components/modal-dialog.html",
+      "webUrl": "https://uipotion.com/potions/components/dialog.html",
       "agentGuideUrl": "https://uipotion.com/potions/components/dialog.json",
       "created": "2026-01-11",
       "updated": "2026-01-11"
@@ -34,7 +34,7 @@
       "updated": "2026-01-12"
     },
     {
-      "id": "pricing-table-3tier",
+      "id": "pricing-table",
       "name": "3-Tier SaaS Pricing Table with Monthly/Yearly Toggle",
       "category": "features",
       "tags": ["pricing", "saas", "subscription", "billing", "marketing", "responsive", "conversion"],

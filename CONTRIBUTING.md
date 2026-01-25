@@ -100,8 +100,6 @@ Add your potion to `src/statics/potions-index.json`:
   "category": "components",
   "tags": ["tag1", "tag2"],
   "excerpt": "Brief description",
-  "complexity": "intermediate",
-  "estimatedImplementationTime": "1-2 hours",
   "webUrl": "https://uipotion.com/potions/components/your-potion.html",
   "agentGuideUrl": "https://uipotion.com/potions/components/your-potion.json",
   "created": "2026-01-24",

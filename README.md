@@ -285,8 +285,6 @@ Add entry to `src/statics/potions-index.json`:
   "category": "components",
   "tags": ["tag1", "tag2"],
   "excerpt": "Brief description",
-  "complexity": "intermediate",
-  "estimatedImplementationTime": "2-3 hours",
   "webUrl": "https://uipotion.com/potions/components/your-component.html",
   "agentGuideUrl": "https://uipotion.com/potions/components/your-component.json",
   "created": "2026-01-10",
@@ -367,8 +365,6 @@ Searchable catalog of all potions. Each entry includes:
 - `category` - layouts|components|features|patterns|tooling
 - `tags` - Array of tags for filtering
 - `excerpt` - Brief description
-- `complexity` - beginner|intermediate|advanced
-- `estimatedImplementationTime` - Time estimate
 - `webUrl` - Human-readable documentation
 - `agentGuideUrl` - JSON guide for AI implementation
 - `created` - Creation date
