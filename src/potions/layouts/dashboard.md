@@ -886,6 +886,7 @@ This dashboard layout commonly uses these components:
 
 - **[Navbar Component](/potions/components/navbar.html)** - For the header navigation bar
 - **[Data Table Component](/potions/components/data-table.html)** - For displaying tabular data in the main content area
+- **[Dropdown/Select Component](/potions/components/dropdown-select.html)** - For filters, settings, and data selection in dashboard controls
 - **[Dialog Component](/potions/components/dialog.html)** - For modals and action confirmations
 - **[Toast Notifications](/potions/components/toast-notifications.html)** - For user feedback messages
 

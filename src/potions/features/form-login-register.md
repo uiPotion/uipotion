@@ -372,6 +372,7 @@ const [showPassword, setShowPassword] = useState(false);
 This form feature works well with these potions:
 
 - **[Text Input Component](/potions/components/text-input.html)** - Foundation component for form inputs with built-in error/success states
+- **[Dropdown/Select Component](/potions/components/dropdown-select.html)** - For country, language, or other selection fields in registration forms
 - **[Form Validation Pattern](/potions/patterns/form-validation.html)** - UX guidelines for validation timing and error display
 
 These are suggestions to enhance your implementation. This feature works independently.

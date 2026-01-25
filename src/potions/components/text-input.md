@@ -415,6 +415,7 @@ This Text Input component is designed to work seamlessly with the [Form Validati
 
 The Text Input component works well with these potions:
 
+- **[Dropdown/Select Component](/potions/components/dropdown-select.html)** - Complementary form component for selection fields, works alongside text inputs in forms
 - **[Form Validation Pattern](/potions/patterns/form-validation.html)** - Apply validation timing and error display best practices to create user-friendly forms
 - **[Login & Registration Forms](/potions/features/form-login-register.html)** - Complete authentication forms that demonstrate Text Input in action
 

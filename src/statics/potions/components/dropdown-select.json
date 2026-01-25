@@ -1,0 +1,866 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
+  "id": "dropdown-select",
+  "version": "1.0.0",
+  "name": "Dropdown/Select Component (Accessible) with Search and Multi-Select",
+  "category": "components",
+  "tags": [
+    "dropdown",
+    "select",
+    "combobox",
+    "listbox",
+    "form",
+    "a11y",
+    "wcag",
+    "aria",
+    "keyboard-navigation"
+  ],
+  "description": "An accessible dropdown/select component with search/filter capability, multi-select support, keyboard navigation, and full ARIA combobox/listbox pattern. Supports grouped options, loading states, and error handling.",
+  "tokens": {
+    "layout": {
+      "triggerHeightPx": 44,
+      "triggerPaddingXPx": 14,
+      "triggerPaddingYPx": 11,
+      "borderWidthPx": 1,
+      "borderRadiusPx": 6,
+      "labelMarginBottomPx": 6,
+      "hintMarginTopPx": 6,
+      "errorMarginTopPx": 6,
+      "iconSizePx": 20,
+      "iconPaddingPx": 12,
+      "optionHeightPx": 40,
+      "optionPaddingXPx": 14,
+      "optionPaddingYPx": 10,
+      "dropdownMaxHeightPx": 300,
+      "dropdownMinWidthPx": 200,
+      "searchInputHeightPx": 36
+    },
+    "typography": {
+      "labelFontSizePx": 14,
+      "labelFontWeight": 500,
+      "triggerFontSizePx": 16,
+      "optionFontSizePx": 16,
+      "hintFontSizePx": 14,
+      "errorFontSizePx": 14,
+      "groupLabelFontSizePx": 12,
+      "groupLabelFontWeight": 600
+    },
+    "motion": {
+      "openDurationMs": 200,
+      "closeDurationMs": 150,
+      "focusTransitionMs": 150,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+    }
+  },
+  "aiAgentInstructions": {
+    "summary": "Implement a fully accessible dropdown/select component with search/filter, multi-select support, keyboard navigation (Arrow keys, Enter, Escape, Tab), and proper ARIA combobox/listbox pattern. Adapt to the user's framework and styling system. Ensure WCAG AA compliance with focus management, screen reader support, and proper ARIA attributes.",
+    "keyFeatures": [
+      "Label with required indicator and optional tooltip",
+      "Trigger button/input that opens dropdown",
+      "Search/filter input (optional) for filtering options",
+      "Dropdown list with scrollable options",
+      "Single-select and multi-select variants",
+      "Grouped options with group labels",
+      "Keyboard navigation: Arrow keys, Enter, Escape, Tab",
+      "Focus management: trap focus in dropdown when open",
+      "Loading state with spinner",
+      "Empty state when no options match filter",
+      "Error state with error message",
+      "Disabled state for trigger and options",
+      "Selected state indicators (checkmarks, highlights)",
+      "Screen reader support with ARIA combobox/listbox pattern",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system.",
+      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes.",
+      "CRITICAL: Implement proper ARIA attributes: aria-expanded, aria-haspopup, aria-controls, aria-activedescendant, aria-selected, aria-multiselectable, aria-label, aria-labelledby, aria-describedby"
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine package.json, existing components, config files, and style patterns.",
+      "0a. Detect framework patterns: Check for React hooks, Vue composition API, Angular decorators, or Svelte syntax.",
+      "0b. Detect styling conventions: Identify Tailwind, SCSS, CSS Modules, styled-components, or vanilla CSS usage.",
+      "0c. Detect design tokens: Check for existing color systems, spacing scales, typography, and form patterns.",
+      "1. Build component anatomy: Container, Label, Trigger, Dropdown, SearchInput (optional), OptionList, Option, GroupLabel",
+      "2. Implement open/close state management",
+      "3. Add trigger button/input with aria-expanded, aria-haspopup, aria-controls",
+      "4. Implement dropdown positioning (below trigger, with viewport boundary detection)",
+      "5. Add search/filter input if searchable=true (with debouncing)",
+      "6. Implement option rendering with proper ARIA: aria-selected, aria-posinset, aria-setsize",
+      "7. Add keyboard navigation: Arrow keys (Up/Down), Enter (select highlighted option), Space (select highlighted option), Escape (close), Tab (close and move focus). CRITICAL: Enter/Space on trigger must select highlighted option when dropdown is open. Enter/Space on search input must select highlighted option. This is a common oversight.",
+      "8. Implement focus management: trap focus in dropdown when open, restore to trigger on close",
+      "9. Add single-select: clicking option selects and closes dropdown",
+      "10. Add multi-select: clicking option toggles selection, dropdown stays open",
+      "11. Implement selected state indicators (checkmarks, background highlight)",
+      "12. Add loading state: show spinner in dropdown when loading=true",
+      "13. Add empty state: show message when no options match filter",
+      "14. Add error state: show error message below trigger, set aria-invalid",
+      "15. Add disabled state: disable trigger and prevent opening",
+      "16. Implement grouped options with group labels (optgroup pattern)",
+      "17. Add aria-activedescendant to track highlighted option during keyboard navigation",
+      "18. Ensure screen reader announces: label, expanded state, selected value(s), option count",
+      "19. Use ONLY the detected styling system. Do NOT add new CSS approaches.",
+      "20. Test with keyboard and screen readers"
+    ]
+  },
+  "componentSpec": {
+    "goal": "Provide a fully accessible dropdown/select component that allows users to choose from a list of options, with optional search/filter capability, single or multi-select support, keyboard navigation, and proper ARIA semantics for screen readers.",
+    "anatomy": {
+      "slots": [
+        "container",
+        "label",
+        "requiredIndicator",
+        "labelTooltip",
+        "trigger",
+        "triggerIcon",
+        "dropdown",
+        "searchInput",
+        "optionList",
+        "option",
+        "optionIcon",
+        "groupLabel",
+        "loadingSpinner",
+        "emptyState",
+        "hintText",
+        "errorMessage"
+      ],
+      "hierarchy": "Container( Label(Text, RequiredIndicator?, Tooltip?), Trigger(Text/Value, Icon?), Dropdown( SearchInput?, OptionList( GroupLabel?, Option(Text, Icon?)* )*, LoadingSpinner?, EmptyState? ), HintText?, ErrorMessage? )"
+    },
+    "stateModel": {
+      "open": {
+        "type": "boolean",
+        "description": "Whether the dropdown is currently open.",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "value": {
+        "type": "array",
+        "description": "Selected value(s). String for single-select, array for multi-select, null for no selection. In TypeScript terms: string | string[] | null.",
+        "default": null,
+        "persistence": "component state or parent state",
+        "notes": "Type varies: string for single-select, string[] for multi-select, null when no selection. Implementation should handle all three cases."
+      },
+      "highlightedIndex": {
+        "type": "number",
+        "description": "Index of currently highlighted option (for keyboard navigation).",
+        "default": -1,
+        "persistence": "component state only"
+      },
+      "searchQuery": {
+        "type": "string",
+        "description": "Current search/filter query string.",
+        "default": "",
+        "persistence": "component state only"
+      },
+      "filteredOptions": {
+        "type": "array",
+        "description": "Options filtered by search query.",
+        "default": [],
+        "persistence": "computed from options and searchQuery"
+      },
+      "error": {
+        "type": "string",
+        "description": "Error message to display. Empty string or null means no error.",
+        "default": "",
+        "persistence": "props/parent state"
+      },
+      "loading": {
+        "type": "boolean",
+        "description": "Whether options are being loaded (shows spinner in dropdown).",
+        "default": false,
+        "persistence": "props/parent state"
+      },
+      "disabled": {
+        "type": "boolean",
+        "description": "Whether dropdown is disabled (not interactive).",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "required": {
+        "type": "boolean",
+        "description": "Whether field is required. Shows asterisk (*) indicator in label.",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "multiSelect": {
+        "type": "boolean",
+        "description": "Whether multiple options can be selected.",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "searchable": {
+        "type": "boolean",
+        "description": "Whether dropdown includes search/filter input.",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "size": {
+        "type": "enum",
+        "description": "Size variant affecting trigger height, padding, and font size.",
+        "allowedValues": [
+          "small",
+          "medium",
+          "large"
+        ],
+        "default": "medium",
+        "persistence": "props/config"
+      }
+    },
+    "interactions": [
+      {
+        "event": "triggerClick",
+        "when": "!disabled",
+        "result": "toggleDropdown",
+        "sideEffects": [
+          "If closed: open dropdown, move focus to search input (if searchable) or first option, set aria-expanded='true'",
+          "If open: close dropdown, restore focus to trigger, set aria-expanded='false'"
+        ]
+      },
+      {
+        "event": "triggerKeyDown",
+        "when": "!disabled",
+        "result": "handleTriggerKeyboard",
+        "sideEffects": [
+          "Space/Enter: if closed, open dropdown and move focus to search/options; if open and option highlighted (highlightedIndex >= 0), select highlighted option",
+          "ArrowDown: if closed, open dropdown and highlight first option; if open, highlight next option",
+          "ArrowUp: if closed, open dropdown and highlight last option; if open, highlight previous option",
+          "Escape: close if open",
+          "Tab: close if open, allow focus to move"
+        ],
+        "preventDefault": true,
+        "accessibilityNotes": "CRITICAL: Space and Enter must select highlighted option when dropdown is open. This is essential for keyboard accessibility. Arrow keys open and navigate. Tab closes and moves focus."
+      },
+      {
+        "event": "optionClick",
+        "when": "open",
+        "result": "selectOption",
+        "sideEffects": [
+          "If single-select: set value, close dropdown, restore focus to trigger, call onChange",
+          "If multi-select: toggle option in value array, keep dropdown open, maintain focus, call onChange"
+        ],
+        "stopPropagation": true
+      },
+      {
+        "event": "optionKeyDown",
+        "when": "open",
+        "result": "handleOptionKeyboard",
+        "sideEffects": [
+          "ArrowDown: highlight next option, scroll into view if needed",
+          "ArrowUp: highlight previous option, scroll into view if needed",
+          "Enter/Space: select option (same as click)",
+          "Escape: close dropdown, restore focus to trigger",
+          "Tab: close dropdown, allow focus to move",
+          "Home: highlight first option",
+          "End: highlight last option",
+          "Type-ahead: jump to option starting with typed character"
+        ],
+        "preventDefault": true,
+        "accessibilityNotes": "Arrow keys navigate, Enter/Space select, Escape closes, Tab moves focus away."
+      },
+      {
+        "event": "searchInputKeyDown",
+        "when": "open && searchable",
+        "result": "handleSearchKeyboard",
+        "sideEffects": [
+          "Enter/Space: select highlighted option (or first option if highlightedIndex < 0)",
+          "ArrowDown: move focus to first option and set highlightedIndex to 0",
+          "Escape: clear query if not empty, otherwise close dropdown",
+          "Tab: close dropdown and move focus"
+        ],
+        "preventDefault": true,
+        "accessibilityNotes": "CRITICAL: Enter/Space in search input must select the highlighted option (or first option if none highlighted). This is essential for keyboard accessibility."
+      },
+      {
+        "event": "searchInputChange",
+        "when": "open && searchable",
+        "result": "updateSearchQuery",
+        "sideEffects": [
+          "Update searchQuery state",
+          "Filter options based on query (debounced if async)",
+          "Reset highlightedIndex to 0 (first filtered option)",
+          "Update aria-activedescendant to first filtered option"
+        ]
+      },
+      {
+        "event": "outsideClick",
+        "when": "open",
+        "result": "closeDropdown",
+        "sideEffects": [
+          "Close dropdown",
+          "Restore focus to trigger",
+          "Set aria-expanded='false'"
+        ]
+      },
+      {
+        "event": "escapeKey",
+        "when": "open",
+        "result": "closeDropdown",
+        "sideEffects": [
+          "Close dropdown",
+          "Restore focus to trigger",
+          "Set aria-expanded='false'"
+        ],
+        "preventDefault": true
+      }
+    ],
+    "responsiveBehavior": {
+      "mobile": {
+        "maxWidthPx": 767,
+        "behavior": "Full width trigger by default, dropdown matches trigger width, max height reduced to fit viewport",
+        "touchTargets": "Trigger height minimum 44px, options minimum 44px height",
+        "dropdownPosition": "Below trigger, or above if no space below"
+      },
+      "desktop": {
+        "minWidthPx": 1024,
+        "behavior": "Fixed or constrained width based on context, default 100% of parent",
+        "hover": "Show hover state on options (if not disabled)",
+        "dropdownPosition": "Below trigger, with viewport boundary detection"
+      }
+    },
+    "variants": {
+      "singleSelect": {
+        "description": "Single selection mode. Selecting an option closes dropdown and updates value.",
+        "ariaPattern": "combobox or listbox",
+        "behavior": "One option selected at a time"
+      },
+      "multiSelect": {
+        "description": "Multiple selection mode. Selecting options toggles them, dropdown stays open.",
+        "ariaPattern": "listbox with aria-multiselectable='true'",
+        "behavior": "Multiple options can be selected simultaneously"
+      },
+      "searchable": {
+        "description": "Includes search input to filter options.",
+        "ariaPattern": "combobox with aria-autocomplete='list'",
+        "behavior": "User can type to filter options"
+      },
+      "grouped": {
+        "description": "Options organized into groups with labels.",
+        "ariaPattern": "listbox with optgroup elements or aria-groupedby",
+        "behavior": "Groups visually and semantically separated"
+      }
+    },
+    "dataContract": {
+      "props": {
+        "label": {
+          "type": "string",
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "required": true
+        },
+        "id": {
+          "type": "string",
+          "required": false,
+          "default": "generated from name"
+        },
+        "options": {
+          "type": "Array<{ value: string; label: string; disabled?: boolean; group?: string }>",
+          "required": true,
+          "description": "Array of selectable options. Each option has value, label, optional disabled flag, and optional group name."
+        },
+        "value": {
+          "type": "string | string[] | null",
+          "required": false,
+          "controlled": true,
+          "description": "Selected value(s). String for single-select, array for multi-select."
+        },
+        "defaultValue": {
+          "type": "string | string[] | null",
+          "required": false,
+          "uncontrolled": true
+        },
+        "placeholder": {
+          "type": "string",
+          "required": false,
+          "default": "Select an option..."
+        },
+        "error": {
+          "type": "string | null",
+          "required": false
+        },
+        "hint": {
+          "type": "string",
+          "required": false
+        },
+        "required": {
+          "type": "boolean",
+          "required": false
+        },
+        "disabled": {
+          "type": "boolean",
+          "required": false
+        },
+        "multiSelect": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "searchable": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "loading": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "size": {
+          "type": "'small' | 'medium' | 'large'",
+          "required": false
+        },
+        "onChange": {
+          "type": "(value: string | string[] | null) => void",
+          "required": false
+        },
+        "onOpen": {
+          "type": "() => void",
+          "required": false
+        },
+        "onClose": {
+          "type": "() => void",
+          "required": false
+        },
+        "onSearch": {
+          "type": "(query: string) => void",
+          "required": false,
+          "description": "Optional callback for async search/filter (debounced)"
+        },
+        "className": {
+          "type": "string",
+          "required": false
+        },
+        "fullWidth": {
+          "type": "boolean",
+          "required": false,
+          "default": true
+        }
+      },
+      "events": {
+        "onChange": "Fired when selection changes (value or value array)",
+        "onOpen": "Fired when dropdown opens",
+        "onClose": "Fired when dropdown closes",
+        "onSearch": "Fired when search query changes (for async filtering)"
+      }
+    }
+  },
+  "animations": {
+    "open": {
+      "durationMs": 200,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": {
+        "opacity": "0 → 1",
+        "transform": "translateY(-8px) → translateY(0)",
+        "scale": "0.95 → 1"
+      }
+    },
+    "close": {
+      "durationMs": 150,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": {
+        "opacity": "1 → 0",
+        "transform": "translateY(0) → translateY(-8px)",
+        "scale": "1 → 0.95"
+      }
+    },
+    "optionHighlight": {
+      "durationMs": 100,
+      "easing": "ease-out",
+      "properties": {
+        "background": "Transition to highlight color on hover/focus"
+      }
+    },
+    "reducedMotion": {
+      "behavior": "Disable transforms and scale, use instant opacity changes",
+      "implementation": "@media (prefers-reduced-motion: reduce) { /* disable transforms, use instant transitions */ }"
+    }
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Label is programmatically associated with trigger via for/id or aria-labelledby",
+        "1.4.3": "Text and border colors maintain 4.5:1 contrast ratio with background",
+        "2.1.1": "Dropdown is fully keyboard operable (Tab, Arrow keys, Enter, Escape)",
+        "2.1.2": "No keyboard trap; Tab closes dropdown and moves focus",
+        "2.4.3": "Focus order is logical (trigger → search → options)",
+        "2.4.7": "Visible focus indicator on trigger and options",
+        "3.2.2": "Opening dropdown does not cause unexpected context change",
+        "3.3.1": "Error messages clearly identify the error",
+        "3.3.2": "Labels and required indicators provided",
+        "4.1.2": "Trigger and options have accessible names, roles, and states",
+        "4.1.3": "Selected values and option states announced to screen readers"
+      }
+    },
+    "keyboardNavigation": {
+      "trigger": {
+        "Space": "If closed: opens dropdown and moves focus to search/options. If open and option highlighted (highlightedIndex >= 0): selects highlighted option. CRITICAL: Must handle both states - this is a common oversight.",
+        "Enter": "If closed: opens dropdown and moves focus to search/options. If open and option highlighted (highlightedIndex >= 0): selects highlighted option. CRITICAL: Must handle both states - this is a common oversight.",
+        "ArrowDown": "If closed: opens dropdown and highlights first option. If open: highlights next option.",
+        "ArrowUp": "If closed: opens dropdown and highlights last option. If open: highlights previous option.",
+        "Escape": "Closes dropdown if open",
+        "Tab": "Closes dropdown if open, moves focus to next element"
+      },
+      "dropdown": {
+        "ArrowDown": "Highlights next option, scrolls into view",
+        "ArrowUp": "Highlights previous option, scrolls into view",
+        "Enter": "CRITICAL: Selects highlighted option (same as clicking). Must work when option is highlighted via aria-activedescendant. This is essential for keyboard accessibility.",
+        "Space": "CRITICAL: Selects highlighted option (same as clicking). Must work when option is highlighted via aria-activedescendant. This is essential for keyboard accessibility.",
+        "Escape": "Closes dropdown, restores focus to trigger",
+        "Tab": "Closes dropdown, moves focus to next element",
+        "Shift+Tab": "Closes dropdown, moves focus to previous element",
+        "Home": "Highlights first option",
+        "End": "Highlights last option",
+        "Type-ahead": "Jumps to first option starting with typed character"
+      },
+      "searchInput": {
+        "Enter": "CRITICAL: Selects highlighted option (or first option if highlightedIndex < 0). Essential for keyboard accessibility. This is a common oversight.",
+        "Space": "CRITICAL: Selects highlighted option (or first option if highlightedIndex < 0). Essential for keyboard accessibility. This is a common oversight.",
+        "ArrowDown": "Moves focus to first option and highlights it",
+        "Escape": "Closes dropdown if query empty, clears query if not empty",
+        "Tab": "Closes dropdown, moves focus to next element"
+      }
+    },
+    "ariaAttributes": {
+      "required": {
+        "trigger": {
+          "id": "Unique ID for trigger element",
+          "name": "Name attribute for form submission",
+          "aria-expanded": "true when open, false when closed",
+          "aria-haspopup": "listbox or true",
+          "aria-controls": "ID of dropdown element",
+          "aria-labelledby": "Points to label element ID",
+          "aria-describedby": "Points to hint text and/or error message element IDs (space-separated)",
+          "aria-invalid": "true when error exists, false or omitted when valid",
+          "aria-required": "true when field is required",
+          "aria-autocomplete": "list (if searchable)"
+        },
+        "dropdown": {
+          "id": "Unique ID for dropdown element",
+          "role": "listbox (for select) or combobox (if searchable)",
+          "aria-multiselectable": "true if multiSelect, false or omitted if single-select",
+          "aria-labelledby": "Points to label element ID"
+        },
+        "option": {
+          "id": "Unique ID for each option element",
+          "role": "option",
+          "aria-selected": "true if selected, false if not selected",
+          "aria-posinset": "Position in set (1-based index)",
+          "aria-setsize": "Total number of options in set",
+          "aria-disabled": "true if disabled, false or omitted if enabled"
+        },
+        "searchInput": {
+          "id": "Unique ID for search input",
+          "aria-label": "Search options",
+          "aria-controls": "ID of option list",
+          "aria-autocomplete": "list"
+        },
+        "groupLabel": {
+          "id": "Unique ID for group label",
+          "role": "group",
+          "aria-label": "Group name"
+        }
+      },
+      "optional": {
+        "trigger": {
+          "aria-activedescendant": "ID of currently highlighted option (when dropdown open)"
+        },
+        "emptyState": {
+          "role": "status",
+          "aria-live": "polite"
+        }
+      }
+    },
+    "screenReader": {
+      "trigger": "Label text, expanded state, selected value(s), and required state announced when trigger receives focus",
+      "open": "Screen reader announces 'listbox opened' or 'combobox opened' with option count",
+      "option": "Option label and selected state announced when highlighted",
+      "selection": "Selected value(s) announced when option selected",
+      "close": "Screen reader announces dropdown closed",
+      "error": "Error message announced via aria-describedby and aria-live",
+      "empty": "Empty state message announced when no options match filter"
+    },
+    "focusManagement": {
+      "open": "When dropdown opens, focus moves to search input (if searchable) or first option",
+      "close": "When dropdown closes, focus returns to trigger",
+      "trap": "Focus is trapped within dropdown while open (Tab cycles within dropdown)",
+      "highlight": "Highlighted option tracked via aria-activedescendant on trigger",
+      "scroll": "Highlighted option scrolled into view when navigating with keyboard"
+    },
+    "implementationChecklist": [
+      "Label is associated with trigger via for/id or aria-labelledby",
+      "Required indicator (*) shown when required=true",
+      "aria-required='true' on trigger when required",
+      "aria-expanded='true' when open, 'false' when closed",
+      "aria-haspopup='listbox' or 'true' on trigger",
+      "aria-controls points to dropdown ID",
+      "aria-invalid='true' on trigger when error exists",
+      "aria-describedby references hint text ID when hint provided",
+      "aria-describedby references error message ID when error exists",
+      "Dropdown has role='listbox' (or 'combobox' if searchable)",
+      "aria-multiselectable='true' on dropdown if multiSelect",
+      "Each option has role='option'",
+      "aria-selected='true' on selected options",
+      "aria-posinset and aria-setsize on options for position information",
+      "aria-activedescendant on trigger points to highlighted option ID",
+      "Focus ring visible and meets contrast requirements",
+      "Tab key opens/closes dropdown appropriately",
+      "Arrow keys navigate options",
+      "Enter/Space selects option",
+      "Escape closes dropdown",
+      "Focus returns to trigger on close",
+      "Search input (if present) is keyboard accessible",
+      "Empty state announced when no options match filter",
+      "Loading state announced when loading=true",
+      "Screen reader announces label, expanded state, selected value(s), and required state"
+    ]
+  },
+  "projectDetection": {
+    "framework": {
+      "description": "Detect the project's framework to use appropriate patterns for state management, event handling, and component structure.",
+      "detectionSteps": [
+        "Check package.json for framework dependencies (react, vue, @angular/core, svelte)",
+        "Examine existing form components to see how they handle value, onChange, state",
+        "Check for existing dropdown/select components as reference",
+        "Identify state management patterns (hooks, composition API, services, stores)"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect styling approach to match existing form components and ensure consistency.",
+      "detectionSteps": [
+        "Check package.json for styling dependencies",
+        "Look for existing form components and their styling approach",
+        "Identify class naming conventions for form states (error, disabled, open)",
+        "Check for utility functions (cn, clsx) for conditional class composition",
+        "Look for form-specific design tokens or CSS variables"
+      ],
+      "adaptationRules": [
+        "If Tailwind: Use ring utilities for focus, border-red-500 for error, dropdown utilities",
+        "If SCSS/CSS: Create .dropdown class with state modifiers (.dropdown--open, .dropdown--error, .dropdown--disabled)",
+        "If styled-components: Use props for state styling, theme for colors",
+        "If CSS Modules: Create dropdown.module.css with state classes"
+      ]
+    },
+    "designTokens": {
+      "description": "Use existing form design tokens for colors, spacing, typography, and states.",
+      "detectionSteps": [
+        "Check for form-specific color tokens (error-red, focus-blue, selected-bg)",
+        "Look for spacing tokens for trigger padding and margins",
+        "Check for typography tokens for label and option font sizes",
+        "Look for border radius and border width tokens",
+        "Check for existing dropdown/select styling patterns",
+        "Identify z-index tokens for dropdown overlay"
+      ]
+    }
+  },
+  "outputConstraints": {
+    "must": [
+      "Detect and use ONLY the project's existing framework and styling system",
+      "Use project's design tokens for colors, spacing, and typography",
+      "Create stylesheet classes for vanilla CSS/SCSS (no inline styles)",
+      "Implement proper ARIA attributes (aria-expanded, aria-haspopup, aria-controls, aria-activedescendant, aria-selected, aria-multiselectable)",
+      "Show required indicator (*) in label when required=true",
+      "Associate error messages with trigger via aria-describedby",
+      "Provide visible focus ring meeting contrast requirements",
+      "Support both controlled and uncontrolled usage patterns (framework-appropriate)",
+      "Implement keyboard navigation: Arrow keys navigate, Enter/Space select highlighted option (CRITICAL: must work on trigger when dropdown is open and on search input), Escape closes, Tab moves focus",
+      "Trap focus in dropdown when open, restore to trigger on close",
+      "Use for/id association or aria-labelledby for label-trigger connection",
+      "Handle viewport boundary detection for dropdown positioning",
+      "Support type-ahead navigation (jump to option starting with typed character)"
+    ],
+    "mustNot": [
+      "Introduce new styling systems or dependencies",
+      "Use inline style attributes (use classes instead)",
+      "Forget aria-expanded when dropdown opens/closes",
+      "Forget aria-activedescendant during keyboard navigation",
+      "Remove focus ring without providing alternative focus indicator",
+      "Hardcode colors (use design tokens or match existing components)",
+      "Make required indicator interactive or focusable",
+      "Allow keyboard trap (Tab must close dropdown and move focus)",
+      "Forget to restore focus to trigger on close",
+      "Forget aria-selected on options",
+      "Forget aria-multiselectable on dropdown for multi-select",
+      "Use native <select> element (this is a custom dropdown component)",
+      "Forget to handle Enter/Space selection when dropdown is open (must select highlighted option on trigger and search input)"
+    ]
+  },
+  "testingChecklist": [
+    "Label displays correctly and is associated with trigger",
+    "Required indicator (*) appears when required=true",
+    "Hint text displays below trigger when provided",
+    "Error message displays when error prop is provided",
+    "Error styling applied (red border, red text)",
+    "Disabled state prevents interaction and applies gray styling",
+    "Focus ring appears when trigger focused",
+    "Focus ring has sufficient contrast (3:1 minimum)",
+    "Tab key moves focus to trigger",
+    "Shift+Tab moves focus away from trigger",
+    "Space/Enter on trigger opens dropdown when closed",
+    "CRITICAL: Space/Enter on trigger selects highlighted option when dropdown is open (common oversight - must test)",
+    "ArrowDown on trigger opens dropdown and highlights first option",
+    "ArrowUp on trigger opens dropdown and highlights last option",
+    "Escape on trigger closes dropdown if open",
+    "Dropdown opens and displays options",
+    "Dropdown positioned correctly (below trigger, viewport boundary detection)",
+    "Search input appears when searchable=true",
+    "Search input filters options as user types",
+    "Arrow keys navigate options (Up/Down)",
+    "Enter/Space on options selects highlighted option",
+    "CRITICAL: Enter/Space on search input selects highlighted option (or first option if none highlighted) - common oversight, must test",
+    "Escape closes dropdown and restores focus to trigger",
+    "Tab closes dropdown and moves focus to next element",
+    "Clicking option selects it (single-select closes, multi-select stays open)",
+    "Selected options show checkmark or highlight",
+    "Multi-select allows multiple selections",
+    "Grouped options display with group labels",
+    "Loading spinner appears when loading=true",
+    "Empty state message appears when no options match filter",
+    "aria-expanded='true' when open, 'false' when closed",
+    "aria-haspopup='listbox' or 'true' on trigger",
+    "aria-controls points to dropdown ID",
+    "aria-activedescendant points to highlighted option ID",
+    "aria-selected='true' on selected options",
+    "aria-multiselectable='true' on dropdown if multiSelect",
+    "aria-invalid='true' on trigger when error exists",
+    "aria-required='true' on trigger when required",
+    "aria-describedby references hint text ID when hint provided",
+    "aria-describedby references error message ID when error provided",
+    "Screen reader announces label when trigger focused",
+    "Screen reader announces expanded state when dropdown opens",
+    "Screen reader announces selected value(s) when trigger focused",
+    "Screen reader announces option label and selected state when navigating",
+    "Screen reader announces empty state when no options match",
+    "Focus returns to trigger when dropdown closes",
+    "Focus trapped in dropdown when open (Tab cycles within)",
+    "Highlighted option scrolled into view during keyboard navigation",
+    "Type-ahead navigation works (jump to option starting with character)",
+    "Styling matches project conventions (Tailwind, SCSS, etc.)",
+    "All colors use project design tokens (no hardcoded values)"
+  ],
+  "frameworkPatterns": {
+    "react": {
+      "controlled": "const [value, setValue] = useState(null); <DropdownSelect value={value} onChange={setValue} options={options} />",
+      "uncontrolled": "<DropdownSelect defaultValue='option1' name='category' options={options} />",
+      "stateManagement": "Use useState for open, value, highlightedIndex, searchQuery. Use useRef for dropdown element. Use useEffect for outside click detection and keyboard handlers.",
+      "customHooks": "Optional: Create useDropdownState, useKeyboardNavigation, useClickOutside hooks for better organization",
+      "example": "<DropdownSelect label='Category' name='category' options={categories} value={selectedCategory} onChange={setSelectedCategory} required error={errors.category} searchable />"
+    },
+    "vue": {
+      "vModel": "<DropdownSelect v-model='category' label='Category' name='category' :options='categories' :required='true' :error='errors.category' />",
+      "stateManagement": "Use ref for open, value, highlightedIndex, searchQuery. Use reactive for options. Use onMounted/onUnmounted for event listeners.",
+      "composable": "Optional: Create useDropdown composable for common dropdown logic",
+      "example": "<DropdownSelect v-model='form.category' label='Category' :options='categories' :error='validationErrors.category' :searchable='true' />"
+    },
+    "angular": {
+      "formControl": "<app-dropdown-select [label]='Category' [formControl]='categoryControl' [options]='categories' [error]='categoryControl.errors?.required'></app-dropdown-select>",
+      "stateManagement": "Use FormControl from Reactive Forms, error from FormControl.errors. Use @ViewChild for dropdown element reference.",
+      "example": "categoryControl = new FormControl(null, [Validators.required]);"
+    },
+    "svelte": {
+      "binding": "<DropdownSelect bind:value={category} label='Category' name='category' options={categories} error={errors.category} />",
+      "stateManagement": "Use let for value, reactive statements for computed properties. Use onMount/onDestroy for event listeners.",
+      "example": "<DropdownSelect bind:value={form.category} label='Category' {required} :options={categories} error={$errors.category} :searchable={true} />"
+    }
+  },
+  "stylingApproaches": {
+    "tailwindCSS": {
+      "container": "space-y-2",
+      "label": "block text-sm font-medium text-gray-700 dark:text-gray-300",
+      "required": "text-red-500 ml-0.5",
+      "trigger": "relative w-full px-3.5 py-2.5 text-base border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center justify-between",
+      "triggerError": "border-red-500 focus:ring-red-500 focus:border-red-500",
+      "dropdown": "absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-[300px] overflow-auto",
+      "option": "px-3.5 py-2.5 text-base cursor-pointer hover:bg-gray-100 focus:bg-blue-50 focus:outline-none aria-selected:bg-blue-100 aria-selected:text-blue-900",
+      "optionDisabled": "opacity-50 cursor-not-allowed",
+      "searchInput": "w-full px-3 py-2 border-b border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500",
+      "hint": "text-sm text-gray-500",
+      "error": "text-sm text-red-600 flex items-center gap-1"
+    },
+    "cssModules": "Create dropdown.module.css with .container, .label, .required, .trigger, .trigger--open, .trigger--error, .trigger--disabled, .dropdown, .option, .option--selected, .option--highlighted, .option--disabled, .searchInput, .hint, .error classes",
+    "styledComponents": "Create styled.div components with props for state styling (open, error, disabled, selected, highlighted)",
+    "scss": "Create _dropdown.scss with BEM classes (.dropdown, .dropdown__label, .dropdown__trigger, .dropdown__trigger--open, .dropdown__option, .dropdown__option--selected) or nested SCSS"
+  },
+  "commonVariations": {
+    "countrySelect": {
+      "description": "Country selection with search and flag icons",
+      "searchable": true,
+      "options": "Array of countries with country codes",
+      "display": "Flag icon + country name"
+    },
+    "languageSelect": {
+      "description": "Language selection with native names",
+      "searchable": true,
+      "options": "Array of languages with codes and native names",
+      "display": "Language name in native script"
+    },
+    "tagSelect": {
+      "description": "Multi-select for tags/categories",
+      "multiSelect": true,
+      "display": "Selected tags shown as chips/badges in trigger",
+      "behavior": "Dropdown stays open for multiple selections"
+    },
+    "asyncSearch": {
+      "description": "Async search with server-side filtering",
+      "searchable": true,
+      "onSearch": "Debounced callback to fetch options from server",
+      "loading": "Shows spinner while fetching"
+    }
+  },
+  "edgeCases": {
+    "longOptionLabels": {
+      "issue": "Very long option text",
+      "solution": "Allow text to wrap or truncate with ellipsis, ensure sufficient width"
+    },
+    "manyOptions": {
+      "issue": "Hundreds or thousands of options",
+      "solution": "Implement virtual scrolling or pagination, use async search/filter"
+    },
+    "noOptionsMatch": {
+      "issue": "Search filter results in no matches",
+      "solution": "Show empty state message, keep dropdown open, allow user to clear search"
+    },
+    "viewportBoundary": {
+      "issue": "Dropdown would overflow viewport",
+      "solution": "Detect viewport boundaries, position dropdown above trigger if no space below, or adjust position"
+    },
+    "nestedInScrollContainer": {
+      "issue": "Dropdown trigger inside scrollable container",
+      "solution": "Use fixed positioning or portal for dropdown, handle scroll events"
+    },
+    "requiredWithoutValue": {
+      "issue": "Field is required but no value selected",
+      "solution": "Show error on form submission, set aria-invalid='true'"
+    },
+    "multiSelectManySelected": {
+      "issue": "Many options selected in multi-select mode",
+      "solution": "Show count in trigger (e.g., '3 selected') or show first few with '+N more'"
+    }
+  },
+  "meta": {
+    "created": "2026-01-25",
+    "updated": "2026-01-25",
+    "webUrl": "https://uipotion.com/potions/components/dropdown-select.html",
+    "relatedPotions": [
+      {
+        "id": "text-input",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: See Text Input component for similar form input patterns and styling",
+        "required": false
+      },
+      {
+        "id": "form-validation",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "Optional: Apply Form Validation pattern for validation timing and error display best practices",
+        "required": false
+      },
+      {
+        "id": "form-login-register",
+        "category": "features",
+        "relationship": "used-in",
+        "description": "Optional: See Login & Registration Forms for complete form example using dropdown components",
+        "required": false
+      }
+    ]
+  }
+}

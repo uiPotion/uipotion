@@ -389,6 +389,7 @@ User clicks Submit
 This pattern complements these potions:
 
 - **[Text Input Component](/potions/components/text-input.html)** - Foundation component for form inputs with built-in error/success states
+- **[Dropdown/Select Component](/potions/components/dropdown-select.html)** - Form selection component that benefits from validation timing patterns
 - **[Login & Registration Forms](/potions/features/form-login-register.html)** - Complete authentication forms that demonstrate this pattern in practice
 - **[Dialog Component](/potions/components/dialog.html)** - For complex validation scenarios requiring modals
 

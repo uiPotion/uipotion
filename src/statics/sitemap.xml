@@ -64,6 +64,13 @@
   </url>
 
   <url>
+    <loc>https://uipotion.com/potions/components/dropdown-select.html</loc>
+    <lastmod>2026-01-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://uipotion.com/potions/components/navbar.html</loc>
     <lastmod>2026-01-24</lastmod>
     <changefreq>monthly</changefreq>
@@ -72,7 +79,7 @@
 
   <url>
     <loc>https://uipotion.com/potions/components/text-input.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -86,7 +93,7 @@
 
   <url>
     <loc>https://uipotion.com/potions/features/form-login-register.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -100,7 +107,7 @@
 
   <url>
     <loc>https://uipotion.com/potions/layouts/dashboard.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -114,7 +121,7 @@
 
   <url>
     <loc>https://uipotion.com/potions/patterns/form-validation.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

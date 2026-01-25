@@ -265,6 +265,37 @@
         "webUrl": {
           "type": "string",
           "minLength": 1
+        },
+        "relatedPotions": {
+          "type": "array",
+          "description": "Optional: Array of related potions that complement or are used with this potion. These are suggestions, not requirements.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "category", "relationship", "description"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "category": {
+                "type": "string",
+                "enum": ["layouts", "components", "features", "patterns", "tooling"]
+              },
+              "relationship": {
+                "type": "string",
+                "description": "Type of relationship: 'complements', 'used-in', 'extends', etc."
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "required": {
+                "type": "boolean",
+                "description": "Whether this related potion is required (default: false, should always be false as potions are independent)"
+              }
+            }
+          }
         }
       }
     },
