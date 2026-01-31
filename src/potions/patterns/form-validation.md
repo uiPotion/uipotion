@@ -14,6 +14,7 @@ tags:
   - patterns
   - user-experience
 agentManifest: 'potions/patterns/form-validation.json'
+path: 'potions/patterns/form-validation'
 ---
 
 # Form Validation Pattern - UX and Timing Strategies
@@ -388,10 +389,10 @@ User clicks Submit
 
 This pattern complements these potions:
 
-- **[Text Input Component](/potions/components/text-input.html)** - Foundation component for form inputs with built-in error/success states
-- **[Dropdown/Select Component](/potions/components/dropdown-select.html)** - Form selection component that benefits from validation timing patterns
-- **[Login & Registration Forms](/potions/features/form-login-register.html)** - Complete authentication forms that demonstrate this pattern in practice
-- **[Dialog Component](/potions/components/dialog.html)** - For complex validation scenarios requiring modals
+- **[Text Input Component](/potions/components/text-input)** - Foundation component for form inputs with built-in error/success states
+- **[Dropdown/Select Component](/potions/components/dropdown-select)** - Form selection component that benefits from validation timing patterns
+- **[Login & Registration Forms](/potions/features/form-login-register)** - Complete authentication forms that demonstrate this pattern in practice
+- **[Dialog Component](/potions/components/dialog)** - For complex validation scenarios requiring modals
 
 These are suggestions to help you build complete forms. This pattern works with any form components you choose to use.
 

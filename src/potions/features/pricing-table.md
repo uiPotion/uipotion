@@ -14,6 +14,7 @@ tags:
   - responsive
   - conversion
 agentManifest: 'potions/features/pricing-table.json'
+path: 'potions/features/pricing-table'
 ---
 
 # 3-Tier SaaS Pricing Table

@@ -2,7 +2,7 @@
   "$schema": "https://uipotion.com/schema/categories/components.schema.json",
   "id": "navbar",
   "version": "1.0.2",
-  "name": "Navigation Bar (Responsive) with Mobile Menu + Dropdowns",
+  "name": "Navigation Bar (Responsive) with Mobile Menu",
   "category": "components",
   "tags": [
     "navbar",

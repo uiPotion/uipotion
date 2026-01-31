@@ -225,7 +225,7 @@
             resultItemContainer.setAttribute('role', 'listitem');
 
             const resultLink = document.createElement('a');
-            resultLink.href = postsPath + result.fileName;
+            resultLink.href = postsPath + result.fileName.replace(/\.html$/, '');
             resultLink.classList.add('search-result-link');
 
             // Extract category from fileName (e.g., "components/navbar.html" -> "components")

@@ -16,6 +16,7 @@ tags:
   - aria
   - queue
 agentManifest: 'potions/components/toast-notifications.json'
+path: 'potions/components/toast-notifications'
 ---
 
 # Toast Notifications (Accessible) with Queue System

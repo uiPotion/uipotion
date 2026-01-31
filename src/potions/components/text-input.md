@@ -15,6 +15,7 @@ tags:
   - aria
   - form-control
 agentManifest: 'potions/components/text-input.json'
+path: 'potions/components/text-input'
 ---
 
 # Text Input Field
@@ -372,7 +373,7 @@ emailControl = new FormControl('', [Validators.required, Validators.email]);
 
 ## Integration with Form Validation Pattern
 
-This Text Input component is designed to work seamlessly with the [Form Validation Pattern](/potions/patterns/form-validation.html):
+This Text Input component is designed to work seamlessly with the [Form Validation Pattern](/potions/patterns/form-validation):
 
 1. **Validation Timing**: Show errors only after `onBlur` (when touched)
 2. **Error Display**: Pass error message via `error` prop
@@ -415,9 +416,9 @@ This Text Input component is designed to work seamlessly with the [Form Validati
 
 The Text Input component works well with these potions:
 
-- **[Dropdown/Select Component](/potions/components/dropdown-select.html)** - Complementary form component for selection fields, works alongside text inputs in forms
-- **[Form Validation Pattern](/potions/patterns/form-validation.html)** - Apply validation timing and error display best practices to create user-friendly forms
-- **[Login & Registration Forms](/potions/features/form-login-register.html)** - Complete authentication forms that demonstrate Text Input in action
+- **[Dropdown/Select Component](/potions/components/dropdown-select)** - Complementary form component for selection fields, works alongside text inputs in forms
+- **[Form Validation Pattern](/potions/patterns/form-validation)** - Apply validation timing and error display best practices to create user-friendly forms
+- **[Login & Registration Forms](/potions/features/form-login-register)** - Complete authentication forms that demonstrate Text Input in action
 
 These are suggestions to enhance your implementation. Text Input works independently and can be used in any context.
 

@@ -20,6 +20,3 @@ Allow: /
 
 # Sitemaps
 Sitemap: https://uipotion.com/sitemap.xml
-
-# Performance: Crawl-delay to be nice to server
-Crawl-delay: 1

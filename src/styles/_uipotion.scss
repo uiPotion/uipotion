@@ -135,6 +135,39 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+/* Custom scrollbar - matches page (dark track, indigo thumb) */
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #6366f1 #262626;
+}
+
+/* Width */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track (background) */
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: #262626;
+}
+
+/* Thumb (draggable part) */
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: #6366f1;
+  border-radius: 6px;
+}
+
+/* Hover */
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: #818cf8;
+}
+
 /* Logo Styling - Clean & Simple */
 .logo-container {
   display: flex;

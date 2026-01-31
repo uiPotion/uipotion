@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Generate sitemap.xml automatically from potions markdown files
- * Run: node generate-sitemap.js
- * Or add to package.json scripts: "sitemap": "node generate-sitemap.js"
+ * Generate sitemap.xml and _redirects from potions and static pages.
+ * Run: node generate-static.js
+ * Or: npm run static
  */
 
 const fs = require('fs');
@@ -11,16 +11,17 @@ const path = require('path');
 // Configuration
 const POTIONS_DIR = 'src/potions';
 const OUTPUT_FILE = 'src/statics/sitemap.xml';
+const REDIRECTS_FILE = 'src/statics/_redirects';
 const BASE_URL = 'https://uipotion.com';
 
-// Static pages with their priorities
+// Static pages with their priorities (pretty URLs, no .html)
 const STATIC_PAGES = [
   { path: '/', priority: '1.0', changefreq: 'weekly' },
-  { path: '/about.html', priority: '0.8', changefreq: 'monthly' },
-  { path: '/potions.html', priority: '0.9', changefreq: 'weekly' },
-  { path: '/contribute.html', priority: '0.7', changefreq: 'monthly' },
-  { path: '/validator.html', priority: '0.6', changefreq: 'monthly' },
-  { path: '/legal.html', priority: '0.3', changefreq: 'yearly' },
+  { path: '/about', priority: '0.8', changefreq: 'monthly' },
+  { path: '/potions', priority: '0.9', changefreq: 'weekly' },
+  { path: '/contribute', priority: '0.7', changefreq: 'monthly' },
+  { path: '/validator', priority: '0.6', changefreq: 'monthly' },
+  { path: '/legal', priority: '0.3', changefreq: 'yearly' },
 ];
 
 // API/Discovery endpoints
@@ -55,7 +56,7 @@ function findPotions() {
         potions.push({
           category,
           slug,
-          path: `/potions/${category}/${slug}.html`,
+          path: `/potions/${category}/${slug}`,
           priority: '0.8',
           changefreq: 'monthly',
           lastmod: getFileLastModified(filepath)
@@ -132,8 +133,28 @@ function generateSitemap() {
   return { xml, potions };
 }
 
+function generateRedirects(potions) {
+  // Netlify _redirects: from to status (whitespace-separated). See https://docs.netlify.com/routing/redirects/
+  const lines = [
+    '# Netlify Pretty URLs: .html → pretty (301). Auto-generated — do not edit by hand.',
+    '/index.html / 301',
+  ];
+  STATIC_PAGES.forEach(page => {
+    if (page.path === '/') return;
+    lines.push(`${page.path}.html ${page.path} 301`);
+  });
+  lines.push('/404.html /404 301');
+  potions.forEach(potion => {
+    lines.push(`${potion.path}.html ${potion.path} 301`);
+  });
+  lines.push('');
+  lines.push('# Serve 404 for missing URLs');
+  lines.push('/* /404.html 404');
+  return lines.join('\n') + '\n';
+}
+
 function main() {
-  console.log('🗺️  Generating sitemap.xml...\n');
+  console.log('Generating sitemap.xml and _redirects...\n');
 
   const { xml, potions } = generateSitemap();
 
@@ -146,17 +167,18 @@ function main() {
     }
   });
 
-  // Write to file
   const outputDir = path.dirname(OUTPUT_FILE);
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
   fs.writeFileSync(OUTPUT_FILE, xml, 'utf-8');
+  const redirects = generateRedirects(potions);
+  fs.writeFileSync(REDIRECTS_FILE, redirects, 'utf-8');
 
-  console.log(`\n✅ Sitemap generated successfully!`);
-  console.log(`📁 Saved to: ${OUTPUT_FILE}`);
-  console.log(`📊 Total URLs: ${STATIC_PAGES.length + potions.length + API_ENDPOINTS.length}`);
+  console.log(`\nSitemap generated: ${OUTPUT_FILE}`);
+  console.log(`Redirects generated: ${REDIRECTS_FILE}`);
+  console.log(`Total URLs: ${STATIC_PAGES.length + potions.length + API_ENDPOINTS.length}`);
 }
 
 main();

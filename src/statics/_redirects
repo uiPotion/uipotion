@@ -1,0 +1,23 @@
+# Netlify Pretty URLs: .html → pretty (301). Auto-generated — do not edit by hand.
+/index.html / 301
+/about.html /about 301
+/potions.html /potions 301
+/contribute.html /contribute 301
+/validator.html /validator 301
+/legal.html /legal 301
+/404.html /404 301
+/potions/components/data-table.html /potions/components/data-table 301
+/potions/components/dialog.html /potions/components/dialog 301
+/potions/components/dropdown-select.html /potions/components/dropdown-select 301
+/potions/components/navbar.html /potions/components/navbar 301
+/potions/components/text-input.html /potions/components/text-input 301
+/potions/components/toast-notifications.html /potions/components/toast-notifications 301
+/potions/features/form-login-register.html /potions/features/form-login-register 301
+/potions/features/pricing-table.html /potions/features/pricing-table 301
+/potions/layouts/dashboard.html /potions/layouts/dashboard 301
+/potions/layouts/landing-page.html /potions/layouts/landing-page 301
+/potions/patterns/form-validation.html /potions/patterns/form-validation 301
+/potions/tooling/eslint-config.html /potions/tooling/eslint-config 301
+
+# Serve 404 for missing URLs
+/* /404.html 404

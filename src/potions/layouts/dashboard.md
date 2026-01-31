@@ -11,6 +11,7 @@ tags:
   - responsive
   - admin
 agentManifest: 'potions/layouts/dashboard.json'
+path: 'potions/layouts/dashboard'
 ---
 
 # Dashboard Layout
@@ -884,11 +885,11 @@ const notifications = [
 
 This dashboard layout commonly uses these components:
 
-- **[Navbar Component](/potions/components/navbar.html)** - For the header navigation bar
-- **[Data Table Component](/potions/components/data-table.html)** - For displaying tabular data in the main content area
-- **[Dropdown/Select Component](/potions/components/dropdown-select.html)** - For filters, settings, and data selection in dashboard controls
-- **[Dialog Component](/potions/components/dialog.html)** - For modals and action confirmations
-- **[Toast Notifications](/potions/components/toast-notifications.html)** - For user feedback messages
+- **[Navbar Component](/potions/components/navbar)** - For the header navigation bar
+- **[Data Table Component](/potions/components/data-table)** - For displaying tabular data in the main content area
+- **[Dropdown/Select Component](/potions/components/dropdown-select)** - For filters, settings, and data selection in dashboard controls
+- **[Dialog Component](/potions/components/dialog)** - For modals and action confirmations
+- **[Toast Notifications](/potions/components/toast-notifications)** - For user feedback messages
 
 These are examples of components that pair well with dashboards. The layout works with any content you choose.
 

@@ -16,6 +16,7 @@ tags:
   - aria
   - keyboard-navigation
 agentManifest: 'potions/components/dropdown-select.json'
+path: 'potions/components/dropdown-select'
 ---
 
 # Dropdown/Select Component
@@ -501,7 +502,7 @@ categoryControl = new FormControl(null, [Validators.required]);
 
 ## Integration with Form Validation Pattern
 
-This Dropdown/Select component is designed to work seamlessly with the [Form Validation Pattern](/potions/patterns/form-validation.html):
+This Dropdown/Select component is designed to work seamlessly with the [Form Validation Pattern](/potions/patterns/form-validation):
 
 1. **Validation Timing**: Show errors only after user attempts to submit or blur
 2. **Error Display**: Pass error message via `error` prop
@@ -551,9 +552,9 @@ This Dropdown/Select component is designed to work seamlessly with the [Form Val
 
 The Dropdown/Select component works well with these potions:
 
-- **[Text Input Component](/potions/components/text-input.html)** - Similar form input patterns and styling for consistency
-- **[Form Validation Pattern](/potions/patterns/form-validation.html)** - Apply validation timing and error display best practices
-- **[Login & Registration Forms](/potions/features/form-login-register.html)** - Complete form example that may use dropdown components
+- **[Text Input Component](/potions/components/text-input)** - Similar form input patterns and styling for consistency
+- **[Form Validation Pattern](/potions/patterns/form-validation)** - Apply validation timing and error display best practices
+- **[Login & Registration Forms](/potions/features/form-login-register)** - Complete form example that may use dropdown components
 
 These are suggestions to enhance your implementation. Dropdown/Select works independently and can be used in any context.
 

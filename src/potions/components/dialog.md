@@ -14,6 +14,7 @@ tags:
   - wcag
   - aria
 agentManifest: 'potions/components/dialog.json'
+path: 'potions/components/dialog'
 ---
 
 # Modal Dialog (Accessible) with Focus Trap and Actions

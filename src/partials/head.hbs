@@ -16,12 +16,12 @@
   <link rel="manifest" href="{{relativePath 'site.webmanifest'}}">
   <meta name="theme-color" content="#8B5CF6">
   
-  <!-- Canonical URL -->
-  <link rel="canonical" href="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{else}}index.html{{/if}}">
+  <!-- Canonical URL (use / for home when currentPath empty) -->
+  <link rel="canonical" href="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{/if}}">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="{{#if agentManifest}}article{{else}}website{{/if}}">
-  <meta property="og:url" content="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{else}}index.html{{/if}}">
+  <meta property="og:url" content="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{/if}}">
   <meta property="og:title" content="{{title}}">
   <meta property="og:description" content="{{description}}">
   <meta property="og:image" content="https://uipotion.com/assets/images/og-image.png">
@@ -32,7 +32,7 @@
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{else}}index.html{{/if}}">
+  <meta name="twitter:url" content="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{/if}}">
   <meta name="twitter:title" content="{{title}}">
   <meta name="twitter:description" content="{{description}}">
   <meta name="twitter:image" content="https://uipotion.com/assets/images/og-image.png">
@@ -89,7 +89,7 @@
     "dateModified": "{{publicationDate}}",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://uipotion.com/{{currentPath}}"
+      "@id": "https://uipotion.com/{{#if currentPath}}{{currentPath}}{{/if}}"
     },
     "image": "https://uipotion.com/assets/images/og-image.png",
     "about": {
@@ -126,7 +126,7 @@
     },
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://uipotion.com/potions.html?q={search_term_string}",
+      "target": "https://uipotion.com/potions?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   }
@@ -138,7 +138,7 @@
   <header class="main-header">
     <div class="container">
       <div class="main-header-container">
-        <a href="{{relativePath 'index.html'}}" class="logo-container">
+        <a href="{{relativePath 'index'}}" class="logo-container">
           <img src="{{relativePath 'assets/images/uipotion-logo.png'}}" alt="UI Potion Logo" width="32" height="32" class="logo-image">
           <span class="logo-text">UI Potion</span>
         </a>
@@ -153,9 +153,9 @@
         <!-- Desktop & Mobile Menu -->
         <nav class="main-menu" id="mainMenu">
           <ul class="main-menu-list">
-            <li class="main-menu-list-item"><a href="{{relativePath 'potions.html'}}">Potions</a></li>
-            <li class="main-menu-list-item"><a href="{{relativePath 'about.html'}}">About</a></li>
-            <li class="main-menu-list-item"><a href="{{relativePath 'contribute.html'}}">Contribute</a></li>
+            <li class="main-menu-list-item"><a href="{{relativePath 'potions'}}">Potions</a></li>
+            <li class="main-menu-list-item"><a href="{{relativePath 'about'}}">About</a></li>
+            <li class="main-menu-list-item"><a href="{{relativePath 'contribute'}}">Contribute</a></li>
             <li class="main-menu-list-item">
               <button class="search-toggle-btn" data-js-search aria-label="Search potions" title="Search potions">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

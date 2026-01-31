@@ -6,7 +6,7 @@
       "category": "layouts",
       "tags": ["layouts", "dashboard", "sidebar", "responsive", "admin"],
       "excerpt": "A responsive admin dashboard layout with collapsible sidebar navigation and fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.",
-      "webUrl": "https://uipotion.com/potions/layouts/dashboard.html",
+      "webUrl": "https://uipotion.com/potions/layouts/dashboard",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/dashboard.json",
       "created": "2026-01-10",
       "updated": "2026-01-10"
@@ -17,7 +17,7 @@
       "category": "components",
       "tags": ["components", "modal", "dialog", "overlay", "focus-trap", "a11y", "wcag", "aria"],
       "excerpt": "An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.",
-      "webUrl": "https://uipotion.com/potions/components/dialog.html",
+      "webUrl": "https://uipotion.com/potions/components/dialog",
       "agentGuideUrl": "https://uipotion.com/potions/components/dialog.json",
       "created": "2026-01-11",
       "updated": "2026-01-11"
@@ -39,7 +39,7 @@
       "category": "features",
       "tags": ["features", "pricing", "saas", "subscription", "billing", "marketing", "responsive", "conversion"],
       "excerpt": "A responsive 3-tier pricing table component with monthly/yearly billing toggle, highlighted 'Most Popular' plan, and feature comparison. Perfect for SaaS marketing pages, product pages, and subscription-based services.",
-      "webUrl": "https://uipotion.com/potions/features/pricing-table.html",
+      "webUrl": "https://uipotion.com/potions/features/pricing-table",
       "agentGuideUrl": "https://uipotion.com/potions/features/pricing-table.json",
       "created": "2026-01-18",
       "updated": "2026-01-18"
@@ -50,7 +50,7 @@
       "category": "components",
       "tags": ["components", "data-table", "table", "sortable", "pagination", "filtering", "selection", "responsive", "a11y", "wcag", "admin", "dashboard"],
       "excerpt": "A comprehensive data table component with sorting, pagination, filtering, row selection, and responsive behavior. Includes loading, empty, and error states with full keyboard navigation support.",
-      "webUrl": "https://uipotion.com/potions/components/data-table.html",
+      "webUrl": "https://uipotion.com/potions/components/data-table",
       "agentGuideUrl": "https://uipotion.com/potions/components/data-table.json",
       "created": "2026-01-18",
       "updated": "2026-01-18"
@@ -72,7 +72,7 @@
       "category": "layouts",
       "tags": ["layouts", "landing-page", "marketing", "hero", "features", "testimonials", "cta", "responsive", "conversion"],
       "excerpt": "A conversion-optimized marketing landing page layout with hero section, feature highlights, social proof, and multiple CTAs. Perfect for product launches, SaaS marketing, and lead generation campaigns.",
-      "webUrl": "https://uipotion.com/potions/layouts/landing-page.html",
+      "webUrl": "https://uipotion.com/potions/layouts/landing-page",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/landing-page.json",
       "created": "2026-01-24",
       "updated": "2026-01-24"
@@ -83,7 +83,7 @@
       "category": "tooling",
       "tags": ["tooling", "eslint", "linting", "config", "code-quality", "developer-experience", "typescript", "accessibility", "formatting"],
       "excerpt": "A comprehensive ESLint configuration generator supporting React, Vue, Angular, and Svelte with accessibility linting, TypeScript support, and Prettier integration.",
-      "webUrl": "https://uipotion.com/potions/tooling/eslint-config.html",
+      "webUrl": "https://uipotion.com/potions/tooling/eslint-config",
       "agentGuideUrl": "https://uipotion.com/potions/tooling/eslint-config.json",
       "created": "2026-01-24",
       "updated": "2026-01-24"
@@ -94,7 +94,7 @@
       "category": "patterns",
       "tags": ["patterns", "validation", "forms", "ux", "accessibility", "error-handling", "progressive-disclosure", "user-experience"],
       "excerpt": "A comprehensive UX pattern for form validation covering timing strategies, error display, async validation, accessibility, and integration with form libraries.",
-      "webUrl": "https://uipotion.com/potions/patterns/form-validation.html",
+      "webUrl": "https://uipotion.com/potions/patterns/form-validation",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/form-validation.json",
       "created": "2026-01-24",
       "updated": "2026-01-24"
@@ -105,7 +105,7 @@
       "category": "components",
       "tags": ["components", "input", "form", "text-field", "validation", "a11y", "wcag", "aria", "form-control"],
       "excerpt": "An accessible text input component with label, hint text, error display, success indicator, and comprehensive state management. Foundation for all form inputs.",
-      "webUrl": "https://uipotion.com/potions/components/text-input.html",
+      "webUrl": "https://uipotion.com/potions/components/text-input",
       "agentGuideUrl": "https://uipotion.com/potions/components/text-input.json",
       "created": "2026-01-24",
       "updated": "2026-01-24"
@@ -116,7 +116,7 @@
       "category": "features",
       "tags": ["features", "form", "authentication", "login", "registration", "validation", "accessibility", "forms"],
       "excerpt": "Complete authentication forms (login and registration) with real-time validation, error handling, password strength, and accessibility.",
-      "webUrl": "https://uipotion.com/potions/features/form-login-register.html",
+      "webUrl": "https://uipotion.com/potions/features/form-login-register",
       "agentGuideUrl": "https://uipotion.com/potions/features/form-login-register.json",
       "created": "2026-01-24",
       "updated": "2026-01-24"
@@ -127,12 +127,12 @@
       "category": "components",
       "tags": ["components", "dropdown", "select", "combobox", "listbox", "form", "a11y", "wcag", "aria", "keyboard-navigation"],
       "excerpt": "An accessible dropdown/select component with search/filter capability, multi-select support, keyboard navigation, and full ARIA combobox/listbox pattern. Supports grouped options, loading states, and error handling.",
-      "webUrl": "https://uipotion.com/potions/components/dropdown-select.html",
+      "webUrl": "https://uipotion.com/potions/components/dropdown-select",
       "agentGuideUrl": "https://uipotion.com/potions/components/dropdown-select.json",
       "created": "2026-01-25",
       "updated": "2026-01-25"
     }
   ],
   "totalCount": 12,
-  "lastUpdated": "2026-01-25"
+  "lastUpdated": "2026-01-31"
 }

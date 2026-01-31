@@ -171,8 +171,8 @@ npm run build
 # Validate all potions against their schemas
 npm run validate
 
-# Generate sitemap.xml
-npm run sitemap
+# Generate sitemap.xml and _redirects
+npm run static
 
 # The build output will be in the `build/` directory
 ```

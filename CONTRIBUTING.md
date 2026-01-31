@@ -7,7 +7,7 @@ Thank you for your interest in contributing to UI Potion! This guide will help y
 1. Fork this repository at https://github.com/uiPotion/uipotion
 2. Create your potion (Markdown + JSON)
 3. Validate using the [Schema Validator](https://uipotion.com/validator.html)
-4. Run `npm run sitemap` to update sitemap (automatic!)
+4. Run `npm run static` to update sitemap and redirects (automatic!)
 5. Submit a pull request
 
 ## Creating a Potion
@@ -79,15 +79,15 @@ Then write comprehensive specifications in the body (see existing potions for fo
 
 Visit https://uipotion.com/validator.html and validate your JSON file.
 
-### Step 4: Update Sitemap (Automatic!)
+### Step 4: Update Sitemap and Redirects (Automatic!)
 
 After creating your potion files, run:
 
 ```bash
-npm run sitemap
+npm run static
 ```
 
-This automatically scans all markdown files and updates `src/statics/sitemap.xml`. No manual editing needed!
+This automatically scans all markdown files and updates `src/statics/sitemap.xml` and `src/statics/_redirects`. No manual editing needed!
 
 ### Step 5: Update Potions Index
 
@@ -121,8 +121,8 @@ npm start
 # Build for production
 npm run build
 
-# Update sitemap
-npm run sitemap
+# Update sitemap and redirects
+npm run static
 ```
 
 Visit http://localhost:3000 to preview your changes.
@@ -132,7 +132,7 @@ Visit http://localhost:3000 to preview your changes.
 **Before submitting:**
 - ✅ JSON validates with no errors
 - ✅ Markdown has correct front matter
-- ✅ Ran `npm run sitemap`
+- ✅ Ran `npm run static`
 - ✅ Updated `potions-index.json`
 - ✅ Tested locally with `npm start`
 - ✅ Followed existing potion format

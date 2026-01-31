@@ -15,6 +15,7 @@ tags:
   - accessibility
   - formatting
 agentManifest: 'potions/tooling/eslint-config.json'
+path: 'potions/tooling/eslint-config'
 ---
 
 # ESLint Config Generator for UI Projects

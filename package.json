@@ -4,9 +4,9 @@
   "description": "AI-agent-optimized UI component guides for any framework",
   "main": "index.js",
   "scripts": {
-    "start": "npm run validate && npm run sitemap && harold-scripts start",
-    "build": "npm run validate && npm run sitemap && harold-scripts build",
-    "sitemap": "node generate-sitemap.js",
+    "start": "npm run validate && npm run static && harold-scripts start",
+    "build": "npm run validate && npm run static && harold-scripts build",
+    "static": "node generate-static.js",
     "validate": "node validate-potions.js"
   },
   "repository": {

@@ -8,127 +8,127 @@
   <!-- Static Pages -->
   <url>
     <loc>https://uipotion.com/</loc>
-    <lastmod>2026-01-25</lastmod>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/about.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/about</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/potions</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/contribute.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/contribute</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/validator.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/validator</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/legal.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/legal</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
 
   <!-- Individual Potions -->
   <url>
-    <loc>https://uipotion.com/potions/components/data-table.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <loc>https://uipotion.com/potions/components/data-table</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/components/dialog.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <loc>https://uipotion.com/potions/components/dialog</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/components/dropdown-select.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/potions/components/dropdown-select</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/components/navbar.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <loc>https://uipotion.com/potions/components/navbar</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/components/text-input.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/potions/components/text-input</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/components/toast-notifications.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <loc>https://uipotion.com/potions/components/toast-notifications</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/features/form-login-register.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/potions/features/form-login-register</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/features/pricing-table.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <loc>https://uipotion.com/potions/features/pricing-table</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/layouts/dashboard.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/potions/layouts/dashboard</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/layouts/landing-page.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <loc>https://uipotion.com/potions/layouts/landing-page</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/patterns/form-validation.html</loc>
-    <lastmod>2026-01-25</lastmod>
+    <loc>https://uipotion.com/potions/patterns/form-validation</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://uipotion.com/potions/tooling/eslint-config.html</loc>
-    <lastmod>2026-01-24</lastmod>
+    <loc>https://uipotion.com/potions/tooling/eslint-config</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -136,14 +136,14 @@
   <!-- API/Discovery Endpoints for AI Agents -->
   <url>
     <loc>https://uipotion.com/uipotion-manifest.json</loc>
-    <lastmod>2026-01-25</lastmod>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://uipotion.com/potions-index.json</loc>
-    <lastmod>2026-01-25</lastmod>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>

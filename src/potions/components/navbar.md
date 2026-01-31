@@ -1,6 +1,6 @@
 ---
 layout: 'potion'
-title: 'Navigation Bar (Responsive) with Mobile Menu + Dropdowns'
+title: 'Navigation Bar (Responsive) with Mobile Menu'
 publicationDate: '2026-01-12'
 excerpt: 'A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, optional transparent-to-solid transition, and first-class dropdown support. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.'
 category: 'Components'
@@ -15,9 +15,10 @@ tags:
   - dropdown
   - a11y
 agentManifest: 'potions/components/navbar.json'
+path: 'potions/components/navbar'
 ---
 
-# Navigation Bar (Responsive) with Mobile Menu + Dropdowns
+# Navigation Bar (Responsive) with Mobile Menu
 
 A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, optional transparent-to-solid transition, and first-class dropdown support. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.
 
