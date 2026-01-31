@@ -236,7 +236,7 @@ SOFTWARE.
 
 - **Issues**: [GitHub Issues](https://github.com/uiPotion/uipotion/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/uiPotion/uipotion/discussions)
-- **Email**: julian.cwirko@gmail.com
+- **X**: [@uipotion](https://x.com/uipotion) · [@thejulianio](https://x.com/thejulianio)
 
 ## Acknowledgments
 
