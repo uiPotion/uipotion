@@ -135,17 +135,19 @@ function generateSitemap() {
 
 function generateRedirects(potions) {
   // Netlify _redirects: from to status (whitespace-separated). See https://docs.netlify.com/routing/redirects/
+  // Use 301! (force) so redirect runs even when the .html file exists; otherwise Netlify serves the file.
+  const force = '301!';
   const lines = [
     '# Netlify Pretty URLs: .html → pretty (301). Auto-generated — do not edit by hand.',
-    '/index.html / 301',
+    `/index.html / ${force}`,
   ];
   STATIC_PAGES.forEach(page => {
     if (page.path === '/') return;
-    lines.push(`${page.path}.html ${page.path} 301`);
+    lines.push(`${page.path}.html ${page.path} ${force}`);
   });
-  lines.push('/404.html /404 301');
+  lines.push(`/404.html /404 ${force}`);
   potions.forEach(potion => {
-    lines.push(`${potion.path}.html ${potion.path} 301`);
+    lines.push(`${potion.path}.html ${potion.path} ${force}`);
   });
   lines.push('');
   lines.push('# Serve 404 for missing URLs');
