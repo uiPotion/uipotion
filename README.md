@@ -3,7 +3,7 @@
 > AI-agent-optimized UI component guides for any framework
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Built with Harold](https://img.shields.io/badge/Built%20with-Harold-orange)](https://haroldjs.com)
+[![Built with Harold](https://img.shields.io/badge/Built%20with-Harold-deeppink)](https://haroldjs.com)
 
 ## What is UI Potion?
 
@@ -32,120 +32,67 @@ Think of it as "recipes for AI" - detailed guides that your AI assistant reads a
 
 ## How It Works
 
-### For Developers
+You don't need to install anything or fetch anything in your code. Use your AI coding assistant (e.g. Cursor, Copilot) and give it a link to a potion. Iterate from there.
+
+### Simple workflow
 
 1. **Browse potions** at [uipotion.com](https://uipotion.com)
-2. **Find what you need** (dashboard layout, pricing table, etc.)
-3. **Copy the potion URL** or JSON guide link
-4. **Tell your AI assistant**: "Implement this component from UI Potion" + paste link
-5. **Specify your stack**: "Use React with Tailwind CSS"
-6. **Get generated code** perfectly adapted to your project
+2. **Pick what you need** (e.g. dashboard layout, pricing table)
+3. **Copy the potion link** (the page URL or the JSON guide URL)
+4. **Paste the link in your AI chat** and say what you want, e.g.:  
+   *"Implement this dashboard layout for my app. I use React and Tailwind. Guide: https://uipotion.com/potions/layouts/dashboard.json"*
+5. **Review the generated code** and ask for tweaks (layout, styling, behavior) until it fits your project
+
+Your assistant uses the guide at that URL to generate code for your stack. You never fetch potions in your own code; you just share the link and iterate in the chat.
 
 **Example**:
 ```
-Developer: "I need a dashboard layout with collapsible sidebar. 
-I'm using React and Tailwind. Use this guide: 
-https://uipotion.com/potions/layouts/dashboard.json"
+You: "I need a dashboard with collapsible sidebar. React + Tailwind.
+     Use this guide: https://uipotion.com/potions/layouts/dashboard.json"
 
-AI Assistant:
-- Loads dashboard.json
-- Understands specifications
-- Adapts to React (useState, useEffect, etc.)
-- Uses Tailwind utility classes
-- Generates production-ready code
-
-Result: Complete dashboard layout in minutes, perfectly adapted to your stack.
+Your AI assistant uses the guide and adapts it to your stack (e.g. React and Tailwind only if you have them; otherwise it follows your current framework and styling). You paste it, run it, then ask for changes
+(e.g. "make the sidebar 240px" or "add a dark theme") and iterate.
 ```
 
-### For AI Agents
+### For AI assistants
 
-AI agents can automatically discover and load potions:
+When a user gives you a UI Potion link (e.g. `https://uipotion.com/potions/layouts/dashboard.json`):
 
-```javascript
-// 1. Load main manifest
-const manifest = await fetch('https://uipotion.com/uipotion-manifest.json');
+1. Open or fetch that URL to read the specification.
+2. Use the spec to generate implementation code in the user's framework and styling (React/Vue/Svelte, Tailwind/CSS Modules, etc.).
+3. Follow the guide's structure, accessibility, and behavior; don't invent details that aren't in the spec.
 
-// 2. Browse available potions
-const potionsIndex = await fetch('https://uipotion.com/potions-index.json');
-
-// 3. Load specific guide
-const guide = await fetch('https://uipotion.com/potions/layouts/dashboard.json');
-
-// 4. Parse specifications
-// 5. Generate implementation adapted to user's stack
-```
-
-**Workflow**:
-1. Agent loads manifest to discover available potions
-2. Agent browses potions-index.json to find relevant component
-3. Agent loads specific potion JSON guide
-4. Agent adapts the guide to user's framework and styling preferences
-5. Agent implements the component based on detailed specifications
+No need to fetch the main manifest or potions index unless you're building discovery/search. For normal use, the user provides the potion link and you implement from that single guide.
 
 ## Available Potions
 
-### Layouts
-- ✅ **Dashboard Layout with Collapsible Sidebar** - Responsive admin dashboard with sidebar navigation and fixed header
-
-### Coming Soon
-- Pricing Tables
-- Hero Sections
-- Authentication Flows
-- Dialog/Modal Components
-- Navigation Components (Navbar, Sidebar, Breadcrumbs)
-- Form Components (Multi-step forms, Validation patterns)
-- Data Display (Tables, Cards, Lists)
-- And many more...
+See [uipotion.com](https://uipotion.com) for the full list of potions (layouts, components, features, patterns, tooling).
 
 ## What Makes UI Potion Different?
 
-### Traditional Component Library
-```javascript
-// Install specific version
-npm install some-ui-lib@2.3.4
+### Traditional component library
 
-// Use pre-built component
-import { Dashboard } from 'some-ui-lib'
+You install a package, import components, and hope versions match:
 
-// Problems:
-// - Locked to React (or Vue, or Angular)
-// - Locked to specific styling approach
-// - Breaks when you upgrade
-// - Still needs customization
-// - Adds to bundle size
-```
+- **Install**: `npm install some-ui-lib@2.3.4`
+- **Use**: `import { Dashboard } from 'some-ui-lib'`
+- **Downsides**: Locked to one framework and styling, breaks on upgrades, still needs customization, adds to bundle size
 
-### UI Potion Approach
-```javascript
-// AI reads specification
-const spec = await fetch('uipotion.com/potions/layouts/dashboard.json')
+### UI Potion
 
-// AI generates code adapted to YOUR stack:
-// - Your framework (React, Vue, Angular, Svelte, etc.)
-// - Your styling (Tailwind, CSS Modules, Chakra, etc.)
-// - Your patterns and conventions
-// - Latest framework features
-// - No external dependencies
+You give your AI assistant a link to a potion and iterate in chat:
 
-// Result: Fresh, custom code that fits your project
-```
+- **You**: Paste the potion URL in your AI chat (e.g. `https://uipotion.com/potions/layouts/dashboard.json`) and say: "Implement this for my React + Tailwind app."
+- **Your assistant**: Uses the guide and generates code for your stack (your framework, your styling, your conventions).
+- **You**: Paste the code, run it, then ask for changes ("wider sidebar", "add dark mode") and iterate.
 
-## Technology
-
-This site is built with [Harold](https://haroldjs.com) - a static site generator using Markdown + Handlebars + SCSS.
-
-### Why Harold?
-
-- **Simple**: Markdown for content, Handlebars for templates, SCSS for styling
-- **Fast**: Static output is blazing fast
-- **Flexible**: Easy to customize and extend
-- **Zero runtime**: Pure HTML/CSS output
+No install in your code, no version lock-in. You get code that fits your project and you refine it in conversation.
 
 ## Development
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js
 - npm or yarn
 
 ### Installation
@@ -184,51 +131,6 @@ npm run static
 - **Fast rebuilds**: Only rebuilds changed files
 - **Port 3000**: Serves on http://localhost:3000
 
-## Project Structure
-
-```
-src/
-├── potions/           # Markdown files (human-readable documentation)
-│   ├── layouts/       # Layout patterns (dashboards, landing pages)
-│   ├── components/    # Reusable components (buttons, dialogs, cards)
-│   └── features/      # Complete features (pricing, auth flows)
-│
-├── statics/            # Static files copied to root (Harold)
-│   ├── uipotion-manifest.json    # Main entry point for AI agents
-│   ├── potions-index.json        # Searchable catalog of potions
-│   └── potions/                  # Individual component guides
-│       └── dashboard.json
-│
-├── pages/             # Site pages (Handlebars templates)
-│   ├── index.hbs      # Homepage
-│   └── about.hbs      # About page
-│
-├── potion-layouts/    # Handlebars layouts for potion pages
-│   └── potion.hbs     # Layout template
-│
-├── partials/          # Reusable Handlebars components
-│   ├── head.hbs       # HTML head with meta tags
-│   └── footer.hbs     # Site footer
-│
-├── styles/            # SCSS stylesheets
-│   ├── main.scss      # Main stylesheet (compiled)
-│   ├── _basic.scss    # Basic/reset styles
-│   ├── _page.scss     # Page-level styles
-│   └── _uipotion.scss # UI Potion-specific styles
-│
-└── assets/            # Static assets
-    └── images/        # Images and icons
-        └── favicon.png
-
-build/                 # Generated output (don't edit!)
-├── index.html
-├── about.html
-├── potions/           # Generated potion pages
-├── potions/           # Generated potion pages
-├── styles/            # Compiled CSS
-└── assets/            # Copied assets
-```
-
 ## Contributing
 
 We welcome contributions! UI Potion grows with community input.
@@ -242,7 +144,21 @@ We welcome contributions! UI Potion grows with community input.
 
 ### Adding a New Potion
 
-#### Step 1: Create Markdown File
+**Recommended: create with your AI assistant.** Give it this repo (or the [uipotion-manifest](https://uipotion.com/uipotion-manifest.json) and [potions-index](https://uipotion.com/potions-index.json)), point it to the **schemas** in `src/statics/schemas/` and to **existing potions** in the same category as references, and ask it to add a new potion (Markdown + JSON guide + index entry). The schemas define the required shape; existing potions show the style and level of detail. Then **validate and test** (see below). Iterate with the AI until validation passes and the result looks good.
+
+**Always validate in the end:**
+
+```bash
+npm run validate   # Validates all potion JSON against category schemas
+npm run build     # Build (validation runs automatically)
+npm start         # Dev server (validation runs automatically)
+```
+
+Visit http://localhost:3000 to verify the new potion. Then submit a pull request with a short description of the potion and why it's useful.
+
+**Manual option:** If you prefer to write everything by hand, follow the steps below.
+
+#### Manual Step 1: Create Markdown File
 
 Create `src/potions/[category]/your-component.md`:
 
@@ -264,23 +180,11 @@ agentManifest: 'potions/components/your-component.json'
 Detailed human-readable documentation...
 ```
 
-#### Step 2: Create JSON Guide
+#### Manual Step 2: Create JSON Guide
 
-Create `src/statics/potions/components/your-component.json`:
+Create `src/statics/potions/[category]/your-component.json`. Use the **category schema** in `src/statics/schemas/categories/` and an existing potion in that category (e.g. `dashboard.json` for layouts) as reference. Include at least: `aiAgentInstructions`, `structure`, `components`, `responsiveBreakpoints`, `stateManagement`, `frameworkPatterns`, `stylingApproaches`, `accessibility`, `animations`, `testingChecklist`.
 
-Use `dashboard.json` as a template. Include:
-- `aiAgentInstructions` - Summary and implementation steps
-- `structure` - Component hierarchy
-- `components` - Detailed specifications
-- `responsiveBreakpoints` - Mobile, tablet, desktop behavior
-- `stateManagement` - Required state variables
-- `frameworkPatterns` - React, Vue, Angular, Svelte examples
-- `stylingApproaches` - Tailwind, CSS Modules, etc.
-- `accessibility` - Complete a11y requirements
-- `animations` - Timing and easing specifications
-- `testingChecklist` - Verification steps
-
-#### Step 3: Update Potions Index
+#### Manual Step 3: Update Potions Index
 
 Add entry to `src/statics/potions-index.json`:
 
@@ -300,24 +204,13 @@ Add entry to `src/statics/potions-index.json`:
 
 Don't forget to update `totalCount` and `lastUpdated`!
 
-#### Step 4: Validate and Test
+#### Manual Step 4: Validate and Test
 
-```bash
-npm run validate # Validate all potions (runs automatically on build/start)
-npm run build    # Build the site
-npm start        # Test in dev server
-```
+Run `npm run validate`, then `npm run build` and `npm start`; check the new potion at http://localhost:3000.
 
-The validation script automatically checks all potion JSON files against their category schemas. It runs automatically before `npm run build` and `npm start`, but you can also run it manually with `npm run validate`.
+#### Manual Step 5: Submit Pull Request
 
-Visit http://localhost:3000 to verify everything works.
-
-#### Step 5: Submit Pull Request
-
-Once tested, submit a pull request with:
-- Clear description of the potion
-- Why it's useful
-- Any special considerations
+Submit a PR with a clear description of the potion, why it's useful, and any special considerations.
 
 ### Guidelines
 
@@ -352,57 +245,22 @@ See `.cursorrules` for detailed guidelines on:
 - ✅ Testing verification steps
 - ✅ Complexity level and time estimate
 
-## API for AI Agents
+## Programmatic access (optional)
 
-### Main Manifest
+Most users only need to share a potion link with their AI assistant. If you're building discovery or search (e.g. "find all dashboard-related potions"), you can use:
 
-**URL**: `https://uipotion.com/uipotion-manifest.json`
+- **Main manifest**: `https://uipotion.com/uipotion-manifest.json` — service metadata, categories, link to potions index
+- **Potions index**: `https://uipotion.com/potions-index.json` — catalog of all potions (id, name, category, tags, excerpt, webUrl, agentGuideUrl, dates)
+- **Individual guide**: `https://uipotion.com/potions/[category]/[id].json` — full implementation spec for one component
 
-Entry point for AI agent discovery. Contains:
-- Service metadata
-- Categories
-- URLs for potions index
-- Usage instructions
+For normal use, the user provides the potion URL; no need to fetch the manifest or index.
 
-### Potions Index
+## Example: Dashboard Layout
 
-**URL**: `https://uipotion.com/potions-index.json`
+- **Docs (human)**: https://uipotion.com/potions/layouts/dashboard.html  
+- **Guide (for your AI)**: https://uipotion.com/potions/layouts/dashboard.json
 
-Searchable catalog of all potions. Each entry includes:
-- `id` - Unique identifier
-- `name` - Human-readable name
-- `category` - layouts|components|features|patterns|tooling
-- `tags` - Array of tags for filtering
-- `excerpt` - Brief description
-- `webUrl` - Human-readable documentation
-- `agentGuideUrl` - JSON guide for AI implementation
-- `created` - Creation date
-- `updated` - Last update date
-
-### Individual Guides
-
-**URL**: `https://uipotion.com/potions/[category]/[id].json`
-
-Detailed implementation guide for specific component. Contains complete specifications for AI to generate implementation.
-
-## Examples
-
-### Example: Dashboard Layout
-
-**Human URL**: https://uipotion.com/potions/layouts/dashboard.html  
-**AI Guide URL**: https://uipotion.com/potions/layouts/dashboard.json
-
-The dashboard layout includes:
-- Collapsible sidebar (280px expanded, 80px collapsed)
-- Fixed header with navigation
-- Responsive content area
-- Mobile overlay behavior
-- Keyboard navigation support
-- Smooth animations (300ms)
-- localStorage persistence
-- Complete accessibility
-
-AI agents can implement this in any framework with any styling approach.
+Give your assistant the guide URL and say e.g. "Implement this dashboard for my React + Tailwind app." The guide covers collapsible sidebar, fixed header, responsive content, mobile overlay, keyboard nav, animations, and accessibility — your assistant adapts it to your stack and you iterate from there.
 
 ## License
 
