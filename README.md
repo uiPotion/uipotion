@@ -135,90 +135,7 @@ npm run static
 
 We welcome contributions! UI Potion grows with community input.
 
-### How to Contribute
-
-1. **Add a new potion** (component guide)
-2. **Improve existing potions** (add details, fix issues)
-3. **Enhance documentation**
-4. **Report issues** or suggest features
-
-### Adding a New Potion
-
-**Recommended: create with your AI assistant.** Give it this repo (or the [uipotion-manifest](https://uipotion.com/uipotion-manifest.json) and [potions-index](https://uipotion.com/potions-index.json)), point it to the **schemas** in `src/statics/schemas/` and to **existing potions** in the same category as references, and ask it to add a new potion (Markdown + JSON guide + index entry). The schemas define the required shape; existing potions show the style and level of detail. Then **validate and test** (see below). Iterate with the AI until validation passes and the result looks good.
-
-**Always validate in the end:**
-
-```bash
-npm run validate   # Validates all potion JSON against category schemas
-npm run build     # Build (validation runs automatically)
-npm start         # Dev server (validation runs automatically)
-```
-
-Visit http://localhost:3000 to verify the new potion. Then submit a pull request with a short description of the potion and why it's useful.
-
-**Manual option:** If you prefer to write everything by hand, follow the steps below.
-
-#### Manual Step 1: Create Markdown File
-
-Create `src/potions/[category]/your-component.md`:
-
-```yaml
----
-layout: 'potion'
-title: 'Your Component Name'
-publicationDate: '2026-01-10'
-excerpt: 'Brief description (1-2 sentences)'
-category: 'Components'  # Layouts, Components, Features, Patterns, or Tooling
-tags:
-  - relevant
-  - tags
-agentManifest: 'potions/components/your-component.json'
----
-
-# Your Component Name
-
-Detailed human-readable documentation...
-```
-
-#### Manual Step 2: Create JSON Guide
-
-Create `src/statics/potions/[category]/your-component.json`. Use the **category schema** in `src/statics/schemas/categories/` and an existing potion in that category (e.g. `dashboard.json` for layouts) as reference. Include at least: `aiAgentInstructions`, `structure`, `components`, `responsiveBreakpoints`, `stateManagement`, `frameworkPatterns`, `stylingApproaches`, `accessibility`, `animations`, `testingChecklist`.
-
-#### Manual Step 3: Update Potions Index
-
-Add entry to `src/statics/potions-index.json`:
-
-```json
-{
-  "id": "your-component",
-  "name": "Your Component Name",
-  "category": "components",
-  "tags": ["tag1", "tag2"],
-  "excerpt": "Brief description",
-  "webUrl": "https://uipotion.com/potions/components/your-component.html",
-  "agentGuideUrl": "https://uipotion.com/potions/components/your-component.json",
-  "created": "2026-01-10",
-  "updated": "2026-01-10"
-}
-```
-
-Don't forget to update `totalCount` and `lastUpdated`!
-
-#### Manual Step 4: Validate and Test
-
-Run `npm run validate`, then `npm run build` and `npm start`; check the new potion at http://localhost:3000.
-
-#### Manual Step 5: Submit Pull Request
-
-Submit a PR with a clear description of the potion, why it's useful, and any special considerations.
-
-### Guidelines
-
-See `.cursorrules` for detailed guidelines on:
-- Potion structure
-- JSON guide requirements
-- Content standards
-- Best practices
+**Step-by-step and full guide:** See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the contribution workflow, or the **[Contribute page on the website](https://uipotion.com/contribute)** for schemas, Schema Validator, AI prompts, and best practices. We keep the same narrative in both so you can follow either; the web version is more extended. You can also try contributing with your AI assistant — both guides explain how.
 
 ## What Makes a Good Potion?
 
@@ -257,7 +174,7 @@ For normal use, the user provides the potion URL; no need to fetch the manifest 
 
 ## Example: Dashboard Layout
 
-- **Docs (human)**: https://uipotion.com/potions/layouts/dashboard.html  
+- **Docs (human)**: https://uipotion.com/potions/layouts/dashboard  
 - **Guide (for your AI)**: https://uipotion.com/potions/layouts/dashboard.json
 
 Give your assistant the guide URL and say e.g. "Implement this dashboard for my React + Tailwind app." The guide covers collapsible sidebar, fixed header, responsive content, mobile overlay, keyboard nav, animations, and accessibility — your assistant adapts it to your stack and you iterate from there.
@@ -310,10 +227,11 @@ SOFTWARE.
 ## Links
 
 - **Website**: [uipotion.com](https://uipotion.com)
+- **Contribute**: [uipotion.com/contribute](https://uipotion.com/contribute)
 - **AI Manifest**: [uipotion.com/uipotion-manifest.json](https://uipotion.com/uipotion-manifest.json)
 - **GitHub**: [github.com/uiPotion/uipotion](https://github.com/uiPotion/uipotion)
 - **Harold SSG**: [haroldjs.com](https://haroldjs.com)
-- **Legal**: [uipotion.com/legal.html](https://uipotion.com/legal.html)
+- **Legal**: [uipotion.com/legal](https://uipotion.com/legal)
 
 ## Support & Contact
 

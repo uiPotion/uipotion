@@ -1,4 +1,5 @@
-{{> head title="Contribute to UI Potion" description="Learn how to contribute your own potions to UI Potion through pull requests" currentPath="contribute" }}
+{{> head title="Contribute to UI Potion" description="Learn how to contribute your own potions to UI Potion through pull
+requests" currentPath="contribute" }}
 
 <div class="about-page">
   <!-- Hero Header -->
@@ -9,35 +10,114 @@
         <span>/</span>
         <span>Contribute</span>
       </div>
-      
+
       <h1 class="about-hero-title">Contribute to UI Potion</h1>
-      
+
       <p class="about-hero-description">
-        Share your UI component specifications with the community. Learn how to create and submit potions that AI agents can use to generate production-ready code.
+        Share your UI component specifications with the community. Learn how to create and submit potions that AI agents
+        can use to generate production-ready code.
       </p>
     </div>
   </header>
-  
+
   <!-- Main Content -->
   <main class="about-main">
     <div class="about-main-container">
       <article class="about-article">
         <section class="about-section">
-          <h2>How to Contribute</h2>
-          <p>Contributing to UI Potion is straightforward. Follow these steps to add your potion to the collection:</p>
-          
-          <ol>
-            <li><strong>Fork the repository</strong> on GitHub</li>
-            <li><strong>Create your potion</strong> following the schema guidelines (see below)</li>
-            <li><strong>Validate your potion</strong> using our <a href="{{relativePath 'validator'}}">Schema Validator</a></li>
-            <li><strong>Update sitemap</strong> by running <code>npm run sitemap</code> (automatic!)</li>
-            <li><strong>Submit a pull request</strong> with your new potion</li>
-            <li><strong>Wait for review</strong> - we'll check that it follows the schema and guidelines</li>
-          </ol>
-          
-          <p><strong>Note:</strong> The sitemap.xml is automatically generated! Just run <code>npm run sitemap</code> after adding your potion files, and it will scan all markdown files and update the sitemap for you.</p>
+          <p><strong>Try contributing with your AI assistant.</strong> Point your AI at this repo (or the <a
+              href="https://uipotion.com/uipotion-manifest.json" target="_blank" rel="noopener">uipotion-manifest</a>
+            and <a href="https://uipotion.com/potions-index.json" target="_blank" rel="noopener">potions-index</a>),
+            give it the schemas in <code>src/statics/schemas/</code> and existing potions in the same category as
+            references, and ask it to draft a new potion (Markdown + JSON + index entry). Then run
+            <code>npm run validate</code>, tweak if needed, and open a PR. Many contributors use AI for the first draft
+            and refine from there.</p>
         </section>
-        
+
+        <section class="about-section">
+          <h2>Quick Start</h2>
+          <p>Follow these steps to add your potion to the collection:</p>
+
+          <ol>
+            <li><strong>Fork this repository</strong> at <a href="https://github.com/uiPotion/uipotion" target="_blank"
+                rel="noopener">github.com/uiPotion/uipotion</a></li>
+            <li><strong>Create your potion</strong> (Markdown + JSON) — see Creating a Potion below</li>
+            <li><strong>Validate</strong> using the <a href="{{relativePath 'validator'}}">Schema Validator</a> or
+              <code>npm run validate</code></li>
+            <li><strong>Run <code>npm run static</code></strong> to update sitemap and redirects (automatic!)</li>
+            <li><strong>Submit a pull request</strong> with your new potion</li>
+          </ol>
+
+          <p>We'll review your potion for schema compliance and best practices, then merge and publish when ready.</p>
+        </section>
+
+        <section class="about-section">
+          <h2>Creating a Potion</h2>
+          <p>Each potion consists of <strong>two files</strong>:</p>
+          <ul>
+            <li><strong>Markdown file</strong> (<code>src/potions/[category]/your-potion.md</code>) — human-readable web
+              version</li>
+            <li><strong>JSON file</strong> (<code>src/statics/potions/[category]/your-potion.json</code>) — AI-readable
+              guide</li>
+          </ul>
+
+          <h3>Categories</h3>
+          <p>Choose the appropriate category:</p>
+          <ul>
+            <li><strong>layouts</strong> — Full-page layouts (dashboards, landing pages, app shells)</li>
+            <li><strong>components</strong> — Reusable UI elements (buttons, dialogs, forms, cards)</li>
+            <li><strong>features</strong> — Complete user flows (authentication, onboarding, checkout)</li>
+            <li><strong>patterns</strong> — Design patterns and guidelines</li>
+            <li><strong>tooling</strong> — Developer tools and infrastructure</li>
+          </ul>
+
+          <h3>Step 1: Create JSON File</h3>
+          <p>Create <code>src/statics/potions/[category]/your-potion.json</code></p>
+          <p>Use the <strong>category schema</strong> in <code>src/statics/schemas/categories/</code> and an existing
+            potion as template (e.g., <code>navbar.json</code> for components, <code>dashboard.json</code> for layouts).
+            Include at least: <code>id</code>, <code>name</code>, <code>version</code>, <code>category</code>,
+            <code>tags</code>, <code>description</code>, <code>aiAgentInstructions</code>,
+            <code>frameworkPatterns</code>, <code>stylingApproaches</code>, <code>accessibility</code>,
+            <code>testingChecklist</code>. See Available Schemas and Using Schemas with AI below for more.</p>
+
+          <h3>Step 2: Create Markdown File</h3>
+          <p>Create <code>src/potions/[category]/your-potion.md</code></p>
+          <p>Required front matter: <code>layout</code>, <code>title</code>, <code>publicationDate</code>,
+            <code>excerpt</code>, <code>category</code>, <code>tags</code>, <code>agentManifest</code>. The
+            <code>agentManifest</code> must point to your JSON file (e.g.
+            <code>potions/components/your-potion.json</code>). Then write comprehensive specifications in the body; see
+            existing potions (e.g. <code>navbar.md</code>, <code>dashboard.md</code>) for format.</p>
+          <div class="example-box">
+            <p><strong>Example front matter:</strong></p>
+            <pre><code>---
+layout: 'potion'
+title: 'Your Potion Name'
+publicationDate: '2026-01-24'
+excerpt: 'Brief description (1-2 sentences)'
+category: 'Components'
+tags:
+  - components
+  - tag1
+  - tag2
+agentManifest: 'potions/components/your-potion.json'
+---</code></pre>
+          </div>
+
+          <h3>Step 3: Validate</h3>
+          <p>Visit the <a href="{{relativePath 'validator'}}">Schema Validator</a> or run <code>npm run validate</code>
+            to validate your JSON. Fix any errors before continuing.</p>
+
+          <h3>Step 4: Update Sitemap and Redirects</h3>
+          <p>Run <code>npm run static</code>. This scans markdown files and updates <code>src/statics/sitemap.xml</code>
+            and <code>src/statics/_redirects</code>. No manual editing needed.</p>
+
+          <h3>Step 5: Update Potions Index</h3>
+          <p>Add your potion to <code>src/statics/potions-index.json</code> (add an entry with <code>id</code>,
+            <code>name</code>, <code>category</code>, <code>tags</code>, <code>excerpt</code>, <code>webUrl</code>,
+            <code>agentGuideUrl</code>, <code>created</code>, <code>updated</code>). Update <code>totalCount</code> and
+            <code>lastUpdated</code> at the top of the file.</p>
+        </section>
+
         <section class="about-section">
           <h2>Understanding Schemas</h2>
           <p>UI Potion uses JSON Schema to ensure all potions follow a consistent structure. Schemas define:</p>
@@ -45,67 +125,79 @@
             <li><strong>Required fields</strong> - What every potion must include</li>
             <li><strong>Data types</strong> - The format of each field</li>
             <li><strong>Validation rules</strong> - Constraints and patterns</li>
-            <li><strong>Category-specific requirements</strong> - What's needed for layouts, components, features, etc.</li>
+            <li><strong>Category-specific requirements</strong> - What's needed for layouts, components, features, etc.
+            </li>
           </ul>
-          
-          <p>You can use these schemas with AI assistants to generate potions! Simply provide the schema to your AI and ask it to create a potion that follows the structure.</p>
+
+          <p>You can use these schemas with AI assistants to generate potions! Simply provide the schema to your AI and
+            ask it to create a potion that follows the structure.</p>
         </section>
-        
+
         <section class="about-section">
           <h2>Available Schemas</h2>
           <p>Each category has its own schema. Choose the one that matches your potion type:</p>
-          
+
           <div class="schemas-grid">
             <div class="schema-card">
               <h3>Base Schema</h3>
               <p>Common structure for all potions (required fields, metadata, AI instructions)</p>
-              <a href="https://uipotion.com/schemas/potion.base.schema.json" target="_blank" rel="noopener">View Schema →</a>
+              <a href="https://uipotion.com/schemas/potion.base.schema.json" target="_blank" rel="noopener">View Schema
+                →</a>
             </div>
-            
+
             <div class="schema-card">
               <h3>Layouts</h3>
               <p>For full-page layouts: dashboards, app shells, landing pages</p>
-              <a href="https://uipotion.com/schemas/categories/layouts.schema.json" target="_blank" rel="noopener">View Schema →</a>
+              <a href="https://uipotion.com/schemas/categories/layouts.schema.json" target="_blank" rel="noopener">View
+                Schema →</a>
             </div>
-            
+
             <div class="schema-card">
               <h3>Components</h3>
               <p>For reusable UI components: buttons, dialogs, navbars, forms</p>
-              <a href="https://uipotion.com/schemas/categories/components.schema.json" target="_blank" rel="noopener">View Schema →</a>
+              <a href="https://uipotion.com/schemas/categories/components.schema.json" target="_blank"
+                rel="noopener">View Schema →</a>
             </div>
-            
+
             <div class="schema-card">
               <h3>Features</h3>
               <p>For complete user flows: authentication, onboarding, wizards</p>
-              <a href="https://uipotion.com/schemas/categories/features.schema.json" target="_blank" rel="noopener">View Schema →</a>
+              <a href="https://uipotion.com/schemas/categories/features.schema.json" target="_blank" rel="noopener">View
+                Schema →</a>
             </div>
-            
+
             <div class="schema-card">
               <h3>Patterns</h3>
               <p>For design patterns and guidelines: accessibility patterns, interaction patterns</p>
-              <a href="https://uipotion.com/schemas/categories/patterns.schema.json" target="_blank" rel="noopener">View Schema →</a>
+              <a href="https://uipotion.com/schemas/categories/patterns.schema.json" target="_blank" rel="noopener">View
+                Schema →</a>
             </div>
-            
+
             <div class="schema-card">
               <h3>Tooling</h3>
               <p>For developer tools: CI validation, generators, token pipelines</p>
-              <a href="https://uipotion.com/schemas/categories/tooling.schema.json" target="_blank" rel="noopener">View Schema →</a>
+              <a href="https://uipotion.com/schemas/categories/tooling.schema.json" target="_blank" rel="noopener">View
+                Schema →</a>
             </div>
           </div>
-          
+
           <h3>Contract Schemas</h3>
           <p>These are reusable building blocks referenced by category schemas:</p>
           <ul>
-            <li><a href="https://uipotion.com/schemas/contracts/accessibility.contract.schema.json" target="_blank" rel="noopener">Accessibility Contract</a> - WCAG compliance, ARIA, keyboard navigation</li>
-            <li><a href="https://uipotion.com/schemas/contracts/state.contract.schema.json" target="_blank" rel="noopener">State Contract</a> - State definitions and management</li>
-            <li><a href="https://uipotion.com/schemas/contracts/interactions.contract.schema.json" target="_blank" rel="noopener">Interactions Contract</a> - User interaction patterns</li>
+            <li><a href="https://uipotion.com/schemas/contracts/accessibility.contract.schema.json" target="_blank"
+                rel="noopener">Accessibility Contract</a> - WCAG compliance, ARIA, keyboard navigation</li>
+            <li><a href="https://uipotion.com/schemas/contracts/state.contract.schema.json" target="_blank"
+                rel="noopener">State Contract</a> - State definitions and management</li>
+            <li><a href="https://uipotion.com/schemas/contracts/interactions.contract.schema.json" target="_blank"
+                rel="noopener">Interactions Contract</a> - User interaction patterns</li>
           </ul>
         </section>
-        
+
         <section class="about-section">
           <h2>Using Schemas with AI</h2>
-          <p>You can use these schemas to generate potions with AI assistants. AI can help you create both the JSON and Markdown files:</p>
-          
+          <p>You can use these schemas to generate potions with AI assistants. AI can help you create both the JSON and
+            Markdown files:</p>
+
           <h3>Generating the JSON File</h3>
           <div class="example-box">
             <p><strong>Example prompt for AI:</strong></p>
@@ -121,7 +213,7 @@ The component should:
 
 Make sure the JSON follows the schema exactly and includes all required fields.</code></pre>
           </div>
-          
+
           <h3>Generating the Markdown File</h3>
           <p>Once you have your JSON file, you can ask AI to create the Markdown version:</p>
           <div class="example-box">
@@ -136,22 +228,24 @@ The Markdown should:
 
 The agentManifest should point to: potions/components/your-potion-name.json</code></pre>
           </div>
-          
+
           <p>The AI will generate properly structured files that you can then validate and submit!</p>
         </section>
-        
+
         <section class="about-section">
           <h2>Validate Your Potion</h2>
-          <p>Before submitting a pull request, always validate your potion JSON against the appropriate schema. You can use either the web-based validator or the CLI script:</p>
-          
+          <p>Before submitting a pull request, always validate your potion JSON against the appropriate schema. You can
+            use either the web-based validator or the CLI script:</p>
+
           <h3>Web-Based Validator</h3>
           <div class="validator-cta">
             <a href="{{relativePath 'validator'}}" class="button primary">Open Schema Validator</a>
             <p>Select the correct category schema and paste your JSON to check for errors.</p>
           </div>
-          
+
           <h3>CLI Validation Script</h3>
-          <p>For contributors working locally, you can also use the Node.js CLI validation script that validates all potions at once:</p>
+          <p>For contributors working locally, you can also use the Node.js CLI validation script that validates all
+            potions at once:</p>
           <div class="example-box">
             <pre><code># Validate all potions
 npm run validate
@@ -168,7 +262,7 @@ node validate-potions.js</code></pre>
             <li>Runs automatically before <code>npm run build</code> and <code>npm start</code></li>
             <li>Exits with error code if validation fails (useful for CI/CD)</li>
           </ul>
-          
+
           <p>Both validators will:</p>
           <ul>
             <li>Check that all required fields are present</li>
@@ -177,144 +271,48 @@ node validate-potions.js</code></pre>
             <li>Show detailed error messages if something is wrong</li>
           </ul>
         </section>
-        
+
         <section class="about-section">
-          <h2>Creating Your Potion</h2>
-          <p>Each potion consists of <strong>two files</strong>:</p>
-          <ul>
-            <li><strong>JSON file</strong> - Machine-readable format for AI agents (required)</li>
-            <li><strong>Markdown file</strong> - Human-readable web version (required)</li>
-          </ul>
-          
-          <h3>Step 1: Choose the Right Category</h3>
-          <p>Determine which category your potion belongs to:</p>
-          <ul>
-            <li><strong>Layouts</strong> - Full-page structures (dashboards, landing pages, app shells)</li>
-            <li><strong>Components</strong> - Reusable UI elements (buttons, dialogs, navbars, forms)</li>
-            <li><strong>Features</strong> - Complete user flows (auth, onboarding, checkout)</li>
-            <li><strong>Patterns</strong> - Design patterns and guidelines</li>
-            <li><strong>Tooling</strong> - Developer tools and integrations</li>
-          </ul>
-          
-          <h3>Step 2: Create the JSON File</h3>
-          <p>Create a new JSON file in the appropriate directory:</p>
-          <ul>
-            <li><code>src/statics/potions/layouts/your-potion-name.json</code></li>
-            <li><code>src/statics/potions/components/your-potion-name.json</code></li>
-            <li><code>src/statics/potions/features/your-potion-name.json</code></li>
-            <li><code>src/statics/potions/patterns/your-potion-name.json</code></li>
-            <li><code>src/statics/potions/tooling/your-potion-name.json</code></li>
-          </ul>
-          
-          <h3>Step 3: Create the Markdown (Web) File</h3>
-          <p>Create a corresponding Markdown file in the potions directory. This is the human-readable web version that appears on the website:</p>
-          <ul>
-            <li><code>src/potions/layouts/your-potion-name.md</code></li>
-            <li><code>src/potions/components/your-potion-name.md</code></li>
-            <li><code>src/potions/features/your-potion-name.md</code></li>
-            <li><code>src/potions/patterns/your-potion-name.md</code></li>
-            <li><code>src/potions/tooling/your-potion-name.md</code></li>
-          </ul>
-          
-          <p><strong>Important:</strong> The Markdown file must include an <code>agentManifest</code> field in the front matter that links to your JSON file. This creates the connection between the web version and the AI-readable version.</p>
-          
+          <h2>Testing Locally</h2>
+          <p>Before submitting a PR, run the project locally:</p>
           <div class="example-box">
-            <p><strong>Example Markdown front matter:</strong></p>
-            <pre><code>---
-layout: 'potion'
-title: 'Your Component Name'
-publicationDate: '2026-01-15'
-excerpt: 'Brief description of your component (1-2 sentences)'
-category: 'Components'
-tags:
-  - tag1
-  - tag2
-  - tag3
-agentManifest: 'potions/components/your-potion-name.json'
----
-
-# Your Component Name
-
-[Your detailed markdown content here...]</code></pre>
+            <pre><code>npm install
+npm start</code></pre>
           </div>
-          
-          <p><strong>Creating the Markdown file:</strong></p>
-          <ul>
-            <li><strong>With AI:</strong> You can use AI to generate the Markdown file based on your JSON. Provide the JSON to your AI assistant and ask it to create a comprehensive, human-readable Markdown version with detailed specifications.</li>
-            <li><strong>Manually:</strong> You can also write it by hand. Review existing potions (like <code>navbar.md</code> or <code>dashboard.md</code>) to see the format and level of detail expected.</li>
-          </ul>
-          
-          <p>The Markdown file should include:</p>
-          <ul>
-            <li>Overview and description</li>
-            <li>Component/layout structure and hierarchy</li>
-            <li>Detailed specifications (dimensions, states, behavior)</li>
-            <li>Responsive design breakpoints</li>
-            <li>Accessibility requirements</li>
-            <li>Animation specifications</li>
-            <li>Framework patterns (framework-agnostic descriptions)</li>
-            <li>Testing checklist</li>
-          </ul>
-          
-          <p><strong>Review existing examples:</strong> Check out existing potions to understand the format:</p>
-          <ul>
-            <li><code>src/potions/components/navbar.md</code></li>
-            <li><code>src/potions/components/dialog.md</code></li>
-            <li><code>src/potions/layouts/dashboard.md</code></li>
-          </ul>
-          
-          <h3>Step 4: Follow the Schema</h3>
-          <p>Use the appropriate category schema as your guide. Key things to include:</p>
-          <ul>
-            <li>All required fields from the base schema (id, version, name, category, tags, description, etc.)</li>
-            <li>Category-specific required fields (e.g., componentSpec for components, layoutModel for layouts)</li>
-            <li>Comprehensive AI agent instructions</li>
-            <li>Framework patterns (React, Vue, Angular, Svelte)</li>
-            <li>Styling approaches (Tailwind, CSS Modules, etc.)</li>
-            <li>Accessibility requirements</li>
-            <li>Testing checklist</li>
-          </ul>
-          
-          <h3>Step 5: Validate</h3>
-          <p>Use the <a href="{{relativePath 'validator'}}">web-based Schema Validator</a> or run <code>npm run validate</code> to ensure your JSON is correct before submitting. Make sure both your JSON and Markdown files are properly formatted and the <code>agentManifest</code> path in the Markdown file correctly points to your JSON file.</p>
+          <p>Visit <a href="http://localhost:3000">http://localhost:3000</a> to preview your changes. You can also run
+            <code>npm run build</code> for a production build and <code>npm run static</code> to regenerate sitemap and
+            redirects.</p>
         </section>
-        
+
         <section class="about-section">
-          <h2>Pull Request Process</h2>
-          
+          <h2>Pull Request Guidelines</h2>
+
           <h3>Before Submitting</h3>
           <ul>
-            <li>✅ Validate your potion JSON using the <a href="{{relativePath 'validator'}}">web validator</a> or run <code>npm run validate</code></li>
-            <li>✅ Ensure all required fields are present in JSON</li>
-            <li>✅ Check that your potion follows the schema structure</li>
-            <li>✅ Test that the JSON is valid (no syntax errors)</li>
-            <li>✅ Create the Markdown file with proper front matter</li>
-            <li>✅ Verify the <code>agentManifest</code> path in Markdown points to your JSON file</li>
-            <li>✅ Review existing Markdown files to match the format and detail level</li>
-            <li>✅ Use a descriptive commit message</li>
+            <li>JSON validates with no errors (<a href="{{relativePath 'validator'}}">web validator</a> or
+              <code>npm run validate</code>)</li>
+            <li>Markdown has correct front matter</li>
+            <li>Ran <code>npm run static</code></li>
+            <li>Updated <code>potions-index.json</code></li>
+            <li>Tested locally with <code>npm start</code></li>
+            <li>Followed existing potion format</li>
           </ul>
-          
-          <h3>Pull Request Template</h3>
-          <p>When creating your PR, include:</p>
+
+          <h3>PR Description Should Include</h3>
           <ul>
-            <li><strong>Category</strong> - Which category does this potion belong to?</li>
-            <li><strong>Description</strong> - What does this potion provide?</li>
-            <li><strong>Validation</strong> - Confirmation that it passes schema validation</li>
-            <li><strong>Example use case</strong> - When would someone use this potion?</li>
+            <li><strong>Category and potion name</strong></li>
+            <li><strong>Brief description</strong> of what it provides</li>
+            <li><strong>Confirmation</strong> that it passes validation</li>
+            <li><strong>Example use case</strong> — when would someone use this potion?</li>
           </ul>
-          
-          <h3>What Happens Next</h3>
-          <ol>
-            <li>We'll review your potion for schema compliance</li>
-            <li>We'll check that it follows best practices</li>
-            <li>We may suggest improvements or ask questions</li>
-            <li>Once approved, your potion will be merged and published!</li>
-          </ol>
+
+          <p>We'll review your potion for schema compliance and best practices, suggest improvements if needed, then
+            merge and publish when ready.</p>
         </section>
-        
+
         <section class="about-section">
           <h2>Best Practices</h2>
-          
+
           <h3>Writing AI Agent Instructions</h3>
           <ul>
             <li>Be specific about styling enforcement (e.g., "MUST use Tailwind if detected")</li>
@@ -322,14 +320,14 @@ agentManifest: 'potions/components/your-potion-name.json'
             <li>Provide clear implementation steps</li>
             <li>Include output constraints (what to avoid)</li>
           </ul>
-          
+
           <h3>Framework Patterns</h3>
           <ul>
             <li>Provide examples for React, Vue, Angular, and Svelte when possible</li>
             <li>Use framework-agnostic descriptions when patterns are similar</li>
             <li>Include state management patterns (useState, refs, etc.)</li>
           </ul>
-          
+
           <h3>Accessibility</h3>
           <ul>
             <li>Always specify WCAG compliance level (A, AA, or AAA)</li>
@@ -337,7 +335,7 @@ agentManifest: 'potions/components/your-potion-name.json'
             <li>Document ARIA attributes needed</li>
             <li>Provide screen reader considerations</li>
           </ul>
-          
+
           <h3>Testing</h3>
           <ul>
             <li>Include a comprehensive testing checklist</li>
@@ -345,22 +343,45 @@ agentManifest: 'potions/components/your-potion-name.json'
             <li>Include edge cases and error states</li>
           </ul>
         </section>
-        
+
+        <section class="about-section">
+          <h2>Content Guidelines</h2>
+          <ul>
+            <li><strong>Be comprehensive</strong> — Include all necessary details for AI to implement</li>
+            <li><strong>Be framework-agnostic</strong> — Avoid framework-specific code in descriptions</li>
+            <li><strong>Include accessibility</strong> — WCAG compliance, ARIA, keyboard navigation</li>
+            <li><strong>Include responsive specs</strong> — Mobile, tablet, desktop breakpoints</li>
+            <li><strong>Include testing checklist</strong> — What to verify after implementation</li>
+          </ul>
+        </section>
+
+        <section class="about-section">
+          <h2>Questions?</h2>
+          <ul>
+            <li>Check existing potions for examples</li>
+            <li>Review the <code>.cursorrules</code> file in the repo for detailed guidelines</li>
+            <li>Ask in your pull request if unsure</li>
+          </ul>
+        </section>
+
         <section class="about-section">
           <h2>Resources</h2>
           <ul>
-            <li><a href="{{relativePath 'validator'}}">Schema Validator</a> - Validate your potions before submitting</li>
-            <li><a href="https://github.com/uiPotion/uipotion" target="_blank" rel="noopener">GitHub Repository</a> - View the codebase and submit PRs</li>
-            <li><a href="{{relativePath 'about'}}">About UI Potion</a> - Learn more about the project</li>
+            <li><a href="{{relativePath 'validator'}}">Schema Validator</a> — Validate your potions before submitting
+            </li>
+            <li><a href="https://github.com/uiPotion/uipotion" target="_blank" rel="noopener">GitHub Repository</a> —
+              View the codebase and submit PRs</li>
+            <li><a href="{{relativePath 'about'}}">About UI Potion</a> — Learn more about the project</li>
           </ul>
         </section>
-        
+
         <section class="about-section">
           <h2>Get Started</h2>
           <p>Ready to contribute? Start by exploring the schemas and validating your first potion!</p>
           <div style="margin-top: 24px;">
             <a href="{{relativePath 'validator'}}" class="button primary">Validate a Potion</a>
-            <a href="https://github.com/uiPotion/uipotion" target="_blank" rel="noopener" class="button" style="margin-left: 12px;">View on GitHub</a>
+            <a href="https://github.com/uiPotion/uipotion" target="_blank" rel="noopener" class="button"
+              style="margin-left: 12px;">View on GitHub</a>
           </div>
         </section>
       </article>
