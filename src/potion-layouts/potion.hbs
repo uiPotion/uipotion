@@ -5,9 +5,9 @@
   <header class="potion-hero" role="banner">
     <div class="potion-hero-container">
       <nav class="potion-breadcrumb" aria-label="Breadcrumb navigation">
-        <a href="{{relativePath 'index'}}">Home</a>
+        <a href="/">Home</a>
         <span aria-hidden="true">/</span>
-        <a href="../../potions">All Potions</a>
+        <a href="/potions">All Potions</a>
         <span aria-hidden="true">/</span>
         <span>{{category}}</span>
         <span aria-hidden="true">/</span>
@@ -33,7 +33,7 @@
         <p class="potion-ai-hint">
           Use this URL with your AI coding assistant (Claude, ChatGPT, etc.) to automatically implement this component in your stack
         </p>
-        <a href="{{relativePath agentManifest}}" class="potion-download-btn" download aria-label="Download JSON guide for AI agents">
+        <a href="/{{agentManifest}}" class="potion-download-btn" download aria-label="Download JSON guide for AI agents">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
           </svg>
@@ -73,7 +73,7 @@
   <span class="sr-only">Scroll to top</span>
 </button>
 
-<script src="{{relativePath 'assets/js/scroll-to-top.js'}}"></script>
-<script src="{{relativePath 'assets/js/copy-button.js'}}"></script>
+<script src="/assets/js/scroll-to-top.js"></script>
+<script src="/assets/js/copy-button.js"></script>
 
 {{> footer}}

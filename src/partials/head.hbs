@@ -10,10 +10,10 @@
   <meta name="description" content="{{description}}">
   
   <!-- Favicon Suite -->
-  <link rel="icon" type="image/png" sizes="32x32" href="{{relativePath 'assets/images/favicon-32x32.png'}}">
-  <link rel="icon" type="image/png" sizes="16x16" href="{{relativePath 'assets/images/favicon-16x16.png'}}">
-  <link rel="apple-touch-icon" sizes="180x180" href="{{relativePath 'assets/images/apple-touch-icon.png'}}">
-  <link rel="manifest" href="{{relativePath 'site.webmanifest'}}">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#8B5CF6">
   
   <!-- Canonical URL (use / for home when currentPath empty) -->
@@ -61,7 +61,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="{{relativePath 'styles/main.css'}}">
+  <link rel="stylesheet" href="/styles/main.css">
   
   {{#if agentManifest}}
   <!-- JSON-LD Structured Data for AI Agent Discovery -->
@@ -138,8 +138,8 @@
   <header class="main-header">
     <div class="container">
       <div class="main-header-container">
-        <a href="{{relativePath 'index'}}" class="logo-container">
-          <img src="{{relativePath 'assets/images/uipotion-logo.png'}}" alt="UI Potion Logo" width="32" height="32" class="logo-image">
+        <a href="/" class="logo-container">
+          <img src="/assets/images/uipotion-logo.png" alt="UI Potion Logo" width="32" height="32" class="logo-image">
           <span class="logo-text">UI Potion</span>
         </a>
         
@@ -153,9 +153,9 @@
         <!-- Desktop & Mobile Menu -->
         <nav class="main-menu" id="mainMenu">
           <ul class="main-menu-list">
-            <li class="main-menu-list-item"><a href="{{relativePath 'potions'}}">Potions</a></li>
-            <li class="main-menu-list-item"><a href="{{relativePath 'about'}}">About</a></li>
-            <li class="main-menu-list-item"><a href="{{relativePath 'contribute'}}">Contribute</a></li>
+            <li class="main-menu-list-item"><a href="/potions">Potions</a></li>
+            <li class="main-menu-list-item"><a href="/about">About</a></li>
+            <li class="main-menu-list-item"><a href="/contribute">Contribute</a></li>
             <li class="main-menu-list-item">
               <button class="search-toggle-btn" data-js-search aria-label="Search potions" title="Search potions">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

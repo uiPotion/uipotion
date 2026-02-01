@@ -1,0 +1,1115 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
+  "id": "ai-agent-chat",
+  "version": "1.0.0",
+  "name": "AI Agent Chat Layout",
+  "category": "layouts",
+  "tags": [
+    "layouts",
+    "chat",
+    "ai",
+    "agent",
+    "conversation",
+    "messaging",
+    "responsive",
+    "a11y"
+  ],
+  "description": "A responsive AI agent chat interface layout with message history, input area, typing indicators, and conversation management. Perfect for AI assistants, chatbots, and conversational interfaces.",
+  "tokens": {
+    "layout": {
+      "sidebarWidthPx": 280,
+      "headerHeightPx": 64,
+      "inputAreaMinHeightPx": 72,
+      "inputAreaMaxHeightPx": 256,
+      "messageMaxWidthPx": 768,
+      "zIndex": {
+        "base": 0,
+        "messageBubbles": 1,
+        "inputArea": 10,
+        "header": 20,
+        "sidebarDesktop": 30,
+        "dropdownsPopovers": 40,
+        "mobileSidebarOverlay": 50,
+        "backdrop": 60,
+        "modals": 70
+      }
+    },
+    "motion": {
+      "messageEntranceDurationMs": 300,
+      "sidebarSlideDurationMs": 250,
+      "inputHeightTransitionMs": 150,
+      "sendButtonPressMs": 100,
+      "autoScrollDurationMs": 300,
+      "typingIndicatorCycleMs": 1400,
+      "defaultEasing": "ease-out",
+      "inputEasing": "ease-in-out"
+    },
+    "breakpoints": {
+      "tabletMinPx": 768,
+      "desktopMinPx": 1024
+    }
+  },
+  "layoutPresets": {
+    "default": {
+      "sidebarWidthPx": 280,
+      "messageMaxWidthPx": 768
+    },
+    "wide": {
+      "sidebarWidthPx": 320,
+      "messageMaxWidthPx": 900
+    },
+    "compact": {
+      "sidebarWidthPx": 0,
+      "messageMaxWidthPx": 768
+    }
+  },
+  "layoutModel": {
+    "type": "stack",
+    "scrollRegion": "custom",
+    "positioningContract": {
+      "header": "fixed-top",
+      "inputArea": "fixed-bottom",
+      "messageList": "scrollable-middle",
+      "sidebar": "optional-fixed-left"
+    },
+    "invariants": [
+      "Header and input area are always visible",
+      "Message list scrolls independently between header and input",
+      "Input area accounts for safe areas on mobile",
+      "No horizontal scroll in message content",
+      "When sidebar is visible on desktop, main chat container must have margin-inline-start (or left margin) equal to sidebar width so the sidebar never overlaps content; when closed or overlay, use zero margin"
+    ]
+  },
+  "aiAgentInstructions": {
+    "summary": "Implement a responsive AI agent chat interface with message history, input area, typing indicators, and optional conversation sidebar. The layout is framework-agnostic and should adapt to the user's chosen stack (React, Vue, Angular, Svelte, etc.) and styling approach (Tailwind, CSS Modules, Chakra UI, Material-UI, etc.).",
+    "keyFeatures": [
+      "Optional sidebar for conversation list (280-320px on desktop, overlay on mobile). When sidebar is visible on desktop, main chat container MUST have left margin equal to sidebar width so the sidebar never overlaps content.",
+      "Fixed header with agent info (56-64px height)",
+      "Scrollable message list with user/agent message distinction",
+      "Fixed input area with auto-expanding textarea",
+      "Typing indicator with animated dots",
+      "Quick action chips for common prompts",
+      "Message bubbles with asymmetric border-radius (speech bubble effect)",
+      "Support for code blocks, links, and rich formatting",
+      "Auto-scroll to new messages with user scroll detection",
+      "Full keyboard accessibility with ARIA live regions",
+      "Mobile-optimized with touch-friendly targets (44px min)",
+      "Smooth animations (300ms message entrance, 250ms sidebar slide)",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems.",
+      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements. Define classes like .message, .message--user, .message--agent, .input-area, etc.",
+      "CRITICAL: When detecting React, extract logic from useEffect hooks into separate custom hooks that do ONE thing each. For example: useChatMessages(), useAutoScroll(), useTypingIndicator(), useConversation()."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine: (a) package.json for framework (React, Vue, Angular, Svelte) and styling dependencies (tailwindcss, styled-components, emotion, sass, etc.), (b) existing component files to see how they import styles (CSS Modules, Tailwind classes, styled-components, etc.), (c) config files (tailwind.config.js, vite.config.js, webpack.config.js, etc.), (d) existing style files and their structure.",
+      "0a. Detect framework patterns: Check how existing components are structured (hooks in React, composition API in Vue, etc.), how state is managed, and what patterns are used.",
+      "0b. Detect styling conventions: Identify class naming (BEM, camelCase, kebab-case), how styles are imported, whether there's a design system or token system, and what utility functions exist (cn, clsx, classnames, etc.).",
+      "0c. If detection is uncertain, ask the user about their styling approach and framework before proceeding.",
+      "1. Create main layout container with optional sidebar and main chat area",
+      "2. Implement Header component with agent info (avatar, name, status) and actions",
+      "3. Create MessageList component with scrollable container and centered max-width content",
+      "4. Implement MessageBubble component with user/agent variants and asymmetric border-radius",
+      "5. Add InputArea component with auto-expanding textarea, send button, and optional quick actions",
+      "6. Implement TypingIndicator component with animated dots",
+      "7. Add sidebar with conversation list (if enabled), with overlay behavior on mobile. When sidebar is open on desktop, apply margin-inline-start (or left margin) to the main chat container equal to sidebar width so the sidebar never overlaps the main content. Ensure users can always close the sidebar when it is open at every breakpoint (visible close control or header control that toggles).",
+      "8. Implement state management for messages, input value, typing state, and sidebar visibility",
+      "9. Add auto-scroll behavior with user scroll detection (pause auto-scroll when user scrolls up)",
+      "10. Implement keyboard navigation (Enter to send, Shift+Enter for new line, Escape to close sidebar)",
+      "11. Add ARIA live regions for new messages and typing indicator announcements",
+      "12. Implement responsive breakpoints (mobile, tablet, desktop) with appropriate layout changes",
+      "13. Add smooth animations for message entrance, sidebar slide, and input height changes",
+      "14. Use ONLY the detected styling system. Match existing component styling patterns exactly.",
+      "15. Input area: Provide clear white space on all sides (min 16px padding). Bottom padding must include env(safe-area-inset-bottom). Gap between text input and send button: 12px min. Message list: Use sufficient padding-bottom (24px+) so content does not sit under the input area."
+    ]
+  },
+  "structure": {
+    "hierarchy": {
+      "ChatLayout": {
+        "description": "Root container, full viewport height, manages sidebar and main chat area layout",
+        "children": {
+          "Sidebar": {
+            "description": "Optional conversation list sidebar (280-320px desktop, overlay mobile)",
+            "children": [
+              "ConversationList",
+              "AgentSelector",
+              "NewConversationButton"
+            ]
+          },
+          "ChatContainer": {
+            "description": "Main chat area containing header, message list, and input area",
+            "children": {
+              "Header": {
+                "description": "Fixed header with agent info and actions",
+                "children": [
+                  "MenuToggle",
+                  "AgentInfo",
+                  "HeaderActions"
+                ]
+              },
+              "MessageList": {
+                "description": "Scrollable message history with centered content",
+                "children": [
+                  "MessageBubble",
+                  "DateDivider",
+                  "TypingIndicator"
+                ]
+              },
+              "InputArea": {
+                "description": "Fixed input area at bottom with message composition",
+                "children": [
+                  "QuickActions",
+                  "TextInput",
+                  "AttachmentButton",
+                  "SendButton"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "Sidebar": {
+      "description": "Optional conversation list sidebar with collapsible behavior",
+      "dimensions": {
+        "desktopWidthPx": 280,
+        "wideModeWidthPx": 320,
+        "mobile": "full screen overlay or hidden",
+        "collapsedWidthPx": 0
+      },
+      "states": [
+        "expanded",
+        "hidden",
+        "overlay"
+      ],
+      "elements": {
+        "ConversationList": {
+          "itemHeightPx": 64,
+          "scrollable": true,
+          "itemStructure": [
+            "Title",
+            "Timestamp",
+            "LastMessagePreview"
+          ]
+        },
+        "AgentSelector": {
+          "type": "dropdown or list",
+          "shows": [
+            "AgentName",
+            "Avatar",
+            "Status"
+          ]
+        },
+        "NewConversationButton": {
+          "position": "top or bottom of sidebar",
+          "style": "primary button or floating action button"
+        }
+      },
+      "behavior": {
+        "mobile": {
+          "overlay": "Overlay with backdrop, dismissible",
+          "backdropClick": "Close sidebar when backdrop clicked",
+          "preventBodyScroll": "Lock body scroll when sidebar open"
+        },
+        "animation": "250ms ease-out slide transition",
+        "persistence": "Store sidebar state in localStorage (optional)",
+        "closeability": "When the sidebar is open, the user must always have a visible way to close it at every breakpoint (including desktop). Provide at least one: a dedicated close control in the sidebar, or a header control that both opens and closes the sidebar. Do not hide or remove the close option on larger viewports. Ensure the close action is keyboard-accessible and has an accessible name (e.g. aria-label)."
+      },
+      "layoutSpace": "When sidebar is visible on desktop, the main chat container must have margin-inline-start (or left margin) equal to sidebar width so the sidebar never overlaps the main content. When sidebar is closed or in overlay mode (mobile/tablet), use zero margin. Sidebar visibility must be tied to open/closed state on all breakpoints (do not force sidebar visible on desktop regardless of state)."
+    },
+    "Header": {
+      "description": "Fixed header bar with agent information and actions",
+      "dimensions": {
+        "heightPx": 64,
+        "width": "100% of chat area",
+        "position": "fixed or sticky at top"
+      },
+      "layout": "[MenuToggle] [AgentInfo] [spacer] [HeaderActions]",
+      "elements": {
+        "MenuToggle": {
+          "sizePx": 40,
+          "visibility": "When sidebar is collapsible",
+          "icon": "Hamburger or sidebar toggle icon"
+        },
+        "AgentInfo": {
+          "avatarSizePx": 36,
+          "nameFontSizePx": 16,
+          "statusIndicatorSizePx": 8,
+          "statusTextFontSizePx": 12
+        },
+        "HeaderActions": {
+          "buttonSizePx": 40,
+          "actions": [
+            "Settings",
+            "ClearChat",
+            "AdditionalActions"
+          ]
+        }
+      },
+      "behavior": {
+        "shadow": "Subtle shadow or border-bottom for depth",
+        "dropdowns": "Close on outside click or Escape key",
+        "keyboard": "Full keyboard navigation"
+      }
+    },
+    "MessageList": {
+      "description": "Scrollable container for conversation history",
+      "dimensions": {
+        "padding": "16-24px",
+        "paddingBottomMinPx": 24,
+        "maxWidthPx": 768,
+        "messageGapPx": 16
+      },
+      "spacingRequirements": "Use sufficient padding-bottom (24-32px recommended) so that the last message or welcome content does not sit directly under the input area. This prevents overlap and gives clear visual separation.",
+      "layout": "Vertical stack of messages, centered with max-width",
+      "behavior": {
+        "autoScroll": "Scroll to bottom on new messages",
+        "userScrollDetection": "Pause auto-scroll when user scrolls up",
+        "pagination": "Optional infinite scroll or pagination for loading history",
+        "emptyState": "Welcome screen or suggested prompts when no messages"
+      }
+    },
+    "MessageBubble": {
+      "description": "Individual message display with user/agent styling",
+      "dimensions": {
+        "maxWidthPercent": 85,
+        "paddingPx": 12,
+        "borderRadiusPx": 16,
+        "asymmetricBorderRadius": {
+          "user": "16px 16px 4px 16px",
+          "agent": "16px 16px 16px 4px"
+        }
+      },
+      "variants": {
+        "user": {
+          "background": "Primary brand color or dark neutral",
+          "text": "White or high contrast",
+          "alignment": "flex-end (right side)"
+        },
+        "agent": {
+          "background": "Light gray or subtle color",
+          "text": "Dark text on light background",
+          "alignment": "flex-start (left side)"
+        }
+      },
+      "elements": {
+        "Content": {
+          "supports": [
+            "Plain text",
+            "Code blocks",
+            "Links",
+            "Lists",
+            "Rich formatting"
+          ]
+        },
+        "Timestamp": {
+          "fontSizePx": 11,
+          "color": "Muted gray",
+          "position": "Below message bubble"
+        },
+        "Avatar": {
+          "sizePx": 32,
+          "position": "Before agent messages",
+          "shape": "Circle"
+        }
+      },
+      "behavior": {
+        "selection": "Allow text selection",
+        "actions": "Optional context menu (copy, delete, retry)"
+      }
+    },
+    "TypingIndicator": {
+      "description": "Animated indicator showing agent is generating response",
+      "dimensions": {
+        "heightPx": 32,
+        "width": "Auto (fits content)"
+      },
+      "elements": {
+        "AnimatedDots": {
+          "count": 3,
+          "sizePx": 8,
+          "animation": "Sequential bounce or fade (1.4s cycle)",
+          "delaysMs": [0, 200, 400]
+        },
+        "Text": {
+          "content": "Agent is typing...",
+          "fontSizePx": 12,
+          "optional": true
+        }
+      },
+      "behavior": {
+        "display": "Show when agent is generating response",
+        "hide": "Hide when message arrives",
+        "animation": "Smooth fade in/out (200ms)"
+      }
+    },
+    "InputArea": {
+      "description": "Fixed message composition area at bottom of screen",
+      "dimensions": {
+        "minHeightPx": 72,
+        "maxHeightPx": 256,
+        "paddingPx": 12,
+        "paddingHorizontalMinPx": 16,
+        "paddingBottomMinPx": 16,
+        "includeSafeAreaBottom": true,
+        "gapBetweenInputAndSendButtonPx": 12
+      },
+      "spacingRequirements": "Input area must have clear white space on all sides: minimum 12-16px padding. Bottom padding must include env(safe-area-inset-bottom) on mobile (e.g. calc(16px + env(safe-area-inset-bottom))). Gap between text input and send button: 12px minimum. Do not let the input sit flush with viewport edges.",
+      "layout": "[QuickActions (optional)] [TextInput] [AttachmentButton (optional)] [SendButton]",
+      "elements": {
+        "QuickActions": {
+          "position": "Above text input",
+          "layout": "Horizontal scrollable chips",
+          "chipHeightPx": 32,
+          "chipPaddingPx": "8-16 horizontal",
+          "borderRadiusPx": 16
+        },
+        "TextInput": {
+          "type": "Auto-expanding textarea",
+          "minRows": 1,
+          "maxRows": 8,
+          "fontSizePx": 14,
+          "borderRadiusPx": 20,
+          "placeholder": "Type a message..."
+        },
+        "AttachmentButton": {
+          "sizePx": 40,
+          "icon": "Paperclip or plus",
+          "optional": true
+        },
+        "SendButton": {
+          "sizePx": 40,
+          "shape": "Circle or rounded square",
+          "icon": "Send arrow or paper plane",
+          "states": [
+            "default (muted/disabled)",
+            "active (primary color)",
+            "loading (spinner)"
+          ]
+        }
+      },
+      "behavior": {
+        "autoFocus": "Focus input when chat opens",
+        "enterToSend": "Enter sends, Shift+Enter for new line",
+        "autoExpand": "Input expands as user types",
+        "heightTransition": "150ms ease-in-out",
+        "enableSend": "Only when input not empty",
+        "clearOnSend": "Clear input after sending",
+        "errorHandling": "Maintain input if sending fails"
+      }
+    },
+    "WelcomeScreen": {
+      "description": "Empty state shown when no messages exist",
+      "dimensions": {
+        "height": "Full message list height",
+        "maxWidthPx": 600
+      },
+      "elements": {
+        "Icon": {
+          "type": "Optional illustration or icon",
+          "sizePx": 64
+        },
+        "Heading": {
+          "text": "How can I help you today?",
+          "fontSizePx": 24
+        },
+        "Subtext": {
+          "description": "Brief agent capability description",
+          "fontSizePx": 14
+        },
+        "SuggestedPrompts": {
+          "count": "3-6 suggestions",
+          "style": "Clickable cards or buttons"
+        }
+      }
+    }
+  },
+  "responsiveBreakpoints": {
+    "desktop": {
+      "minWidth": "1024px",
+      "sidebar": "Visible by default (if enabled)",
+      "messageMaxWidth": "768-900px (centered)",
+      "inputArea": "Full width with comfortable padding",
+      "quickActions": "Visible above input"
+    },
+    "tablet": {
+      "minWidth": "768px",
+      "maxWidth": "1023px",
+      "sidebar": "Collapsible, overlay mode when open",
+      "messageMaxWidth": "100% with 16-24px margins",
+      "inputArea": "Full width, reduced padding",
+      "quickActions": "Horizontal scroll or hidden"
+    },
+    "mobile": {
+      "maxWidth": "767px",
+      "sidebar": "Hidden by default, fullscreen overlay when open",
+      "messageMaxWidth": "100% with 12-16px margins",
+      "inputArea": "Full width, minimal padding (12px)",
+      "quickActions": "Horizontal scroll, compact",
+      "header": "Simplified (avatar and name only)",
+      "touchTargets": "Minimum 44px"
+    },
+    "resizeHandling": {
+      "debounceMs": 200,
+      "behavior": "Re-evaluate breakpoint on resize, close mobile sidebar if switching to desktop"
+    }
+  },
+  "stateManagement": {
+    "statesToTrack": {
+      "messages": {
+        "type": "array",
+        "description": "List of all messages in conversation. Structure: { id: string, role: 'user'|'agent', content: string, timestamp: ISO string, status: 'sent'|'delivering'|'error', attachments?: array }",
+        "persistence": "Server/database (not localStorage)"
+      },
+      "inputValue": {
+        "type": "string",
+        "description": "Current text in input field",
+        "default": "",
+        "persistence": "localStorage (optional, auto-save draft)"
+      },
+      "isTyping": {
+        "type": "boolean",
+        "description": "Whether agent is generating response",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "sidebarOpen": {
+        "type": "boolean",
+        "description": "Whether sidebar is visible on mobile",
+        "default": false,
+        "persistence": "localStorage (optional)"
+      },
+      "conversations": {
+        "type": "array",
+        "description": "List of available conversations",
+        "persistence": "Server/database"
+      },
+      "activeConversationId": {
+        "type": "string",
+        "description": "Currently selected conversation ID",
+        "persistence": "localStorage or URL param"
+      },
+      "isSending": {
+        "type": "boolean",
+        "description": "Whether message is being sent",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "hasMoreMessages": {
+        "type": "boolean",
+        "description": "For pagination/infinite scroll",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "userScrolled": {
+        "type": "boolean",
+        "description": "Whether user has manually scrolled up",
+        "default": false,
+        "persistence": "component state only"
+      }
+    },
+    "ssrConsiderations": {
+      "localStorage": "Only access in onMounted/useEffect",
+      "defaultState": "Empty messages, closed sidebar",
+      "hydrationMismatch": "Initialize state after mount to prevent mismatches"
+    }
+  },
+  "persistence": {
+    "storage": "localStorage",
+    "keys": {
+      "sidebarOpen": "uipotion.ai-chat.sidebarOpen.v1",
+      "activeConversationId": "uipotion.ai-chat.activeConversation.v1",
+      "draftMessage": "uipotion.ai-chat.draftMessage.v1"
+    }
+  },
+  "navigationBehavior": {
+    "onConversationChange": {
+      "sidebar": "close on mobile",
+      "scroll": "scroll to bottom of new conversation"
+    },
+    "onRouteChange": {
+      "sidebar": "close",
+      "saveDraft": "save current input value"
+    }
+  },
+  "internationalization": {
+    "rtl": {
+      "supported": true,
+      "messageAlignment": {
+        "user": "start (left in RTL)",
+        "agent": "end (right in RTL)"
+      },
+      "useLogicalProperties": true,
+      "notes": "Use logical CSS properties (inset-inline-start/end, margin-inline-start/end) for proper RTL support."
+    }
+  },
+  "mobileSafeArea": {
+    "applyTo": [
+      "header",
+      "inputArea"
+    ],
+    "topInset": "env(safe-area-inset-top)",
+    "bottomInset": "env(safe-area-inset-bottom)",
+    "notes": "On mobile devices with notches/home indicators, add safe-area padding to fixed header and input area."
+  },
+  "motionPreferences": {
+    "prefersReducedMotion": {
+      "behavior": "reduce",
+      "rules": [
+        "Disable message entrance animations",
+        "Keep typing indicator but simplify animation",
+        "Reduce transition durations to 0ms or 50ms",
+        "Keep essential state changes but make them instant"
+      ]
+    }
+  },
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "useState for component state, custom hooks for chat logic, Context API or props for sharing",
+      "customHooks": [
+        "useChatMessages() - manages message list and operations",
+        "useAutoScroll(messageListRef, messages, isTyping) - handles auto-scrolling",
+        "useTypingIndicator(isTyping) - manages typing animation state",
+        "useConversation() - manages conversation switching",
+        "useLocalStorage(key, defaultValue) - SSR-safe localStorage"
+      ],
+      "componentStructure": "<ChatLayout><Sidebar /><ChatContainer><Header /><MessageList /><InputArea /></ChatContainer></ChatLayout>",
+      "keyLibraries": "Optional: react-textarea-autosize for input, react-virtualized for long message lists"
+    },
+    "vue": {
+      "stateManagement": "ref() or reactive() for state, watch() for localStorage, provide/inject for sharing",
+      "customHooks": "useChatMessages(), useAutoScroll(), useTypingIndicator() as composables",
+      "componentStructure": "<ChatLayout><Sidebar /><ChatContainer><Header /><MessageList /><InputArea /></ChatContainer></ChatLayout>",
+      "keyLibraries": "Optional: vue-textarea-autosize for input, vue-virtual-scroller for long lists"
+    },
+    "angular": {
+      "stateManagement": "Component properties, RxJS BehaviorSubject for shared state, services for persistence",
+      "services": [
+        "ChatService - manages messages and conversations",
+        "AutoScrollService - handles scroll behavior",
+        "TypingIndicatorService - manages typing state"
+      ],
+      "componentStructure": "<app-chat-layout><app-sidebar /><div class=\"chat-container\"><app-header /><app-message-list /><app-input-area /></div></app-chat-layout>"
+    },
+    "svelte": {
+      "stateManagement": "writable stores for state, onMount for localStorage",
+      "customHooks": "Create chat store, autoScroll store, typingIndicator store",
+      "componentStructure": "<ChatLayout><Sidebar /><ChatContainer><Header /><MessageList /><InputArea /></ChatContainer></ChatLayout>"
+    }
+  },
+  "stylingApproaches": {
+    "note": "These are implementation examples showing how to apply designSystem specifications. Always refer to designSystem for authoritative values.",
+    "tailwindCSS": {
+      "description": "Use utility classes with dynamic classes based on state. Use arbitrary values for exact pixel values.",
+      "messageBubbleExample": "class='max-w-[85%] px-4 py-3 rounded-2xl' :class=\"{'bg-blue-600 text-white rounded-tr-sm': isUser, 'bg-gray-100 text-gray-900 rounded-tl-sm': isAgent}\"",
+      "inputExample": "class='flex-1 resize-none rounded-2xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none'",
+      "key": "Use logical properties (start/end) for RTL support. Use arbitrary values for exact sizes.",
+      "note": "Map token values directly. Use max-w-3xl (768px) or max-w-[900px] for message list."
+    },
+    "cssModules": {
+      "description": "Scoped CSS classes with conditional class names. Apply token values directly in CSS.",
+      "approach": "Define .message, .messageUser, .messageAgent, .inputArea, .sendButton. Toggle via className logic.",
+      "example": ".message { max-width: 85%; border-radius: 16px; } .messageUser { background: #3b82f6; color: white; border-radius: 16px 16px 4px 16px; }",
+      "note": "Prefer logical properties (margin-inline-start) for RTL support."
+    },
+    "styledComponents": {
+      "description": "CSS-in-JS with props. Map token values to component props.",
+      "approach": "Pass isUser prop and adjust styles dynamically",
+      "example": "const MessageBubble = styled.div`max-width: 85%; padding: 12px 16px; border-radius: ${p => p.isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px'}; background: ${p => p.isUser ? '#3b82f6' : '#f3f4f6'};`",
+      "note": "Extract tokens into shared constants module."
+    },
+    "chakraUI": {
+      "components": "Use Box, Flex, VStack, HStack for layout. Avatar component for agent avatars.",
+      "approach": "Use Chakra components with responsive variants. Override styles using token values.",
+      "theme": "Extend Chakra theme with designSystem colors and tokens",
+      "transitions": "Use Chakra transition helpers, respect prefers-reduced-motion"
+    },
+    "materialUI": {
+      "components": "Use Paper for message bubbles, TextField for input, IconButton for actions",
+      "approach": "Override MUI components with token values for dimensions and colors",
+      "theme": "Override MUI theme to match designSystem + tokens"
+    },
+    "vanillaCSS": {
+      "description": "Standard CSS with class toggles. Apply token values directly. CRITICAL: ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes.",
+      "approach": "Define .message, .message--user, .message--agent, .input-area, .send-button. Toggle classes via JS.",
+      "example": ".message{max-width:85%;padding:12px 16px;border-radius:16px}.message--user{background:#3b82f6;color:#fff;border-radius:16px 16px 4px 16px}.message--agent{background:#f3f4f6;color:#1f2937;border-radius:16px 16px 16px 4px}",
+      "note": "Apply classes via className/class attribute: <div class='message message--user'> NOT <div style='background: #3b82f6'>"
+    },
+    "sass": {
+      "description": "SCSS with variables and mixins. Define token values as SCSS variables.",
+      "approach": "Create SCSS variables for tokens. Use mixins for message bubble styles.",
+      "example": "$message-max-width: 85%; $user-bg: #3b82f6; .message { max-width: $message-max-width; @include message-bubble($user-bg); }"
+    }
+  },
+  "animations": {
+    "messageEntrance": {
+      "durationMs": 300,
+      "easing": "ease-out",
+      "properties": {
+        "transform": "translateY(10px) to translateY(0)",
+        "opacity": "0 to 1"
+      },
+      "staggerMs": 50
+    },
+    "typingIndicator": {
+      "cycleMs": 1400,
+      "dotDelaysMs": [0, 200, 400],
+      "animation": "Sequential bounce or fade"
+    },
+    "inputHeight": {
+      "durationMs": 150,
+      "easing": "ease-in-out",
+      "property": "height"
+    },
+    "sidebarSlide": {
+      "durationMs": 250,
+      "easing": "ease-out",
+      "transform": "translateX(-100%) to translateX(0)"
+    },
+    "sendButtonPress": {
+      "durationMs": 100,
+      "transform": "scale(0.95) on press"
+    },
+    "autoScroll": {
+      "durationMs": 300,
+      "easing": "ease-out",
+      "behavior": "smooth"
+    }
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.1.1": "Non-text Content - All icons have aria-label or sr-only text",
+        "1.3.1": "Info and Relationships - Semantic HTML structure with proper roles",
+        "1.4.3": "Contrast Minimum - 4.5:1 for normal text, 3:1 for large text",
+        "2.1.1": "Keyboard - All interactive elements keyboard accessible",
+        "2.1.2": "No Keyboard Trap - Focus doesn't get trapped",
+        "2.4.2": "Page Titled - Descriptive page title",
+        "2.4.3": "Focus Order - Logical tab order throughout",
+        "2.4.4": "Link Purpose - Clear button labels",
+        "2.4.7": "Focus Visible - Clear focus indicators",
+        "4.1.2": "Name, Role, Value - All elements have accessible names and roles",
+        "4.1.3": "Status Messages - Use aria-live for new messages and typing indicator"
+      }
+    },
+    "keyboardNavigation": {
+      "tabOrder": "Header actions → Message list (optional) → Input area → Send button",
+      "enterKey": "Send message from input",
+      "shiftEnter": "New line in input",
+      "escapeKey": "Close sidebar or dropdowns",
+      "focusManagement": {
+        "afterSend": "Focus remains in input",
+        "sidebar": "Trap focus when open on mobile",
+        "restoreFocus": "Restore focus to toggle button when sidebar closes"
+      }
+    },
+    "ariaAttributes": {
+      "required": {
+        "messageList": {
+          "role": "log",
+          "ariaLive": "polite",
+          "ariaLabel": "Chat messages"
+        },
+        "userMessage": {
+          "ariaLabel": "You said: [content]"
+        },
+        "agentMessage": {
+          "ariaLabel": "Agent said: [content]"
+        },
+        "typingIndicator": {
+          "ariaLive": "polite",
+          "ariaLabel": "Agent is typing",
+          "srOnlyText": "Agent is typing"
+        },
+        "inputField": {
+          "ariaLabel": "Message input",
+          "placeholder": "Type a message..."
+        },
+        "sendButton": {
+          "ariaLabel": "Send message",
+          "disabled": "true/false"
+        },
+        "sidebar": {
+          "role": "complementary",
+          "ariaLabel": "Conversation list",
+          "ariaHidden": "false/true based on state"
+        }
+      },
+      "dynamicUpdates": [
+        "Announce new messages via aria-live",
+        "Update aria-hidden when sidebar opens/closes",
+        "Update disabled state on send button",
+        "Announce typing status changes"
+      ]
+    },
+    "screenReader": {
+      "announcements": {
+        "newMessage": "Agent said: [content] or You said: [content]",
+        "typing": "Agent is typing",
+        "sendConfirmation": "Message sent (optional, brief)",
+        "error": "Failed to send message"
+      },
+      "labels": {
+        "iconButtons": "All icon buttons must have aria-label",
+        "messageBubbles": "Descriptive aria-label for each message"
+      }
+    },
+    "focusManagement": {
+      "focusVisible": {
+        "required": true,
+        "css": "outline: 2px solid var(--primary-color); outline-offset: 2px",
+        "targets": ["input", "textarea", "button"]
+      }
+    },
+    "colorContrast": {
+      "requirement": "WCAG AA: 4.5:1 for normal text, 3:1 for large text",
+      "criticalAreas": [
+        "User message text on bubble background",
+        "Agent message text on bubble background",
+        "Input text on input background",
+        "Button text on button background",
+        "Timestamp text on background",
+        "Placeholder text"
+      ]
+    },
+    "implementationChecklist": [
+      "All buttons have aria-label or visible text",
+      "All icons have aria-label or sr-only text",
+      "Message list has role='log' and aria-live='polite'",
+      "Typing indicator announces to screen readers",
+      "Input field has accessible name",
+      "Send button has disabled state communicated",
+      "Color contrast verified (4.5:1 minimum)",
+      "Keyboard navigation works throughout",
+      "Focus visible on all interactive elements",
+      "Focus managed properly in sidebar",
+      "Screen reader tested with NVDA, VoiceOver, or JAWS",
+      "Touch targets minimum 44px on mobile"
+    ]
+  },
+  "designSystem": {
+    "note": "Tool-agnostic design specifications. Implement using project's chosen styling approach.",
+    "colorGuidelines": {
+      "userMessage": {
+        "backgroundLight": "Primary brand color (e.g., #3b82f6, #10b981) or dark neutral (#1f2937)",
+        "backgroundDark": "Primary color or lighter shade (#60a5fa, #34d399)",
+        "text": "White (#ffffff) or very light (#f3f4f6)",
+        "links": "Light blue or underlined white",
+        "codeBlocks": "Darker background within bubble (#1f2937), light text"
+      },
+      "agentMessage": {
+        "backgroundLight": "Light gray (#f3f4f6, #e5e7eb) or white with border",
+        "backgroundDark": "Dark gray (#374151, #4b5563)",
+        "text": "Dark gray (#1f2937, #111827) for light, light gray (#e5e7eb) for dark",
+        "links": "Primary brand color",
+        "codeBlocks": "Dark background (#1f2937), light text, rounded corners"
+      },
+      "inputArea": {
+        "backgroundLight": "White (#ffffff) or very light gray (#f9fafb)",
+        "backgroundDark": "Dark gray (#1f2937, #374151)",
+        "border": "1px solid light gray (#e5e7eb) or transparent",
+        "focusBorder": "Primary brand color",
+        "text": "Match body text color",
+        "placeholder": "Muted gray (#9ca3af)"
+      },
+      "sendButton": {
+        "default": "Muted gray or disabled state",
+        "active": "Primary brand color",
+        "disabled": "Light gray (#d1d5db)"
+      },
+      "header": {
+        "backgroundLight": "White (#ffffff) or very light gray (#f9fafb)",
+        "backgroundDark": "Dark gray (#1f2937)",
+        "border": "1px solid light gray (#e5e7eb)",
+        "text": "Dark gray (#1f2937) for light, light gray (#e5e7eb) for dark"
+      },
+      "sidebar": {
+        "backgroundLight": "White (#ffffff) or light gray (#f9fafb)",
+        "backgroundDark": "Dark gray (#1f2937)",
+        "activeConversation": "Primary color at 10% opacity or left border"
+      }
+    },
+    "typography": {
+      "messageText": {
+        "fontSizePx": 14,
+        "fontWeight": 400,
+        "lineHeight": 1.5
+      },
+      "codeBlocks": {
+        "fontFamily": "Monospace (Consolas, Monaco, 'Courier New')",
+        "fontSizePx": 13
+      },
+      "timestamps": {
+        "fontSizePx": 11,
+        "fontWeight": 400,
+        "color": "Muted"
+      },
+      "agentName": {
+        "fontSizePx": 16,
+        "fontWeight": 500
+      },
+      "statusText": {
+        "fontSizePx": 12,
+        "fontWeight": 400
+      },
+      "inputText": {
+        "fontSizePx": 14,
+        "fontWeight": 400
+      },
+      "quickActions": {
+        "fontSizePx": 13,
+        "fontWeight": 400
+      },
+      "welcomeHeading": {
+        "fontSizePx": 24,
+        "fontWeight": 700
+      }
+    },
+    "spacing": {
+      "messageList": {
+        "paddingPx": 16,
+        "paddingBottomPx": 24,
+        "gapPx": 16
+      },
+      "messageBubble": {
+        "paddingPx": 12,
+        "maxWidthPercent": 85
+      },
+      "inputArea": {
+        "paddingPx": 16,
+        "paddingBottomIncludeSafeArea": true,
+        "gapBetweenInputAndSendButtonPx": 12,
+        "minHeightPx": 72
+      },
+      "header": {
+        "paddingPx": 12
+      }
+    },
+    "borderRadius": {
+      "messageBubbles": "16px (asymmetric for speech bubble effect)",
+      "inputField": "20-24px",
+      "sendButton": "50% (circle) or 8-12px",
+      "quickActions": "16-18px",
+      "avatars": "50%",
+      "headerButtons": "6-8px"
+    },
+    "shadows": {
+      "header": "0 1px 3px rgba(0, 0, 0, 0.1)",
+      "inputArea": "0 -2px 10px rgba(0, 0, 0, 0.05)",
+      "messageBubbles": "0 1px 2px rgba(0, 0, 0, 0.05)",
+      "sidebar": "4px 0 15px rgba(0, 0, 0, 0.1)"
+    }
+  },
+  "overflowPolicy": {
+    "messageList": {
+      "x": "hidden",
+      "y": "auto"
+    },
+    "messageContent": {
+      "codeBlocks": "allowInternalScroll",
+      "longText": "wordWrap"
+    }
+  },
+  "dataStructures": {
+    "message": {
+      "description": "Individual message object",
+      "example": {
+        "id": "msg_123",
+        "role": "user",
+        "content": "Hello, how are you?",
+        "timestamp": "2026-02-01T10:30:00Z",
+        "status": "sent",
+        "attachments": []
+      }
+    },
+    "conversation": {
+      "description": "Conversation metadata",
+      "example": {
+        "id": "conv_456",
+        "title": "Project Discussion",
+        "lastMessage": "Let me review that...",
+        "timestamp": "2026-02-01T10:30:00Z",
+        "unreadCount": 0,
+        "agentId": "agent_1"
+      }
+    },
+    "agent": {
+      "description": "AI agent information",
+      "example": {
+        "id": "agent_1",
+        "name": "Assistant",
+        "avatar": "/avatars/assistant.png",
+        "status": "online"
+      }
+    }
+  },
+  "commonVariations": {
+    "withoutSidebar": "Full-width chat, header contains conversation dropdown",
+    "compactMode": "Reduced padding, smaller avatars, good for widgets",
+    "embeddedWidget": "Floating button opens modal chat (400-500px width)",
+    "multiAgent": "Agent switcher in header, different colors per agent",
+    "richContent": "Images, file attachments, interactive cards in messages"
+  },
+  "zIndexLayers": {
+    "base": 0,
+    "messageBubbles": 1,
+    "inputArea": 10,
+    "header": 20,
+    "sidebarDesktop": 30,
+    "dropdownsPopovers": 40,
+    "mobileSidebarOverlay": 50,
+    "backdrop": 60,
+    "modals": 70
+  },
+  "implementationDetails": {
+    "autoScroll": {
+      "behavior": "Scroll to bottom on new message",
+      "userScrollDetection": "Check scroll position, pause auto-scroll when user scrolled up",
+      "resume": "Resume auto-scroll when user scrolls to bottom",
+      "animation": "300ms ease-out smooth scroll"
+    },
+    "inputHandling": {
+      "autoExpand": "Increase textarea rows up to max (8)",
+      "enterBehavior": "Send message (Enter) or new line (Shift+Enter)",
+      "heightTransition": "150ms ease-in-out"
+    },
+    "messageStreaming": {
+      "optional": true,
+      "implementation": "Update message content as chunks arrive",
+      "throttle": "Use requestAnimationFrame or throttle for smooth updates",
+      "cursor": "Show streaming cursor during active stream"
+    },
+    "performance": {
+      "virtualization": "Use virtual scrolling for long message lists (>100 messages)",
+      "debounce": "Debounce input changes if doing heavy processing",
+      "lazyLoad": "Lazy load images and attachments"
+    }
+  },
+  "edgeCases": {
+    "longMessages": "Message bubble expands vertically, code blocks scroll horizontally",
+    "rapidSending": "Queue messages, show loading state per message, prevent duplicates",
+    "emptyInput": "Disable send button, visual indication of disabled state",
+    "failedSend": "Show error state on message, provide retry button, keep text in input",
+    "slowConnection": "Optimistic UI (show message immediately), loading indicator, timeout handling",
+    "messageOverflow": "Max-height with 'Read more' for extremely long messages"
+  },
+  "testingChecklist": [
+    "Message bubbles display with correct user/agent styling",
+    "Input area stays fixed at bottom",
+    "Header remains fixed at top",
+    "Messages scroll smoothly in list",
+    "Auto-scroll works on new messages",
+    "User scroll detection pauses auto-scroll",
+    "Send button sends message",
+    "Enter key sends, Shift+Enter adds new line",
+    "Input expands as user types",
+    "Typing indicator animates",
+    "Sidebar opens/closes smoothly",
+    "Responsive at all breakpoints",
+    "Keyboard navigation works",
+    "Screen reader announces messages",
+    "Color contrast verified",
+    "Touch targets 44px+ on mobile",
+    "Empty state displays correctly",
+    "Failed message shows error state"
+  ],
+  "projectDetection": {
+    "framework": {
+      "description": "Detect project's framework by examining package.json, existing components, and project structure",
+      "detectionSteps": [
+        "Check package.json for framework dependencies",
+        "Examine existing component files for framework patterns",
+        "Check build configuration files",
+        "Look for framework-specific directories"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect project's styling approach by examining dependencies, config files, and existing styles",
+      "detectionSteps": [
+        "Check package.json for styling dependencies",
+        "Look for config files (tailwind.config.js, etc.)",
+        "Examine existing component files",
+        "Check for style files and naming conventions"
+      ],
+      "adaptationRules": [
+        "If Tailwind detected: Use Tailwind classes, respect existing config",
+        "If SCSS/CSS detected: Use SCSS/CSS files matching project structure",
+        "If styled-components detected: Use styled-components syntax",
+        "If CSS Modules detected: Use .module.css files",
+        "If no styling system: Use vanilla CSS or CSS Modules"
+      ]
+    },
+    "designTokens": {
+      "description": "Identify existing design tokens, color systems, spacing scales from the project",
+      "detectionSteps": [
+        "Check for design token files",
+        "Examine Tailwind config for theme values",
+        "Look at existing components for patterns",
+        "Check CSS variables in global styles"
+      ]
+    }
+  },
+  "outputConstraints": {
+    "must": [
+      "Detect and use ONLY the project's existing framework",
+      "Detect and use ONLY the project's existing styling system",
+      "Use project's existing design tokens if available",
+      "Use project's class composition utility if it exists",
+      "Follow project's naming conventions",
+      "Match existing component patterns",
+      "Create CSS classes for vanilla CSS (never inline styles)"
+    ],
+    "mustNot": [
+      "Do NOT introduce new styling systems",
+      "Do NOT add <style> blocks unless that's the project's convention",
+      "Do NOT use inline style attributes (except dynamic values)",
+      "Do NOT create new CSS files unless that's how project structures styles",
+      "Do NOT hardcode colors/values - use project's design tokens",
+      "Do NOT import new UI libraries",
+      "Do NOT use string concatenation for class names"
+    ]
+  },
+  "meta": {
+    "created": "2026-02-01",
+    "updated": "2026-02-01",
+    "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
+    "relatedPotions": [
+      {
+        "id": "text-input",
+        "category": "components",
+        "relationship": "reuse",
+        "description": "Reuse for the message input field (auto-expanding textarea, states, accessibility).",
+        "required": false
+      },
+      {
+        "id": "dialog",
+        "category": "components",
+        "relationship": "reuse",
+        "description": "Reuse for confirmation dialogs (clear chat, delete message).",
+        "required": false
+      },
+      {
+        "id": "toast-notifications",
+        "category": "components",
+        "relationship": "reuse",
+        "description": "Reuse for success/error feedback (message sent, send failed).",
+        "required": false
+      },
+      {
+        "id": "dropdown-select",
+        "category": "components",
+        "relationship": "reuse",
+        "description": "Reuse for agent selector or conversation switcher in header/sidebar.",
+        "required": false
+      },
+      {
+        "id": "navbar",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: header patterns (sticky, actions, mobile toggle) can inform chat header.",
+        "required": false
+      }
+    ]
+  }
+}

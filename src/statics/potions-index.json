@@ -131,8 +131,19 @@
       "agentGuideUrl": "https://uipotion.com/potions/components/dropdown-select.json",
       "created": "2026-01-25",
       "updated": "2026-01-25"
+    },
+    {
+      "id": "ai-agent-chat",
+      "name": "AI Agent Chat Layout",
+      "category": "layouts",
+      "tags": ["layouts", "chat", "ai", "agent", "conversation", "messaging", "responsive", "a11y"],
+      "excerpt": "A responsive AI agent chat interface layout with message history, input area, typing indicators, and conversation management. Perfect for AI assistants, chatbots, and conversational interfaces.",
+      "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
+      "agentGuideUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.json",
+      "created": "2026-02-01",
+      "updated": "2026-02-01"
     }
   ],
-  "totalCount": 12,
-  "lastUpdated": "2026-01-31"
+  "totalCount": 13,
+  "lastUpdated": "2026-02-01"
 }

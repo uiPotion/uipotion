@@ -6,7 +6,7 @@ requests" currentPath="contribute" }}
   <header class="about-hero">
     <div class="about-hero-container">
       <div class="about-breadcrumb">
-        <a href="{{relativePath 'index'}}">Home</a>
+        <a href="/">Home</a>
         <span>/</span>
         <span>Contribute</span>
       </div>
@@ -42,7 +42,7 @@ requests" currentPath="contribute" }}
             <li><strong>Fork this repository</strong> at <a href="https://github.com/uiPotion/uipotion" target="_blank"
                 rel="noopener">github.com/uiPotion/uipotion</a></li>
             <li><strong>Create your potion</strong> (Markdown + JSON) — see Creating a Potion below</li>
-            <li><strong>Validate</strong> using the <a href="{{relativePath 'validator'}}">Schema Validator</a> or
+            <li><strong>Validate</strong> using the <a href="/validator">Schema Validator</a> or
               <code>npm run validate</code></li>
             <li><strong>Run <code>npm run static</code></strong> to update sitemap and redirects (automatic!)</li>
             <li><strong>Submit a pull request</strong> with your new potion</li>
@@ -104,7 +104,7 @@ agentManifest: 'potions/components/your-potion.json'
           </div>
 
           <h3>Step 3: Validate</h3>
-          <p>Visit the <a href="{{relativePath 'validator'}}">Schema Validator</a> or run <code>npm run validate</code>
+          <p>Visit the <a href="/validator">Schema Validator</a> or run <code>npm run validate</code>
             to validate your JSON. Fix any errors before continuing.</p>
 
           <h3>Step 4: Update Sitemap and Redirects</h3>
@@ -239,7 +239,7 @@ The agentManifest should point to: potions/components/your-potion-name.json</cod
 
           <h3>Web-Based Validator</h3>
           <div class="validator-cta">
-            <a href="{{relativePath 'validator'}}" class="button primary">Open Schema Validator</a>
+            <a href="/validator" class="button primary">Open Schema Validator</a>
             <p>Select the correct category schema and paste your JSON to check for errors.</p>
           </div>
 
@@ -259,7 +259,7 @@ node validate-potions.js</code></pre>
             <li>Detects the category from the file path or <code>$schema</code> field</li>
             <li>Validates each potion against its category schema</li>
             <li>Shows detailed error messages for any issues</li>
-            <li>Runs automatically before <code>npm run build</code> and <code>npm start</code></li>
+            <li>Runs automatically before <code>npm run build</code></li>
             <li>Exits with error code if validation fails (useful for CI/CD)</li>
           </ul>
 
@@ -289,7 +289,7 @@ npm start</code></pre>
 
           <h3>Before Submitting</h3>
           <ul>
-            <li>JSON validates with no errors (<a href="{{relativePath 'validator'}}">web validator</a> or
+            <li>JSON validates with no errors (<a href="/validator">web validator</a> or
               <code>npm run validate</code>)</li>
             <li>Markdown has correct front matter</li>
             <li>Ran <code>npm run static</code></li>
@@ -367,11 +367,11 @@ npm start</code></pre>
         <section class="about-section">
           <h2>Resources</h2>
           <ul>
-            <li><a href="{{relativePath 'validator'}}">Schema Validator</a> — Validate your potions before submitting
+            <li><a href="/validator">Schema Validator</a> — Validate your potions before submitting
             </li>
             <li><a href="https://github.com/uiPotion/uipotion" target="_blank" rel="noopener">GitHub Repository</a> —
               View the codebase and submit PRs</li>
-            <li><a href="{{relativePath 'about'}}">About UI Potion</a> — Learn more about the project</li>
+            <li><a href="/about">About UI Potion</a> — Learn more about the project</li>
           </ul>
         </section>
 
@@ -379,7 +379,7 @@ npm start</code></pre>
           <h2>Get Started</h2>
           <p>Ready to contribute? Start by exploring the schemas and validating your first potion!</p>
           <div style="margin-top: 24px;">
-            <a href="{{relativePath 'validator'}}" class="button primary">Validate a Potion</a>
+            <a href="/validator" class="button primary">Validate a Potion</a>
             <a href="https://github.com/uiPotion/uipotion" target="_blank" rel="noopener" class="button"
               style="margin-left: 12px;">View on GitHub</a>
           </div>

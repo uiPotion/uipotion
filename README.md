@@ -112,10 +112,10 @@ npm install
 # Start dev server with hot reload (http://localhost:3000)
 npm start
 
-# Build for production
+# Build for production (runs validation automatically)
 npm run build
 
-# Validate all potions against their schemas
+# Validate all potions against their schemas (optional; also runs on build)
 npm run validate
 
 # Generate sitemap.xml and _redirects
