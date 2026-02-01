@@ -9,7 +9,7 @@ tags:
   - landing-page
   - marketing
   - hero
-  - features
+  - feature-highlights
   - testimonials
   - cta
   - responsive

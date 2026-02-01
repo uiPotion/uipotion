@@ -286,7 +286,7 @@ body::-webkit-scrollbar-thumb:hover {
   .section-intro {
     text-align: center;
     font-size: 1.125rem;
-    color: #71717a;
+    color: #9ca3af;
     margin-bottom: 72px;
     max-width: 700px;
     margin-left: auto;
@@ -859,10 +859,6 @@ body::-webkit-scrollbar-thumb:hover {
   z-index: 1;
 }
 
-.about-breadcrumb {
-  /* Styles moved to consolidated breadcrumb section */
-}
-
 .about-hero-title {
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 800;
@@ -1247,10 +1243,6 @@ body::-webkit-scrollbar-thumb:hover {
   margin: 0 auto;
   position: relative;
   z-index: 1;
-}
-
-.validator-breadcrumb {
-  /* Styles moved to consolidated breadcrumb section */
 }
 
 .validator-hero-title {
@@ -1781,10 +1773,6 @@ html {
   margin: 0 auto;
   position: relative;
   z-index: 1;
-}
-
-.potion-breadcrumb {
-  /* Styles moved to consolidated breadcrumb section */
 }
 
 .potion-hero-title {
@@ -2455,10 +2443,6 @@ html {
     margin-bottom: 0;
     max-width: 800px;
   }
-}
-
-.potions-breadcrumb {
-  /* Styles moved to consolidated breadcrumb section */
 }
 
 /* Potions Catalog Content */

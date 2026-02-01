@@ -83,7 +83,7 @@ title: 'Component Name'                               # REQUIRED: Descriptive na
 publicationDate: '2026-01-10'                         # REQUIRED: YYYY-MM-DD format
 excerpt: 'Brief description'                          # REQUIRED: 1-2 sentences
 category: 'Layouts'                                   # REQUIRED: Layouts|Components|Features|Patterns|Tooling
-tags: [tag1, tag2]                                    # REQUIRED: Array of tags
+tags: [tag1, tag2]                                    # REQUIRED: Array of tags. First tag MUST be the category (layouts|components|features|patterns|tooling). Do NOT add any other category name as a tag (e.g. a Layouts potion must not have "features" in tags), or the potion will appear in multiple catalog sections.
 agentManifest: 'potions/[category]/component-id.json' # REQUIRED: Path to JSON guide (in statics/)
 ---
 ```
@@ -604,7 +604,7 @@ In the **JSON file** (for AI agents) - OPTIONAL:
 
 Before considering a potion complete:
 - [ ] Markdown file has correct front matter
-- [ ] Markdown file includes category tag (e.g., `components`, `layouts`, `patterns`) as first tag for postsList helper
+- [ ] Markdown file includes category tag (e.g., `components`, `layouts`, `patterns`) as first tag for postsList helper; tags do not include any other category name (layouts, components, features, patterns, tooling) so the potion appears in only one catalog section
 - [ ] JSON guide is comprehensive and follows template
 - [ ] Added to potions-index.json
 - [ ] Updated totalCount and lastUpdated in potions-index.json
@@ -629,6 +629,7 @@ Before considering a potion complete:
 ### UI Potion-Specific
 - ❌ Don't use ASCII art or emojis in potion markdown files
 - ❌ Don't provide framework-specific code in potions (keep it generic)
+- ❌ Don't add a category name (layouts, components, features, patterns, tooling) as a tag unless it is the potion's category—otherwise the potion appears in multiple catalog sections
 - ❌ Don't forget to update potions-index.json
 - ❌ Don't skip accessibility specifications
 - ❌ Don't be vague in JSON guides (AI needs specifics)
