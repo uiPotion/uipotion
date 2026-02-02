@@ -16,12 +16,11 @@
   <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#8B5CF6">
   
-  <!-- Canonical URL (use / for home when currentPath empty) -->
-  <link rel="canonical" href="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{/if}}">
+  <link rel="canonical" href="https://uipotion.com{{#if currentPath}}/{{currentPath}}{{/if}}">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="{{#if agentManifest}}article{{else}}website{{/if}}">
-  <meta property="og:url" content="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{/if}}">
+  <meta property="og:url" content="https://uipotion.com{{#if currentPath}}/{{currentPath}}{{/if}}">
   <meta property="og:title" content="{{title}}">
   <meta property="og:description" content="{{description}}">
   <meta property="og:image" content="https://uipotion.com/assets/images/og-image.png">
@@ -32,7 +31,7 @@
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://uipotion.com/{{#if currentPath}}{{currentPath}}{{/if}}">
+  <meta name="twitter:url" content="https://uipotion.com{{#if currentPath}}/{{currentPath}}{{/if}}">
   <meta name="twitter:title" content="{{title}}">
   <meta name="twitter:description" content="{{description}}">
   <meta name="twitter:image" content="https://uipotion.com/assets/images/og-image.png">
@@ -89,7 +88,7 @@
     "dateModified": "{{publicationDate}}",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://uipotion.com/{{#if currentPath}}{{currentPath}}{{/if}}"
+      "@id": "https://uipotion.com{{#if currentPath}}/{{currentPath}}{{/if}}"
     },
     "image": "https://uipotion.com/assets/images/og-image.png",
     "about": {
