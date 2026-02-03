@@ -1123,7 +1123,51 @@
   "aiImplementationPrompt": "Create a responsive dashboard layout with a collapsible sidebar (default 280px expanded, 80px collapsed), fixed header (64px height), fixed footer (60px height), and scrollable content area. The sidebar should overlay on mobile (<768px) and persist its collapsed state (desktop) in localStorage using key 'uipotion.dashboard.sidebarCollapsed.v1'. Both header and footer should adjust their start offset based on sidebar state (280px when expanded, 80px when collapsed on desktop). Content area should account for fixed header/footer offsets (top 64px, bottom 60px) and avoid horizontal page scrolling. Include smooth 300ms transitions, keyboard accessibility with ARIA labels, and active state highlighting for current page. Ensure overlay behavior includes backdrop dismissal, focus trap, focus restoration, body scroll lock, and inert background content. Respect prefers-reduced-motion and apply mobile safe-area insets. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. Include mobile menu toggle, user dropdown, and notifications button in the header. Footer should contain copyright and navigation links. CRITICAL: If vanilla CSS is detected, create CSS classes in a stylesheet, never use inline styles. If React is detected, extract useEffect logic into separate custom hooks (one concern per hook).",
   "meta": {
     "created": "2026-01-10",
-    "updated": "2026-01-11",
-    "webUrl": "https://uipotion.com/potions/layouts/dashboard.html"
+    "updated": "2026-02-03",
+    "webUrl": "https://uipotion.com/potions/layouts/dashboard.html",
+    "relatedPotions": [
+      {
+        "id": "navbar",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: For the header navigation bar.",
+        "required": false
+      },
+      {
+        "id": "data-table",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: For displaying tabular data in the main content area.",
+        "required": false
+      },
+      {
+        "id": "file-upload",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: For settings, profile, or document sections (e.g. avatar, CSV import, document management).",
+        "required": false
+      },
+      {
+        "id": "dropdown-select",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: For filters, settings, and data selection in dashboard controls.",
+        "required": false
+      },
+      {
+        "id": "dialog",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: For modals and action confirmations.",
+        "required": false
+      },
+      {
+        "id": "toast-notifications",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: For user feedback messages.",
+        "required": false
+      }
+    ]
   }
 }

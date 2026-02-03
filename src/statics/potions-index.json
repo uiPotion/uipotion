@@ -9,7 +9,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/dashboard",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/dashboard.json",
       "created": "2026-01-10",
-      "updated": "2026-01-10"
+      "updated": "2026-02-03"
     },
     {
       "id": "dialog",
@@ -142,8 +142,19 @@
       "agentGuideUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.json",
       "created": "2026-02-01",
       "updated": "2026-02-01"
+    },
+    {
+      "id": "file-upload",
+      "name": "File Upload Component",
+      "category": "components",
+      "tags": ["components", "file-upload", "dropzone", "drag-and-drop", "forms", "a11y", "wcag", "aria", "keyboard-navigation", "progress", "validation"],
+      "excerpt": "A fully accessible file upload component with drag-and-drop, browse button fallback, validation (type/size/count), per-file progress, retry/cancel, and robust keyboard and screen reader support.",
+      "webUrl": "https://uipotion.com/potions/components/file-upload",
+      "agentGuideUrl": "https://uipotion.com/potions/components/file-upload.json",
+      "created": "2026-02-03",
+      "updated": "2026-02-03"
     }
   ],
-  "totalCount": 13,
-  "lastUpdated": "2026-02-01"
+  "totalCount": 14,
+  "lastUpdated": "2026-02-03"
 }

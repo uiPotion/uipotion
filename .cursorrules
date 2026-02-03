@@ -418,6 +418,12 @@ Update `totalCount` and `lastUpdated` fields.
 - `src/statics/uipotion-manifest.json` (update `meta.updated`; update categories only if introducing a new one)
 - No manual homepage listing needed (potions are rendered from Markdown)
 
+### Places to Update When Editing an Existing Potion
+After changing a potion's content (JSON, Markdown, relatedPotions, See Also, etc.), update dates so index and manifest stay in sync:
+- **Potion JSON**: `src/statics/potions/[category]/[slug].json` → set `meta.updated` to today (YYYY-MM-DD).
+- **Potions index**: `src/statics/potions-index.json` → set that potion's `updated` to the same date; set top-level `lastUpdated` to the same date.
+- **Manifest**: `src/statics/uipotion-manifest.json` → set `meta.updated` to the same date.
+
 ### Step 4: Build and Test
 
 ```bash
@@ -630,7 +636,8 @@ Before considering a potion complete:
 - ❌ Don't use ASCII art or emojis in potion markdown files
 - ❌ Don't provide framework-specific code in potions (keep it generic)
 - ❌ Don't add a category name (layouts, components, features, patterns, tooling) as a tag unless it is the potion's category—otherwise the potion appears in multiple catalog sections
-- ❌ Don't forget to update potions-index.json
+- ❌ Don't forget to update potions-index.json when adding a potion
+- ❌ Don't forget to update dates when editing a potion: the potion JSON `meta.updated`, that potion's `updated` in potions-index.json, index `lastUpdated`, and uipotion-manifest.json `meta.updated`
 - ❌ Don't skip accessibility specifications
 - ❌ Don't be vague in JSON guides (AI needs specifics)
 - ❌ Don't forget responsive breakpoints
