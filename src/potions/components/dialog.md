@@ -892,6 +892,14 @@ enableBodyScroll(dialogRef.value);
 
 ---
 
+## See Also
+
+The Dialog component works well with these potions:
+
+- **[Button](/potions/components/button)** - For footer actions (primary, secondary, destructive)
+
+These are suggestions. Dialog works with any button implementation you choose.
+
 ## Summary for AI Agents
 
 This modal dialog is a standard accessible dialog component with focus trap, focus restoration, scroll lock, and keyboard accessibility. Key implementation points:

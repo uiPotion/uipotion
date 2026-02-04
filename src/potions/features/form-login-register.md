@@ -374,6 +374,7 @@ This form feature works well with these potions:
 
 - **[Text Input Component](/potions/components/text-input)** - Foundation component for form inputs with built-in error/success states
 - **[Dropdown/Select Component](/potions/components/dropdown-select)** - For country, language, or other selection fields in registration forms
+- **[Button](/potions/components/button)** - For submit, clear, and link-style actions
 - **[Form Validation Pattern](/potions/patterns/form-validation)** - UX guidelines for validation timing and error display
 
 These are suggestions to enhance your implementation. This feature works independently.

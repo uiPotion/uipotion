@@ -1131,6 +1131,7 @@ const quickActions = [
 This AI agent chat layout commonly uses these components:
 
 - **[Text Input Component](/potions/components/text-input)** - For the message input field
+- **[Button](/potions/components/button)** - For send button, toolbar actions, and dialog action footers
 - **[Dialog Component](/potions/components/dialog)** - For confirmation dialogs (clear chat, delete message)
 - **[Toast Notifications](/potions/components/toast-notifications)** - For success/error feedback
 - **[Dropdown/Select Component](/potions/components/dropdown-select)** - For agent selector or conversation actions

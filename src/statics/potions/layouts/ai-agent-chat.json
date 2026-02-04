@@ -1109,6 +1109,13 @@
         "relationship": "complements",
         "description": "Optional: header patterns (sticky, actions, mobile toggle) can inform chat header.",
         "required": false
+      },
+      {
+        "id": "button",
+        "category": "components",
+        "relationship": "reuse",
+        "description": "Reuse for send button, toolbar actions, and dialog action footers.",
+        "required": false
       }
     ]
   }

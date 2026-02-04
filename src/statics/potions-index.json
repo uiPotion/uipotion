@@ -153,8 +153,19 @@
       "agentGuideUrl": "https://uipotion.com/potions/components/file-upload.json",
       "created": "2026-02-03",
       "updated": "2026-02-03"
+    },
+    {
+      "id": "button",
+      "name": "Button",
+      "category": "components",
+      "tags": ["components", "button", "cta", "a11y", "wcag", "aria", "focus-visible", "loading", "icon-button", "states", "variants", "forms"],
+      "excerpt": "A foundational, accessible Button component with semantic variants, sizes, icon-only support, loading/disabled states, and optional link/toggle behavior. Designed to map cleanly into existing design systems via tokens.",
+      "webUrl": "https://uipotion.com/potions/components/button",
+      "agentGuideUrl": "https://uipotion.com/potions/components/button.json",
+      "created": "2026-02-04",
+      "updated": "2026-02-04"
     }
   ],
-  "totalCount": 14,
-  "lastUpdated": "2026-02-03"
+  "totalCount": 15,
+  "lastUpdated": "2026-02-04"
 }

@@ -1,0 +1,650 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
+  "id": "button",
+  "version": "1.0.0",
+  "name": "Button",
+  "category": "components",
+  "tags": [
+    "components",
+    "button",
+    "cta",
+    "a11y",
+    "wcag",
+    "aria",
+    "focus-visible",
+    "loading",
+    "icon-button",
+    "states",
+    "variants",
+    "forms"
+  ],
+  "description": "A foundational, accessible Button component with semantic variants, sizes, icon-only support, loading/disabled states, and optional link/toggle behavior. Designed to map cleanly into existing design systems via tokens and adapter rules.",
+
+  "tokens": {
+    "layout": {
+      "minTouchTargetPx": 44,
+      "borderRadiusPx": 8,
+      "borderWidthPx": 1,
+      "gapBetweenIconAndLabelPx": 8,
+      "iconSizePx": 18,
+      "spinnerSizePx": 16,
+      "focusRingWidthPx": 2,
+      "focusRingOffsetPx": 2,
+      "sizes": {
+        "sm": {
+          "heightPx": 36,
+          "paddingXPx": 12,
+          "paddingYPx": 8,
+          "fontSizePx": 14
+        },
+        "md": {
+          "heightPx": 44,
+          "paddingXPx": 14,
+          "paddingYPx": 11,
+          "fontSizePx": 16
+        },
+        "lg": {
+          "heightPx": 52,
+          "paddingXPx": 16,
+          "paddingYPx": 14,
+          "fontSizePx": 16
+        }
+      }
+    },
+    "typography": {
+      "fontWeight": 600,
+      "letterSpacing": "normal",
+      "lineHeight": 1.1
+    },
+    "motion": {
+      "hoverTransitionMs": 120,
+      "pressTransitionMs": 80,
+      "focusTransitionMs": 120,
+      "spinnerFadeInMs": 120,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "reducedMotionDurationMs": 100
+    }
+  },
+
+  "aiAgentInstructions": {
+    "summary": "Implement a reusable Button component that is accessible by default, supports semantic variants (primary/secondary/ghost/destructive/link), sizes (sm/md/lg), icon-only buttons, loading state (prevents double submit), and optional link/toggle behavior. CRITICAL: integrate into the existing design system (tokens, class conventions, existing Button primitives) rather than inventing new styling.",
+    "keyFeatures": [
+      "Default semantic <button> with type control (button/submit/reset) and safe defaults",
+      "Variants: primary, secondary, ghost, destructive, link (map to existing DS equivalents)",
+      "Sizes: sm, md, lg with consistent heights and padding",
+      "Icon + label layout with stable spacing; icon-only supported",
+      "Loading state: disables interactions, announces busy state, prevents double submit",
+      "Disabled state: true disabled behavior for <button>; aria-disabled strategy for link variant",
+      "Focus-visible ring that matches project conventions (never remove focus indicator)",
+      "Cursor: pointer by default for clickable affordance; cursor: not-allowed when disabled",
+      "Optional toggle behavior via aria-pressed (when togglable=true)",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework + styling system first, then use ONLY that system.",
+      "CRITICAL: When detecting vanilla CSS/SCSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes."
+    ],
+    "implementationSteps": [
+      "0. MANDATORY - Detect before implementing: From package.json and source files (e.g. existing components, main CSS/SCSS), determine the project's framework and styling system. Use ONLY the matching stylingApproaches entry (e.g. tailwindCSS, cssModules, scss, styledComponents). Do not choose or mix another approach; if the project uses Tailwind, do not add a separate stylesheet; if it uses CSS Modules, do not use Tailwind utilities.",
+      "0a. If the project already has a Button primitive: wrap/extend it to add missing behaviors (loading, icon-only a11y, aria-pressed) without breaking existing usage.",
+      "0b. If tokens exist (CSS vars, Tailwind theme, theme files): map variant+state styles to those tokens. Avoid hardcoded colors.",
+      "1. Build component anatomy: Root, Label, LeadingIcon, TrailingIcon, Spinner, FocusRing (style), LoadingOverlay (optional).",
+      "2. Implement props: variant, size, disabled, loading, iconOnly, fullWidth, type, as (button|a), href, togglable, pressed.",
+      "3. Enforce behavior rules: loading implies disabled interaction; submit buttons must not double-submit; keep layout stable during loading (spinner + label).",
+      "4. Implement focus-visible ring following project patterns; ensure keyboard support is native and intact.",
+      "5. Add accessibility: correct semantics, aria-busy for loading, aria-disabled for anchors, aria-label for icon-only, aria-pressed for toggles.",
+      "6. Add reduced-motion support: shorten/disable press transforms; keep focus ring and color transitions minimal.",
+      "7. Provide adapter mapping guidance (Tailwind/CSS Modules/styled-components/SCSS).",
+      "8. Validate with testingChecklist (keyboard, SR, disabled/link behavior, loading)."
+    ]
+  },
+
+  "componentSpec": {
+    "goal": "Provide a single, design-system-friendly Button component that can be used across the product for actions and navigation while remaining accessible, consistent, and easy for agents to integrate into existing styling/token systems.",
+    "anatomy": {
+      "slots": [
+        "root",
+        "label",
+        "leadingIcon",
+        "trailingIcon",
+        "spinner",
+        "focusRing"
+      ],
+      "hierarchy": "Root( LeadingIcon?, Spinner?, Label?, TrailingIcon? )"
+    },
+
+    "stateModel": {
+      "variant": {
+        "type": "enum",
+        "description": "Semantic style variant mapped to the project's design system.",
+        "allowedValues": [
+          "primary",
+          "secondary",
+          "ghost",
+          "destructive",
+          "link"
+        ],
+        "default": "primary",
+        "persistence": "props/config"
+      },
+      "size": {
+        "type": "enum",
+        "description": "Size variant affecting height, padding, and font size.",
+        "allowedValues": ["sm", "md", "lg"],
+        "default": "md",
+        "persistence": "props/config"
+      },
+      "disabled": {
+        "type": "boolean",
+        "description": "Disables interactions and indicates non-interactive state.",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "loading": {
+        "type": "boolean",
+        "description": "Shows spinner, prevents interactions, and indicates busy state.",
+        "default": false,
+        "persistence": "props/parent state"
+      },
+      "focused": {
+        "type": "boolean",
+        "description": "Whether the button currently has focus (for styling only).",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "hovered": {
+        "type": "boolean",
+        "description": "Hover state (desktop pointer environments).",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "pressedVisual": {
+        "type": "boolean",
+        "description": "Visual pressed state for pointer down (not aria-pressed unless togglable).",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "togglable": {
+        "type": "boolean",
+        "description": "If true, button represents a toggle; use aria-pressed with pressed state.",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "pressed": {
+        "type": "boolean",
+        "description": "Toggle state when togglable=true (controlled or uncontrolled).",
+        "default": false,
+        "persistence": "component state or parent state",
+        "notes": "If togglable=false, ignore aria-pressed."
+      },
+      "iconOnly": {
+        "type": "boolean",
+        "description": "Icon-only mode: label is visually hidden; aria-label is required.",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "fullWidth": {
+        "type": "boolean",
+        "description": "Expands button to full container width.",
+        "default": false,
+        "persistence": "props/config"
+      },
+      "as": {
+        "type": "enum",
+        "description": "Render target: native button or anchor (link button). Prefer <button> for actions.",
+        "allowedValues": ["button", "a"],
+        "default": "button",
+        "persistence": "props/config"
+      }
+    },
+
+    "interactions": [
+      {
+        "event": "pointerDown",
+        "when": "!disabled && !loading",
+        "result": "setPressedVisualTrue",
+        "sideEffects": [
+          "Apply pressed styling immediately (subtle scale/brightness)"
+        ],
+        "preventDefault": false
+      },
+      {
+        "event": "pointerUpOrLeave",
+        "when": "pressedVisual",
+        "result": "setPressedVisualFalse",
+        "sideEffects": ["Restore normal styling"],
+        "preventDefault": false
+      },
+      {
+        "event": "click",
+        "when": "!disabled && !loading",
+        "result": "invokeOnClick",
+        "sideEffects": [
+          "If togglable=true: toggle pressed state and set aria-pressed accordingly",
+          "If as='a': navigate to href (unless aria-disabled=true)"
+        ],
+        "stopPropagation": false
+      },
+      {
+        "event": "keyDown",
+        "when": "focused && !disabled && !loading",
+        "result": "nativeActivation",
+        "sideEffects": [
+          "Enter/Space activate the button (native behavior for <button>)",
+          "If as='a': Enter activates link; Space should not scroll the page (optional: preventDefault + trigger click for link-style buttons)"
+        ],
+        "preventDefault": false,
+        "accessibilityNotes": "Prefer native semantics. Only intercept Space for anchor-as-button scenarios if needed."
+      },
+      {
+        "event": "focus",
+        "result": "setFocusedTrue",
+        "sideEffects": ["Show focus-visible ring"],
+        "preventDefault": false
+      },
+      {
+        "event": "blur",
+        "result": "setFocusedFalse",
+        "sideEffects": ["Hide focus-visible ring"],
+        "preventDefault": false
+      }
+    ],
+
+    "responsiveBehavior": {
+      "mobile": {
+        "maxWidthPx": 767,
+        "behavior": "Ensure min touch target of 44px; prefer md size by default; fullWidth is common in forms.",
+        "touchTargets": "Height >= 44px; icon-only still >= 44px square",
+        "typography": "Keep label font size >= 16px where it prevents iOS zoom in form-heavy contexts (project dependent)."
+      },
+      "desktop": {
+        "minWidthPx": 1024,
+        "behavior": "Enable hover states; keep press animation subtle; avoid layout shift on loading.",
+        "hover": "Variant-specific hover feedback (color/brightness) aligned to DS."
+      }
+    },
+
+    "variants": {
+      "primary": {
+        "description": "Main call-to-action. Highest emphasis.",
+        "behavior": "Use primary action tokens; strong contrast; supports loading."
+      },
+      "secondary": {
+        "description": "Secondary actions, less emphasis.",
+        "behavior": "Neutral surface with border or subtle fill."
+      },
+      "ghost": {
+        "description": "Low-emphasis actions on dense UIs.",
+        "behavior": "Minimal background; clear hover/focus affordance."
+      },
+      "destructive": {
+        "description": "Dangerous action (delete, remove).",
+        "behavior": "Use danger tokens; ensure contrast; optionally require confirmation elsewhere."
+      },
+      "link": {
+        "description": "Text-like button for inline actions or navigation.",
+        "behavior": "Prefer <a> for true navigation; underline on hover/focus; aria-disabled strategy when disabled."
+      },
+      "iconOnly": {
+        "description": "Square icon button (toolbar actions).",
+        "requirements": "Requires aria-label; tooltip recommended (optional)."
+      },
+      "toggle": {
+        "description": "Button as a toggle control.",
+        "requirements": "Use aria-pressed and maintain visible on/off styling."
+      }
+    },
+
+    "dataContract": {
+      "props": {
+        "children": {
+          "type": "ReactNode | string",
+          "required": false,
+          "description": "Button label/content."
+        },
+        "ariaLabel": {
+          "type": "string",
+          "required": false,
+          "description": "Required when iconOnly=true and no visible label."
+        },
+
+        "variant": {
+          "type": "'primary' | 'secondary' | 'ghost' | 'destructive' | 'link'",
+          "required": false,
+          "default": "primary"
+        },
+        "size": {
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "default": "md"
+        },
+
+        "disabled": { "type": "boolean", "required": false, "default": false },
+        "loading": { "type": "boolean", "required": false, "default": false },
+
+        "fullWidth": { "type": "boolean", "required": false, "default": false },
+        "iconOnly": { "type": "boolean", "required": false, "default": false },
+
+        "leadingIcon": { "type": "ReactNode | string", "required": false },
+        "trailingIcon": { "type": "ReactNode | string", "required": false },
+
+        "type": {
+          "type": "'button' | 'submit' | 'reset'",
+          "required": false,
+          "default": "button"
+        },
+
+        "as": {
+          "type": "'button' | 'a'",
+          "required": false,
+          "default": "button"
+        },
+        "href": {
+          "type": "string",
+          "required": false,
+          "description": "Required when as='a'."
+        },
+        "target": { "type": "string", "required": false },
+        "rel": { "type": "string", "required": false },
+
+        "togglable": { "type": "boolean", "required": false, "default": false },
+        "pressed": { "type": "boolean", "required": false, "controlled": true },
+        "defaultPressed": {
+          "type": "boolean",
+          "required": false,
+          "uncontrolled": true
+        },
+
+        "onClick": { "type": "(event) => void", "required": false },
+        "onPressedChange": {
+          "type": "(pressed: boolean) => void",
+          "required": false,
+          "description": "For togglable buttons."
+        },
+
+        "className": { "type": "string", "required": false },
+        "styleVariantClassName": {
+          "type": "string",
+          "required": false,
+          "description": "Optional hook for DS integration (advanced)."
+        }
+      },
+      "events": {
+        "onClick": "Fired on activation (mouse/keyboard). Not fired when disabled/loading.",
+        "onPressedChange": "Fired when togglable=true and pressed state changes."
+      }
+    }
+  },
+
+  "animations": {
+    "hover": {
+      "durationMs": 120,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": {
+        "backgroundOrBorder": "Slight emphasis change (token-driven)",
+        "shadow": "Optional subtle elevation change (token-driven)"
+      }
+    },
+    "press": {
+      "durationMs": 80,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "transform": "Optional subtle scale (1 -> 0.98) OR brightness change; keep minimal to avoid jank",
+      "notes": "Prefer no transform if DS avoids it; never cause layout shift."
+    },
+    "focus": {
+      "durationMs": 120,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": {
+        "focusRing": "Fade/transition focus ring to visible state"
+      }
+    },
+    "loading": {
+      "spinnerFadeInMs": 120,
+      "notes": "Spinner should not change button width; reserve space or overlay while preserving label width."
+    },
+    "reducedMotion": {
+      "behavior": "Disable press transforms; use simple opacity/color transitions with short durations",
+      "implementation": "@media (prefers-reduced-motion: reduce) { /* reduce/disable transforms and long transitions */ }"
+    }
+  },
+
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Use native semantics (<button> for actions, <a> for navigation) so role/name are correct.",
+        "1.4.3": "Text/icon contrast must meet WCAG AA (4.5:1 for text; 3:1 for large text/icons depending on context).",
+        "2.1.1": "Keyboard operable via native activation (Enter/Space for buttons).",
+        "2.4.7": "Visible focus indicator (focus-visible ring).",
+        "3.2.2": "Activation should not cause unexpected context changes without user intent.",
+        "4.1.2": "Accessible name, role, state: disabled, pressed (aria-pressed), busy (aria-busy)."
+      }
+    },
+
+    "keyboardNavigation": {
+      "Tab": "Moves focus to the button/link if focusable.",
+      "Shift+Tab": "Moves focus away.",
+      "Enter": "Activates button; activates link when as='a'.",
+      "Space": "Activates native <button>. For <a>, Space should not scroll; optional: preventDefault + trigger click if used as button-like control."
+    },
+
+    "ariaAttributes": {
+      "required": {
+        "button": {
+          "type": "button | submit | reset",
+          "disabled": "Use native disabled attribute when as='button'.",
+          "aria-busy": "true when loading=true (optional but recommended)."
+        },
+        "toggle": {
+          "aria-pressed": "true/false when togglable=true."
+        }
+      },
+      "optional": {
+        "iconOnly": {
+          "aria-label": "Required when iconOnly=true and label is not visible."
+        },
+        "linkDisabled": {
+          "aria-disabled": "Use aria-disabled='true' for as='a' disabled behavior; also remove from tab order (tabIndex=-1) and prevent click."
+        }
+      }
+    },
+
+    "screenReader": {
+      "nameComputation": "Icon-only buttons must provide aria-label; visible label preferred otherwise.",
+      "loading": "When loading=true, announce busy state via aria-busy and/or include visually hidden 'Loading' text if appropriate.",
+      "toggle": "When togglable=true, screen reader announces pressed state via aria-pressed."
+    },
+
+    "focusManagement": {
+      "focusRing": "Use :focus-visible (or framework equivalent) to avoid showing focus on mouse click while preserving keyboard focus indication.",
+      "neverRemoveFocus": "Never remove focus outline without replacement.",
+      "disabledFocus": "Disabled buttons should not be focusable. For aria-disabled links: remove from tab order."
+    },
+
+    "implementationChecklist": [
+      "Use <button> for actions, <a> for navigation when possible.",
+      "Default type='button' to avoid accidental form submits.",
+      "Native disabled attribute for <button> when disabled=true OR loading=true.",
+      "If as='a' and disabled: set aria-disabled='true', prevent navigation, set tabIndex=-1.",
+      "Icon-only requires aria-label (or aria-labelledby).",
+      "Toggle mode uses aria-pressed and visible pressed styling.",
+      "Focus-visible ring is present and matches DS conventions.",
+      "Loading state prevents double-submit and does not cause layout shift."
+    ]
+  },
+
+  "projectDetection": {
+    "framework": {
+      "description": "Identify the UI framework and component conventions (including existing Button primitives).",
+      "detectionSteps": [
+        "Inspect package.json for framework (React/Vue/Angular/Svelte) and UI libraries (MUI/Chakra/AntD/shadcn/etc.).",
+        "Search the codebase for an existing Button component and how variants/sizes are implemented.",
+        "Check routing/link primitives (Next.js Link, react-router Link, Vue Router) to decide how link buttons should render."
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect the styling approach and match it exactly.",
+      "detectionSteps": [
+        "Check for tailwindcss, sass, CSS Modules, styled-components/emotion, vanilla-extract.",
+        "Inspect existing components to see class composition patterns (cn/clsx/classnames).",
+        "Locate design tokens (CSS vars, theme objects, Tailwind theme)."
+      ],
+      "adaptationRules": [
+        "If a design system Button exists: extend/wrap; do not re-invent styles.",
+        "If Tailwind: implement with utility classes and existing token conventions; avoid new global CSS.",
+        "If CSS Modules/SCSS: implement BEM-like state modifiers; no inline styles.",
+        "If styled-components/emotion: use theme tokens and props; do not introduce class stylesheets."
+      ]
+    },
+    "designTokens": {
+      "description": "Map semantic variants and states to existing token sets.",
+      "detectionSteps": [
+        "Find action/brand tokens for primary, neutral tokens for secondary/ghost, danger tokens for destructive.",
+        "Find focus ring conventions (outline, box-shadow, ring tokens).",
+        "Confirm disabled and loading state patterns used elsewhere."
+      ]
+    }
+  },
+
+  "outputConstraints": {
+    "must": [
+      "Match existing framework patterns and any existing Button primitive.",
+      "Match existing styling conventions exactly (Tailwind/CSS Modules/SCSS/styled-components/etc.).",
+      "Default type='button' unless explicitly overridden.",
+      "Prevent interactions when loading=true (no double submit).",
+      "Provide accessible icon-only behavior (aria-label).",
+      "Provide focus-visible ring and do not remove focus indication.",
+      "Use semantic variants and map them to DS tokens (avoid hardcoded colors)."
+    ],
+    "mustNot": [
+      "Do not introduce a new styling system or CSS strategy.",
+      "Do not hardcode brand colors if a token system exists.",
+      "Do not use <div role='button'> unless absolutely unavoidable (prefer native).",
+      "Do not ship icon-only buttons without an accessible name.",
+      "Do not allow loading buttons to be activated multiple times.",
+      "In TypeScript: do not spread a loosely-typed object containing ARIA attributes (e.g. Record<string, string | boolean>) onto <button> or <a>; use correctly typed props (Booleanish for aria-busy, aria-pressed, aria-disabled) to avoid DOM attribute type errors."
+    ]
+  },
+
+  "testingChecklist": [
+    "Renders as <button> by default and is focusable via Tab.",
+    "Default type is 'button' (no accidental form submit).",
+    "Submit type triggers form submit when type='submit'.",
+    "Disabled <button> cannot be focused or clicked.",
+    "Loading=true prevents clicks and key activation; no double submit.",
+    "Loading does not cause layout shift (width stable).",
+    "Icon-only requires aria-label; screen reader announces name.",
+    "Focus-visible ring appears with keyboard navigation and meets contrast requirements.",
+    "Hover state appears on desktop pointer devices; not required on touch-only.",
+    "Link variant renders as <a> when appropriate; disabled link uses aria-disabled + tabIndex=-1 and blocks navigation.",
+    "Toggle mode sets aria-pressed correctly and updates on activation.",
+    "Reduced motion disables press transforms (if implemented) and keeps interaction usable."
+  ],
+
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "Prefer a stateless Button; togglable can be controlled via pressed/onPressedChange or internal state when defaultPressed provided.",
+      "example": "",
+      "typeScript": "When passing ARIA props (aria-busy, aria-pressed, aria-disabled) to <button> or <a>, use types React expects: boolean or Booleanish, not string | boolean. Avoid building these in a loosely-typed Record (e.g. Record<string, string | boolean | undefined>) and spreading onto the element, or TypeScript will report incompatible DOM attribute types. Use conditional spreads with literal types (e.g. ...(loading && { 'aria-busy': true })) or explicitly typed props instead."
+    },
+    "vue": {
+      "stateManagement": "Use props for variant/size/disabled/loading; emit click and pressed-change for toggle mode.",
+      "example": ""
+    },
+    "angular": {
+      "stateManagement": "Use @Input for props; @Output for click/pressedChange; ensure type defaulting to 'button' in templates.",
+      "example": ""
+    },
+    "svelte": {
+      "stateManagement": "Use exported props; dispatch events; maintain minimal internal state only for uncontrolled toggle mode.",
+      "example": ""
+    }
+  },
+
+  "stylingApproaches": {
+    "tailwindCSS": {
+      "rootBase": "inline-flex items-center justify-center rounded-md font-semibold cursor-pointer transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed",
+      "sizes": {
+        "sm": "h-9 px-3 text-sm",
+        "md": "h-11 px-3.5 text-base",
+        "lg": "h-13 px-4 text-base"
+      },
+      "variants": {
+        "primary": "bg-primary text-primary-foreground hover:opacity-90",
+        "secondary": "bg-secondary text-secondary-foreground hover:opacity-90",
+        "ghost": "bg-transparent hover:bg-muted",
+        "destructive": "bg-destructive text-destructive-foreground hover:opacity-90",
+        "link": "bg-transparent underline-offset-4 hover:underline"
+      },
+      "notes": "Map these to the project's actual Tailwind tokens/classes; do not assume color names exist."
+    },
+    "cssModules": "Create button.module.css with .root, .root--primary, .root--secondary, .root--ghost, .root--destructive, .root--link, .root--sm, .root--md, .root--lg, .root--loading, .root--iconOnly, .spinner, .label classes.",
+    "styledComponents": "Create a styled ButtonRoot that reads variant/size props and theme tokens; keep :focus-visible styling consistent with DS.",
+    "scss": "Create _button.scss with BEM modifiers: .btn, .btn--primary, .btn--secondary, .btn--ghost, .btn--destructive, .btn--link, .btn--sm/.btn--md/.btn--lg, .btn--loading, .btn--icon-only."
+  },
+
+  "commonVariations": {
+    "primaryCTA": {
+      "description": "Primary button used for the main action on a page.",
+      "notes": "Ensure strong contrast and clear focus ring."
+    },
+    "iconOnlyToolbar": {
+      "description": "Icon-only button for toolbars.",
+      "requirements": "aria-label required; tooltip recommended."
+    },
+    "submitInForm": {
+      "description": "Submit button inside forms.",
+      "requirements": "type='submit'; loading prevents double submit."
+    },
+    "linkButton": {
+      "description": "Button styled like a link for inline actions or navigation.",
+      "requirements": "Use <a> for navigation; manage disabled via aria-disabled."
+    },
+    "destructiveConfirm": {
+      "description": "Destructive action button used alongside confirmation flows.",
+      "notes": "Often paired with Dialog component."
+    }
+  },
+
+  "edgeCases": {
+    "accidentalSubmit": {
+      "issue": "Buttons inside forms submit unexpectedly.",
+      "solution": "Default type='button' unless explicitly set."
+    },
+    "iconOnlyNoLabel": {
+      "issue": "Icon-only button has no accessible name.",
+      "solution": "Require ariaLabel prop when iconOnly=true."
+    },
+    "disabledAnchor": {
+      "issue": "<a> cannot be truly disabled.",
+      "solution": "Use aria-disabled, tabIndex=-1, and prevent default navigation/click."
+    },
+    "loadingDoubleClick": {
+      "issue": "Users can trigger action multiple times.",
+      "solution": "When loading=true, block activation and show busy state."
+    },
+    "layoutShiftOnSpinner": {
+      "issue": "Spinner makes button width jump.",
+      "solution": "Reserve space for label and/or overlay spinner without changing width."
+    }
+  },
+
+  "meta": {
+    "created": "2026-02-04",
+    "updated": "2026-02-04",
+    "webUrl": "https://uipotion.com/potions/components/button",
+    "relatedPotions": [
+      {
+        "id": "dialog",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Buttons are used in dialog action footers (primary/secondary/destructive).",
+        "required": false
+      },
+      {
+        "id": "text-input",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Buttons commonly appear with form inputs (submit, clear, next-step).",
+        "required": false
+      }
+    ]
+  }
+}

@@ -1188,6 +1188,29 @@
   "meta": {
     "created": "2026-01-24",
     "updated": "2026-01-24",
-    "webUrl": "https://uipotion.com/potions/layouts/landing-page.html"
+    "webUrl": "https://uipotion.com/potions/layouts/landing-page.html",
+    "relatedPotions": [
+      {
+        "id": "navbar",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: For the header navigation.",
+        "required": false
+      },
+      {
+        "id": "button",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: For hero and section CTAs (primary, secondary).",
+        "required": false
+      },
+      {
+        "id": "pricing-table",
+        "category": "features",
+        "relationship": "used-in",
+        "description": "Optional: For the pricing section.",
+        "required": false
+      }
+    ]
   }
 }

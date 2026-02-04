@@ -1217,6 +1217,15 @@
   "meta": {
     "created": "2026-01-18",
     "updated": "2026-01-18",
-    "webUrl": "https://uipotion.com/potions/features/pricing-table.html"
+    "webUrl": "https://uipotion.com/potions/features/pricing-table.html",
+    "relatedPotions": [
+      {
+        "id": "button",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: For plan CTAs and billing toggle (primary/secondary).",
+        "required": false
+      }
+    ]
   }
 }

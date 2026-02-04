@@ -685,6 +685,13 @@
         "required": false
       },
       {
+        "id": "button",
+        "category": "components",
+        "relationship": "uses",
+        "description": "Optional: Consider using Button component for submit, clear, and link-style actions.",
+        "required": false
+      },
+      {
         "id": "form-validation",
         "category": "patterns",
         "relationship": "applies",

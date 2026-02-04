@@ -1144,6 +1144,7 @@ If the mobile hamburger menu works intermittently or not at all, check:
 This landing page layout commonly uses these components:
 
 - **[Navbar Component](/potions/components/navbar)** - For the header navigation
+- **[Button](/potions/components/button)** - For hero and section CTAs (primary, secondary)
 - **[Pricing Table Feature](/potions/features/pricing-table)** - For the pricing section
 
 These are examples of components that work well with landing pages. The layout is flexible and works with any content sections you choose.

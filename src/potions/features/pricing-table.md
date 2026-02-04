@@ -888,6 +888,14 @@ Create a 3-tier SaaS pricing table with the following specifications:
 Reference: UI Potion 3-Tier SaaS Pricing Table
 ```
 
+## See Also
+
+This pricing table feature works well with these potions:
+
+- **[Button](/potions/components/button)** - For plan CTAs and billing toggle (primary/secondary)
+
+These are suggestions. The pricing table works with any button implementation you choose.
+
 ## Summary for AI Agents
 
 This 3-tier pricing table is a standard marketing component with billing frequency toggle and feature comparison. Key implementation points:
