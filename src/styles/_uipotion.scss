@@ -269,6 +269,16 @@ body::-webkit-scrollbar-thumb:hover {
     }
 
   }
+
+  a:not(.button) {
+    color: #60a5fa;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #93c5fd;
+    }
+  }
 }
 
 /* Sections - Pure Black Theme */
@@ -292,6 +302,16 @@ body::-webkit-scrollbar-thumb:hover {
     margin-left: auto;
     margin-right: auto;
     line-height: 1.7;
+  }
+
+  a:not(.button) {
+    color: #60a5fa;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #93c5fd;
+    }
   }
 
   h2 {

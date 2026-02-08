@@ -1,0 +1,119 @@
+{{> head title="Potion Kit - CLI for Harold & UI Potion" description="Build websites with Harold and UI Potion using an interactive AI chat. Potion Kit is a CLI that uses the UI Potion catalog so the model can only suggest components from real specs." currentPath="potion-kit" }}
+
+<div class="about-page">
+  <header class="about-hero">
+    <div class="about-hero-container">
+      <div class="about-breadcrumb">
+        <a href="/">Home</a>
+        <span>/</span>
+        <span>Potion Kit</span>
+      </div>
+
+      <h1 class="about-hero-title">Potion Kit</h1>
+
+      <p class="about-hero-description">
+        CLI to build websites with <a href="https://haroldjs.com" target="_blank" rel="noopener noreferrer">Harold</a> and UI Potion: static sites with Handlebars, Markdown, and SCSS only. Chat with the AI to design and build your site; the model uses the UI Potion catalog and Harold conventions and can only suggest components from real specs.
+      </p>
+    </div>
+  </header>
+
+  <main class="about-main">
+    <div class="about-main-container">
+      <article class="about-article">
+        <section class="about-section">
+          <p><strong>Note:</strong> Potion Kit is actively developed. We recommend the newest OpenAI or Anthropic models for the best outcome quality. Use consumes API tokens; costs depend on your provider. By using the tool you accept it as-is. We hope you enjoy building with it.</p>
+        </section>
+
+        <section class="about-section">
+          <h2>Commands</h2>
+          <ul>
+            <li><strong><code>potion-kit chat</code></strong> or <strong><code>potion-kit</code></strong> (default) — Interactive chat.</li>
+            <li><strong><code>potion-kit chat "message"</code></strong> — Send one message and exit (one-shot).</li>
+            <li><strong><code>potion-kit clear</code></strong> — Clear chat history for this project (next chat starts a new conversation).</li>
+          </ul>
+        </section>
+
+        <section class="about-section">
+          <h2>Install &amp; Run</h2>
+          <p>Use Potion Kit as an installed CLI from any directory where you have a <code>.env</code> with your LLM API key. No need to clone the repo.</p>
+
+          <h3>Install</h3>
+          <p><strong>Option A — npx (no install):</strong></p>
+          <pre><code>npx potion-kit chat</code></pre>
+          <p><strong>Option B — global install:</strong></p>
+          <pre><code>npm install -g potion-kit
+potion-kit chat</code></pre>
+
+          <h3>Run in your project</h3>
+          <ol>
+            <li><strong>Go to the directory</strong> where you want to work (new site or existing project). It can be an empty folder.</li>
+            <li><strong>Create a <code>.env</code> file</strong> with your LLM provider and API key. Minimal contents:</li>
+          </ol>
+          <pre><code>POTION_KIT_PROVIDER=openai
+OPENAI_API_KEY=sk-your-key-here</code></pre>
+          <p>For Anthropic use <code>POTION_KIT_PROVIDER=anthropic</code> and <code>ANTHROPIC_API_KEY=...</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">Potion Kit README</a> for all options and security notes.</p>
+          <ol start="3">
+            <li><strong>Run Potion Kit</strong> from that same directory:</li>
+          </ol>
+          <pre><code>npx potion-kit chat
+# or, if installed globally:
+potion-kit chat</code></pre>
+          <p>The tool reads <code>.env</code> from the current working directory, so always run <code>potion-kit</code> from the directory that contains your <code>.env</code>.</p>
+        </section>
+
+        <section class="about-section">
+          <h2>Usage Examples</h2>
+          <p><strong>Interactive chat (recommended):</strong></p>
+          <pre><code>cd my-project
+npx potion-kit chat</code></pre>
+          <p>Type your message at the <code>You:</code> prompt, press Enter; the model replies. Type <code>exit</code>, <code>quit</code>, or <code>q</code> (or Ctrl+C) to quit. Your conversation is saved for the next run.</p>
+          <p><strong>One-shot (single message then exit):</strong></p>
+          <pre><code>npx potion-kit chat "I want a blog with a header and footer"
+npx potion-kit chat "Add the navbar potion to the layout"</code></pre>
+          <p><strong>Start a new conversation:</strong></p>
+          <pre><code>npx potion-kit clear
+npx potion-kit chat "Let's build a docs site"</code></pre>
+        </section>
+
+        <section class="about-section">
+          <h2>Config &amp; .env</h2>
+          <p>Config is loaded in this order (later overrides earlier):</p>
+          <ol>
+            <li><code>.env</code> in the current working directory</li>
+            <li>Environment variables (e.g. <code>OPENAI_API_KEY</code>, <code>POTION_KIT_PROVIDER</code>)</li>
+            <li><code>~/.potion-kit/config.json</code> — provider and model only; do not put API keys there.</li>
+          </ol>
+          <p>Key variables: <code>POTION_KIT_PROVIDER</code> (required: <code>openai</code> or <code>anthropic</code>), <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code>, and optionally <code>POTION_KIT_MODEL</code>, <code>POTION_KIT_API_KEY</code>, <code>POTION_KIT_BASE_URL</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> for full details.</p>
+          <p><strong>Security:</strong> Potion Kit never sends <code>.env</code> or API keys to the model. Never commit <code>.env</code>; add it to <code>.gitignore</code>. Never put API keys in <code>~/.potion-kit/config.json</code>.</p>
+        </section>
+
+        <section class="about-section">
+          <h2>Chat History</h2>
+          <p>Conversation is stored in <code>.potion-kit/chat-history.json</code> in the directory where you run <code>potion-kit chat</code>. Add <code>.potion-kit/</code> to <code>.gitignore</code> if you do not want to commit chat history. Use <code>potion-kit clear</code> to reset history for that project.</p>
+        </section>
+
+        <section class="about-section">
+          <h2>Legal</h2>
+          <p>Potion Kit uses UI Potion specifications and catalog. By using Potion Kit you are using UI Potion's service and agree to the <a href="/legal">UI Potion legal disclaimer and privacy policy</a>. That page covers disclaimers on AI-generated code, liability, and user responsibility. Please read it before use.</p>
+        </section>
+
+        <section class="about-section">
+          <h2>Links</h2>
+          <ul>
+            <li><strong>npm</strong>: <a href="https://www.npmjs.com/package/potion-kit" target="_blank" rel="noopener noreferrer">potion-kit</a></li>
+            <li><strong>GitHub</strong>: <a href="https://github.com/uiPotion/potion-kit" target="_blank" rel="noopener noreferrer">github.com/uiPotion/potion-kit</a></li>
+            <li><strong>Harold</strong>: <a href="https://haroldjs.com" target="_blank" rel="noopener noreferrer">haroldjs.com</a></li>
+            <li><strong>UI Potion</strong>: <a href="/">Home</a> · <a href="/potions">Potions</a> · <a href="/about">About</a></li>
+          </ul>
+        </section>
+
+        <section class="about-section">
+          <h2>Get Started</h2>
+          <p><a href="/" class="button primary">Browse UI Potion</a> <a href="https://www.npmjs.com/package/potion-kit" target="_blank" rel="noopener noreferrer" class="button">Install Potion Kit (npm)</a></p>
+        </section>
+      </article>
+    </div>
+  </main>
+</div>
+
+{{> footer}}

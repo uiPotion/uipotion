@@ -230,7 +230,7 @@ agentManifest: 'potions/[category]/id.json' # REQUIRED: Path to JSON (in statics
 
 <div class="container">
   <h1>Welcome</h1>
-  <a href="{{relativePath 'about.html'}}">About</a>
+  <a href="/about">About</a>
 </div>
 
 {{> footer}}
@@ -239,7 +239,7 @@ agentManifest: 'potions/[category]/id.json' # REQUIRED: Path to JSON (in statics
 **Key Points**:
 - NO DOCTYPE/HTML tags in pages (added by layout)
 - ALWAYS use `{{> partialName}}` for header/footer
-- ALWAYS use `{{relativePath 'path'}}` for links
+- Use **absolute paths** for links (e.g. `/`, `/about`, `/potions`, `/potion-kit`, `/contribute`, `/legal`). Do NOT use the `relativePath` helper in this project.
 - Pages are compiled with Handlebars + minified
 
 ### Potion Layouts
@@ -258,13 +258,19 @@ Available variables in layouts:
 
 ### Handlebars Helpers
 
-#### 1. `relativePath` - Generate Relative Paths (ALWAYS USE THIS!)
+#### 1. Links and paths (this project)
 
-```handlebars
-<link rel="stylesheet" href="{{relativePath 'styles/main.css'}}">
-<a href="{{relativePath 'about.html'}}">About</a>
-<img src="{{relativePath 'assets/images/logo.png'}}">
-```
+**Do NOT use the `relativePath` helper in this project.** Use absolute paths for all internal links and assets, e.g.:
+
+- `/` or `/index.html` — Home
+- `/about` — About
+- `/potions` — Potions catalog
+- `/potion-kit` — Potion Kit
+- `/contribute` — Contribute
+- `/legal` — Legal
+- `/assets/images/...`, `/styles/main.css` — Assets and styles
+
+Example: `<a href="/about">About</a>`, `<a href="/potion-kit">Potion Kit</a>`, `<img src="/assets/images/logo.png" alt="...">`.
 
 #### 2. `hostDirName` - Subdirectory Deployment
 
@@ -556,7 +562,7 @@ In the **JSON file** (for AI agents) - OPTIONAL:
 - ❌ Don't compile SCSS partials directly
 
 ### For Handlebars
-- ✅ ALWAYS use `{{relativePath 'path'}}` for ALL links/assets
+- ✅ Use **absolute paths** for links and assets (e.g. `/about`, `/potions`, `/assets/...`). Do NOT use `relativePath` in this project.
 - ✅ Use `{{> partialName}}` to include partials
 - ✅ Use semantic HTML5 elements
 - ✅ Include `{{> head}}` at top and `{{> footer}}` at bottom
@@ -616,7 +622,7 @@ Before considering a potion complete:
 - [ ] Updated totalCount and lastUpdated in potions-index.json
 - [ ] Built successfully with `harold-scripts build`
 - [ ] Tested in dev server with `harold-scripts start`
-- [ ] Links work correctly with relativePath
+- [ ] Links work correctly (absolute paths)
 - [ ] JSON validates (proper structure)
 - [ ] Responsive on mobile/tablet/desktop
 - [ ] Content is clear and comprehensive
@@ -646,7 +652,7 @@ Before considering a potion complete:
 ### Harold-Specific
 - ❌ DON'T edit files in `build/` (auto-generated!)
 - ❌ DON'T skip required front matter fields
-- ❌ DON'T use absolute paths (use `relativePath`)
+- ❌ DON'T use the `relativePath` helper (this project uses absolute paths)
 - ❌ DON'T prefix partials with `_` (only SCSS!)
 - ❌ DON'T compile SCSS partials directly
 - ❌ DON'T forget to rebuild after changes
@@ -673,8 +679,8 @@ Before considering a potion complete:
 |------|------|
 | Build site | `harold-scripts build` |
 | Dev server | `harold-scripts start` |
-| Link to page | `{{relativePath 'about.html'}}` |
-| Link to asset | `{{relativePath 'assets/images/logo.png'}}` |
+| Link to page | `/about`, `/potions`, `/potion-kit`, etc. |
+| Link to asset | `/assets/images/logo.png`, `/styles/main.css` |
 | Format date | `{{formatDate date=publicationDate format='dd mmmm yyyy'}}` |
 | Use partial | `{{> head}}` / `{{> footer}}` |
 | Pass data | `{{> head title="Page"}}` |
@@ -772,7 +778,7 @@ Before considering a potion complete:
 1. Look at `src/potions/layouts/dashboard.md` and `src/statics/potions/layouts/dashboard.json` as reference
 2. Ensure framework and styling agnosticism
 3. Provide comprehensive specifications, not just code
-4. Use `{{relativePath}}` for ALL links and assets
+4. Use absolute paths for links and assets (do not use `relativePath`)
 5. Test with `harold-scripts build` frequently
 6. Remember: AI agents are the primary consumers of JSON guides
 7. Follow established Harold patterns
