@@ -194,10 +194,14 @@ Harold transforms:
 ### Commands
 
 ```bash
-harold-scripts build    # Full build
-harold-scripts start    # Build + dev server (localhost:3000) + watch
+npm run build           # Full build (preferred)
+npm run start           # Build + dev server (localhost:3000) + watch
 npm test               # Run test suite (if applicable)
 ```
+
+**Build command rule (CRITICAL)**:
+- Always use `npm run build` for full builds in this project.
+- Do not run `harold-scripts build` directly unless explicitly debugging Harold internals.
 
 ### Front Matter Rules (CRITICAL!)
 
@@ -433,8 +437,8 @@ After changing a potion's content (JSON, Markdown, relatedPotions, See Also, etc
 ### Step 4: Build and Test
 
 ```bash
-harold-scripts build    # Build the site
-harold-scripts start    # Start dev server on http://localhost:3000
+npm run build           # Build the site
+npm run start           # Start dev server on http://localhost:3000
 ```
 
 ### Step 5: Cross-Reference Related Potions (CRITICAL!)
@@ -620,8 +624,8 @@ Before considering a potion complete:
 - [ ] JSON guide is comprehensive and follows template
 - [ ] Added to potions-index.json
 - [ ] Updated totalCount and lastUpdated in potions-index.json
-- [ ] Built successfully with `harold-scripts build`
-- [ ] Tested in dev server with `harold-scripts start`
+- [ ] Built successfully with `npm run build`
+- [ ] Tested in dev server with `npm run start`
 - [ ] Links work correctly (absolute paths)
 - [ ] JSON validates (proper structure)
 - [ ] Responsive on mobile/tablet/desktop
@@ -677,8 +681,8 @@ Before considering a potion complete:
 
 | Task | Code |
 |------|------|
-| Build site | `harold-scripts build` |
-| Dev server | `harold-scripts start` |
+| Build site | `npm run build` |
+| Dev server | `npm run start` |
 | Link to page | `/about`, `/potions`, `/potion-kit`, etc. |
 | Link to asset | `/assets/images/logo.png`, `/styles/main.css` |
 | Format date | `{{formatDate date=publicationDate format='dd mmmm yyyy'}}` |
@@ -704,7 +708,7 @@ Before considering a potion complete:
 ## 🎓 How Harold Build Works
 
 ```
-1. harold-scripts build
+1. npm run build
    ↓
 2. prepareDirectories() - Create build/potions/, etc.
    ↓
@@ -753,7 +757,7 @@ Before considering a potion complete:
 
 ---
 
-## 🔄 Dev Server (harold-scripts start)
+## 🔄 Dev Server (npm run start)
 
 1. Run initial build
 2. Start HTTP server on port 3000
@@ -779,7 +783,7 @@ Before considering a potion complete:
 2. Ensure framework and styling agnosticism
 3. Provide comprehensive specifications, not just code
 4. Use absolute paths for links and assets (do not use `relativePath`)
-5. Test with `harold-scripts build` frequently
+5. Test with `npm run build` frequently
 6. Remember: AI agents are the primary consumers of JSON guides
 7. Follow established Harold patterns
 8. Keep it simple

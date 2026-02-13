@@ -164,8 +164,19 @@
       "agentGuideUrl": "https://uipotion.com/potions/components/button.json",
       "created": "2026-02-04",
       "updated": "2026-02-04"
+    },
+    {
+      "id": "blog",
+      "name": "Blog Layout (List and Post)",
+      "category": "layouts",
+      "tags": ["layouts", "blog", "article", "post", "content", "responsive", "sidebar", "pagination", "newsletter"],
+      "excerpt": "A comprehensive blog layout covering the list frontpage (post cards, grid, pagination) and single post layout (article, sidebar, comments, related posts). Includes all UI sections typically needed in blogs.",
+      "webUrl": "https://uipotion.com/potions/layouts/blog",
+      "agentGuideUrl": "https://uipotion.com/potions/layouts/blog.json",
+      "created": "2026-02-12",
+      "updated": "2026-02-13"
     }
   ],
-  "totalCount": 15,
-  "lastUpdated": "2026-02-04"
+  "totalCount": 16,
+  "lastUpdated": "2026-02-13"
 }

@@ -1,0 +1,712 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
+  "id": "blog",
+  "version": "1.0.0",
+  "name": "Blog Layout (List and Post)",
+  "category": "layouts",
+  "tags": [
+    "layouts",
+    "blog",
+    "article",
+    "post",
+    "content",
+    "responsive",
+    "sidebar",
+    "pagination",
+    "newsletter"
+  ],
+  "description": "A comprehensive blog layout covering the list frontpage (post cards, grid, pagination) and single post layout (article, sidebar, comments, related posts). Includes all UI sections typically needed in blogs: navbar, hero, post list, post card, post header, article content, sidebar, newsletter, footer, pagination, comments, share buttons.",
+  "tokens": {
+    "layout": {
+      "contentMaxWidthPx": 1200,
+      "articleMaxWidthPx": 720,
+      "sidebarWidthPx": 320,
+      "sectionPaddingDesktopPx": 64,
+      "sectionPaddingMobilePx": 32,
+      "gridGapDesktopPx": 32,
+      "gridGapMobilePx": 24,
+      "zIndex": {
+        "base": 0,
+        "navbar": 50,
+        "modal": 100
+      }
+    },
+    "motion": {
+      "defaultDurationMs": 400,
+      "defaultEasing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "fastDurationMs": 200,
+      "staggerDelayMs": 80
+    },
+    "breakpoints": {
+      "tabletMinPx": 768,
+      "desktopMinPx": 1024
+    }
+  },
+  "layoutPresets": {
+    "default": {
+      "name": "Editorial",
+      "postListColumns": "2",
+      "postListColumnsNote": "2 columns when sidebar is visible for better card sizing; 3 columns only when sidebar is hidden",
+      "featuredPost": true,
+      "heroVariant": "split-hero",
+      "sidebarVisible": true,
+      "cardStyle": "elevated-soft",
+      "articleWidthPx": 720
+    },
+    "compact": {
+      "name": "Minimal",
+      "postListColumns": "2",
+      "featuredPost": false,
+      "heroVariant": "text-only",
+      "sidebarVisible": false,
+      "cardStyle": "flat-border",
+      "articleWidthPx": 700
+    },
+    "magazine": {
+      "name": "Magazine",
+      "postListColumns": "3",
+      "sidebarVisible": true,
+      "featuredPost": true,
+      "heroVariant": "media-first",
+      "cardStyle": "high-contrast",
+      "sectionDividers": "alternating background bands + hairline borders",
+      "articleWidthPx": 760
+    }
+  },
+  "layoutModel": {
+    "type": "stack",
+    "scrollRegion": "page",
+    "positioningContract": {
+      "navbar": "fixed-top or sticky-top",
+      "sections": "sequential-stack",
+      "footer": "inline-bottom"
+    },
+    "invariants": [
+      "Sections stack vertically in source order",
+      "Entire page scrolls (no nested scroll containers)",
+      "Navbar remains fixed or sticky during scroll",
+      "No horizontal page scroll is introduced",
+      "Blog list and post layouts share navbar and footer",
+      "Optional sidebar sits beside main content on desktop"
+    ]
+  },
+  "aiAgentInstructions": {
+    "summary": "Implement a complete, production-grade blog layout covering both the list frontpage and single post page. Prioritize visual polish, scannability, and readability: clear hierarchy, refined spacing rhythm, strong typography, and cohesive card system. The layout is framework-agnostic and adapts to the user's stack and styling approach.",
+    "keyFeatures": [
+      "Blog list page: hero (optional), post grid/cards (2 columns on desktop with sidebar, 3 without), pagination, optional sidebar (categories, tags, search, newsletter)",
+      "Post page: article header (full-width hero with title, meta, author, reading time), content area (constrained width for readability), optional sidebar (TOC, author bio, related posts), comments, share buttons, related posts",
+      "Post card component: featured image, title, excerpt, date, author, category/tags with consistent card styling and hover feedback",
+      "Shared navbar and footer across list and post pages",
+      "Fully responsive with mobile-first approach",
+      "Optional sidebar collapses or moves below content on mobile",
+      "Pagination with prev/next and page numbers",
+      "Newsletter signup section",
+      "Comments section (placeholder or integration-ready)",
+      "Strong visual hierarchy with an editorial feel (hero emphasis, section rhythm, typographic contrast)",
+      "Reading-first article typography (16-18px body, optimized measure, generous line-height, clear heading cadence)",
+      "Consistent visual system for surfaces: cards, side panels, forms, and footer blocks",
+      "Modern 2026 blog styling patterns: clean whitespace, bold heading hierarchy, subtle motion, meaningful imagery",
+      "Quality contract: outputs must show intentional hierarchy, depth layering, and consistent interaction states, not plain starter defaults",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first.",
+      "CRITICAL: Avoid generic starter UI look. Apply explicit designSystem values for spacing, typography, color, border radius, and shadows.",
+      "CRITICAL: When vanilla CSS is detected, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes.",
+      "CRITICAL: When React is detected, extract logic into separate custom hooks that do ONE thing each."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine package.json, existing components, config files, and style structure. Use ONLY the detected system.",
+      "0a. Detect framework patterns: component structure, routing, state management.",
+      "0b. Detect styling conventions: class naming, design tokens, imports.",
+      "0c. If detection is uncertain, ask the user about framework and styling.",
+      "1. Create shared layout shell: Navbar, Footer, main content wrapper",
+      "2. Implement blog list page: hero (optional), post grid with PostCard components (2 columns on desktop if sidebar present, 3 if no sidebar), pagination",
+      "3. Build PostCard component: image, title, excerpt, date, author, category/tags",
+      "4. Implement post page: article header (full-width hero with title, meta, author, reading time, featured image), article content (constrained width ~720px for readability), optional sidebar",
+      "5. Add sidebar component: categories, tags, search, newsletter signup (list page); TOC, author bio, related posts (post page)",
+      "6. Implement pagination component: prev/next links, page numbers",
+      "7. Add newsletter signup section (form or link)",
+      "8. Add comments section placeholder structure",
+      "9. Add share buttons component",
+      "10. Add related posts section on post page",
+      "11. Apply visual hierarchy pass: hero prominence, section spacing rhythm, consistent component density, card/media treatment",
+      "11a. Run Modern UI quality gate before finalizing: check visual hierarchy, spacing rhythm, surface consistency, and interaction polish.",
+      "12. Implement responsive breakpoints (mobile: 1 col, tablet: 2 cols, desktop: 2 cols with sidebar or 3 without) and preserve visual quality at each size",
+      "13. Ensure all interactive elements are keyboard accessible",
+      "14. Add semantic HTML5 and ARIA attributes",
+      "15. Add subtle motion (card hover, reveal, sticky navbar transitions) with reduced-motion fallback",
+      "16. Use ONLY the detected styling system."
+    ]
+  },
+  "structure": {
+    "hierarchy": {
+      "BlogListPage": {
+        "description": "Blog frontpage showing list of posts",
+        "children": {
+          "Navbar": { "description": "Fixed or sticky navigation bar", "children": ["Logo", "NavigationLinks", "SearchLink", "NewsletterLink"] },
+          "HeroSection": { "description": "Optional banner with blog title and tagline", "children": ["BlogTitle", "BlogTagline"] },
+          "MainContent": {
+            "description": "Main content area with optional sidebar",
+            "children": {
+              "PostList": { "description": "Grid of post cards", "children": ["PostCard[]"] },
+              "Sidebar": { "description": "Optional sidebar on list page", "children": ["Categories", "Tags", "Search", "NewsletterForm"] }
+            }
+          },
+          "Pagination": { "description": "Prev/next and page numbers", "children": ["PrevLink", "PageNumbers", "NextLink"] },
+          "Footer": { "description": "Page footer", "children": ["FooterLinks", "SocialLinks", "Copyright"] }
+        }
+      },
+      "PostPage": {
+        "description": "Single post/article page",
+        "children": {
+          "Navbar": { "description": "Shared navbar", "children": ["Logo", "NavigationLinks", "SearchLink"] },
+          "ArticleHeader": {
+            "description": "Post title and meta",
+            "children": ["PostTitle", "PostMeta", "AuthorInfo", "ReadingTime", "FeaturedImage"]
+          },
+          "MainContent": {
+            "description": "Article body with optional sidebar",
+            "children": {
+              "ArticleContent": { "description": "Main article body", "children": ["ArticleBody"] },
+              "Sidebar": { "description": "Optional sidebar on post page", "children": ["TableOfContents", "AuthorBio", "RelatedPosts"] }
+            }
+          },
+          "ShareButtons": { "description": "Social share buttons", "children": ["ShareButton[]"] },
+          "CommentsSection": { "description": "Comments area", "children": ["CommentsList", "CommentForm"] },
+          "RelatedPosts": { "description": "Related posts section", "children": ["RelatedPostCard[]"] },
+          "Footer": { "description": "Shared footer", "children": ["FooterLinks", "SocialLinks", "Copyright"] }
+        }
+      }
+    }
+  },
+  "components": {
+    "Navbar": {
+      "description": "Fixed or sticky navigation bar shared across blog pages",
+      "dimensions": { "heightPx": 64, "paddingHorizontalPx": "24-32", "position": "fixed or sticky top" },
+      "states": ["default", "scrolled"],
+      "elements": {
+        "Logo": { "heightPx": "32-40", "position": "left", "linkable": true },
+        "NavigationLinks": { "display": "horizontal (desktop), hamburger (mobile)", "fontSizePx": "14-16", "gapPx": "24-32", "typicalLinks": ["Blog", "About", "Contact", "Categories"] },
+        "SearchLink": { "iconSizePx": "20-24", "position": "right", "optional": true },
+        "NewsletterLink": { "position": "right", "optional": true }
+      },
+      "behavior": { "scrollTransition": "optional (transparent to solid)", "mobileMenu": "hamburger below 768px" }
+    },
+    "HeroSection": {
+      "description": "Optional hero/banner on blog list page",
+      "dimensions": { "paddingVerticalPx": "48-80 (desktop), 32-48 (mobile)", "paddingHorizontalPx": "24-32", "contentMaxWidthPx": 1200 },
+      "states": ["default"],
+      "elements": {
+        "BlogTitle": { "fontSizePx": "36-48 (desktop), 28-36 (mobile)", "fontWeight": "700-800", "marginBottomPx": 8 },
+        "BlogTagline": { "fontSizePx": "16-20", "color": "muted", "maxWidthPx": 600 }
+      }
+    },
+    "PostCard": {
+      "description": "Card component for each post in the list",
+      "dimensions": { "minHeightPx": 280, "borderRadiusPx": "8-12" },
+      "states": ["default", "hover", "loading"],
+      "elements": {
+        "FeaturedImage": { "aspectRatio": "16:9 or 4:3", "heightPx": "160-200", "objectFit": "cover", "loading": "lazy" },
+        "CategoryTag": { "fontSizePx": "12-14", "position": "above title", "optional": true },
+        "PostTitle": { "fontSizePx": "18-22", "fontWeight": "600-700", "lineClamp": "2-3", "marginBottomPx": 8 },
+        "Excerpt": { "fontSizePx": "14-16", "lineClamp": "2-3", "lineHeight": "1.5", "color": "muted", "marginBottomPx": 12 },
+        "PostMeta": { "fontSizePx": "12-14", "color": "muted", "layout": "horizontal", "includes": ["date", "author", "readingTime"] }
+      },
+      "behavior": { "linkable": "entire card or title", "hoverEffect": "subtle lift or shadow" }
+    },
+    "ArticleHeader": {
+      "description": "Header section for single post page",
+      "dimensions": { "paddingVerticalPx": "48-80 (desktop), 32-48 (mobile)", "paddingHorizontalPx": "24-32", "contentMaxWidthPx": "none (full width) or 1200 for contained look", "layoutNote": "Article header should span full width for visual impact; content area can be constrained" },
+      "states": ["default"],
+      "elements": {
+        "CategoryTag": { "fontSizePx": "12-14", "marginBottomPx": 12, "optional": true },
+        "PostTitle": { "fontSizePx": "32-48 (desktop), 24-32 (mobile)", "fontWeight": "700-800", "lineHeight": "1.2", "marginBottomPx": 16 },
+        "PostMeta": { "fontSizePx": "14-16", "layout": "horizontal", "gapPx": 16, "includes": ["date", "author", "readingTime"] },
+        "AuthorInfo": { "avatarSizePx": "40-48", "nameFontSizePx": "14-16", "optional": true },
+        "FeaturedImage": { "aspectRatio": "16:9 or 21:9", "marginTopPx": 24, "optional": true }
+      }
+    },
+    "ArticleContent": {
+      "description": "Main article body content area",
+      "dimensions": { "maxWidthPx": 720, "paddingVerticalPx": "24-48", "lineHeight": "1.6-1.8" },
+      "states": ["default"],
+      "elements": {
+        "ArticleBody": { "fontSizePx": "16-18", "paragraphSpacingPx": 24, "headingHierarchy": "h2, h3, h4" },
+        "CodeBlock": { "fontSizePx": "14-16", "paddingPx": 16, "borderRadiusPx": 8 },
+        "Blockquote": { "borderLeftPx": 4, "paddingLeftPx": 16, "fontStyle": "italic" },
+        "Image": { "maxWidthPercent": 100, "borderRadiusPx": "8-12" }
+      }
+    },
+    "Sidebar": {
+      "description": "Optional sidebar (list page: categories, tags, newsletter; post page: TOC, author bio, related)",
+      "dimensions": { "widthPx": "280-320 (desktop)", "paddingPx": 24, "position": "right on desktop, below content on mobile" },
+      "states": ["default"],
+      "elements": {
+        "SectionHeading": { "fontSizePx": "14-16", "fontWeight": "600", "marginBottomPx": 16, "textTransform": "uppercase optional" },
+        "CategoriesList": { "fontSizePx": "14-16", "gapPx": 8 },
+        "TagsCloud": { "fontSizePx": "12-14", "display": "flex-wrap", "gapPx": 8 },
+        "SearchInput": { "heightPx": 40, "paddingPx": "8-12" },
+        "NewsletterForm": { "emailInput": "required", "submitButton": "required" },
+        "TableOfContents": { "fontSizePx": "14-16", "nestingIndentPx": 16 },
+        "AuthorBio": { "avatarSizePx": "64-80", "nameFontSizePx": "16-18", "bioFontSizePx": "14-16" }
+      },
+      "behavior": { "sticky": "optional on desktop", "responsive": "full width below content on mobile" }
+    },
+    "Pagination": {
+      "description": "Pagination for blog list page",
+      "dimensions": { "paddingVerticalPx": 32, "gapPx": 8 },
+      "states": ["default", "disabled", "active"],
+      "elements": {
+        "PrevLink": { "label": "Previous or Prev", "disabledWhen": "first page" },
+        "PageNumbers": { "display": "1, 2, 3 ... or ellipsis", "activePage": "highlighted" },
+        "NextLink": { "label": "Next", "disabledWhen": "last page" }
+      },
+      "behavior": { "ariaLabel": "Pagination", "keyboardNav": "Tab through links" }
+    },
+    "ShareButtons": {
+      "description": "Social share buttons on post page",
+      "dimensions": { "gapPx": 12, "iconSizePx": "20-24" },
+      "states": ["default", "hover"],
+      "elements": { "ShareButton": { "platforms": ["Twitter", "LinkedIn", "Facebook", "Copy link"], "ariaLabel": "required per button" } },
+      "behavior": { "placement": "below article or in sidebar" }
+    },
+    "CommentsSection": {
+      "description": "Comments area on post page",
+      "dimensions": { "paddingVerticalPx": 48, "maxWidthPx": 720 },
+      "states": ["default", "loading", "empty"],
+      "elements": {
+        "SectionHeading": { "fontSizePx": "24-28", "fontWeight": "600", "marginBottomPx": 24 },
+        "CommentsList": { "commentItem": "avatar, name, date, body", "nesting": "optional for replies" },
+        "CommentForm": { "fields": "name, email, body", "submitButton": "required" }
+      },
+      "behavior": { "integrationReady": "placeholder for Disqus, Commento, or custom" }
+    },
+    "RelatedPosts": {
+      "description": "Related posts section at bottom of post page",
+      "dimensions": { "paddingVerticalPx": 48, "contentMaxWidthPx": 1200 },
+      "states": ["default"],
+      "elements": {
+        "SectionHeading": { "fontSizePx": "24-28", "fontWeight": "600", "marginBottomPx": 24 },
+        "RelatedPostCard": { "sameAs": "PostCard but may be smaller", "columns": "2-3 (desktop)" }
+      }
+    },
+    "NewsletterSection": {
+      "description": "Newsletter signup section",
+      "dimensions": { "paddingVerticalPx": "48-64", "paddingHorizontalPx": 24 },
+      "states": ["default", "submitting", "success", "error"],
+      "elements": {
+        "Headline": { "fontSizePx": "20-24", "fontWeight": "600", "marginBottomPx": 8 },
+        "Subtext": { "fontSizePx": "14-16", "color": "muted", "marginBottomPx": 24 },
+        "EmailInput": { "heightPx": 44, "paddingPx": "12-16" },
+        "SubmitButton": { "heightPx": 44, "paddingPx": "16-24" }
+      }
+    },
+    "Footer": {
+      "description": "Page footer shared across blog pages",
+      "dimensions": { "paddingVerticalPx": "48-64", "paddingHorizontalPx": "24-32", "contentMaxWidthPx": 1200 },
+      "states": ["default"],
+      "elements": {
+        "FooterLinks": { "layout": "grid or horizontal", "columns": "2-4 (desktop)", "fontSizePx": "14-16" },
+        "SocialLinks": { "layout": "horizontal", "iconSizePx": "20-24", "gapPx": 16 },
+        "Copyright": { "fontSizePx": 14, "color": "muted" }
+      }
+    }
+  },
+  "responsiveBreakpoints": {
+    "desktop": {
+      "minWidth": "1024px",
+      "blogList": "2 column grid when sidebar visible (for better card proportions), 3 columns if no sidebar",
+      "blogListNote": "With sidebar at 320px, 2 columns gives cards ~360-400px each. 3 columns makes cards too narrow (~240px)",
+      "postPage": "article center, sidebar right; header spans full width",
+      "sidebar": "visible, 280-320px width"
+    },
+    "tablet": {
+      "minWidth": "768px",
+      "maxWidth": "1023px",
+      "blogList": "2 column grid, sidebar below or hidden",
+      "postPage": "article full width or sidebar below",
+      "sidebar": "full width below content or hidden"
+    },
+    "mobile": {
+      "maxWidth": "767px",
+      "blogList": "1 column stack",
+      "postPage": "article full width",
+      "sidebar": "full width below content",
+      "pagination": "prev/next only or condensed numbers"
+    },
+    "resizeHandling": { "debounceMs": 200, "behavior": "Re-evaluate layout on resize" }
+  },
+  "stateManagement": {
+    "statesToTrack": {
+      "mobileMenuOpen": { "type": "boolean", "description": "Mobile hamburger menu state", "default": false, "persistence": "component state only" },
+      "navbarScrolled": { "type": "boolean", "description": "Navbar scroll state for transition", "default": false, "persistence": "component state only" },
+      "currentPage": { "type": "number", "description": "Current pagination page", "determination": "URL query param or route", "persistence": "URL" },
+      "newsletterForm": { "type": "object", "description": "Newsletter form state (email, submitting, error, success)", "persistence": "component state only" },
+      "commentForm": { "type": "object", "description": "Comment form state (name, email, body, submitting, error)", "persistence": "component state only" }
+    },
+    "ssrConsiderations": {
+      "scrollListener": "Add in onMounted/useEffect, check window",
+      "currentPage": "Read from URL on server if SSR"
+    }
+  },
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "useState for component state, useEffect for scroll, custom hooks for form logic",
+      "componentStructure": "<BlogLayout><Navbar /><main>{children}</main><Footer /></BlogLayout>",
+      "blogList": "<BlogListPage><PostGrid posts={posts} /><Pagination currentPage={page} totalPages={total} /></BlogListPage>",
+      "postPage": "<PostPage post={post}><ArticleHeader /><ArticleContent /><ShareButtons /><CommentsSection /><RelatedPosts /></PostPage>"
+    },
+    "vue": {
+      "stateManagement": "ref() for state, onMounted for scroll",
+      "componentStructure": "<BlogLayout><Navbar /><main><slot /></main><Footer /></BlogLayout>"
+    },
+    "angular": {
+      "stateManagement": "Component properties, Router for pagination",
+      "componentStructure": "<app-blog-layout><app-navbar></app-navbar><main><router-outlet></router-outlet></main><app-footer></app-footer></app-blog-layout>"
+    },
+    "svelte": {
+      "stateManagement": "writable stores, onMount for scroll",
+      "componentStructure": "<BlogLayout><Navbar /><main><slot /></main><Footer /></BlogLayout>"
+    }
+  },
+  "stylingApproaches": {
+    "tailwindCSS": { "description": "Use utility classes with responsive modifiers (md:, lg:)", "postGridExample": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" },
+    "cssModules": { "description": "Scoped classes with media queries for breakpoints" },
+    "styledComponents": { "description": "CSS-in-JS with theme and responsive props" },
+    "chakraUI": { "components": "Box, Container, Grid, Flex, Heading, Text, Button, Input" },
+    "vanillaCSS": { "description": "Standard CSS. CRITICAL: Create classes in stylesheet, NEVER inline styles." }
+  },
+  "animations": {
+    "postCardHover": {
+      "transform": "translateY(-4px)",
+      "shadow": "elevate from subtle to medium",
+      "durationMs": 220,
+      "easing": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+    },
+    "navbarTransition": {
+      "properties": ["background-color", "box-shadow", "backdrop-filter"],
+      "durationMs": 280
+    },
+    "heroEntrance": {
+      "elements": ["eyebrow", "title", "subtitle", "featured card"],
+      "durationMs": 650,
+      "staggerMs": 80,
+      "animation": "fade + translateY(12px -> 0)"
+    },
+    "scrollReveal": {
+      "description": "Optional fade-in for post cards and sidebar blocks on scroll",
+      "durationMs": 520,
+      "threshold": "12% visible",
+      "staggerMs": 70
+    },
+    "paginationTransition": {
+      "durationMs": 180,
+      "animation": "crossfade + slight vertical offset"
+    },
+    "prefersReducedMotion": {
+      "disable": ["scrollReveal", "heroEntrance"],
+      "keep": ["postCardHover (subtle)", "navbarTransition"],
+      "rules": ["Remove translate animations, keep opacity changes <= 120ms"]
+    }
+  },
+  "accessibility": {
+    "wcagCompliance": { "level": "AA", "requirements": { "1.1.1": "Alt text for images", "1.3.1": "Semantic HTML", "2.1.1": "Keyboard", "2.4.2": "Page title", "2.4.4": "Link purpose", "2.4.7": "Focus visible" } },
+    "keyboardNavigation": { "tabOrder": "Navbar, main content, sidebar, pagination, footer", "pagination": "Tab through links" },
+    "ariaAttributes": {
+      "required": {
+        "mainContent": "<main role=\"main\">",
+        "article": "<article>",
+        "pagination": "aria-label=\"Pagination\"",
+        "nav": "aria-label=\"Main navigation\"",
+        "search": "aria-label=\"Search\""
+      }
+    },
+    "screenReader": { "headingHierarchy": "h1 for post title, h2 for sections", "skipLinks": "Skip to main content" }
+  },
+  "designSystem": {
+    "note": "Visual quality is first-class: avoid generic default UI. Use this design system as an explicit style contract for blog list and article pages.",
+    "colorGuidelines": {
+      "globalCanvas": {
+        "background": "Warm off-white or neutral surface (e.g., #f8fafc, #f9fafb, #ffffff)",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#334155",
+        "textMuted": "#64748b",
+        "hairlineBorder": "#e2e8f0"
+      },
+      "accentSystem": {
+        "primary": "#4f46e5",
+        "primaryHover": "#4338ca",
+        "primarySoft": "rgba(79, 70, 229, 0.1)",
+        "categoryChips": "Use 2-4 harmonious accents per category, not random colors"
+      },
+      "cardsAndPanels": {
+        "cardBackground": "#ffffff",
+        "cardBorder": "1px solid #e2e8f0",
+        "cardShadowDefault": "0 2px 8px rgba(15, 23, 42, 0.06)",
+        "cardShadowHover": "0 12px 28px rgba(15, 23, 42, 0.12)",
+        "sidebarPanelBackground": "#ffffff",
+        "sidebarPanelBorder": "1px solid #e2e8f0"
+      },
+      "hero": {
+        "background": "Layered gradient or soft mesh + subtle noise (optional)",
+        "titleColor": "#0b1220",
+        "subtitleColor": "#334155",
+        "eyebrowColor": "#4f46e5"
+      },
+      "linksAndInteractive": {
+        "linkDefault": "#1e293b",
+        "linkHover": "#4f46e5",
+        "focusRing": "2px solid #6366f1 with 2px offset",
+        "buttonPrimaryText": "#ffffff",
+        "buttonSecondaryBackground": "#eef2ff"
+      }
+    },
+    "typography": {
+      "fontFamily": "Use project font stack; prefer modern sans for UI + optional serif accent for large headlines.",
+      "scale": {
+        "heroTitle": "clamp(2rem, 4vw, 3.5rem)",
+        "postTitle": "clamp(1.9rem, 3.6vw, 3.1rem)",
+        "sectionHeading": "clamp(1.35rem, 2.4vw, 1.9rem)",
+        "cardTitle": "clamp(1.06rem, 1.6vw, 1.35rem)",
+        "body": "16-18px",
+        "meta": "12-14px"
+      },
+      "weights": {
+        "heroTitle": "700-800",
+        "postTitle": "700-800",
+        "cardTitle": "600-700",
+        "body": "400-500",
+        "meta": "500"
+      },
+      "readingExperience": {
+        "lineHeightBody": "1.65-1.8",
+        "lineHeightHeadings": "1.15-1.3",
+        "measure": "65-78ch for article body",
+        "paragraphSpacing": "1rem to 1.5rem",
+        "textAlignment": "left for long-form content"
+      }
+    },
+    "spacing": {
+      "scale": "4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96",
+      "sectionRhythm": {
+        "listPageSectionGap": "48-72px",
+        "articleSectionGap": "40-64px",
+        "sidebarBlockGap": "20-24px"
+      },
+      "density": {
+        "cardPadding": "20-28px",
+        "panelPadding": "20-24px",
+        "compactMetaGap": "8-12px"
+      }
+    },
+    "shadows": {
+      "card": {
+        "default": "0 2px 8px rgba(15, 23, 42, 0.06)",
+        "hover": "0 12px 28px rgba(15, 23, 42, 0.12)"
+      },
+      "navbar": {
+        "scrolled": "0 6px 24px rgba(15, 23, 42, 0.08)"
+      },
+      "panels": {
+        "default": "0 1px 3px rgba(15, 23, 42, 0.04)"
+      }
+    },
+    "borderRadius": {
+      "cards": "14-18px",
+      "media": "12-16px",
+      "buttons": "10-12px",
+      "inputs": "10-12px",
+      "chips": "999px"
+    },
+    "visualHierarchy": {
+      "principles": [
+        "Hero title and featured story should be immediately dominant above fold",
+        "Post card title contrast and spacing should make the list scan in seconds",
+        "Metadata is secondary but consistently placed and legible",
+        "Sidebar blocks should read as grouped utilities, not primary content",
+        "Article content should feel calm: generous whitespace, stable measure, clear heading rhythm"
+      ]
+    },
+    "imagery": {
+      "ratioPolicy": "Use consistent card media ratios in list view (16:9 recommended)",
+      "quality": "Prefer editorial photos/illustrations with coherent color tone",
+      "overlay": "If text overlays media, maintain minimum AA contrast"
+    }
+  },
+  "commonVariations": {
+    "heroStyles": [
+      "Split hero (text + featured story card)",
+      "Text-only hero with category pills",
+      "Media-first hero with featured image background"
+    ],
+    "listLayouts": [
+      "2-column card grid with sidebar (recommended default for balanced card sizing)",
+      "3-column card grid without sidebar (for wider layout without sidebar constraint)",
+      "Hybrid list: featured post + two-column cards",
+      "Minimal list: no sidebar, more whitespace, tighter card border"
+    ],
+    "postLayouts": [
+      "Full-width article header + constrained content + sticky sidebar (recommended)",
+      "Article + sticky TOC sidebar",
+      "Single-column reading mode",
+      "Article with inline related modules between sections"
+    ]
+  },
+  "implementationDetails": {
+    "visualQualityGuardrails": {
+      "avoid": [
+        "Default framework starter aesthetics (centered demo look, oversized empty spaces)",
+        "Inconsistent border radii and shadow depths across cards and panels",
+        "Unbounded line lengths in article body",
+        "Random spacing jumps between sections",
+        "3 columns with sidebar on blog list (cards become too narrow, ~240px each)",
+        "Constrained article header on post page (should span full width for visual impact)"
+      ],
+      "require": [
+        "Apply one coherent card system (radius, border, shadow, hover behavior)",
+        "Use responsive type scale for hero/post headings",
+        "Ensure section spacing follows a repeatable rhythm",
+        "Preserve high contrast in key reading surfaces",
+        "Use 2 columns (not 3) for blog list when sidebar is visible (gives cards proper width ~360-400px)",
+        "Make article header full-width on post page; constrain only the article content for readability"
+      ]
+    },
+    "typographyImplementation": {
+      "fluidType": "Prefer clamp() for hero and major headings when supported by project style system",
+      "bodyText": "Set 16-18px body with 1.65-1.8 line-height for article content",
+      "headingAnchors": "Maintain stable vertical spacing before and after h2/h3/h4 in article flow"
+    },
+    "modernUiQualityContract": {
+      "intent": "Keep the output visually current without prescribing exact fonts, libraries, or brand styles.",
+      "principles": [
+        "Use one coherent surface system across cards, panels, forms, and navigation (matching radius, border, depth, and hover logic).",
+        "Create strong first-screen hierarchy: clear dominant headline, clear secondary metadata, and obvious primary actions.",
+        "Use layered depth intentionally (background layers, section separation, or subtle elevation), but keep content readability first.",
+        "Maintain spacing rhythm across sections so vertical flow feels designed, not accidental.",
+        "Treat interactive states as part of design quality: hover, focus-visible, active, and disabled must be deliberate and consistent."
+      ],
+      "compositionRules": [
+        "At least one high-emphasis section (hero or article header) should establish visual identity immediately.",
+        "Utility/sidebar blocks should look related but less dominant than primary reading content.",
+        "Card grids should prioritize readability and scan speed before density.",
+        "Visual accents should be reused intentionally (not random per component)."
+      ],
+      "antiPatterns": [
+        "Unstyled framework starter aesthetics (plain centered demo layout, default button/input look).",
+        "Mixing multiple unrelated visual systems on one page.",
+        "Overloaded decoration that reduces contrast or reading comfort.",
+        "Inconsistent focus/hover treatments between components."
+      ],
+      "qualityGate": {
+        "minimumCriteria": [
+          "Above-the-fold area has a clear visual focal point and readable supporting content.",
+          "Cards, side panels, and forms share a unified surface language.",
+          "Interactive elements have visible default, hover, and focus-visible states.",
+          "Section spacing follows a repeatable rhythm across the whole page.",
+          "Final UI does not look like a scaffold/template starter."
+        ],
+        "selfReviewQuestions": [
+          "Can a user identify primary content and secondary utilities in under 3 seconds?",
+          "Does the page still feel cohesive when viewed at mobile, tablet, and desktop breakpoints?",
+          "If component labels were removed, would the visual hierarchy still be obvious?"
+        ]
+      }
+    }
+  },
+  "projectDetection": {
+    "framework": {
+      "description": "Detect the project's framework by examining package.json, existing component files, and project structure.",
+      "detectionSteps": [
+        "Check package.json for framework dependencies (react, vue, @angular/core, svelte)",
+        "Examine existing component files for framework-specific patterns",
+        "Check build configuration files",
+        "Look for framework-specific directories"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect the project's styling approach. Use the detected system exclusively.",
+      "detectionSteps": [
+        "Check package.json for styling dependencies: tailwindcss, styled-components, emotion, sass, etc.",
+        "Look for config files: tailwind.config.js, postcss.config.js, etc.",
+        "Examine existing component files to see how styles are imported and used",
+        "Check for style files and their extensions",
+        "Identify class naming conventions and utility functions"
+      ],
+      "adaptationRules": [
+        "If Tailwind is detected: Use Tailwind utility classes exclusively",
+        "If SCSS/CSS is detected: Create SCSS/CSS files matching project structure",
+        "If styled-components is detected: Use styled-components syntax",
+        "If CSS Modules is detected: Use .module.css files",
+        "If no styling system: Use vanilla CSS with semantic class names"
+      ]
+    },
+    "designTokens": {
+      "description": "Identify existing design tokens from the project. Use these instead of hardcoding values.",
+      "detectionSteps": [
+        "Check for design token files (tokens.json, theme.js, etc.)",
+        "Examine Tailwind config for theme values if using Tailwind",
+        "Look at existing components for color, spacing, and typography patterns",
+        "Check CSS variables (--color-*, --spacing-*, etc.) in global styles"
+      ]
+    }
+  },
+  "outputConstraints": {
+    "must": [
+      "Use ONLY project's framework and styling system",
+      "Semantic HTML5 (header, main, article, nav, footer)",
+      "Keyboard accessible",
+      "4.5:1 contrast minimum",
+      "Responsive breakpoints",
+      "Use designSystem visual values (color, typography, spacing, radius, shadow) as explicit implementation contract",
+      "Create a cohesive editorial visual hierarchy (hero prominence, readable cards, calm article typography)",
+      "Keep article measure in readable range and preserve spacing rhythm across sections",
+      "Apply Modern UI quality gate from implementationDetails.modernUiQualityContract before final output"
+    ],
+    "mustNot": [
+      "Introduce new styling systems",
+      "Use inline styles when vanilla CSS detected",
+      "Put multiple concerns in single React useEffect",
+      "Ship generic starter-style blog UI with unstyled/plain sections",
+      "Mix inconsistent card styles in the same page (different radius, borders, and shadow logic)",
+      "Rely on default component styling without intentional hierarchy and interaction polish"
+    ]
+  },
+  "testingChecklist": [
+    "Blog list displays correctly on all breakpoints",
+    "Post cards show image, title, excerpt, date, author",
+    "Post cards have consistent visual system (radius, border, shadow, hover) across entire list",
+    "Blog list uses 2 columns (not 3) on desktop when sidebar is visible",
+    "Article header on post page spans full width (not constrained to article width)",
+    "Pagination works (prev/next, page numbers)",
+    "Post page shows full article with header and meta",
+    "Sidebar displays correctly or collapses on mobile",
+    "Navbar and footer shared across pages",
+    "Hero section has clear visual hierarchy and readable contrast",
+    "Article body measure and line-height are comfortable for long-form reading",
+    "Heading rhythm in article is consistent (h2/h3 spacing and hierarchy)",
+    "Keyboard navigation works",
+    "Focus indicators visible",
+    "Images have alt text",
+    "Heading hierarchy logical (h1, h2, h3)",
+    "No visual regression between list and post pages (same token usage)",
+    "Visual hierarchy is obvious in under 3 seconds (hero/article focal point + secondary metadata + clear action targets)",
+    "Cards, panels, forms, and nav share one coherent surface language",
+    "Interactive states are consistent (default, hover, focus-visible, disabled where relevant)",
+    "UI does not resemble a default framework starter scaffold",
+    "Newsletter form submits (if implemented)",
+    "Comments section structure present (if implemented)",
+    "Share buttons accessible",
+    "Mobile menu works (if implemented)",
+    "No horizontal scroll",
+    "Reduced motion preference disables non-essential movement"
+  ],
+  "meta": {
+    "created": "2026-02-12",
+    "updated": "2026-02-13",
+    "webUrl": "https://uipotion.com/potions/layouts/blog",
+    "relatedPotions": [
+      { "id": "navbar", "category": "components", "relationship": "complements", "description": "Optional: For the header navigation bar.", "required": false },
+      { "id": "button", "category": "components", "relationship": "used-in", "description": "Optional: For newsletter submit, pagination, share buttons.", "required": false },
+      { "id": "text-input", "category": "components", "relationship": "used-in", "description": "Optional: For search input, newsletter email, comment form.", "required": false },
+      { "id": "landing-page", "category": "layouts", "relationship": "complements", "description": "Optional: Blog can share hero pattern with landing pages.", "required": false }
+    ]
+  }
+}
