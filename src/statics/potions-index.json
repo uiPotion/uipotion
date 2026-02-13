@@ -100,6 +100,17 @@
       "updated": "2026-01-24"
     },
     {
+      "id": "dark-light-mode",
+      "name": "Dark/Light Mode Pattern - Theme Switching and Color Schemes",
+      "category": "patterns",
+      "tags": ["patterns", "dark-mode", "light-mode", "theme", "color-scheme", "accessibility", "design-tokens", "responsive"],
+      "excerpt": "A framework-agnostic pattern for implementing dark and light theme switching with system preference detection, user override persistence, semantic color tokens, and accessibility compliance.",
+      "webUrl": "https://uipotion.com/potions/patterns/dark-light-mode",
+      "agentGuideUrl": "https://uipotion.com/potions/patterns/dark-light-mode.json",
+      "created": "2026-02-14",
+      "updated": "2026-02-14"
+    },
+    {
       "id": "text-input",
       "name": "Text Input Field (Accessible) with Label, Error, and Success States",
       "category": "components",
@@ -177,6 +188,6 @@
       "updated": "2026-02-13"
     }
   ],
-  "totalCount": 16,
-  "lastUpdated": "2026-02-13"
+  "totalCount": 17,
+  "lastUpdated": "2026-02-14"
 }

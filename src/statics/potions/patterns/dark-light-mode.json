@@ -1,0 +1,242 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/patterns.schema.json",
+  "id": "dark-light-mode",
+  "version": "1.0.0",
+  "name": "Dark/Light Mode Pattern - Theme Switching and Color Schemes",
+  "category": "patterns",
+  "tags": [
+    "patterns",
+    "dark-mode",
+    "light-mode",
+    "theme",
+    "color-scheme",
+    "accessibility",
+    "design-tokens",
+    "responsive"
+  ],
+  "description": "A framework-agnostic pattern for implementing dark and light theme switching with system preference detection, user override persistence, semantic color tokens, preventing flash of unstyled content, and accessibility compliance.",
+  "aiAgentInstructions": {
+    "summary": "Implement dark and light mode theme switching that respects system preference and allows user override. First detect the project's framework and styling system. Apply theme via inline script in head (before paint) to prevent flash. Use semantic color tokens. Persist user choice in localStorage. Ensure WCAG contrast in both themes and respect prefers-reduced-motion. Adapt to the project's existing styling approach (Tailwind, CSS variables, SCSS, etc.).",
+    "keyFeatures": [
+      "Preference resolution: user override first, then prefers-color-scheme, then light fallback",
+      "Flash prevention: inline script in head sets data-theme before body renders",
+      "Semantic color tokens (--color-background, --color-text, etc.) with light/dark values",
+      "color-scheme meta tag and CSS property for native control styling",
+      "localStorage persistence for user choice (light, dark, system)",
+      "WCAG AA contrast in both themes",
+      "Respect prefers-reduced-motion for theme switch animations",
+      "Media handling: images, SVGs, favicons for both themes",
+      "Logos and icons: header logo, social icons, decorative icons must switch for dark mode (filter: invert, separate asset, or currentColor)",
+      "Framework-agnostic: adapts to React, Vue, Angular, Svelte and any styling system"
+    ],
+    "implementationSteps": [
+      "1. CRITICAL: Detect project framework and styling system (package.json, existing styles, config)",
+      "2. Add <meta name=\"color-scheme\" content=\"dark light\" /> in document head",
+      "3. Add inline blocking script in <head> that reads localStorage, resolves preference (user override > prefers-color-scheme > light), sets data-theme on html before any content renders",
+      "4. Define semantic color tokens with light and dark values (use :root and [data-theme=\"dark\"] or @media (prefers-color-scheme))",
+      "5. Set color-scheme: light dark on :root; override with color-scheme: light or color-scheme: dark when data-theme is set",
+      "6. Replace hardcoded colors in components with token references",
+      "7. Create theme toggle that writes to localStorage and updates data-theme on html",
+      "8. If using transitions, check prefers-reduced-motion and use instant switch when reduce",
+      "9. Verify WCAG contrast for both themes",
+      "10. Handle images/SVGs: use CSS variables in inline SVGs, consider <picture> for critical images",
+      "11. Audit logos and icons: header logo, social icons (GitHub, Twitter, etc.), decorative icons - dark-on-light assets become invisible in dark mode; use filter: invert(1), separate light/dark assets, or currentColor in inline SVGs",
+      "12. Test: no flash on load, persistence works, both themes meet contrast, logos and icons visible in both themes"
+    ]
+  },
+  "patternSpec": {
+    "problem": "Users expect dark mode for reduced eye strain and extended usage. Implementing it well causes flash on load, no persistence, inconsistent contrast, mismatched native controls, and images that look wrong. Many implementations are framework-specific or assume a particular styling system.",
+    "solution": "Apply systematic preference resolution (user override > system > fallback). Use inline script in head to apply theme before paint. Define semantic color tokens per theme. Set color-scheme for native controls. Persist in localStorage. Meet WCAG in both themes. Respect prefers-reduced-motion. Adapt images and SVGs. This pattern is framework-agnostic and works with any styling system.",
+    "do": [
+      "Add color-scheme meta tag in head for early browser hint",
+      "Run blocking script in head to read localStorage and set data-theme before body renders",
+      "Use semantic tokens (--color-background, --color-text, --color-border, etc.)",
+      "Map each token to light and dark values",
+      "Avoid pure black (#000000); use dark gray (#121212 or similar) in dark mode",
+      "Set color-scheme on :root and override when data-theme is light or dark",
+      "Support three modes: light, dark, system (follow prefers-color-scheme)",
+      "Store user choice in localStorage (key: theme or color-scheme)",
+      "Meet WCAG AA contrast (4.5:1 normal text, 3:1 large text and UI) in both themes",
+      "Respect prefers-reduced-motion: use instant switch or no animation when reduce",
+      "Use inline SVG with CSS variables for fill/stroke, or add color-scheme to external SVG root",
+      "Provide favicon dark variant via media attribute when applicable",
+      "Detect project styling system and use ONLY that (Tailwind, CSS, SCSS, etc.)",
+      "Audit logos and icons: header/brand logo, social icons, decorative icons - dark assets need light variant for dark mode (e.g. filter: invert(1), separate image, or currentColor)"
+    ],
+    "dont": [
+      "Apply theme in useEffect, onMounted, or after first paint (causes flash)",
+      "Use pure black backgrounds in dark mode",
+      "Ignore system preference when user has not overridden",
+      "Forget color-scheme (form controls and scrollbars will mismatch)",
+      "Force dark mode without user or system preference",
+      "Use highly saturated colors in dark mode (eye strain)",
+      "Animate theme switch without checking prefers-reduced-motion",
+      "Hardcode hex colors like #fff or #000 in components",
+      "Rely on single-theme images that look wrong in dark mode",
+      "Forget logos and icons: header logo and social icons (GitHub, Twitter, etc.) with dark fill become invisible on dark background; must adapt via filter, asset swap, or currentColor",
+      "Introduce a new styling system; adapt to project's existing approach"
+    ],
+    "examples": [
+      "Preference resolution: Stored value 'dark' -> use dark. Stored value 'system' -> check prefers-color-scheme. If dark, use dark. Else use light.",
+      "Inline script: <script>const t=localStorage.getItem('theme');const d=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t==='light'||t==='dark'?t:d);</script>",
+      "CSS tokens: :root{--color-bg:#fff;--color-text:#111;}[data-theme=dark]{--color-bg:#121212;--color-text:#eee;}",
+      "light-dark() when supported: --color-bg: light-dark(#fff, #121212);",
+      "Toggle: On click, cycle light->dark->system or toggle light/dark, write to localStorage, set data-theme on html",
+      "Reduced motion: @media (prefers-reduced-motion:reduce){[data-theme]{transition:none}}"
+    ],
+    "antiPatterns": [
+      "Late application: Theme applied in framework lifecycle causes visible flash",
+      "No persistence: User selects dark, refreshes, sees light",
+      "Pure black: #000 background causes harsh contrast",
+      "Missing color-scheme: Native form controls stay light on dark page",
+      "Color-only indicators: Error/warning colors that fail in one theme",
+      "Aggressive animation: Theme switch animation ignores reduced motion",
+      "Hardcoded colors: Components using #fff instead of var(--color-background)",
+      "Unadapted images: Bright white-background images in dark mode",
+      "Invisible logos/icons: Dark header logo or social icons on dark background (forgotten adaptation)"
+    ],
+    "checklist": [
+      "User override persists across reloads",
+      "System preference respected when no override",
+      "No visible flash on initial load",
+      "Form controls and scrollbars match active theme",
+      "WCAG AA contrast in both themes",
+      "Reduced motion disables or shortens animation",
+      "Theme toggle works and stores preference",
+      "Forced-colors mode degrades gracefully",
+"Images/SVGs acceptable in both themes",
+      "Works across target breakpoints",
+    "Logos and icons (header, social, decorative) visible and readable in both themes"
+    ]
+  },
+  "tokens": {
+    "description": "Semantic color tokens for theme switching. Each token has light and dark values. Components reference the token, not raw colors.",
+    "required": [
+      {"name": "--color-background", "purpose": "Page background", "lightExample": "#ffffff", "darkExample": "#121212"},
+      {"name": "--color-surface", "purpose": "Cards, panels", "lightExample": "#f5f5f5", "darkExample": "#1e1e1e"},
+      {"name": "--color-text", "purpose": "Primary text", "lightExample": "#111111", "darkExample": "#eeeeee"},
+      {"name": "--color-text-muted", "purpose": "Secondary text", "lightExample": "#666666", "darkExample": "#999999"},
+      {"name": "--color-border", "purpose": "Borders, dividers", "lightExample": "#e0e0e0", "darkExample": "#333333"},
+      {"name": "--color-accent", "purpose": "Links, buttons, highlights", "lightExample": "#0066cc", "darkExample": "#4da6ff"}
+    ],
+    "optional": [
+      {"name": "--color-elevated", "purpose": "Dropdowns, modals"},
+      {"name": "--color-error", "purpose": "Error states"},
+      {"name": "--color-success", "purpose": "Success states"},
+      {"name": "--color-warning", "purpose": "Warning states"}
+    ]
+  },
+  "implementationDetails": {
+    "commonOversights": {
+      "description": "Elements often forgotten when adding dark mode. Audit and fix each.",
+      "items": [
+        {
+          "item": "Header/brand logo",
+          "issue": "Dark logo on light background becomes invisible on dark background",
+          "fix": "Use filter: invert(1) in [data-theme='dark'], provide separate white/light logo asset, or use SVG with currentColor"
+        },
+        {
+          "item": "Social and action icons",
+          "issue": "GitHub, Twitter/X, email icons with dark fill disappear on dark background",
+          "fix": "filter: invert(1) for img/svg, or use inline SVG with fill: currentColor"
+        },
+        {
+          "item": "Decorative icons",
+          "issue": "Icons in navbars, article headers, footers may be single-color dark",
+          "fix": "Same as social icons - invert filter or currentColor"
+        },
+        {
+          "item": "Series/card blocks",
+          "issue": "Content blocks (e.g. related articles) may use hardcoded light background",
+          "fix": "Use --color-surface or theme-aware token so background adapts"
+        }
+      ]
+    },
+    "preferenceResolution": {
+      "order": ["userOverride", "systemPreference", "fallback"],
+      "storageKey": "theme",
+      "storageValues": ["light", "dark", "system"],
+      "fallback": "light",
+      "mediaQuery": "(prefers-color-scheme: dark)"
+    }
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.4.3": "Contrast (Minimum) - 4.5:1 for normal text, 3:1 for large text and UI components in BOTH themes",
+        "2.3.1": "Three Flashes - No theme transition should flash more than 3 times per second",
+        "2.3.3": "Animation from Interactions - Respect prefers-reduced-motion for theme switch"
+      }
+    },
+    "prefersReducedMotion": "When prefers-reduced-motion: reduce, use instant theme switch. Do not animate color changes.",
+    "forcedColors": "When forced-colors: active, browser overrides colors. Use semantic tokens; avoid relying on specific hex values. Test in Windows High Contrast.",
+    "focusIndicators": "Ensure focus rings are visible in both light and dark themes."
+  },
+  "frameworkPatterns": {
+    "react": {
+      "note": "Script in index.html or _document handles flash prevention. React state/custom hook syncs with data-theme for toggle UI.",
+      "approach": "Inline script in public/index.html or similar. Theme context or hook for components. useEffect to sync toggle with document.documentElement.dataset.theme."
+    },
+    "vue": {
+      "note": "Script in index.html for flash prevention. Vue app mounts after theme is set.",
+      "approach": "Inline script in index.html. Composables or provide/inject for theme state. Watch localStorage if needed for cross-tab sync."
+    },
+    "angular": {
+      "note": "Script in index.html for flash prevention. Angular bootstrap runs after.",
+      "approach": "Inline script in index.html. Service for theme state. Document is already themed when app loads."
+    },
+    "svelte": {
+      "note": "Script in index.html for flash prevention.",
+      "approach": "Inline script in index.html. Store or context for theme. Same as React/Vue for state sync."
+    }
+  },
+  "stylingApproaches": {
+    "tailwindCSS": {
+      "note": "Use dark: variant. Ensure dark mode strategy: class (data-theme) or media. Tailwind v3+ supports both.",
+      "approach": "Configure darkMode: 'class' in tailwind.config. Set class='dark' or class='light' on html based on data-theme. Use dark:bg-gray-900 etc."
+    },
+    "cssVariables": {
+      "note": "Define variables on :root and [data-theme='dark'].",
+      "approach": ":root { --color-bg: #fff; } [data-theme='dark'] { --color-bg: #121212; }. Use var(--color-bg) everywhere."
+    },
+    "scss": {
+      "note": "Same as CSS variables; use SCSS variables that compile to custom properties or use @media (prefers-color-scheme) with data-theme override.",
+      "approach": "Map SCSS variables to CSS custom properties, or use mixins for theme-aware values."
+    },
+    "styledComponents": {
+      "note": "Theme provider or CSS variables. Ensure theme is available at root.",
+      "approach": "ThemeProvider with theme object that has light/dark. Or use CSS variables and set them on document.documentElement."
+    }
+  },
+  "testingChecklist": [
+    "User selects dark, refreshes -> dark theme applied immediately, no flash",
+    "User selects light, refreshes -> light theme applied immediately",
+    "User selects system, OS is dark -> dark theme",
+    "User selects system, OS is light -> light theme",
+    "No theme stored, OS dark -> dark on load",
+    "No theme stored, OS light -> light on load",
+    "Toggle switches theme and UI updates immediately",
+    "localStorage contains correct value after toggle",
+    "Form inputs, selects, scrollbars match active theme",
+    "Contrast ratio 4.5:1+ for body text in light theme",
+    "Contrast ratio 4.5:1+ for body text in dark theme",
+    "prefers-reduced-motion: reduce -> instant switch, no animation",
+    "Focus indicators visible in light theme",
+    "Focus indicators visible in dark theme",
+    "SVGs with currentColor or CSS variables adapt correctly",
+    "Header logo and social icons visible in dark mode (not dark-on-dark)",
+    "Forced-colors mode does not break layout"
+  ],
+  "meta": {
+    "created": "2026-02-14",
+    "updated": "2026-02-14",
+    "webUrl": "https://uipotion.com/potions/patterns/dark-light-mode.html",
+    "relatedPotions": [
+      {"id": "button", "category": "components", "relationship": "applies-to", "description": "Optional: Button variants should use theme tokens for colors", "required": false},
+      {"id": "navbar", "category": "components", "relationship": "applies-to", "description": "Optional: Navbar commonly hosts theme toggle control", "required": false},
+      {"id": "dialog", "category": "components", "relationship": "applies-to", "description": "Optional: Dialogs should inherit theme correctly", "required": false},
+      {"id": "form-validation", "category": "patterns", "relationship": "complements", "description": "Optional: Error/success colors must meet contrast in both themes", "required": false}
+    ]
+  }
+}
