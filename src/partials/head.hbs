@@ -97,12 +97,20 @@
       "applicationCategory": "UIComponentGuide",
       "operatingSystem": "Web"
     },
-    "mentions": {
-      "@type": "DataDownload",
-      "contentUrl": "https://uipotion.com/{{agentManifest}}",
-      "encodingFormat": "application/json",
-      "description": "AI Agent Implementation Guide (JSON)"
-    }{{#if tags}},
+    "mentions": [
+      {
+        "@type": "DataDownload",
+        "contentUrl": "https://uipotion.com/{{agentManifest}}",
+        "encodingFormat": "application/json",
+        "description": "AI Agent Implementation Guide (JSON)"
+      },
+      {
+        "@type": "DataDownload",
+        "contentUrl": "https://uipotion.com/{{currentPath}}.md",
+        "encodingFormat": "text/markdown",
+        "description": "Potion source (Markdown)"
+      }
+    ]{{#if tags}},
     "keywords": "{{#each tags}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}"
     {{/if}}
   }

@@ -916,6 +916,18 @@ body::-webkit-scrollbar-thumb:hover {
   line-height: 1.6;
   margin-bottom: 0;
   max-width: 800px;
+
+  a {
+    color: #60a5fa;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+
+    &:hover {
+      color: #93c5fd;
+      border-bottom-color: #60a5fa;
+    }
+  }
 }
 
 /* Main Content Area */
