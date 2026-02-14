@@ -45,6 +45,8 @@ You don't need to install anything or fetch anything in your code. Use your AI c
 
 Your assistant uses the guide at that URL to generate code for your stack. You never fetch potions in your own code; you just share the link and iterate in the chat.
 
+Each potion is also available as Markdown source at the same path with `.md` (for example, `https://uipotion.com/potions/layouts/dashboard.md`).
+
 **Example**:
 ```
 You: "I need a dashboard with collapsible sidebar. React + Tailwind.
@@ -61,6 +63,8 @@ When a user gives you a UI Potion link (e.g. `https://uipotion.com/potions/layou
 1. Open or fetch that URL to read the specification.
 2. Use the spec to generate implementation code in the user's framework and styling (React/Vue/Svelte, Tailwind/CSS Modules, etc.).
 3. Follow the guide's structure, accessibility, and behavior; don't invent details that aren't in the spec.
+
+If the assistant prefers text-first context, use the potion Markdown source at the same path with `.md`.
 
 No need to fetch the main manifest or potions index unless you're building discovery/search. For normal use, the user provides the potion link and you implement from that single guide.
 
@@ -139,7 +143,7 @@ We welcome contributions! UI Potion grows with community input.
 ## What Makes a Good Potion?
 
 ### Human Documentation (Markdown)
-- ✅ Clear visual representation (ASCII art if helpful)
+- ✅ Clear prose descriptions (no ASCII art in website potion markdown)
 - ✅ Component hierarchy and structure
 - ✅ Exact dimensions and measurements
 - ✅ State descriptions and behavior
@@ -166,8 +170,10 @@ We welcome contributions! UI Potion grows with community input.
 Most users only need to share a potion link with their AI assistant. If you're building discovery or search (e.g. "find all dashboard-related potions"), you can use:
 
 - **Main manifest**: `https://uipotion.com/uipotion-manifest.json` — service metadata, categories, link to potions index
-- **Potions index**: `https://uipotion.com/potions-index.json` — catalog of all potions (id, name, category, tags, excerpt, webUrl, agentGuideUrl, dates)
+- **Potions index**: `https://uipotion.com/potions-index.json` — catalog of all potions (`id`, `name`, `category`, `tags`, `excerpt`, `webUrl`, `agentGuideUrl`, `markdownUrl`, dates)
 - **Individual guide**: `https://uipotion.com/potions/[category]/[id].json` — full implementation spec for one component
+- **Markdown source**: `https://uipotion.com/potions/[category]/[id].md` — human-readable source for text/markdown-friendly agents
+- **LLM discovery file**: `https://uipotion.com/llms.txt` — curated entrypoint for LLM/agent discovery
 
 For normal use, the user provides the potion URL; no need to fetch the manifest or index.
 
@@ -228,6 +234,8 @@ SOFTWARE.
 - **Website**: [uipotion.com](https://uipotion.com)
 - **Contribute**: [uipotion.com/contribute](https://uipotion.com/contribute)
 - **AI Manifest**: [uipotion.com/uipotion-manifest.json](https://uipotion.com/uipotion-manifest.json)
+- **Potions Index**: [uipotion.com/potions-index.json](https://uipotion.com/potions-index.json)
+- **LLM Discovery**: [uipotion.com/llms.txt](https://uipotion.com/llms.txt)
 - **GitHub**: [github.com/uiPotion/uipotion](https://github.com/uiPotion/uipotion)
 - **Harold SSG**: [haroldjs.com](https://haroldjs.com)
 - **Legal**: [uipotion.com/legal](https://uipotion.com/legal)
