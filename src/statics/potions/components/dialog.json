@@ -356,7 +356,7 @@
   "meta": {
     "created": "2026-01-11",
     "updated": "2026-01-11",
-    "webUrl": "https://uipotion.com/potions/components/modal-dialog.html",
+    "webUrl": "https://uipotion.com/potions/components/dialog",
     "relatedPotions": [
       {
         "id": "button",
@@ -365,6 +365,8 @@
         "description": "Optional: For footer actions (primary, secondary, destructive).",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/components/dialog.json",
+    "markdownUrl": "https://uipotion.com/potions/components/dialog.md"
   }
 }

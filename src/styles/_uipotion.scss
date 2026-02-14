@@ -1855,33 +1855,144 @@ html {
   max-width: 800px;
 }
 
-/* AI Agent Card - Prominently Displayed */
-.potion-ai-card {
+/* AI Agent Guide card - URL + Copy + Download */
+.potion-resources-bar {
   background: #171717;
   border: 1px solid #262626;
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 32px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.potion-ai-card-header {
+.potion-resources-bar-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
   color: #60a5fa;
   font-weight: 600;
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 
-  .potion-ai-icon {
+  &-icon {
     width: 20px;
     height: 20px;
   }
 }
 
+.potion-resources-bar-url-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #0a0a0a;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.potion-resources-bar-path {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: #e5e5e5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.potion-resources-bar-ext {
+  color: #60a5fa;
+  font-weight: 500;
+}
+
+.potion-resources-bar-copy-btns {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.potion-resources-bar-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: #262626;
+  border: none;
+  color: #e5e5e5;
+  transition: all 0.2s;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .check-icon {
+    display: none;
+  }
+
+  &:hover {
+    background: #404040;
+  }
+
+  &.copied {
+    background: #16a34a;
+    color: #fff;
+
+    .copy-icon {
+      display: none;
+    }
+
+    .check-icon {
+      display: block !important;
+    }
+  }
+}
+
+.potion-resources-bar-hint {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.potion-resources-bar-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.potion-resources-bar-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  background: #4f46e5;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.2s;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: #4338ca;
+  }
+}
+
+/* Copy button used elsewhere (e.g. homepage) - keep for copy-url-section partial */
 .potion-ai-card-body {
   display: flex;
   align-items: center;
@@ -1894,21 +2005,14 @@ html {
 
   .potion-ai-url {
     flex: 1;
+    min-width: 0;
     font-family: 'Monaco', 'Courier New', monospace;
     font-size: 0.875rem;
     color: #94a3b8;
-    overflow-x: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
     text-align: left;
-
-    &::-webkit-scrollbar {
-      height: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #262626;
-      border-radius: 2px;
-    }
   }
 
   .potion-copy-btn {
@@ -1925,63 +2029,22 @@ html {
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
-    position: relative;
     flex-shrink: 0;
-    min-width: 85px;
 
     svg {
       width: 16px;
       height: 16px;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-
-    .copy-icon,
-    .check-icon {
-      flex-shrink: 0;
     }
 
     &:hover {
       background: #404040;
     }
 
-    &:active {
-      transform: scale(0.98);
-    }
-
     &.copied {
       background: #16a34a;
       color: #ffffff;
-
-      &:hover {
-        background: #15803d;
-      }
-
-      .check-icon {
-        animation: checkmarkPop 0.3s ease-out;
-      }
     }
   }
-
-  @keyframes checkmarkPop {
-    0% {
-      transform: scale(0) rotate(-45deg);
-      opacity: 0;
-    }
-    50% {
-      transform: scale(1.2) rotate(0deg);
-    }
-    100% {
-      transform: scale(1) rotate(0deg);
-      opacity: 1;
-    }
-  }
-}
-
-.potion-ai-hint {
-  color: #94a3b8;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  margin-bottom: 16px;
 }
 
 .potion-download-btn {
@@ -2361,8 +2424,30 @@ html {
     font-size: 1.125rem;
   }
 
-  .potion-ai-card {
-    padding: 20px;
+  .potion-resources-bar {
+    padding: 20px 16px;
+  }
+
+  .potion-resources-bar-url-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .potion-resources-bar-path {
+    word-break: break-all;
+    white-space: normal;
+  }
+
+  .potion-resources-bar-copy-btns {
+    justify-content: flex-start;
+  }
+
+  .potion-resources-bar-downloads {
+    flex-direction: column;
+  }
+
+  .potion-resources-bar-download {
+    justify-content: center;
   }
 
   .potion-ai-card-body {

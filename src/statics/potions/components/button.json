@@ -19,7 +19,6 @@
     "forms"
   ],
   "description": "A foundational, accessible Button component with semantic variants, sizes, icon-only support, loading/disabled states, and optional link/toggle behavior. Designed to map cleanly into existing design systems via tokens and adapter rules.",
-
   "tokens": {
     "layout": {
       "minTouchTargetPx": 44,
@@ -65,7 +64,6 @@
       "reducedMotionDurationMs": 100
     }
   },
-
   "aiAgentInstructions": {
     "summary": "Implement a reusable Button component that is accessible by default, supports semantic variants (primary/secondary/ghost/destructive/link), sizes (sm/md/lg), icon-only buttons, loading state (prevents double submit), and optional link/toggle behavior. CRITICAL: integrate into the existing design system (tokens, class conventions, existing Button primitives) rather than inventing new styling.",
     "keyFeatures": [
@@ -95,7 +93,6 @@
       "8. Validate with testingChecklist (keyboard, SR, disabled/link behavior, loading)."
     ]
   },
-
   "componentSpec": {
     "goal": "Provide a single, design-system-friendly Button component that can be used across the product for actions and navigation while remaining accessible, consistent, and easy for agents to integrate into existing styling/token systems.",
     "anatomy": {
@@ -109,7 +106,6 @@
       ],
       "hierarchy": "Root( LeadingIcon?, Spinner?, Label?, TrailingIcon? )"
     },
-
     "stateModel": {
       "variant": {
         "type": "enum",
@@ -127,7 +123,11 @@
       "size": {
         "type": "enum",
         "description": "Size variant affecting height, padding, and font size.",
-        "allowedValues": ["sm", "md", "lg"],
+        "allowedValues": [
+          "sm",
+          "md",
+          "lg"
+        ],
         "default": "md",
         "persistence": "props/config"
       },
@@ -189,12 +189,14 @@
       "as": {
         "type": "enum",
         "description": "Render target: native button or anchor (link button). Prefer <button> for actions.",
-        "allowedValues": ["button", "a"],
+        "allowedValues": [
+          "button",
+          "a"
+        ],
         "default": "button",
         "persistence": "props/config"
       }
     },
-
     "interactions": [
       {
         "event": "pointerDown",
@@ -209,7 +211,9 @@
         "event": "pointerUpOrLeave",
         "when": "pressedVisual",
         "result": "setPressedVisualFalse",
-        "sideEffects": ["Restore normal styling"],
+        "sideEffects": [
+          "Restore normal styling"
+        ],
         "preventDefault": false
       },
       {
@@ -236,17 +240,20 @@
       {
         "event": "focus",
         "result": "setFocusedTrue",
-        "sideEffects": ["Show focus-visible ring"],
+        "sideEffects": [
+          "Show focus-visible ring"
+        ],
         "preventDefault": false
       },
       {
         "event": "blur",
         "result": "setFocusedFalse",
-        "sideEffects": ["Hide focus-visible ring"],
+        "sideEffects": [
+          "Hide focus-visible ring"
+        ],
         "preventDefault": false
       }
     ],
-
     "responsiveBehavior": {
       "mobile": {
         "maxWidthPx": 767,
@@ -260,7 +267,6 @@
         "hover": "Variant-specific hover feedback (color/brightness) aligned to DS."
       }
     },
-
     "variants": {
       "primary": {
         "description": "Main call-to-action. Highest emphasis.",
@@ -291,7 +297,6 @@
         "requirements": "Use aria-pressed and maintain visible on/off styling."
       }
     },
-
     "dataContract": {
       "props": {
         "children": {
@@ -304,7 +309,6 @@
           "required": false,
           "description": "Required when iconOnly=true and no visible label."
         },
-
         "variant": {
           "type": "'primary' | 'secondary' | 'ghost' | 'destructive' | 'link'",
           "required": false,
@@ -315,22 +319,39 @@
           "required": false,
           "default": "md"
         },
-
-        "disabled": { "type": "boolean", "required": false, "default": false },
-        "loading": { "type": "boolean", "required": false, "default": false },
-
-        "fullWidth": { "type": "boolean", "required": false, "default": false },
-        "iconOnly": { "type": "boolean", "required": false, "default": false },
-
-        "leadingIcon": { "type": "ReactNode | string", "required": false },
-        "trailingIcon": { "type": "ReactNode | string", "required": false },
-
+        "disabled": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "loading": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "fullWidth": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "iconOnly": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "leadingIcon": {
+          "type": "ReactNode | string",
+          "required": false
+        },
+        "trailingIcon": {
+          "type": "ReactNode | string",
+          "required": false
+        },
         "type": {
           "type": "'button' | 'submit' | 'reset'",
           "required": false,
           "default": "button"
         },
-
         "as": {
           "type": "'button' | 'a'",
           "required": false,
@@ -341,25 +362,42 @@
           "required": false,
           "description": "Required when as='a'."
         },
-        "target": { "type": "string", "required": false },
-        "rel": { "type": "string", "required": false },
-
-        "togglable": { "type": "boolean", "required": false, "default": false },
-        "pressed": { "type": "boolean", "required": false, "controlled": true },
+        "target": {
+          "type": "string",
+          "required": false
+        },
+        "rel": {
+          "type": "string",
+          "required": false
+        },
+        "togglable": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "pressed": {
+          "type": "boolean",
+          "required": false,
+          "controlled": true
+        },
         "defaultPressed": {
           "type": "boolean",
           "required": false,
           "uncontrolled": true
         },
-
-        "onClick": { "type": "(event) => void", "required": false },
+        "onClick": {
+          "type": "(event) => void",
+          "required": false
+        },
         "onPressedChange": {
           "type": "(pressed: boolean) => void",
           "required": false,
           "description": "For togglable buttons."
         },
-
-        "className": { "type": "string", "required": false },
+        "className": {
+          "type": "string",
+          "required": false
+        },
         "styleVariantClassName": {
           "type": "string",
           "required": false,
@@ -372,7 +410,6 @@
       }
     }
   },
-
   "animations": {
     "hover": {
       "durationMs": 120,
@@ -404,7 +441,6 @@
       "implementation": "@media (prefers-reduced-motion: reduce) { /* reduce/disable transforms and long transitions */ }"
     }
   },
-
   "accessibility": {
     "wcagCompliance": {
       "level": "AA",
@@ -417,14 +453,12 @@
         "4.1.2": "Accessible name, role, state: disabled, pressed (aria-pressed), busy (aria-busy)."
       }
     },
-
     "keyboardNavigation": {
       "Tab": "Moves focus to the button/link if focusable.",
       "Shift+Tab": "Moves focus away.",
       "Enter": "Activates button; activates link when as='a'.",
       "Space": "Activates native <button>. For <a>, Space should not scroll; optional: preventDefault + trigger click if used as button-like control."
     },
-
     "ariaAttributes": {
       "required": {
         "button": {
@@ -445,19 +479,16 @@
         }
       }
     },
-
     "screenReader": {
       "nameComputation": "Icon-only buttons must provide aria-label; visible label preferred otherwise.",
       "loading": "When loading=true, announce busy state via aria-busy and/or include visually hidden 'Loading' text if appropriate.",
       "toggle": "When togglable=true, screen reader announces pressed state via aria-pressed."
     },
-
     "focusManagement": {
       "focusRing": "Use :focus-visible (or framework equivalent) to avoid showing focus on mouse click while preserving keyboard focus indication.",
       "neverRemoveFocus": "Never remove focus outline without replacement.",
       "disabledFocus": "Disabled buttons should not be focusable. For aria-disabled links: remove from tab order."
     },
-
     "implementationChecklist": [
       "Use <button> for actions, <a> for navigation when possible.",
       "Default type='button' to avoid accidental form submits.",
@@ -469,7 +500,6 @@
       "Loading state prevents double-submit and does not cause layout shift."
     ]
   },
-
   "projectDetection": {
     "framework": {
       "description": "Identify the UI framework and component conventions (including existing Button primitives).",
@@ -502,7 +532,6 @@
       ]
     }
   },
-
   "outputConstraints": {
     "must": [
       "Match existing framework patterns and any existing Button primitive.",
@@ -522,7 +551,6 @@
       "In TypeScript: do not spread a loosely-typed object containing ARIA attributes (e.g. Record<string, string | boolean>) onto <button> or <a>; use correctly typed props (Booleanish for aria-busy, aria-pressed, aria-disabled) to avoid DOM attribute type errors."
     ]
   },
-
   "testingChecklist": [
     "Renders as <button> by default and is focusable via Tab.",
     "Default type is 'button' (no accidental form submit).",
@@ -537,7 +565,6 @@
     "Toggle mode sets aria-pressed correctly and updates on activation.",
     "Reduced motion disables press transforms (if implemented) and keeps interaction usable."
   ],
-
   "frameworkPatterns": {
     "react": {
       "stateManagement": "Prefer a stateless Button; togglable can be controlled via pressed/onPressedChange or internal state when defaultPressed provided.",
@@ -557,7 +584,6 @@
       "example": ""
     }
   },
-
   "stylingApproaches": {
     "tailwindCSS": {
       "rootBase": "inline-flex items-center justify-center rounded-md font-semibold cursor-pointer transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed",
@@ -579,7 +605,6 @@
     "styledComponents": "Create a styled ButtonRoot that reads variant/size props and theme tokens; keep :focus-visible styling consistent with DS.",
     "scss": "Create _button.scss with BEM modifiers: .btn, .btn--primary, .btn--secondary, .btn--ghost, .btn--destructive, .btn--link, .btn--sm/.btn--md/.btn--lg, .btn--loading, .btn--icon-only."
   },
-
   "commonVariations": {
     "primaryCTA": {
       "description": "Primary button used for the main action on a page.",
@@ -602,7 +627,6 @@
       "notes": "Often paired with Dialog component."
     }
   },
-
   "edgeCases": {
     "accidentalSubmit": {
       "issue": "Buttons inside forms submit unexpectedly.",
@@ -625,7 +649,6 @@
       "solution": "Reserve space for label and/or overlay spinner without changing width."
     }
   },
-
   "meta": {
     "created": "2026-02-04",
     "updated": "2026-02-04",
@@ -645,6 +668,8 @@
         "description": "Buttons commonly appear with form inputs (submit, clear, next-step).",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/components/button.json",
+    "markdownUrl": "https://uipotion.com/potions/components/button.md"
   }
 }

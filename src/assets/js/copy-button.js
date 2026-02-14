@@ -11,21 +11,20 @@
 
       if (!copyIcon || !checkIcon || !copyText) return;
 
+      const originalLabel = copyText.textContent;
       copyBtn.addEventListener('click', async function() {
         try {
           await navigator.clipboard.writeText(textToCopy);
           
-          // Show check icon, hide copy icon
           copyIcon.style.display = 'none';
           checkIcon.style.display = 'block';
           copyText.textContent = 'Copied!';
           copyBtn.classList.add('copied');
           
-          // Reset after 2.5 seconds
           setTimeout(() => {
             copyIcon.style.display = 'block';
             checkIcon.style.display = 'none';
-            copyText.textContent = 'Copy';
+            copyText.textContent = originalLabel;
             copyBtn.classList.remove('copied');
           }, 2500);
         } catch (err) {
@@ -34,7 +33,7 @@
           if (copyText) {
             copyText.textContent = 'Error';
             setTimeout(() => {
-              copyText.textContent = 'Copy';
+              copyText.textContent = originalLabel;
             }, 2000);
           }
         }

@@ -264,7 +264,18 @@
         },
         "webUrl": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "URL to the human-readable documentation page (HTML)."
+        },
+        "agentGuideUrl": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional: URL to this JSON guide for AI agents."
+        },
+        "markdownUrl": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional: URL to the raw Markdown source (.md)."
         },
         "relatedPotions": {
           "type": "array",

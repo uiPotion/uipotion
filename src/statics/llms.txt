@@ -1,0 +1,34 @@
+# UI Potion
+
+> UI Potion provides framework-agnostic, styling-agnostic UI specifications ("potions") for AI coding assistants. Prefer JSON guides for implementation details, and Markdown pages for human-readable context.
+
+Use this file as the entrypoint for discovery. Each potion is available in three formats:
+- `webUrl` (human-readable HTML)
+- `agentGuideUrl` (JSON specification for AI agents)
+- `markdownUrl` (raw Markdown source)
+
+## Core discovery
+
+- [UI Potion manifest](https://uipotion.com/uipotion-manifest.json): Start here for platform metadata and discovery workflow.
+- [Potions index](https://uipotion.com/potions-index.json): Full catalog with category, tags, and URLs for each potion.
+- [Potion base schema](https://uipotion.com/schemas/potion.base.schema.json): JSON schema contract for potion guides.
+
+## Human guides
+
+- [Contribute guide](https://uipotion.com/contribute): How to add or update potions.
+- [About UI Potion](https://uipotion.com/about): Project purpose and principles.
+- [Legal](https://uipotion.com/legal): Legal and usage disclaimers.
+
+## Representative potion specs (JSON)
+
+- [Button](https://uipotion.com/potions/components/button.json): Accessible, token-driven button spec.
+- [Dialog](https://uipotion.com/potions/components/dialog.json): Accessible modal dialog with focus management.
+- [Data Table](https://uipotion.com/potions/components/data-table.json): Sortable, paginated, filterable table spec.
+- [Dashboard layout](https://uipotion.com/potions/layouts/dashboard.json): Responsive admin layout specification.
+- [Form validation pattern](https://uipotion.com/potions/patterns/form-validation.json): Validation timing and UX guidance.
+
+## Optional
+
+- [Button Markdown source](https://uipotion.com/potions/components/button.md): Human-readable source for the Button potion.
+- [Dialog Markdown source](https://uipotion.com/potions/components/dialog.md): Human-readable source for the Dialog potion.
+- [Dashboard Markdown source](https://uipotion.com/potions/layouts/dashboard.md): Human-readable source for the Dashboard potion.

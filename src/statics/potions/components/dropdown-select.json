@@ -861,6 +861,8 @@
         "description": "Optional: See Login & Registration Forms for complete form example using dropdown components",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/components/dropdown-select.json",
+    "markdownUrl": "https://uipotion.com/potions/components/dropdown-select.md"
   }
 }

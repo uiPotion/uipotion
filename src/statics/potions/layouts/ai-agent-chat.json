@@ -329,7 +329,11 @@
           "count": 3,
           "sizePx": 8,
           "animation": "Sequential bounce or fade (1.4s cycle)",
-          "delaysMs": [0, 200, 400]
+          "delaysMs": [
+            0,
+            200,
+            400
+          ]
         },
         "Text": {
           "content": "Agent is typing...",
@@ -653,7 +657,11 @@
     },
     "typingIndicator": {
       "cycleMs": 1400,
-      "dotDelaysMs": [0, 200, 400],
+      "dotDelaysMs": [
+        0,
+        200,
+        400
+      ],
       "animation": "Sequential bounce or fade"
     },
     "inputHeight": {
@@ -759,7 +767,11 @@
       "focusVisible": {
         "required": true,
         "css": "outline: 2px solid var(--primary-color); outline-offset: 2px",
-        "targets": ["input", "textarea", "button"]
+        "targets": [
+          "input",
+          "textarea",
+          "button"
+        ]
       }
     },
     "colorContrast": {
@@ -1117,6 +1129,8 @@
         "description": "Reuse for send button, toolbar actions, and dialog action footers.",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.json",
+    "markdownUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.md"
   }
 }

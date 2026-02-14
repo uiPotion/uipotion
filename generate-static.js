@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 /**
- * Generate sitemap.xml and _redirects from potions and static pages.
+ * Generate sitemap.xml, _redirects, and copy potion markdown to statics.
  * Run: node generate-static.js
  * Or: npm run static
+ *
+ * Markdown copies: src/potions/[category]/[slug].md to src/statics/potions/
+ * Harold then copies statics to build/. Generated .md files are gitignored.
  */
 
 const fs = require('fs');
@@ -10,6 +13,7 @@ const path = require('path');
 
 // Configuration
 const POTIONS_DIR = 'src/potions';
+const STATICS_POTIONS_DIR = 'src/statics/potions';
 const OUTPUT_FILE = 'src/statics/sitemap.xml';
 const REDIRECTS_FILE = 'src/statics/_redirects';
 const BASE_URL = 'https://uipotion.com';
@@ -133,6 +137,24 @@ function generateSitemap() {
   return { xml, potions };
 }
 
+function copyPotionMarkdown(potions) {
+  // Copy source markdown to statics so Harold includes it in build.
+  // Generated files are gitignored; no duplicates committed.
+  let copied = 0;
+  for (const { category, slug } of potions) {
+    const srcPath = path.join(POTIONS_DIR, category, `${slug}.md`);
+    const destDir = path.join(STATICS_POTIONS_DIR, category);
+    const destPath = path.join(destDir, `${slug}.md`);
+    if (!fs.existsSync(srcPath)) continue;
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
+    fs.copyFileSync(srcPath, destPath);
+    copied++;
+  }
+  return copied;
+}
+
 function generateRedirects(potions) {
   // Netlify _redirects: from to status (whitespace-separated). See https://docs.netlify.com/routing/redirects/
   // Use 301! (force) so redirect runs even when the .html file exists; otherwise Netlify serves the file.
@@ -156,12 +178,17 @@ function generateRedirects(potions) {
 }
 
 function main() {
-  console.log('Generating sitemap.xml and _redirects...\n');
+  console.log('Generating sitemap.xml, _redirects, and copying potion markdown...\n');
 
   const { xml, potions } = generateSitemap();
 
+  const copiedMd = copyPotionMarkdown(potions);
+  if (copiedMd > 0) {
+    console.log(`Copied ${copiedMd} potion markdown files to ${STATICS_POTIONS_DIR}/`);
+  }
+
   // Show summary
-  console.log(`Found ${potions.length} potions:`);
+  console.log(`\nFound ${potions.length} potions:`);
   ['components', 'features', 'layouts', 'patterns', 'tooling'].forEach(category => {
     const count = potions.filter(p => p.category === category).length;
     if (count > 0) {

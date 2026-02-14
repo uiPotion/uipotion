@@ -21,25 +21,9 @@
       <p class="potion-hero-description">{{excerpt}}</p>
       {{/if}}
       
-      <!-- AI Agent Link - Prominently displayed -->
-      <div class="potion-ai-card">
-        <div class="potion-ai-card-header">
-          <svg class="potion-ai-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-          </svg>
-          <span>AI Agent Guide</span>
-        </div>
-        {{> copy-url-section path=agentManifest}}
-        <p class="potion-ai-hint">
-          Use this URL with your AI coding assistant (Claude, ChatGPT, etc.) to automatically implement this component in your stack
-        </p>
-        <a href="/{{agentManifest}}" class="potion-download-btn" download aria-label="Download JSON guide for AI agents">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-          </svg>
-          <span>Download JSON</span>
-        </a>
-      </div>
+      {{#if agentManifest}}
+      {{> potion-resources-bar path=path agentManifest=agentManifest}}
+      {{/if}}
       
       <!-- Meta Info -->
       <div class="potion-meta-bar" role="group" aria-label="Potion metadata">

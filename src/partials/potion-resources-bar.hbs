@@ -1,0 +1,43 @@
+{{!-- AI Agent Guide card: URL + Copy buttons, hint, Download buttons --}}
+<div class="potion-resources-bar">
+  <div class="potion-resources-bar-header">
+    <svg class="potion-resources-bar-header-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+    </svg>
+    <span>AI Agent Guide</span>
+  </div>
+  <div class="potion-resources-bar-url-row">
+    <code class="potion-resources-bar-path" title="https://uipotion.com/{{agentManifest}}">https://uipotion.com/{{path}}.<span class="potion-resources-bar-ext">{json|md}</span></code>
+    <div class="potion-resources-bar-copy-btns">
+      <button type="button" class="potion-resources-bar-copy" data-copy-text="https://uipotion.com/{{agentManifest}}">
+        <svg class="copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+        </svg>
+        <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style="display: none;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span class="copy-text">Copy JSON</span>
+      </button>
+      <button type="button" class="potion-resources-bar-copy" data-copy-text="https://uipotion.com/{{path}}.md">
+        <svg class="copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+        </svg>
+        <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style="display: none;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span class="copy-text">Copy .md</span>
+      </button>
+    </div>
+  </div>
+  <p class="potion-resources-bar-hint">Use this URL with your AI coding assistant (Claude, ChatGPT, Cursor, etc.) to automatically implement this component in your stack.</p>
+  <div class="potion-resources-bar-downloads">
+    <a href="/{{agentManifest}}" class="potion-resources-bar-download" download aria-label="Download JSON guide">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      <span>Download JSON</span>
+    </a>
+    <a href="/{{path}}.md" class="potion-resources-bar-download" download aria-label="Download Markdown source">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      <span>Download .md</span>
+    </a>
+  </div>
+</div>

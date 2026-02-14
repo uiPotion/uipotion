@@ -698,6 +698,8 @@
         "description": "TIP: Apply Form Validation pattern for optimal validation timing and UX (optional)",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/features/form-login-register.json",
+    "markdownUrl": "https://uipotion.com/potions/features/form-login-register.md"
   }
 }

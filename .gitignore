@@ -1,6 +1,9 @@
 node_modules/
 dist/
 build/
+
+# Generated potion markdown (copied from src/potions before build; not committed)
+src/statics/potions/**/*.md
 .harold-cache/
 .DS_Store
 *.log
@@ -10,3 +13,5 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+
+.netlify

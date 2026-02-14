@@ -603,6 +603,8 @@
   "meta": {
     "created": "2026-01-24",
     "updated": "2026-01-24",
-    "webUrl": "https://uipotion.com/potions/tooling/eslint-config.html"
+    "webUrl": "https://uipotion.com/potions/tooling/eslint-config.html",
+    "agentGuideUrl": "https://uipotion.com/potions/tooling/eslint-config.json",
+    "markdownUrl": "https://uipotion.com/potions/tooling/eslint-config.md"
   }
 }

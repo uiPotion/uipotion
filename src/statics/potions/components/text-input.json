@@ -752,6 +752,8 @@
         "description": "Optional: See Login & Registration Forms for complete form example using Text Input",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/components/text-input.json",
+    "markdownUrl": "https://uipotion.com/potions/components/text-input.md"
   }
 }

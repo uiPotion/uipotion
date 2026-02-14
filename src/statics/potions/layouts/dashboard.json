@@ -1175,6 +1175,8 @@
         "description": "Optional: For header CTAs, sidebar actions, table actions, and dialog footers.",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/layouts/dashboard.json",
+    "markdownUrl": "https://uipotion.com/potions/layouts/dashboard.md"
   }
 }

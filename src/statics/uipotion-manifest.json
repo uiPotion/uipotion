@@ -8,7 +8,7 @@
     "potionsIndexUrl": "https://uipotion.com/potions-index.json"
   },
   "usage": {
-    "how_to_use": "AI agents can discover and load component guides by referencing this manifest. Each potion (component guide) is framework-agnostic and provides detailed specifications for implementation.",
+    "how_to_use": "AI agents can discover and load component guides by referencing this manifest. Each potion (component guide) is framework-agnostic and provides detailed specifications for implementation. Each potion is available in three formats: webUrl (human-readable HTML), agentGuideUrl (JSON spec for AI), and markdownUrl (raw Markdown source).",
     "workflow": [
       "1. Agent loads this manifest to discover available potions",
       "2. Agent browses potions-index.json to find relevant component",

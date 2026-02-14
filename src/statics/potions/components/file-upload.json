@@ -230,14 +230,19 @@
         "event": "dragEnter",
         "when": "!disabled",
         "result": "setDragActiveTrue",
-        "sideEffects": ["Set dragActive=true", "Show drag-over visual state"],
+        "sideEffects": [
+          "Set dragActive=true",
+          "Show drag-over visual state"
+        ],
         "preventDefault": true
       },
       {
         "event": "dragLeave",
         "when": "!disabled",
         "result": "setDragActiveFalse",
-        "sideEffects": ["Set dragActive=false"],
+        "sideEffects": [
+          "Set dragActive=false"
+        ],
         "preventDefault": true
       },
       {
@@ -322,24 +327,53 @@
     },
     "dataContract": {
       "props": {
-        "label": { "type": "string", "required": true },
-        "name": { "type": "string", "required": true },
+        "label": {
+          "type": "string",
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "required": true
+        },
         "id": {
           "type": "string",
           "required": false,
           "default": "generated from name"
         },
-        "required": { "type": "boolean", "required": false, "default": false },
-        "disabled": { "type": "boolean", "required": false, "default": false },
-        "multiple": { "type": "boolean", "required": false, "default": false },
-        "accept": { "type": "string", "required": false, "default": "" },
-        "maxFiles": { "type": "number", "required": false, "default": 10 },
+        "required": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "disabled": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "multiple": {
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        "accept": {
+          "type": "string",
+          "required": false,
+          "default": ""
+        },
+        "maxFiles": {
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
         "maxSizeBytes": {
           "type": "number",
           "required": false,
           "default": 10485760
         },
-        "hint": { "type": "string", "required": false },
+        "hint": {
+          "type": "string",
+          "required": false
+        },
         "error": {
           "type": "string | null",
           "required": false,
@@ -395,7 +429,10 @@
           "required": false,
           "default": true
         },
-        "className": { "type": "string", "required": false }
+        "className": {
+          "type": "string",
+          "required": false
+        }
       },
       "types": {
         "FileItem": {
@@ -727,6 +764,8 @@
         "description": "Reference full form UX patterns; file upload frequently appears in profile and onboarding flows.",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/components/file-upload.json",
+    "markdownUrl": "https://uipotion.com/potions/components/file-upload.md"
   }
 }

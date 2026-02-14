@@ -1226,6 +1226,8 @@
         "description": "Optional: For plan CTAs and billing toggle (primary/secondary).",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/features/pricing-table.json",
+    "markdownUrl": "https://uipotion.com/potions/features/pricing-table.md"
   }
 }

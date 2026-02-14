@@ -1156,6 +1156,8 @@
   "meta": {
     "created": "2026-01-18",
     "updated": "2026-01-18",
-    "webUrl": "https://uipotion.com/potions/components/data-table.html"
+    "webUrl": "https://uipotion.com/potions/components/data-table.html",
+    "agentGuideUrl": "https://uipotion.com/potions/components/data-table.json",
+    "markdownUrl": "https://uipotion.com/potions/components/data-table.md"
   }
 }

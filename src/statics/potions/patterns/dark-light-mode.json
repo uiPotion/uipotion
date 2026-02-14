@@ -104,26 +104,68 @@
       "Reduced motion disables or shortens animation",
       "Theme toggle works and stores preference",
       "Forced-colors mode degrades gracefully",
-"Images/SVGs acceptable in both themes",
+      "Images/SVGs acceptable in both themes",
       "Works across target breakpoints",
-    "Logos and icons (header, social, decorative) visible and readable in both themes"
+      "Logos and icons (header, social, decorative) visible and readable in both themes"
     ]
   },
   "tokens": {
     "description": "Semantic color tokens for theme switching. Each token has light and dark values. Components reference the token, not raw colors.",
     "required": [
-      {"name": "--color-background", "purpose": "Page background", "lightExample": "#ffffff", "darkExample": "#121212"},
-      {"name": "--color-surface", "purpose": "Cards, panels", "lightExample": "#f5f5f5", "darkExample": "#1e1e1e"},
-      {"name": "--color-text", "purpose": "Primary text", "lightExample": "#111111", "darkExample": "#eeeeee"},
-      {"name": "--color-text-muted", "purpose": "Secondary text", "lightExample": "#666666", "darkExample": "#999999"},
-      {"name": "--color-border", "purpose": "Borders, dividers", "lightExample": "#e0e0e0", "darkExample": "#333333"},
-      {"name": "--color-accent", "purpose": "Links, buttons, highlights", "lightExample": "#0066cc", "darkExample": "#4da6ff"}
+      {
+        "name": "--color-background",
+        "purpose": "Page background",
+        "lightExample": "#ffffff",
+        "darkExample": "#121212"
+      },
+      {
+        "name": "--color-surface",
+        "purpose": "Cards, panels",
+        "lightExample": "#f5f5f5",
+        "darkExample": "#1e1e1e"
+      },
+      {
+        "name": "--color-text",
+        "purpose": "Primary text",
+        "lightExample": "#111111",
+        "darkExample": "#eeeeee"
+      },
+      {
+        "name": "--color-text-muted",
+        "purpose": "Secondary text",
+        "lightExample": "#666666",
+        "darkExample": "#999999"
+      },
+      {
+        "name": "--color-border",
+        "purpose": "Borders, dividers",
+        "lightExample": "#e0e0e0",
+        "darkExample": "#333333"
+      },
+      {
+        "name": "--color-accent",
+        "purpose": "Links, buttons, highlights",
+        "lightExample": "#0066cc",
+        "darkExample": "#4da6ff"
+      }
     ],
     "optional": [
-      {"name": "--color-elevated", "purpose": "Dropdowns, modals"},
-      {"name": "--color-error", "purpose": "Error states"},
-      {"name": "--color-success", "purpose": "Success states"},
-      {"name": "--color-warning", "purpose": "Warning states"}
+      {
+        "name": "--color-elevated",
+        "purpose": "Dropdowns, modals"
+      },
+      {
+        "name": "--color-error",
+        "purpose": "Error states"
+      },
+      {
+        "name": "--color-success",
+        "purpose": "Success states"
+      },
+      {
+        "name": "--color-warning",
+        "purpose": "Warning states"
+      }
     ]
   },
   "implementationDetails": {
@@ -153,9 +195,17 @@
       ]
     },
     "preferenceResolution": {
-      "order": ["userOverride", "systemPreference", "fallback"],
+      "order": [
+        "userOverride",
+        "systemPreference",
+        "fallback"
+      ],
       "storageKey": "theme",
-      "storageValues": ["light", "dark", "system"],
+      "storageValues": [
+        "light",
+        "dark",
+        "system"
+      ],
       "fallback": "light",
       "mediaQuery": "(prefers-color-scheme: dark)"
     }
@@ -233,10 +283,36 @@
     "updated": "2026-02-14",
     "webUrl": "https://uipotion.com/potions/patterns/dark-light-mode.html",
     "relatedPotions": [
-      {"id": "button", "category": "components", "relationship": "applies-to", "description": "Optional: Button variants should use theme tokens for colors", "required": false},
-      {"id": "navbar", "category": "components", "relationship": "applies-to", "description": "Optional: Navbar commonly hosts theme toggle control", "required": false},
-      {"id": "dialog", "category": "components", "relationship": "applies-to", "description": "Optional: Dialogs should inherit theme correctly", "required": false},
-      {"id": "form-validation", "category": "patterns", "relationship": "complements", "description": "Optional: Error/success colors must meet contrast in both themes", "required": false}
-    ]
+      {
+        "id": "button",
+        "category": "components",
+        "relationship": "applies-to",
+        "description": "Optional: Button variants should use theme tokens for colors",
+        "required": false
+      },
+      {
+        "id": "navbar",
+        "category": "components",
+        "relationship": "applies-to",
+        "description": "Optional: Navbar commonly hosts theme toggle control",
+        "required": false
+      },
+      {
+        "id": "dialog",
+        "category": "components",
+        "relationship": "applies-to",
+        "description": "Optional: Dialogs should inherit theme correctly",
+        "required": false
+      },
+      {
+        "id": "form-validation",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "Optional: Error/success colors must meet contrast in both themes",
+        "required": false
+      }
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/patterns/dark-light-mode.json",
+    "markdownUrl": "https://uipotion.com/potions/patterns/dark-light-mode.md"
   }
 }

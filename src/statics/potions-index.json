@@ -4,188 +4,375 @@
       "id": "dashboard",
       "name": "Dashboard Layout with Collapsible Sidebar",
       "category": "layouts",
-      "tags": ["layouts", "dashboard", "sidebar", "responsive", "admin"],
+      "tags": [
+        "layouts",
+        "dashboard",
+        "sidebar",
+        "responsive",
+        "admin"
+      ],
       "excerpt": "A responsive admin dashboard layout with collapsible sidebar navigation and fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.",
       "webUrl": "https://uipotion.com/potions/layouts/dashboard",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/dashboard.json",
       "created": "2026-01-10",
-      "updated": "2026-02-03"
+      "updated": "2026-02-03",
+      "markdownUrl": "https://uipotion.com/potions/layouts/dashboard.md"
     },
     {
       "id": "dialog",
       "name": "Modal Dialog (Accessible) with Focus Trap and Actions",
       "category": "components",
-      "tags": ["components", "modal", "dialog", "overlay", "focus-trap", "a11y", "wcag", "aria"],
+      "tags": [
+        "components",
+        "modal",
+        "dialog",
+        "overlay",
+        "focus-trap",
+        "a11y",
+        "wcag",
+        "aria"
+      ],
       "excerpt": "An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.",
       "webUrl": "https://uipotion.com/potions/components/dialog",
       "agentGuideUrl": "https://uipotion.com/potions/components/dialog.json",
       "created": "2026-01-11",
-      "updated": "2026-01-11"
+      "updated": "2026-01-11",
+      "markdownUrl": "https://uipotion.com/potions/components/dialog.md"
     },
     {
       "id": "navbar",
       "name": "Navigation Bar (Responsive) with Mobile Menu",
       "category": "components",
-      "tags": ["components", "navbar", "navigation", "header", "responsive", "mobile-menu", "sticky", "a11y"],
+      "tags": [
+        "components",
+        "navbar",
+        "navigation",
+        "header",
+        "responsive",
+        "mobile-menu",
+        "sticky",
+        "a11y"
+      ],
       "excerpt": "A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, and transparent-to-solid transition. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.",
       "webUrl": "https://uipotion.com/potions/components/navbar.html",
       "agentGuideUrl": "https://uipotion.com/potions/components/navbar.json",
       "created": "2026-01-12",
-      "updated": "2026-01-12"
+      "updated": "2026-01-12",
+      "markdownUrl": "https://uipotion.com/potions/components/navbar.md"
     },
     {
       "id": "pricing-table",
       "name": "3-Tier SaaS Pricing Table with Monthly/Yearly Toggle",
       "category": "features",
-      "tags": ["features", "pricing", "saas", "subscription", "billing", "marketing", "responsive", "conversion"],
+      "tags": [
+        "features",
+        "pricing",
+        "saas",
+        "subscription",
+        "billing",
+        "marketing",
+        "responsive",
+        "conversion"
+      ],
       "excerpt": "A responsive 3-tier pricing table component with monthly/yearly billing toggle, highlighted 'Most Popular' plan, and feature comparison. Perfect for SaaS marketing pages, product pages, and subscription-based services.",
       "webUrl": "https://uipotion.com/potions/features/pricing-table",
       "agentGuideUrl": "https://uipotion.com/potions/features/pricing-table.json",
       "created": "2026-01-18",
-      "updated": "2026-01-18"
+      "updated": "2026-01-18",
+      "markdownUrl": "https://uipotion.com/potions/features/pricing-table.md"
     },
     {
       "id": "data-table",
       "name": "Data Table (Sortable, Paginated, Filterable)",
       "category": "components",
-      "tags": ["components", "data-table", "table", "sortable", "pagination", "filtering", "selection", "responsive", "a11y", "wcag", "admin", "dashboard"],
+      "tags": [
+        "components",
+        "data-table",
+        "table",
+        "sortable",
+        "pagination",
+        "filtering",
+        "selection",
+        "responsive",
+        "a11y",
+        "wcag",
+        "admin",
+        "dashboard"
+      ],
       "excerpt": "A comprehensive data table component with sorting, pagination, filtering, row selection, and responsive behavior. Includes loading, empty, and error states with full keyboard navigation support.",
       "webUrl": "https://uipotion.com/potions/components/data-table",
       "agentGuideUrl": "https://uipotion.com/potions/components/data-table.json",
       "created": "2026-01-18",
-      "updated": "2026-01-18"
+      "updated": "2026-01-18",
+      "markdownUrl": "https://uipotion.com/potions/components/data-table.md"
     },
     {
       "id": "toast-notifications",
       "name": "Toast Notifications (Accessible) with Queue System",
       "category": "components",
-      "tags": ["components", "toast", "notifications", "snackbar", "feedback", "alerts", "a11y", "wcag", "aria", "queue", "auto-dismiss"],
+      "tags": [
+        "components",
+        "toast",
+        "notifications",
+        "snackbar",
+        "feedback",
+        "alerts",
+        "a11y",
+        "wcag",
+        "aria",
+        "queue",
+        "auto-dismiss"
+      ],
       "excerpt": "A non-blocking toast notification system with success/error/warning/info variants, queue management, auto-dismiss, keyboard navigation, and screen reader announcements. Perfect for user feedback after actions.",
       "webUrl": "https://uipotion.com/potions/components/toast-notifications.html",
       "agentGuideUrl": "https://uipotion.com/potions/components/toast-notifications.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24"
+      "updated": "2026-01-24",
+      "markdownUrl": "https://uipotion.com/potions/components/toast-notifications.md"
     },
     {
       "id": "landing-page",
       "name": "Landing Page Layout (Marketing)",
       "category": "layouts",
-      "tags": ["layouts", "landing-page", "marketing", "hero", "feature-highlights", "testimonials", "cta", "responsive", "conversion"],
+      "tags": [
+        "layouts",
+        "landing-page",
+        "marketing",
+        "hero",
+        "feature-highlights",
+        "testimonials",
+        "cta",
+        "responsive",
+        "conversion"
+      ],
       "excerpt": "A conversion-optimized marketing landing page layout with hero section, feature highlights, social proof, and multiple CTAs. Perfect for product launches, SaaS marketing, and lead generation campaigns.",
       "webUrl": "https://uipotion.com/potions/layouts/landing-page",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/landing-page.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24"
+      "updated": "2026-01-24",
+      "markdownUrl": "https://uipotion.com/potions/layouts/landing-page.md"
     },
     {
       "id": "eslint-config",
       "name": "ESLint Config Generator for UI Projects",
       "category": "tooling",
-      "tags": ["tooling", "eslint", "linting", "config", "code-quality", "developer-experience", "typescript", "accessibility", "formatting"],
+      "tags": [
+        "tooling",
+        "eslint",
+        "linting",
+        "config",
+        "code-quality",
+        "developer-experience",
+        "typescript",
+        "accessibility",
+        "formatting"
+      ],
       "excerpt": "A comprehensive ESLint configuration generator supporting React, Vue, Angular, and Svelte with accessibility linting, TypeScript support, and Prettier integration.",
       "webUrl": "https://uipotion.com/potions/tooling/eslint-config",
       "agentGuideUrl": "https://uipotion.com/potions/tooling/eslint-config.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24"
+      "updated": "2026-01-24",
+      "markdownUrl": "https://uipotion.com/potions/tooling/eslint-config.md"
     },
     {
       "id": "form-validation",
       "name": "Form Validation Pattern - UX and Timing Strategies",
       "category": "patterns",
-      "tags": ["patterns", "validation", "forms", "ux", "accessibility", "error-handling", "progressive-disclosure", "user-experience"],
+      "tags": [
+        "patterns",
+        "validation",
+        "forms",
+        "ux",
+        "accessibility",
+        "error-handling",
+        "progressive-disclosure",
+        "user-experience"
+      ],
       "excerpt": "A comprehensive UX pattern for form validation covering timing strategies, error display, async validation, accessibility, and integration with form libraries.",
       "webUrl": "https://uipotion.com/potions/patterns/form-validation",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/form-validation.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24"
+      "updated": "2026-01-24",
+      "markdownUrl": "https://uipotion.com/potions/patterns/form-validation.md"
     },
     {
       "id": "dark-light-mode",
       "name": "Dark/Light Mode Pattern - Theme Switching and Color Schemes",
       "category": "patterns",
-      "tags": ["patterns", "dark-mode", "light-mode", "theme", "color-scheme", "accessibility", "design-tokens", "responsive"],
+      "tags": [
+        "patterns",
+        "dark-mode",
+        "light-mode",
+        "theme",
+        "color-scheme",
+        "accessibility",
+        "design-tokens",
+        "responsive"
+      ],
       "excerpt": "A framework-agnostic pattern for implementing dark and light theme switching with system preference detection, user override persistence, semantic color tokens, and accessibility compliance.",
       "webUrl": "https://uipotion.com/potions/patterns/dark-light-mode",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/dark-light-mode.json",
       "created": "2026-02-14",
-      "updated": "2026-02-14"
+      "updated": "2026-02-14",
+      "markdownUrl": "https://uipotion.com/potions/patterns/dark-light-mode.md"
     },
     {
       "id": "text-input",
       "name": "Text Input Field (Accessible) with Label, Error, and Success States",
       "category": "components",
-      "tags": ["components", "input", "form", "text-field", "validation", "a11y", "wcag", "aria", "form-control"],
+      "tags": [
+        "components",
+        "input",
+        "form",
+        "text-field",
+        "validation",
+        "a11y",
+        "wcag",
+        "aria",
+        "form-control"
+      ],
       "excerpt": "An accessible text input component with label, hint text, error display, success indicator, and comprehensive state management. Foundation for all form inputs.",
       "webUrl": "https://uipotion.com/potions/components/text-input",
       "agentGuideUrl": "https://uipotion.com/potions/components/text-input.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24"
+      "updated": "2026-01-24",
+      "markdownUrl": "https://uipotion.com/potions/components/text-input.md"
     },
     {
       "id": "form-login-register",
       "name": "Login & Registration Forms with Validation",
       "category": "features",
-      "tags": ["features", "form", "authentication", "login", "registration", "validation", "accessibility", "forms"],
+      "tags": [
+        "features",
+        "form",
+        "authentication",
+        "login",
+        "registration",
+        "validation",
+        "accessibility",
+        "forms"
+      ],
       "excerpt": "Complete authentication forms (login and registration) with real-time validation, error handling, password strength, and accessibility.",
       "webUrl": "https://uipotion.com/potions/features/form-login-register",
       "agentGuideUrl": "https://uipotion.com/potions/features/form-login-register.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24"
+      "updated": "2026-01-24",
+      "markdownUrl": "https://uipotion.com/potions/features/form-login-register.md"
     },
     {
       "id": "dropdown-select",
       "name": "Dropdown/Select Component (Accessible) with Search and Multi-Select",
       "category": "components",
-      "tags": ["components", "dropdown", "select", "combobox", "listbox", "form", "a11y", "wcag", "aria", "keyboard-navigation"],
+      "tags": [
+        "components",
+        "dropdown",
+        "select",
+        "combobox",
+        "listbox",
+        "form",
+        "a11y",
+        "wcag",
+        "aria",
+        "keyboard-navigation"
+      ],
       "excerpt": "An accessible dropdown/select component with search/filter capability, multi-select support, keyboard navigation, and full ARIA combobox/listbox pattern. Supports grouped options, loading states, and error handling.",
       "webUrl": "https://uipotion.com/potions/components/dropdown-select",
       "agentGuideUrl": "https://uipotion.com/potions/components/dropdown-select.json",
       "created": "2026-01-25",
-      "updated": "2026-01-25"
+      "updated": "2026-01-25",
+      "markdownUrl": "https://uipotion.com/potions/components/dropdown-select.md"
     },
     {
       "id": "ai-agent-chat",
       "name": "AI Agent Chat Layout",
       "category": "layouts",
-      "tags": ["layouts", "chat", "ai", "agent", "conversation", "messaging", "responsive", "a11y"],
+      "tags": [
+        "layouts",
+        "chat",
+        "ai",
+        "agent",
+        "conversation",
+        "messaging",
+        "responsive",
+        "a11y"
+      ],
       "excerpt": "A responsive AI agent chat interface layout with message history, input area, typing indicators, and conversation management. Perfect for AI assistants, chatbots, and conversational interfaces.",
       "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.json",
       "created": "2026-02-01",
-      "updated": "2026-02-01"
+      "updated": "2026-02-01",
+      "markdownUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.md"
     },
     {
       "id": "file-upload",
       "name": "File Upload Component",
       "category": "components",
-      "tags": ["components", "file-upload", "dropzone", "drag-and-drop", "forms", "a11y", "wcag", "aria", "keyboard-navigation", "progress", "validation"],
+      "tags": [
+        "components",
+        "file-upload",
+        "dropzone",
+        "drag-and-drop",
+        "forms",
+        "a11y",
+        "wcag",
+        "aria",
+        "keyboard-navigation",
+        "progress",
+        "validation"
+      ],
       "excerpt": "A fully accessible file upload component with drag-and-drop, browse button fallback, validation (type/size/count), per-file progress, retry/cancel, and robust keyboard and screen reader support.",
       "webUrl": "https://uipotion.com/potions/components/file-upload",
       "agentGuideUrl": "https://uipotion.com/potions/components/file-upload.json",
       "created": "2026-02-03",
-      "updated": "2026-02-03"
+      "updated": "2026-02-03",
+      "markdownUrl": "https://uipotion.com/potions/components/file-upload.md"
     },
     {
       "id": "button",
       "name": "Button",
       "category": "components",
-      "tags": ["components", "button", "cta", "a11y", "wcag", "aria", "focus-visible", "loading", "icon-button", "states", "variants", "forms"],
+      "tags": [
+        "components",
+        "button",
+        "cta",
+        "a11y",
+        "wcag",
+        "aria",
+        "focus-visible",
+        "loading",
+        "icon-button",
+        "states",
+        "variants",
+        "forms"
+      ],
       "excerpt": "A foundational, accessible Button component with semantic variants, sizes, icon-only support, loading/disabled states, and optional link/toggle behavior. Designed to map cleanly into existing design systems via tokens.",
       "webUrl": "https://uipotion.com/potions/components/button",
       "agentGuideUrl": "https://uipotion.com/potions/components/button.json",
       "created": "2026-02-04",
-      "updated": "2026-02-04"
+      "updated": "2026-02-04",
+      "markdownUrl": "https://uipotion.com/potions/components/button.md"
     },
     {
       "id": "blog",
       "name": "Blog Layout (List and Post)",
       "category": "layouts",
-      "tags": ["layouts", "blog", "article", "post", "content", "responsive", "sidebar", "pagination", "newsletter"],
+      "tags": [
+        "layouts",
+        "blog",
+        "article",
+        "post",
+        "content",
+        "responsive",
+        "sidebar",
+        "pagination",
+        "newsletter"
+      ],
       "excerpt": "A comprehensive blog layout covering the list frontpage (post cards, grid, pagination) and single post layout (article, sidebar, comments, related posts). Includes all UI sections typically needed in blogs.",
       "webUrl": "https://uipotion.com/potions/layouts/blog",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/blog.json",
       "created": "2026-02-12",
-      "updated": "2026-02-13"
+      "updated": "2026-02-13",
+      "markdownUrl": "https://uipotion.com/potions/layouts/blog.md"
     }
   ],
   "totalCount": 17,

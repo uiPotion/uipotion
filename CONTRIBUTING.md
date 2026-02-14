@@ -108,6 +108,7 @@ Add your potion to `src/statics/potions-index.json`:
   "excerpt": "Brief description",
   "webUrl": "https://uipotion.com/potions/components/your-potion.html",
   "agentGuideUrl": "https://uipotion.com/potions/components/your-potion.json",
+  "markdownUrl": "https://uipotion.com/potions/components/your-potion.md",
   "created": "2026-01-24",
   "updated": "2026-01-24"
 }

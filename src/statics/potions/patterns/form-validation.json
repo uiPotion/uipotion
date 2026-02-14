@@ -461,6 +461,8 @@
         "description": "Optional: Login & Registration Forms demonstrate this pattern in complete form implementation",
         "required": false
       }
-    ]
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/patterns/form-validation.json",
+    "markdownUrl": "https://uipotion.com/potions/patterns/form-validation.md"
   }
 }

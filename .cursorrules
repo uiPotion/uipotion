@@ -414,6 +414,7 @@ Add new entry to `potions` array:
   "excerpt": "Brief description",
   "webUrl": "https://uipotion.com/potions/components/your-component.html",
   "agentGuideUrl": "https://uipotion.com/potions/components/your-component.json",
+  "markdownUrl": "https://uipotion.com/potions/components/your-component.md",
   "created": "2026-01-10",
   "updated": "2026-01-10"
 }
