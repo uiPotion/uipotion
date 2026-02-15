@@ -68,6 +68,23 @@ If the assistant prefers text-first context, use the potion Markdown source at t
 
 No need to fetch the main manifest or potions index unless you're building discovery/search. For normal use, the user provides the potion link and you implement from that single guide.
 
+## Potion Kit CLI
+
+UI Potion also provides `potion-kit`, a CLI to build Harold + UI Potion websites via AI chat.
+
+- **Interactive chat**: `potion-kit chat`
+- **One-shot**: `potion-kit chat "your request"`
+- **Clear history**: `potion-kit clear`
+- **Help/usage**: `potion-kit` or `potion-kit --help` (unknown commands also show help and do not call the API)
+
+Configuration is project-local and loaded in this order: `.env` in current directory, environment variables, then `./config.json` (provider/model/history only, no API keys). Supported providers are OpenAI, Anthropic, and Moonshot (`POTION_KIT_PROVIDER=moonshot` with `MOONSHOT_API_KEY`).
+
+Chat history is stored in `.potion-kit/chat-history.json` in the directory where you run `potion-kit`. For long conversations, Potion Kit can condense middle history and keep the latest messages within limits.
+
+Links:
+- npm: https://www.npmjs.com/package/potion-kit
+- GitHub: https://github.com/uiPotion/potion-kit
+
 ## Available Potions
 
 See [uipotion.com](https://uipotion.com) for the full list of potions (layouts, components, features, patterns, tooling).

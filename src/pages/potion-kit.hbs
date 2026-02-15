@@ -27,9 +27,10 @@
         <section class="about-section">
           <h2>Commands</h2>
           <ul>
-            <li><strong><code>potion-kit chat</code></strong> or <strong><code>potion-kit</code></strong> (default) — Interactive chat.</li>
+            <li><strong><code>potion-kit chat</code></strong> — Interactive chat.</li>
             <li><strong><code>potion-kit chat "message"</code></strong> — Send one message and exit (one-shot).</li>
             <li><strong><code>potion-kit clear</code></strong> — Clear chat history for this project (next chat starts a new conversation).</li>
+            <li><strong><code>potion-kit</code></strong> or <strong><code>potion-kit --help</code></strong> — Show usage and available commands. Unknown commands also show help and do not call the API.</li>
           </ul>
         </section>
 
@@ -51,7 +52,7 @@ potion-kit chat</code></pre>
           </ol>
           <pre><code>POTION_KIT_PROVIDER=openai
 OPENAI_API_KEY=sk-your-key-here</code></pre>
-          <p>For Anthropic use <code>POTION_KIT_PROVIDER=anthropic</code> and <code>ANTHROPIC_API_KEY=...</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">Potion Kit README</a> for all options and security notes.</p>
+          <p>For Anthropic use <code>POTION_KIT_PROVIDER=anthropic</code> and <code>ANTHROPIC_API_KEY=...</code>. For Moonshot use <code>POTION_KIT_PROVIDER=moonshot</code> and <code>MOONSHOT_API_KEY=...</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">Potion Kit README</a> for all options and security notes.</p>
           <ol start="3">
             <li><strong>Run Potion Kit</strong> from that same directory:</li>
           </ol>
@@ -81,15 +82,15 @@ npx potion-kit chat "Let's build a docs site"</code></pre>
           <ol>
             <li><code>.env</code> in the current working directory</li>
             <li>Environment variables (e.g. <code>OPENAI_API_KEY</code>, <code>POTION_KIT_PROVIDER</code>)</li>
-            <li><code>~/.potion-kit/config.json</code> — provider and model only; do not put API keys there.</li>
+            <li><code>./config.json</code> in the current working directory — provider, model, and optional history settings only; do not put API keys there.</li>
           </ol>
-          <p>Key variables: <code>POTION_KIT_PROVIDER</code> (required: <code>openai</code> or <code>anthropic</code>), <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code>, and optionally <code>POTION_KIT_MODEL</code>, <code>POTION_KIT_API_KEY</code>, <code>POTION_KIT_BASE_URL</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> for full details.</p>
-          <p><strong>Security:</strong> Potion Kit never sends <code>.env</code> or API keys to the model. Never commit <code>.env</code>; add it to <code>.gitignore</code>. Never put API keys in <code>~/.potion-kit/config.json</code>.</p>
+          <p>Key variables: <code>POTION_KIT_PROVIDER</code> (required: <code>openai</code>, <code>anthropic</code>, or <code>moonshot</code>), <code>OPENAI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, or <code>MOONSHOT_API_KEY</code>, and optionally <code>POTION_KIT_MODEL</code>, <code>POTION_KIT_API_KEY</code>, <code>POTION_KIT_BASE_URL</code>, <code>POTION_KIT_MAX_HISTORY_MESSAGES</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> for full details.</p>
+          <p><strong>Security:</strong> Potion Kit never sends <code>.env</code> or API keys to the model. Never commit <code>.env</code>; add it to <code>.gitignore</code>. Never put API keys in <code>./config.json</code>.</p>
         </section>
 
         <section class="about-section">
           <h2>Chat History</h2>
-          <p>Conversation is stored in <code>.potion-kit/chat-history.json</code> in the directory where you run <code>potion-kit chat</code>. Add <code>.potion-kit/</code> to <code>.gitignore</code> if you do not want to commit chat history. Use <code>potion-kit clear</code> to reset history for that project.</p>
+          <p>Conversation is stored in <code>.potion-kit/chat-history.json</code> in the directory where you run <code>potion-kit chat</code>. Each request keeps the first user message, may include a condensed summary of the middle conversation when history gets long, and sends the most recent messages (default 10). Set <code>POTION_KIT_MAX_HISTORY_MESSAGES</code> (or <code>maxHistoryMessages</code> in <code>./config.json</code>) to adjust. Add <code>.potion-kit/</code> to <code>.gitignore</code> if you do not want to commit chat history. Use <code>potion-kit clear</code> to reset history for that project.</p>
         </section>
 
         <section class="about-section">

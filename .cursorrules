@@ -79,7 +79,7 @@ src/
 ```yaml
 ---
 layout: 'potion'                                      # REQUIRED: Layout template
-title: 'Component Name'                               # REQUIRED: Descriptive name
+title: 'Component Name'                               # REQUIRED: Descriptive name (keep concise)
 publicationDate: '2026-01-10'                         # REQUIRED: YYYY-MM-DD format
 excerpt: 'Brief description'                          # REQUIRED: 1-2 sentences
 category: 'Layouts'                                   # REQUIRED: Layouts|Components|Features|Patterns|Tooling
@@ -87,6 +87,16 @@ tags: [tag1, tag2]                                    # REQUIRED: Array of tags.
 agentManifest: 'potions/[category]/component-id.json' # REQUIRED: Path to JSON guide (in statics/)
 ---
 ```
+
+**Potion Title Rule (CRITICAL)**:
+- Keep potion titles concise and scannable.
+- Prefer `2-6 words` and target `<= 60 characters`.
+- Avoid long qualifier chains in titles (for example "with X, Y, and Z").
+- Put detailed capability descriptions in `excerpt`, sections, and JSON fields instead of the title.
+- Apply this consistently in:
+  - Markdown front matter `title`
+  - JSON guide `name`
+  - Potions index entry `name`
 
 **Content Structure**:
 - Overview describing the component's purpose and key features

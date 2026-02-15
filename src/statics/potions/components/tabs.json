@@ -1,0 +1,681 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
+  "id": "tabs",
+  "version": "1.0.0",
+  "name": "Tabs Component",
+  "category": "components",
+  "tags": [
+    "tabs",
+    "navigation",
+    "segmented-content",
+    "a11y",
+    "aria",
+    "keyboard-navigation",
+    "responsive",
+    "scrollable",
+    "vertical-tabs"
+  ],
+  "description": "An accessible tabs component with horizontal and vertical orientation, automatic or manual activation, responsive overflow handling for many tabs, and motion that respects reduced-motion preferences.",
+  "tokens": {
+    "layout": {
+      "tabMinHeightPx": 44,
+      "tabPaddingXPx": 14,
+      "tabPaddingYPx": 10,
+      "tabGapPx": 4,
+      "indicatorHeightPx": 2,
+      "panelTopSpacingPx": 16,
+      "scrollButtonSizePx": 32
+    },
+    "typography": {
+      "tabFontSizePx": 14,
+      "tabFontWeightDefault": 500,
+      "tabFontWeightActive": 600
+    },
+    "motion": {
+      "indicatorDurationMs": 180,
+      "panelTransitionDurationMs": 220,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+    }
+  },
+  "aiAgentInstructions": {
+    "summary": "Implement an accessible tabs component with `tablist`, `tab`, and `tabpanel` semantics. Support horizontal and vertical orientation, automatic and manual activation modes, and robust overflow behavior (scrollable or overflow menu) for many tabs. Adapt to the detected framework and styling system.",
+    "keyFeatures": [
+      "Horizontal and vertical tab lists",
+      "Automatic activation mode (focus activates tab)",
+      "Manual activation mode (Enter/Space activates focused tab)",
+      "Fixed tabs for small tab counts",
+      "Scrollable tabs for many tabs",
+      "Optional overflow menu strategy for constrained spaces with icon trigger and anchored dropdown",
+      "Overflow menu keeps active tab visible in the main row whenever possible",
+      "Single active panel rendering by default to avoid layout overlap",
+      "Keyboard navigation with wrap behavior",
+      "Home/End key support",
+      "Visible active indicator and focus ring",
+      "Disabled tab support",
+      "Optional async/loading panel state with pending indicators",
+      "Layout safety constraints for nested grid/flex containers",
+      "Responsive behavior for mobile/tablet/desktop",
+      "Reduced-motion support",
+      "CRITICAL: Styling MUST match project conventions and use detected framework/styling system only",
+      "CRITICAL: Maintain ARIA relationships (`aria-controls`, `aria-labelledby`, `aria-selected`) and orientation metadata for vertical tabs"
+    ],
+    "implementationSteps": [
+      "0. Detect framework and styling system before writing code",
+      "1. Build root container with tablist and associated tabpanel container",
+      "2. Render tabs with stable IDs and one active tab selected by default",
+      "3. Add ARIA roles and states: role='tablist', role='tab', role='tabpanel', aria-selected, aria-controls, aria-labelledby",
+      "4. Implement horizontal and vertical orientation behavior",
+      "5. Implement keyboard handling per WAI-ARIA tabs pattern with wrap behavior",
+      "6. Add activation model switch: automatic or manual activation",
+      "7. Support fixed and scrollable variants; keep active tab visible in scrollable mode",
+      "8. Add optional overflow strategy for many tabs (scroll buttons or icon-triggered overflow menu)",
+      "8.1 For overflow menu mode, keep active tab visible in the primary tab row whenever possible and move remaining tabs to menu",
+      "8.2 Position overflow trigger and dropdown in the same alignment context as the tab row to avoid detached controls",
+      "9. Add disabled tab behavior (focus and activation constraints)",
+      "10. Render only the active tabpanel by default; if keeping multiple panels mounted, inactive panels must be removed from layout flow",
+      "11. Add async handling with pending indicators and clear activation timing rules",
+      "12. Implement active indicator positioning and panel transition motion",
+      "13. Respect prefers-reduced-motion by reducing or removing transitions",
+      "14. Ensure responsive behavior and touch target size on small screens",
+      "15. Apply layout safety constraints in constrained containers (for example nested cards, grid and flex children)",
+      "16. Validate screen reader announcements and keyboard flow",
+      "17. Use only project tokens and existing styling patterns"
+    ]
+  },
+  "structure": {
+    "slots": [
+      "root",
+      "tabList",
+      "tab",
+      "activeIndicator",
+      "scrollPrevButton",
+      "scrollNextButton",
+      "overflowMenuTrigger",
+      "overflowMenuItem",
+      "panelContainer",
+      "tabPanel"
+    ],
+    "hierarchy": "Root( TabList( ScrollPrevButton?, Tab*, ScrollNextButton?, OverflowMenuTrigger? ), PanelContainer( TabPanel* ) )",
+    "idStrategy": {
+      "tabIdFormat": "tabs-{instanceId}-tab-{tabKey}",
+      "panelIdFormat": "tabs-{instanceId}-panel-{tabKey}",
+      "mappingRule": "Each tab's aria-controls matches its panel ID; each panel's aria-labelledby matches its tab ID"
+    }
+  },
+  "components": {
+    "tabList": {
+      "role": "tablist",
+      "orientation": "horizontal | vertical",
+      "requiredAttributes": [
+        "aria-orientation (required for vertical)"
+      ]
+    },
+    "tab": {
+      "role": "tab",
+      "requiredAttributes": [
+        "id",
+        "aria-selected",
+        "aria-controls"
+      ],
+      "optionalAttributes": [
+        "aria-disabled"
+      ]
+    },
+    "tabPanel": {
+      "role": "tabpanel",
+      "requiredAttributes": [
+        "id",
+        "aria-labelledby"
+      ]
+    }
+  },
+  "responsiveBreakpoints": {
+    "mobile": {
+      "maxWidthPx": 767,
+      "defaultBehavior": "Horizontal scrollable tabs",
+      "touchTargets": "Minimum 44px tab height",
+      "overflowGuidance": "Use scrollable strip or compact labels when space is constrained",
+      "structureGuidance": "Prefer horizontal tablist on small screens. If desktop uses vertical tabs, collapse to horizontal or stacked sections on mobile. Ensure overflow controls wrap safely and do not push panel content outside container bounds."
+    },
+    "tablet": {
+      "minWidthPx": 768,
+      "maxWidthPx": 1023,
+      "defaultBehavior": "Fixed tabs for small counts; scrollable tabs for medium to large counts"
+    },
+    "desktop": {
+      "minWidthPx": 1024,
+      "defaultBehavior": "Horizontal fixed/scrollable or vertical tabs based on layout density",
+      "overflowGuidance": "Scroll controls or overflow menu for many tabs"
+    }
+  },
+  "stateManagement": {
+    "activeTabId": {
+      "type": "string",
+      "default": "first enabled tab",
+      "description": "Currently selected tab key"
+    },
+    "focusedTabId": {
+      "type": "string",
+      "default": "activeTabId",
+      "description": "Tab that currently has keyboard focus"
+    },
+    "activationMode": {
+      "type": "enum",
+      "allowedValues": [
+        "automatic",
+        "manual"
+      ],
+      "default": "automatic"
+    },
+    "orientation": {
+      "type": "enum",
+      "allowedValues": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    },
+    "overflowMode": {
+      "type": "enum",
+      "allowedValues": [
+        "none",
+        "scrollable",
+        "menu"
+      ],
+      "default": "none"
+    },
+    "scrollPosition": {
+      "type": "number",
+      "default": 0,
+      "description": "Current scroll offset for scrollable tab lists"
+    },
+    "loadingPanel": {
+      "type": "boolean",
+      "default": false,
+      "description": "Optional loading state while panel content resolves"
+    },
+    "pendingTabId": {
+      "type": "string",
+      "default": "",
+      "description": "Tab key currently waiting for async panel readiness. Empty string means no pending tab."
+    },
+    "pendingIndicatorVisible": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether a pending indicator is shown for async tab activation"
+    }
+  },
+  "componentSpec": {
+    "goal": "Provide a robust, accessible tabs interface that allows users to switch between related content panels in the same context using pointer or keyboard input.",
+    "anatomy": {
+      "slots": [
+        "root",
+        "tabList",
+        "tab",
+        "activeIndicator",
+        "scrollPrevButton",
+        "scrollNextButton",
+        "overflowMenuTrigger",
+        "overflowMenuItem",
+        "panelContainer",
+        "tabPanel"
+      ],
+      "hierarchy": "Root( TabList( ScrollPrevButton?, Tab*, ScrollNextButton?, OverflowMenuTrigger? ), PanelContainer( TabPanel* ) )"
+    },
+    "stateModel": {
+      "activeTabId": {
+        "type": "string",
+        "default": "first enabled tab",
+        "description": "Currently selected tab key"
+      },
+      "focusedTabId": {
+        "type": "string",
+        "default": "activeTabId",
+        "description": "Tab that currently has keyboard focus"
+      },
+      "activationMode": {
+        "type": "enum",
+        "allowedValues": [
+          "automatic",
+          "manual"
+        ],
+        "default": "automatic",
+        "description": "How focus and selection relate: automatic activates on focus, manual activates on Enter or Space."
+      },
+      "orientation": {
+        "type": "enum",
+        "allowedValues": [
+          "horizontal",
+          "vertical"
+        ],
+        "default": "horizontal",
+        "description": "Visual and keyboard orientation of the tab list."
+      },
+      "overflowMode": {
+        "type": "enum",
+        "allowedValues": [
+          "none",
+          "scrollable",
+          "menu"
+        ],
+        "default": "none",
+        "description": "Overflow strategy used when all tabs cannot fit in the available space."
+      },
+      "scrollPosition": {
+        "type": "number",
+        "default": 0,
+        "description": "Current scroll offset for scrollable tab lists"
+      },
+      "loadingPanel": {
+        "type": "boolean",
+        "default": false,
+        "description": "Optional loading state while panel content resolves"
+      },
+      "pendingTabId": {
+        "type": "string",
+        "default": "",
+        "description": "Tab key currently waiting for async panel readiness. Empty string means no pending tab."
+      },
+      "pendingIndicatorVisible": {
+        "type": "boolean",
+        "default": false,
+        "description": "Whether pending feedback is visible in tab or panel region"
+      }
+    },
+    "interactions": [
+      {
+        "event": "tabClick",
+        "when": "tab is enabled",
+        "result": "activateClickedTab",
+        "sideEffects": [
+          "Set activeTabId to clicked tab",
+          "Set focusedTabId to clicked tab",
+          "Reveal associated tabpanel and hide others"
+        ]
+      },
+      {
+        "event": "tabArrowNavigation",
+        "when": "focus is inside tablist",
+        "result": "moveFocusWithWrap",
+        "sideEffects": [
+          "Move focusedTabId to next or previous enabled tab based on orientation",
+          "Wrap focus to first or last enabled tab when reaching boundaries",
+          "In automatic mode, update activeTabId to match focusedTabId"
+        ]
+      },
+      {
+        "event": "tabEnterOrSpace",
+        "when": "activationMode is manual and focused tab is enabled",
+        "result": "activateFocusedTabInManualMode",
+        "sideEffects": [
+          "Set activeTabId to focusedTabId",
+          "Reveal associated tabpanel"
+        ]
+      },
+      {
+        "event": "scrollButtons",
+        "when": "overflowMode is scrollable",
+        "result": "scrollTabStripAndKeepFocusedTabVisible",
+        "sideEffects": [
+          "Update scrollPosition",
+          "Ensure focused or active tab remains in visible viewport segment"
+        ]
+      },
+      {
+        "event": "overflowMenuToggle",
+        "when": "overflowMode is menu",
+        "result": "openOrCloseAnchoredOverflowMenu",
+        "sideEffects": [
+          "Toggle anchored overflow popup from trigger control",
+          "Close menu on outside interaction",
+          "Close menu on Escape key"
+        ]
+      },
+      {
+        "event": "overflowMenuSelection",
+        "when": "user selects an item from overflow menu",
+        "result": "activateSelectedTabAndPreserveVisibleActiveContext",
+        "sideEffects": [
+          "Activate selected tab",
+          "Update focusedTabId to selected tab",
+          "Close overflow menu"
+        ]
+      },
+      {
+        "event": "tabAsyncActivationStart",
+        "when": "selected tab requires async panel data",
+        "result": "showPendingIndicatorAndPreserveInteractionClarity",
+        "sideEffects": [
+          "Set pendingTabId to selected tab",
+          "Set pendingIndicatorVisible to true",
+          "Show pending feedback in tab or panel region"
+        ]
+      },
+      {
+        "event": "tabAsyncActivationResolve",
+        "when": "async panel data is ready",
+        "result": "activateResolvedTabAndClearPendingState",
+        "sideEffects": [
+          "Set activeTabId to resolved tab",
+          "Set pendingTabId to empty string",
+          "Set pendingIndicatorVisible to false"
+        ]
+      },
+      {
+        "event": "tabAsyncActivationInterrupted",
+        "when": "user changes intent before previous async request resolves",
+        "result": "cancelOrIgnoreStaleResultAndRespectLatestIntent",
+        "sideEffects": [
+          "Ensure stale responses do not override latest selection",
+          "Keep pending indicator aligned with latest requested tab"
+        ]
+      },
+      {
+        "event": "dynamicTabRemoval",
+        "when": "active tab is removed",
+        "result": "moveSelectionToNearestEnabledTab",
+        "sideEffects": [
+          "Select the nearest enabled tab, preferring next then previous",
+          "Update focusedTabId to the new active tab"
+        ]
+      }
+    ],
+    "responsiveBehavior": {
+      "mobile": {
+        "maxWidthPx": 767,
+        "behavior": "Default to horizontal scrollable tabs with 44px minimum touch targets."
+      },
+      "tablet": {
+        "minWidthPx": 768,
+        "maxWidthPx": 1023,
+        "behavior": "Use fixed tabs for small counts and scrollable tabs for medium to large sets."
+      },
+      "desktop": {
+        "minWidthPx": 1024,
+        "behavior": "Support horizontal fixed/scrollable or vertical tabs based on information density."
+      }
+    },
+    "variants": {
+      "fixed": {
+        "description": "Small tab counts with stable visible positions."
+      },
+      "scrollable": {
+        "description": "Many tabs with scroll strip and optional previous/next controls."
+      },
+      "overflowMenu": {
+        "description": "Constrained space with hidden tabs reachable through an icon trigger and anchored dropdown menu. Keep active tab visible in main row when possible."
+      }
+    },
+    "dataContract": {
+      "props": {
+        "tabs": {
+          "type": "Array<{ id: string; label: string; disabled?: boolean }>",
+          "required": true
+        },
+        "value": {
+          "type": "string",
+          "required": false
+        },
+        "defaultValue": {
+          "type": "string",
+          "required": false
+        },
+        "orientation": {
+          "type": "'horizontal' | 'vertical'",
+          "required": false
+        },
+        "activationMode": {
+          "type": "'automatic' | 'manual'",
+          "required": false
+        },
+        "overflowMode": {
+          "type": "'none' | 'scrollable' | 'menu'",
+          "required": false
+        },
+        "onValueChange": {
+          "type": "(value: string) => void",
+          "required": false
+        }
+      },
+      "events": {
+        "onValueChange": "Fired when active tab changes."
+      }
+    }
+  },
+  "projectDetection": {
+    "framework": {
+      "description": "Detect framework dependencies and existing component patterns before implementation.",
+      "detectionSteps": [
+        "Check package.json for framework dependencies.",
+        "Inspect existing interactive components for state and event patterns.",
+        "Follow existing conventions for controlled vs uncontrolled APIs."
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect and use the project's current styling system only.",
+      "detectionSteps": [
+        "Identify Tailwind, SCSS, CSS Modules, styled-components, or other conventions.",
+        "Inspect component class naming and token usage.",
+        "Match existing focus ring, spacing, and motion patterns."
+      ],
+      "adaptationRules": [
+        "If Tailwind is used, compose utility classes that match existing component conventions.",
+        "If SCSS/CSS is used, implement class-based styles and modifier classes for active/focus/disabled states.",
+        "If CSS Modules are used, keep styles local and map state to explicit class names.",
+        "If styled-components are used, derive state styles from theme tokens and component props."
+      ]
+    },
+    "designTokens": {
+      "description": "Reuse project color, spacing, typography, and motion tokens.",
+      "detectionSteps": [
+        "Locate existing token files or theme configs.",
+        "Map tab indicator, focus ring, and panel spacing to those tokens.",
+        "Avoid introducing new ad-hoc color or spacing values where tokens already exist."
+      ]
+    }
+  },
+  "frameworkPatterns": {
+    "react": {
+      "controlled": "const [activeTab, setActiveTab] = useState('overview'); <Tabs value={activeTab} onValueChange={setActiveTab} tabs={tabs} />",
+      "uncontrolled": "<Tabs defaultValue='overview' tabs={tabs} />",
+      "notes": "Use roving focus state and refs for scroll-into-view behavior"
+    },
+    "vue": {
+      "vModel": "<Tabs v-model='activeTab' :tabs='tabs' activation-mode='manual' />",
+      "notes": "Use refs/composables for key handling and overflow visibility"
+    },
+    "angular": {
+      "binding": "<app-tabs [tabs]='tabs' [activeTabId]='activeTab' (activeTabIdChange)='onTabChange($event)'></app-tabs>",
+      "notes": "Keep role and aria attributes in template bindings"
+    },
+    "svelte": {
+      "binding": "<Tabs bind:activeTabId={activeTab} {tabs} activationMode='automatic' />",
+      "notes": "Use reactive statements for panel visibility and indicator positioning"
+    }
+  },
+  "stylingApproaches": {
+    "tailwindCSS": {
+      "tabList": "flex items-stretch gap-1 border-b border-neutral-200 overflow-x-auto",
+      "tab": "min-h-11 px-3.5 text-sm font-medium whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+      "tabActive": "text-blue-700 border-b-2 border-blue-600",
+      "tabInactive": "text-neutral-600 hover:text-neutral-900",
+      "tabDisabled": "opacity-50 cursor-not-allowed",
+      "panel": "pt-4"
+    },
+    "cssModules": "Create tabs.module.css with classes for root, tabList, tab, tabActive, tabInactive, tabDisabled, indicator, panel, and overflow controls.",
+    "styledComponents": "Use props (active, disabled, orientation) to derive styles and transitions with theme tokens.",
+    "scss": "Create _tabs.scss with BEM classes (.tabs, .tabs__list, .tabs__tab, .tabs__tab--active, .tabs__panel, .tabs--vertical, .tabs--scrollable)."
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Programmatic relationships between tabs and panels are exposed",
+        "1.4.3": "Text and indicator contrast meet minimum requirements",
+        "2.1.1": "Full keyboard operation for tab selection and navigation",
+        "2.4.3": "Logical focus order starts from active tab when entering tab list",
+        "2.4.7": "Visible focus indicator on each focusable tab",
+        "4.1.2": "Roles, names, and states are correct and updated dynamically"
+      }
+    },
+    "keyboardNavigation": {
+      "horizontal": {
+        "ArrowRight": "Move focus to next tab, wrap at end",
+        "ArrowLeft": "Move focus to previous tab, wrap at start",
+        "Home": "Focus first tab",
+        "End": "Focus last tab",
+        "Enter": "Activate focused tab in manual mode",
+        "Space": "Activate focused tab in manual mode"
+      },
+      "vertical": {
+        "ArrowDown": "Move focus to next tab, wrap at end",
+        "ArrowUp": "Move focus to previous tab, wrap at start",
+        "Home": "Focus first tab",
+        "End": "Focus last tab",
+        "Enter": "Activate focused tab in manual mode",
+        "Space": "Activate focused tab in manual mode"
+      }
+    },
+    "ariaAttributes": {
+      "tabList": {
+        "role": "tablist",
+        "aria-orientation": "vertical when in vertical mode"
+      },
+      "tab": {
+        "role": "tab",
+        "id": "required",
+        "aria-selected": "true for active tab, false otherwise",
+        "aria-controls": "ID of associated tab panel",
+        "aria-disabled": "true for disabled tabs"
+      },
+      "tabPanel": {
+        "role": "tabpanel",
+        "id": "required",
+        "aria-labelledby": "ID of associated tab"
+      }
+    },
+    "focusManagement": {
+      "entry": "When focus enters tablist, focus active tab",
+      "movement": "Arrow keys move focus between enabled tabs with wrap",
+      "activation": "Automatic mode activates on focus; manual mode activates on Enter/Space"
+    }
+  },
+  "animations": {
+    "indicatorTransition": {
+      "durationMs": 180,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": {
+        "transform": "move indicator to active tab",
+        "width": "resize to active tab width"
+      }
+    },
+    "panelTransition": {
+      "durationMs": 220,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": {
+        "opacity": "0 -> 1",
+        "transform": "translateY(4px) -> translateY(0)"
+      }
+    },
+    "reducedMotion": {
+      "behavior": "Disable non-essential transitions and use instant panel switch",
+      "implementation": "@media (prefers-reduced-motion: reduce) { /* disable indicator and panel animations */ }"
+    }
+  },
+  "edgeCases": {
+    "manyTabs": {
+      "issue": "Tab labels exceed available width",
+      "solution": "Use scrollable tab list with optional scroll controls or overflow menu. For menu mode, anchor trigger to tab row and keep active tab visible in primary tabs when possible."
+    },
+    "longLabels": {
+      "issue": "Long labels break layout or reduce readability",
+      "solution": "Truncate with ellipsis and provide full text via title/tooltip"
+    },
+    "disabledActiveTab": {
+      "issue": "Current active tab becomes disabled due to state changes",
+      "solution": "Move selection to nearest enabled tab and announce update"
+    },
+    "dynamicTabs": {
+      "issue": "Tabs added or removed at runtime",
+      "solution": "Preserve active tab when possible; reassign to valid neighbor when removed"
+    },
+    "asyncPanelContent": {
+      "issue": "Panel content loading causes lag in automatic mode",
+      "solution": "Use clear pending indicators with cancellation-safe async handling. If lag is high, switch to manual activation or preload likely panels."
+    },
+    "nestedContainerOverflow": {
+      "issue": "Tabs inside narrow cards or flex/grid children can overflow or overlap neighboring content",
+      "solution": "Apply layout safety constraints for shrink behavior, wrapping, and overflow containment in tab and panel containers"
+    },
+    "overflowPopupClipping": {
+      "issue": "Overflow dropdown can be clipped by ancestor containers or detached from tab alignment",
+      "solution": "Ensure overflow popup can escape clipping and remains anchored to its trigger. Keep trigger aligned with tab row baseline."
+    }
+  },
+  "testingChecklist": [
+    "One tab is active by default and associated panel is visible",
+    "Clicking a tab activates it and reveals correct panel",
+    "Horizontal keyboard navigation works with ArrowLeft/ArrowRight and wrapping",
+    "Vertical keyboard navigation works with ArrowUp/ArrowDown and wrapping",
+    "Home and End move focus to first and last tabs",
+    "Enter and Space activate focused tab in manual mode",
+    "Automatic mode activates tab on focus movement",
+    "role='tablist', role='tab', and role='tabpanel' are present",
+    "aria-selected updates correctly for active/inactive tabs",
+    "aria-controls and aria-labelledby mappings are valid and unique",
+    "Vertical mode includes aria-orientation='vertical'",
+    "Focus ring is visible on all focusable tabs",
+    "Disabled tabs cannot be activated",
+    "Roving focus keeps exactly one focusable tab stop in the tablist at a time",
+    "Disabled tabs are skipped during arrow-key focus movement",
+    "Scrollable mode keeps active tab visible",
+    "Overflow controls appear only when needed",
+    "Overflow menu trigger is aligned with tab row and does not appear visually detached",
+    "Overflow menu opens anchored to trigger and closes on outside interaction or Escape",
+    "Selecting an overflow item activates tab and closes menu",
+    "Active tab remains visible in the primary row when overflow menu is used",
+    "Many tabs remain reachable via keyboard and pointer",
+    "Only one panel is perceivable and interactive at a time",
+    "Inactive panels do not affect layout flow or overlap adjacent sections",
+    "Tabs remain stable when multiple tab instances are stacked on one page",
+    "Tabs remain stable inside constrained parent containers (for example cards or grid/flex columns)",
+    "Long labels and long panel content do not cause horizontal overflow",
+    "Panel transitions are subtle and not distracting",
+    "Reduced-motion disables or minimizes transitions",
+    "Touch targets are at least 44px high on mobile",
+    "On mobile, vertical desktop tabs degrade to a stable small-screen structure",
+    "Async tabs show pending indicator and resolve to the latest user intent",
+    "Stale async responses do not override newer tab selections",
+    "No inline styles when project uses class-based styling"
+  ],
+  "meta": {
+    "created": "2026-02-14",
+    "updated": "2026-02-14",
+    "webUrl": "https://uipotion.com/potions/components/tabs.html",
+    "relatedPotions": [
+      {
+        "id": "data-table",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Use tabs to segment data table views (for example All, Open, Archived).",
+        "required": false
+      },
+      {
+        "id": "dashboard",
+        "category": "layouts",
+        "relationship": "used-in",
+        "description": "Optional: Tabs work well in dashboard sections with dense information.",
+        "required": false
+      },
+      {
+        "id": "button",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Reuse button interaction states and focus token patterns for tabs.",
+        "required": false
+      }
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/components/tabs.json",
+    "markdownUrl": "https://uipotion.com/potions/components/tabs.md"
+  }
+}

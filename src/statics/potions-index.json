@@ -373,8 +373,30 @@
       "created": "2026-02-12",
       "updated": "2026-02-13",
       "markdownUrl": "https://uipotion.com/potions/layouts/blog.md"
+    },
+    {
+      "id": "tabs",
+      "name": "Tabs Component",
+      "category": "components",
+      "tags": [
+        "components",
+        "tabs",
+        "navigation",
+        "segmented-content",
+        "a11y",
+        "aria",
+        "keyboard-navigation",
+        "responsive",
+        "scrollable"
+      ],
+      "excerpt": "An accessible tabs component for horizontal and vertical layouts with fixed or scrollable tab lists, keyboard navigation, optional manual activation, responsive behavior, and robust overflow handling for many tabs.",
+      "webUrl": "https://uipotion.com/potions/components/tabs",
+      "agentGuideUrl": "https://uipotion.com/potions/components/tabs.json",
+      "created": "2026-02-14",
+      "updated": "2026-02-14",
+      "markdownUrl": "https://uipotion.com/potions/components/tabs.md"
     }
   ],
-  "totalCount": 17,
+  "totalCount": 18,
   "lastUpdated": "2026-02-14"
 }
