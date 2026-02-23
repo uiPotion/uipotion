@@ -1087,6 +1087,18 @@ function useScrollPosition(threshold = 20) {
 
 ---
 
+## See Also
+
+The Navigation Bar component works well with these potions:
+
+- **[Command Palette](/potions/components/command-palette)** - Add a global search-and-action entry point from the header with `Cmd/Ctrl+K`
+- **[Dashboard Layout with Collapsible Sidebar](/potions/layouts/dashboard)** - Combine top navigation with dense admin navigation and workspace controls
+- **[AI Agent Chat Layout](/potions/layouts/ai-agent-chat)** - Reuse header patterns and actions for conversational product shells
+
+These are suggestions. Navigation Bar works independently and can be used in any context.
+
+---
+
 ## Summary for AI Agents
 
 This navigation bar is a responsive navbar component with mobile menu dialog, sticky positioning (default: true), optional transparent-to-solid transition (marketing variant only), and first-class dropdown support. Key implementation points:

@@ -193,39 +193,33 @@ Container
 
 ### On Trigger
 
-| Key | Action |
-|-----|--------|
-| Space | **If closed**: Opens dropdown and moves focus to search/options. **If open and option highlighted**: Selects highlighted option. **CRITICAL**: Must handle both states - this is a common oversight. |
-| Enter | **If closed**: Opens dropdown and moves focus to search/options. **If open and option highlighted**: Selects highlighted option. **CRITICAL**: Must handle both states - this is a common oversight. |
-| ArrowDown | **If closed**: Opens dropdown and highlights first option. **If open**: Highlights next option. |
-| ArrowUp | **If closed**: Opens dropdown and highlights last option. **If open**: Highlights previous option. |
-| Escape | Closes dropdown if open |
-| Tab | Closes dropdown if open, moves focus to next element |
+- `Space`: **If closed**: Opens dropdown and moves focus to search/options. **If open and option highlighted**: Selects highlighted option. **CRITICAL**: Must handle both states - this is a common oversight.
+- `Enter`: **If closed**: Opens dropdown and moves focus to search/options. **If open and option highlighted**: Selects highlighted option. **CRITICAL**: Must handle both states - this is a common oversight.
+- `ArrowDown`: **If closed**: Opens dropdown and highlights first option. **If open**: Highlights next option.
+- `ArrowUp`: **If closed**: Opens dropdown and highlights last option. **If open**: Highlights previous option.
+- `Escape`: Closes dropdown if open
+- `Tab`: Closes dropdown if open, moves focus to next element
 
 ### In Dropdown
 
-| Key | Action |
-|-----|--------|
-| ArrowDown | Highlights next option, scrolls into view |
-| ArrowUp | Highlights previous option, scrolls into view |
-| Enter | **CRITICAL**: Selects highlighted option (same as clicking). Must work when option is highlighted via aria-activedescendant. Essential for keyboard accessibility. |
-| Space | **CRITICAL**: Selects highlighted option (same as clicking). Must work when option is highlighted via aria-activedescendant. Essential for keyboard accessibility. |
-| Escape | Closes dropdown, restores focus to trigger |
-| Tab | Closes dropdown, moves focus to next element |
-| Shift+Tab | Closes dropdown, moves focus to previous element |
-| Home | Highlights first option |
-| End | Highlights last option |
-| Type-ahead | Jumps to first option starting with typed character |
+- `ArrowDown`: Highlights next option, scrolls into view
+- `ArrowUp`: Highlights previous option, scrolls into view
+- `Enter`: **CRITICAL**: Selects highlighted option (same as clicking). Must work when option is highlighted via aria-activedescendant. Essential for keyboard accessibility.
+- `Space`: **CRITICAL**: Selects highlighted option (same as clicking). Must work when option is highlighted via aria-activedescendant. Essential for keyboard accessibility.
+- `Escape`: Closes dropdown, restores focus to trigger
+- `Tab`: Closes dropdown, moves focus to next element
+- `Shift+Tab`: Closes dropdown, moves focus to previous element
+- `Home`: Highlights first option
+- `End`: Highlights last option
+- `Type-ahead`: Jumps to first option starting with typed character
 
 ### In Search Input
 
-| Key | Action |
-|-----|--------|
-| Enter | **CRITICAL**: Selects highlighted option (or first option if none highlighted). Essential for keyboard accessibility. This is a common oversight. |
-| Space | **CRITICAL**: Selects highlighted option (or first option if none highlighted). Essential for keyboard accessibility. This is a common oversight. |
-| ArrowDown | Moves focus to first option and highlights it |
-| Escape | Closes dropdown if query empty, clears query if not empty |
-| Tab | Closes dropdown, moves focus to next element |
+- `Enter`: **CRITICAL**: Selects highlighted option (or first option if none highlighted). Essential for keyboard accessibility. This is a common oversight.
+- `Space`: **CRITICAL**: Selects highlighted option (or first option if none highlighted). Essential for keyboard accessibility. This is a common oversight.
+- `ArrowDown`: Moves focus to first option and highlights it
+- `Escape`: Closes dropdown if query empty, clears query if not empty
+- `Tab`: Closes dropdown, moves focus to next element
 
 ## Accessibility Requirements
 

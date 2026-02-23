@@ -15,7 +15,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/dashboard",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/dashboard.json",
       "created": "2026-01-10",
-      "updated": "2026-02-03",
+      "updated": "2026-02-22",
       "markdownUrl": "https://uipotion.com/potions/layouts/dashboard.md"
     },
     {
@@ -54,10 +54,10 @@
         "a11y"
       ],
       "excerpt": "A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, and transparent-to-solid transition. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.",
-      "webUrl": "https://uipotion.com/potions/components/navbar.html",
+      "webUrl": "https://uipotion.com/potions/components/navbar",
       "agentGuideUrl": "https://uipotion.com/potions/components/navbar.json",
       "created": "2026-01-12",
-      "updated": "2026-01-12",
+      "updated": "2026-02-22",
       "markdownUrl": "https://uipotion.com/potions/components/navbar.md"
     },
     {
@@ -124,7 +124,7 @@
         "auto-dismiss"
       ],
       "excerpt": "A non-blocking toast notification system with success/error/warning/info variants, queue management, auto-dismiss, keyboard navigation, and screen reader announcements. Perfect for user feedback after actions.",
-      "webUrl": "https://uipotion.com/potions/components/toast-notifications.html",
+      "webUrl": "https://uipotion.com/potions/components/toast-notifications",
       "agentGuideUrl": "https://uipotion.com/potions/components/toast-notifications.json",
       "created": "2026-01-24",
       "updated": "2026-01-24",
@@ -300,7 +300,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.json",
       "created": "2026-02-01",
-      "updated": "2026-02-01",
+      "updated": "2026-02-22",
       "markdownUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.md"
     },
     {
@@ -395,8 +395,30 @@
       "created": "2026-02-14",
       "updated": "2026-02-14",
       "markdownUrl": "https://uipotion.com/potions/components/tabs.md"
+    },
+    {
+      "id": "command-palette",
+      "name": "Command Palette",
+      "category": "components",
+      "tags": [
+        "components",
+        "command-palette",
+        "command-menu",
+        "omnibox",
+        "keyboard-shortcuts",
+        "fuzzy-search",
+        "productivity",
+        "a11y",
+        "aria"
+      ],
+      "excerpt": "An accessible command palette component for keyboard-first navigation and action execution, with fuzzy search, grouped results, recent commands, and role-aware command visibility.",
+      "webUrl": "https://uipotion.com/potions/components/command-palette",
+      "agentGuideUrl": "https://uipotion.com/potions/components/command-palette.json",
+      "created": "2026-02-22",
+      "updated": "2026-02-22",
+      "markdownUrl": "https://uipotion.com/potions/components/command-palette.md"
     }
   ],
-  "totalCount": 18,
-  "lastUpdated": "2026-02-14"
+  "totalCount": 19,
+  "lastUpdated": "2026-02-22"
 }

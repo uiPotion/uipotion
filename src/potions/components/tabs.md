@@ -102,24 +102,20 @@ Keyboard behavior follows the WAI-ARIA Tabs pattern.
 
 ### Horizontal Tab List
 
-| Key | Action |
-|-----|--------|
-| ArrowRight | Move focus to next tab (wrap from last to first) |
-| ArrowLeft | Move focus to previous tab (wrap from first to last) |
-| Home | Move focus to first tab |
-| End | Move focus to last tab |
-| Enter / Space | Activate focused tab in manual activation mode |
-| Tab | Move focus out of tab list to active panel or next focusable element |
+- `ArrowRight`: Move focus to next tab (wrap from last to first)
+- `ArrowLeft`: Move focus to previous tab (wrap from first to last)
+- `Home`: Move focus to first tab
+- `End`: Move focus to last tab
+- `Enter / Space`: Activate focused tab in manual activation mode
+- `Tab`: Move focus out of tab list to active panel or next focusable element
 
 ### Vertical Tab List
 
-| Key | Action |
-|-----|--------|
-| ArrowDown | Move focus to next tab (wrap from last to first) |
-| ArrowUp | Move focus to previous tab (wrap from first to last) |
-| Home | Move focus to first tab |
-| End | Move focus to last tab |
-| Enter / Space | Activate focused tab in manual activation mode |
+- `ArrowDown`: Move focus to next tab (wrap from last to first)
+- `ArrowUp`: Move focus to previous tab (wrap from first to last)
+- `Home`: Move focus to first tab
+- `End`: Move focus to last tab
+- `Enter / Space`: Activate focused tab in manual activation mode
 
 Notes:
 - In automatic mode, arrow navigation also activates the newly focused tab.

@@ -1084,9 +1084,16 @@
   },
   "meta": {
     "created": "2026-02-01",
-    "updated": "2026-02-01",
+    "updated": "2026-02-22",
     "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
     "relatedPotions": [
+      {
+        "id": "command-palette",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Use Command Palette for quick prompt templates, tool actions, and conversation switches.",
+        "required": false
+      },
       {
         "id": "text-input",
         "category": "components",

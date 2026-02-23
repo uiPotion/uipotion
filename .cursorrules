@@ -111,8 +111,10 @@ agentManifest: 'potions/[category]/component-id.json' # REQUIRED: Path to JSON g
 **IMPORTANT - Visual Representations & Content Formatting**:
 - ❌ **NEVER** use ASCII art or text-based diagrams in potion markdown files for the website
 - ❌ **NEVER** use emojis (✅ ❌ ✓ ✗ etc.) in potion markdown files for the website
+- ❌ **NEVER** use Markdown tables in potion markdown files for the website (table rendering is not reliable in this project)
 - ❌ ASCII boxes, borders, or visual layouts look unprofessional on the rendered website
 - ✅ Use clear prose descriptions instead (e.g., "A 3-column grid layout with...")
+- ✅ For key/action mappings and comparisons, use plain bullet lists (for example: `- Key: Action`) instead of tables
 - ✅ Save visual diagrams for future when we add screenshot/image support
 - ✅ In JSON files for AI agents, you can include text structure if needed, but keep it minimal
 - ✅ Use plain text for lists and examples (e.g., "Good:", "Bad:" instead of emojis)

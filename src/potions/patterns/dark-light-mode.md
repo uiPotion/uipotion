@@ -148,12 +148,10 @@ Each token has a light value and a dark value. Components reference the token, n
 
 When implementing dark mode, these elements are often forgotten:
 
-| Element | Issue | Fix |
-|---------|-------|-----|
-| Header logo | Dark logo invisible on dark background | `filter: invert(1)` in dark mode, or separate light asset |
-| Social icons (GitHub, Twitter, etc.) | Dark fill disappears | `filter: invert(1)`, or inline SVG with `currentColor` |
-| Decorative icons | Same as social icons | Same treatment |
-| Series/card blocks | Hardcoded light background | Use `--color-surface` or theme token |
+- **Header logo**: Issue: dark logo becomes invisible on dark background. Fix: use `filter: invert(1)` in dark mode, or provide a separate light asset.
+- **Social icons (GitHub, Twitter, etc.)**: Issue: dark fill disappears. Fix: use `filter: invert(1)`, or inline SVG with `currentColor`.
+- **Decorative icons**: Issue: same as social icons. Fix: same treatment.
+- **Series/card blocks**: Issue: hardcoded light background. Fix: use `--color-surface` or a theme token.
 
 ## Anti-Patterns to Avoid
 

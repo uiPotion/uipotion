@@ -1,0 +1,779 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
+  "id": "command-palette",
+  "version": "1.0.0",
+  "name": "Command Palette",
+  "category": "components",
+  "tags": [
+    "components",
+    "command-palette",
+    "command-menu",
+    "omnibox",
+    "keyboard-shortcuts",
+    "fuzzy-search",
+    "productivity",
+    "a11y",
+    "aria"
+  ],
+  "description": "An accessible command palette component for keyboard-first navigation and action execution, with fuzzy search, grouped results, recent commands, and role-aware command visibility.",
+  "tokens": {
+    "layout": {
+      "panelMaxWidthPx": 720,
+      "panelMinWidthPx": 320,
+      "panelBorderRadiusPx": 12,
+      "inputHeightPx": 44,
+      "rowHeightPx": 44,
+      "rowPaddingXPx": 14,
+      "rowPaddingYPx": 10,
+      "groupGapPx": 12,
+      "listMaxHeightPx": 420
+    },
+    "typography": {
+      "inputFontSizePx": 16,
+      "rowLabelFontSizePx": 14,
+      "rowMetaFontSizePx": 12,
+      "groupLabelFontSizePx": 12
+    },
+    "motion": {
+      "openDurationMs": 180,
+      "closeDurationMs": 150,
+      "backdropDurationMs": 140,
+      "easing": "cubic-bezier(0.2, 0, 0, 1)"
+    }
+  },
+  "aiAgentInstructions": {
+    "summary": "Implement an accessible Command Palette component that opens with Cmd/Ctrl+K, supports fuzzy command search, grouped results, keyboard-first navigation, permission-aware filtering, and safe command execution. Match the detected framework and styling system exactly.",
+    "keyFeatures": [
+      "Global open shortcut (Cmd/Ctrl+K) with optional visible trigger",
+      "Modal dialog behavior with focus trap and focus restoration",
+      "Search input with fuzzy matching and keyword aliases",
+      "Grouped command results with optional icons and shortcut hints",
+      "Recent commands and suggested commands when query is empty",
+      "Permission-aware command filtering",
+      "Context-aware ranking for current workspace or route",
+      "Keyboard navigation with ArrowUp/ArrowDown and Enter execution — CRITICAL: navigation order must follow the visual (grouped) rendering order, not the raw score-sorted order",
+      "Loading, empty, error, and command execution states",
+      "Optional destructive command confirmation step",
+      "Reduced-motion support for open/close transitions",
+      "CRITICAL: Styling MUST match project conventions and use detected framework/styling system only",
+      "CRITICAL: Maintain accessible dialog/input/result semantics and reliable focus management"
+    ],
+    "implementationSteps": [
+      "0. Detect framework and styling system before writing code",
+      "1. Build trigger and global shortcut listener with collision-safe key handling",
+      "2. Render palette as a modal dialog with backdrop and panel",
+      "3. Move focus to search input on open and restore trigger focus on close",
+      "4. Implement query state and fuzzy filtering (including keyword aliases)",
+      "5. Add grouped results and clear active-row styling",
+      "6. CRITICAL: Build the keyboard navigation list from the grouped visual order (iterate groups in render order, concatenate items), NOT from the raw score-sorted flat list. Score sorting determines which items appear and their intra-group rank, but arrow keys must walk items in the same sequence the user sees on screen.",
+      "7. Implement keyboard navigation for result rows with disabled-row skipping",
+      "8. Suppress mouse hover selection during keyboard-triggered scrollIntoView — track a pointer-moved flag, set it to false on ArrowUp/ArrowDown, reset to true on pointermove, and only update the active row on mouseenter when the flag is true. Without this, scrolling the list under a stationary cursor fires mouseenter and fights the keyboard selection.",
+      "9. Execute command on Enter/click with async-safe loading handling",
+      "10. Add optional recent/suggested commands when query is empty",
+      "11. Add permission/context filtering before rendering results",
+      "12. Add destructive command confirmation behavior",
+      "13. Announce meaningful result count and execution feedback for assistive technology",
+      "14. Apply reduced-motion behavior for users who request it",
+      "15. Ensure responsive layout: on mobile the panel must be full-screen (h-dvh, no margin/rounding/border) with a visible close button in the search row (no Escape key on touch devices). On all viewports, use flex-column panel layout where search input and footer are shrink-0 and only the results list scrolls (flex-1 min-h-0 overflow-y-auto) so the footer always stays at the bottom.",
+      "16. Validate against keyboard, accessibility, and edge-case checklist",
+      "17. Use only project tokens and existing class conventions"
+    ]
+  },
+  "structure": {
+    "slots": [
+      "root",
+      "trigger",
+      "dialog",
+      "backdrop",
+      "panel",
+      "searchInput",
+      "resultsRegion",
+      "groupHeader",
+      "commandList",
+      "commandItem",
+      "confirmationStep",
+      "emptyState",
+      "footerShortcuts"
+    ],
+    "hierarchy": "Root( Trigger?, Dialog( Backdrop, Panel( SearchInput, ResultsRegion( GroupHeader?, CommandList( CommandItem* ) ), ConfirmationStep?, EmptyState?, FooterShortcuts? ) ) )",
+    "idStrategy": {
+      "instanceIdFormat": "palette-{instanceId}",
+      "inputIdFormat": "palette-{instanceId}-input",
+      "listIdFormat": "palette-{instanceId}-list",
+      "itemIdFormat": "palette-{instanceId}-item-{commandId}",
+      "mappingRule": "If aria-activedescendant is used, active command item ID must match itemIdFormat and exist in the rendered list."
+    }
+  },
+  "components": {
+    "trigger": {
+      "description": "Optional visible trigger button in navbar/header with keyboard hint text.",
+      "requiredAttributes": [
+        "aria-haspopup='dialog'",
+        "aria-expanded",
+        "aria-controls (optional but recommended)"
+      ]
+    },
+    "dialog": {
+      "description": "Modal container for palette content.",
+      "requiredAttributes": [
+        "role='dialog'",
+        "aria-modal='true'",
+        "aria-labelledby or aria-label"
+      ]
+    },
+    "searchInput": {
+      "description": "Primary input for command lookup and filtering.",
+      "requiredAttributes": [
+        "id",
+        "type='text' or type='search'",
+        "aria-autocomplete",
+        "aria-controls (when listbox model is used)"
+      ]
+    },
+    "commandItem": {
+      "description": "Result row representing a command.",
+      "requiredAttributes": [
+        "stable id",
+        "aria-disabled when disabled",
+        "active state semantics (selected or activedescendant model)"
+      ]
+    },
+    "confirmationStep": {
+      "description": "Inline confirmation UI shown when a destructive command is selected. Replaces results region temporarily with a confirm/cancel prompt.",
+      "requiredAttributes": [
+        "role='alertdialog' or equivalent alert semantics",
+        "aria-describedby referencing the confirmation message",
+        "focusable confirm and cancel buttons"
+      ]
+    },
+    "mobileCloseButton": {
+      "description": "Close button visible only on mobile viewports (hidden on desktop where Escape key is available). Placed in the search input row. Required because touch devices have no Escape key.",
+      "requiredAttributes": [
+        "aria-label='Close'",
+        "visible only below mobile breakpoint (e.g. hidden sm:hidden, visible on max-sm)",
+        "minimum 44px touch target"
+      ]
+    }
+  },
+  "responsiveBreakpoints": {
+    "mobile": {
+      "maxWidthPx": 767,
+      "defaultBehavior": "Full-screen takeover dialog (h-dvh, no margin, no border-radius, no border) with large touch targets",
+      "touchTargets": "Minimum 44px row height",
+      "layoutGuidance": "Hide non-essential metadata first, keep labels and action clarity",
+      "closeButton": "CRITICAL: Mobile devices have no Escape key. A visible close button must appear in the search input row on mobile viewports. Hide it on desktop where Escape is available.",
+      "panelLayout": "Use flex-column layout so that the search input and footer are fixed (shrink-0) and only the results list scrolls (flex-1 min-h-0 overflow-y-auto). The footer must always remain visible at the bottom regardless of list length."
+    },
+    "tablet": {
+      "minWidthPx": 768,
+      "maxWidthPx": 1023,
+      "defaultBehavior": "Centered dialog with sticky search input and scrollable results"
+    },
+    "desktop": {
+      "minWidthPx": 1024,
+      "defaultBehavior": "Centered floating panel with grouped rows and optional rich metadata",
+      "layoutGuidance": "Show shortcut hints and optional subtitles when space allows"
+    }
+  },
+  "componentSpec": {
+    "goal": "Provide a fast, keyboard-first command surface that lets users discover and execute navigation/actions from one accessible interface.",
+    "anatomy": {
+      "slots": [
+        "root",
+        "trigger",
+        "dialog",
+        "backdrop",
+        "panel",
+        "searchInput",
+        "resultsRegion",
+        "groupHeader",
+        "commandList",
+        "commandItem",
+        "confirmationStep",
+        "emptyState",
+        "footerShortcuts"
+      ],
+      "hierarchy": "Root( Trigger?, Dialog( Backdrop, Panel( SearchInput, ResultsRegion( GroupHeader?, CommandList( CommandItem* ) ), ConfirmationStep?, EmptyState?, FooterShortcuts? ) ) )"
+    },
+    "stateModel": {
+      "open": {
+        "type": "boolean",
+        "description": "Whether the command palette is currently visible.",
+        "default": false,
+        "persistence": "component state or parent state"
+      },
+      "query": {
+        "type": "string",
+        "description": "Current query typed by the user.",
+        "default": "",
+        "persistence": "component state"
+      },
+      "filteredCommands": {
+        "type": "array",
+        "description": "Filtered and ranked command list for current query and context. IMPORTANT: When results are grouped, this list must reflect the visual (group-by-group) render order so that keyboard navigation matches what the user sees. Do not use the raw score-sorted order for navigation.",
+        "default": [],
+        "persistence": "derived state"
+      },
+      "activeCommandId": {
+        "type": "string",
+        "description": "Currently highlighted command ID for keyboard execution.",
+        "default": "",
+        "persistence": "component state"
+      },
+      "loadingResults": {
+        "type": "boolean",
+        "description": "Whether command data retrieval/filtering is waiting on async operations.",
+        "default": false,
+        "persistence": "component state"
+      },
+      "executionState": {
+        "type": "enum",
+        "description": "Execution lifecycle for the currently invoked command.",
+        "default": "idle",
+        "allowedValues": [
+          "idle",
+          "pending",
+          "success",
+          "error"
+        ],
+        "persistence": "component state"
+      },
+      "errorMessage": {
+        "type": "string",
+        "description": "Error text shown when query loading or command execution fails.",
+        "default": "",
+        "persistence": "component state"
+      },
+      "recentCommands": {
+        "type": "array",
+        "description": "Recently executed command IDs shown when query is empty.",
+        "default": [],
+        "persistence": "local storage or app state",
+        "notes": "Avoid storing sensitive command payloads."
+      },
+      "suggestedCommands": {
+        "type": "array",
+        "description": "Context-aware command IDs surfaced when query is empty. Derived from current route, workspace, or usage patterns. Displayed alongside or after recent commands.",
+        "default": [],
+        "persistence": "derived from current route/context"
+      },
+      "confirmationActive": {
+        "type": "boolean",
+        "description": "Whether a destructive command confirmation step is currently shown instead of search results.",
+        "default": false,
+        "persistence": "component state"
+      },
+      "pendingCommandId": {
+        "type": "string",
+        "description": "ID of the destructive command awaiting confirmation. Empty when no confirmation is active.",
+        "default": "",
+        "persistence": "component state"
+      },
+      "scope": {
+        "type": "enum",
+        "description": "Optional command scope for filtering and ranking behavior.",
+        "default": "global",
+        "allowedValues": [
+          "global",
+          "workspace",
+          "project"
+        ],
+        "persistence": "derived from current route/context"
+      }
+    },
+    "interactions": [
+      {
+        "event": "openShortcut",
+        "when": "user presses Cmd/Ctrl + K and no excluded input owns the shortcut",
+        "result": "openPalette",
+        "sideEffects": [
+          "Set open=true",
+          "Move focus to searchInput",
+          "Optionally preload recent commands"
+        ],
+        "preventDefault": true
+      },
+      {
+        "event": "escapeKey",
+        "when": "palette is open",
+        "result": "closePaletteOrClearQuery",
+        "sideEffects": [
+          "If query has text and clearOnFirstEscape=true, clear query",
+          "Otherwise close palette and restore focus to trigger"
+        ],
+        "preventDefault": true
+      },
+      {
+        "event": "backdropClick",
+        "when": "palette is open and click target is outside panel",
+        "result": "closePalette",
+        "sideEffects": [
+          "Restore focus to trigger"
+        ],
+        "preventDefault": false
+      },
+      {
+        "event": "queryChange",
+        "when": "user types in search input",
+        "result": "filterAndRankCommands",
+        "sideEffects": [
+          "Update query value",
+          "Update filteredCommands",
+          "Update activeCommandId to first enabled command"
+        ]
+      },
+      {
+        "event": "arrowDown",
+        "when": "palette is open and results are present",
+        "result": "moveActiveToNextEnabledCommand",
+        "sideEffects": [
+          "Skip disabled commands",
+          "Keep active row visible in scroll container",
+          "CRITICAL: Walk items in visual (grouped) render order, not raw score-sorted order — otherwise arrow keys jump between groups unpredictably",
+          "Set pointer-moved flag to false so that scroll-triggered mouseenter events do not override the keyboard selection"
+        ],
+        "preventDefault": true
+      },
+      {
+        "event": "arrowUp",
+        "when": "palette is open and results are present",
+        "result": "moveActiveToPreviousEnabledCommand",
+        "sideEffects": [
+          "Skip disabled commands",
+          "Keep active row visible in scroll container",
+          "CRITICAL: Walk items in visual (grouped) render order, not raw score-sorted order — otherwise arrow keys jump between groups unpredictably",
+          "Set pointer-moved flag to false so that scroll-triggered mouseenter events do not override the keyboard selection"
+        ],
+        "preventDefault": true
+      },
+      {
+        "event": "enterKey",
+        "when": "active command exists and is enabled",
+        "result": "executeActiveCommand",
+        "sideEffects": [
+          "Set executionState to pending",
+          "Run command handler",
+          "On success optionally close palette",
+          "On error set executionState to error and keep palette open"
+        ],
+        "preventDefault": true
+      },
+      {
+        "event": "resultClick",
+        "when": "user clicks enabled command item",
+        "result": "executeClickedCommand",
+        "sideEffects": [
+          "Update activeCommandId",
+          "Run command handler",
+          "Persist recency on success"
+        ]
+      },
+      {
+        "event": "asyncSearchResultResolve",
+        "when": "query source is asynchronous",
+        "result": "applyLatestResultSetOnly",
+        "sideEffects": [
+          "Discard stale responses for older queries",
+          "Clear loading state"
+        ]
+      },
+      {
+        "event": "destructiveCommandSelection",
+        "when": "selected command has requiresConfirmation=true",
+        "result": "openConfirmationStep",
+        "sideEffects": [
+          "Set confirmationActive=true and pendingCommandId to selected command ID",
+          "Show confirmationStep slot with confirm and cancel actions",
+          "Do not execute command until explicit confirmation",
+          "On confirm: execute command and reset confirmationActive=false",
+          "On cancel: reset confirmationActive=false and return to results"
+        ],
+        "accessibilityNotes": "Confirmation UI must be keyboard and screen-reader accessible. Focus should move to the confirm/cancel actions."
+      }
+    ],
+    "responsiveBehavior": {
+      "mobile": {
+        "maxWidthPx": 767,
+        "behavior": "Full-screen takeover (h-dvh, no margin/rounding/border) with large touch targets, compact metadata, and a visible close button in the search row since mobile has no Escape key."
+      },
+      "tablet": {
+        "minWidthPx": 768,
+        "maxWidthPx": 1023,
+        "behavior": "Use centered dialog with sticky input and grouped list."
+      },
+      "desktop": {
+        "minWidthPx": 1024,
+        "behavior": "Use centered floating panel with richer row metadata and shortcut hints."
+      }
+    },
+    "variants": {
+      "globalPalette": {
+        "description": "Single command surface for app-wide navigation and actions."
+      },
+      "contextualPalette": {
+        "description": "Palette scoped to current page/workspace with higher context relevance."
+      },
+      "navigationFirst": {
+        "description": "Prioritize route commands before action commands."
+      },
+      "actionFirst": {
+        "description": "Prioritize workflow actions over navigation commands."
+      }
+    },
+    "dataContract": {
+      "props": {
+        "commands": {
+          "type": "Array<{ id: string; label: string; keywords?: string[]; group?: string; icon?: string | ComponentNode; subtitle?: string; shortcut?: string; disabled?: boolean; requiresConfirmation?: boolean; priority?: number; permission?: string; run: () => Promise<void> | void }>",
+          "required": true
+        },
+        "open": {
+          "type": "boolean",
+          "required": false,
+          "controlled": true
+        },
+        "defaultOpen": {
+          "type": "boolean",
+          "required": false,
+          "uncontrolled": true
+        },
+        "query": {
+          "type": "string",
+          "required": false,
+          "controlled": true
+        },
+        "defaultQuery": {
+          "type": "string",
+          "required": false,
+          "uncontrolled": true
+        },
+        "scope": {
+          "type": "'global' | 'workspace' | 'project'",
+          "required": false
+        },
+        "closeOnExecute": {
+          "type": "boolean",
+          "required": false,
+          "default": true
+        },
+        "clearOnFirstEscape": {
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "When true, first Escape press clears the query instead of closing the palette. Second Escape closes."
+        },
+        "onOpenChange": {
+          "type": "(open: boolean) => void",
+          "required": false
+        },
+        "onQueryChange": {
+          "type": "(query: string) => void",
+          "required": false
+        },
+        "onExecute": {
+          "type": "(commandId: string) => void",
+          "required": false
+        }
+      },
+      "events": {
+        "onOpenChange": "Fired whenever palette open state changes.",
+        "onQueryChange": "Fired whenever query text changes.",
+        "onExecute": "Fired after a command is selected for execution."
+      }
+    }
+  },
+  "projectDetection": {
+    "framework": {
+      "description": "Detect framework-specific dialog, state, and keyboard event patterns before implementation.",
+      "detectionSteps": [
+        "Check package.json for react, vue, @angular/core, or svelte dependencies.",
+        "Inspect existing modal/dialog and search components for implementation patterns.",
+        "Follow existing event handling and state-control conventions."
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect and use only the project's established styling system.",
+      "detectionSteps": [
+        "Identify Tailwind, SCSS, CSS Modules, styled-components, or other established styling approaches.",
+        "Inspect existing overlay/dialog and list row class naming conventions.",
+        "Match focus ring, spacing, and interaction state patterns from existing components."
+      ],
+      "adaptationRules": [
+        "If Tailwind is used, compose utility classes that match current token and variant conventions.",
+        "If SCSS or CSS is used, implement class-based styles and explicit modifiers for active, disabled, and loading states.",
+        "If CSS Modules are used, keep styles local and map interaction states to module class names.",
+        "If styled-components are used, derive styles from theme tokens and component props."
+      ]
+    },
+    "designTokens": {
+      "description": "Map palette spacing, typography, colors, and motion to existing design tokens.",
+      "detectionSteps": [
+        "Locate current token sources (theme files, CSS variables, or Tailwind theme config).",
+        "Reuse existing overlay, input, list-item, and focus-ring tokens.",
+        "Avoid introducing new ad-hoc color and spacing values where tokens already exist."
+      ]
+    }
+  },
+  "frameworkPatterns": {
+    "react": {
+      "controlled": "const [open, setOpen] = useState(false); <CommandPalette open={open} onOpenChange={setOpen} commands={commands} />",
+      "uncontrolled": "<CommandPalette defaultOpen={false} commands={commands} />",
+      "notes": "Use refs for focus restoration and active row scroll-into-view."
+    },
+    "vue": {
+      "vModel": "<CommandPalette v-model:open='open' v-model:query='query' :commands='commands' />",
+      "notes": "Use composables for keyboard shortcuts and async-safe search handling."
+    },
+    "angular": {
+      "binding": "<app-command-palette [commands]='commands' [open]='open' (openChange)='onOpenChange($event)'></app-command-palette>",
+      "notes": "Bind aria attributes and keyboard handlers in template and component class."
+    },
+    "svelte": {
+      "binding": "<CommandPalette bind:open={open} bind:query={query} {commands} />",
+      "notes": "Use reactive statements for filtered command lists and active-row updates."
+    }
+  },
+  "stylingApproaches": {
+    "tailwindCSS": {
+      "overlay": "fixed inset-0 bg-black/40 backdrop-blur-[1px]",
+      "panel": "mx-4 mt-[12vh] flex max-h-[min(580px,80vh)] w-full max-w-2xl flex-col rounded-xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900 max-sm:mx-0 max-sm:mt-0 max-sm:h-dvh max-sm:max-h-none max-sm:max-w-none max-sm:rounded-none max-sm:border-0",
+      "resultsList": "min-h-0 flex-1 overflow-y-auto overscroll-contain",
+      "input": "h-11 w-full border-b border-neutral-200 bg-transparent px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-neutral-700",
+      "groupHeader": "px-3 pt-3 pb-1 text-xs font-medium uppercase tracking-wide text-neutral-500",
+      "item": "flex h-11 items-center justify-between rounded-md px-3 text-sm",
+      "itemActive": "bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100",
+      "itemDisabled": "opacity-50 cursor-not-allowed",
+      "shortcutHint": "ml-3 text-xs text-neutral-500"
+    },
+    "cssModules": "Create commandPalette.module.css with classes for overlay, panel, input, list, groupHeader, item, itemActive, itemDisabled, emptyState, and footer.",
+    "styledComponents": "Create styled wrappers for Overlay, Panel, Input, List, and Item components using theme tokens and active/disabled props.",
+    "scss": "Create _command-palette.scss with BEM classes (.command-palette, .command-palette__panel, .command-palette__input, .command-palette__item, .command-palette__item--active, .command-palette__item--disabled)."
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Dialog, input, and result relationships are programmatically exposed.",
+        "1.4.3": "Text, active row, and focus indicators meet contrast requirements.",
+        "2.1.1": "Palette is fully operable with keyboard only.",
+        "2.1.2": "No keyboard trap; users can close and return focus predictably.",
+        "2.4.3": "Focus order is logical from input to results and controls.",
+        "2.4.7": "Visible focus indicator for all focusable controls.",
+        "3.2.2": "Command execution happens only on explicit activation.",
+        "4.1.2": "Names, roles, and states are correctly announced."
+      }
+    },
+    "keyboardNavigation": {
+      "Cmd/Ctrl+K": "Open palette and focus search input.",
+      "Escape": "Close palette (or clear query first if configured).",
+      "ArrowDown": "Move active selection to next enabled command.",
+      "ArrowUp": "Move active selection to previous enabled command.",
+      "Enter": "Execute active command.",
+      "Tab": "Move focus within dialog controls while focus trap remains active.",
+      "Shift+Tab": "Reverse focus movement within dialog."
+    },
+    "ariaAttributes": {
+      "required": {
+        "triggerButton": {
+          "aria-haspopup": "dialog",
+          "aria-expanded": "reflect open state"
+        },
+        "dialog": {
+          "role": "dialog",
+          "aria-modal": "true",
+          "aria-label": "or aria-labelledby to provide accessible name"
+        },
+        "searchInput": {
+          "aria-label": "Descriptive label such as 'Search commands'",
+          "aria-controls": "Result list ID when listbox pattern is used",
+          "aria-activedescendant": "Active command item ID when using virtual focus"
+        }
+      },
+      "optional": {
+        "resultsCount": {
+          "aria-live": "polite region announcing result counts after query updates"
+        },
+        "disabledCommand": {
+          "aria-disabled": "true for non-interactive command rows"
+        }
+      }
+    },
+    "screenReader": {
+      "open": "Announce dialog open and place focus on search input.",
+      "queryUpdates": "Announce concise result count changes without excessive verbosity.",
+      "executionFeedback": "Announce success or error messages for executed commands when meaningful."
+    },
+    "focusManagement": {
+      "onOpen": "Move focus to search input.",
+      "trap": "Keep focus within palette while open.",
+      "onClose": "Restore focus to the trigger element.",
+      "activeRow": "Ensure active row remains visible and discoverable while navigating via keyboard."
+    },
+    "implementationChecklist": [
+      "Dialog has an accessible name and modal behavior.",
+      "Input has explicit accessible label.",
+      "Keyboard users can open, navigate, execute, and close without pointer.",
+      "Focus returns to trigger after close.",
+      "Result count announcements are concise and useful.",
+      "Disabled commands are not accidentally executable.",
+      "All focus indicators are visible and high contrast."
+    ]
+  },
+  "animations": {
+    "openClose": {
+      "durationMs": 180,
+      "easing": "cubic-bezier(0.2, 0, 0, 1)",
+      "properties": {
+        "opacity": "0 -> 1 on open, 1 -> 0 on close",
+        "transform": "translateY(8px) -> translateY(0)"
+      }
+    },
+    "backdrop": {
+      "durationMs": 140,
+      "easing": "linear",
+      "properties": {
+        "opacity": "0 -> target backdrop opacity"
+      }
+    },
+    "activeRow": {
+      "durationMs": 100,
+      "easing": "ease-out",
+      "properties": {
+        "backgroundColor": "subtle change when active row updates"
+      }
+    },
+    "reducedMotion": {
+      "behavior": "Disable translate transforms and keep only quick opacity transitions.",
+      "implementation": "@media (prefers-reduced-motion: reduce) { /* minimize motion */ }"
+    }
+  },
+  "edgeCases": {
+    "shortcutConflict": {
+      "issue": "Cmd/Ctrl+K can conflict with browser or in-app editor shortcuts.",
+      "solution": "Allow configurable shortcut enable/disable and exclude focused rich editors when needed."
+    },
+    "staleAsyncResults": {
+      "issue": "Older async query responses can overwrite newer results.",
+      "solution": "Track request tokens and apply only latest response."
+    },
+    "noVisibleCommands": {
+      "issue": "Permissions/context can filter all commands.",
+      "solution": "Show explicit empty guidance and fallback actions."
+    },
+    "destructiveMisfire": {
+      "issue": "Dangerous command could run immediately from Enter key.",
+      "solution": "Require confirmation for commands flagged requiresConfirmation."
+    },
+    "largeCommandSets": {
+      "issue": "Thousands of commands degrade responsiveness.",
+      "solution": "Use indexed search, memoized ranking, and list virtualization."
+    },
+    "mobileNoEscapeKey": {
+      "issue": "Touch devices have no physical Escape key, leaving users with no way to close the palette except tapping the backdrop (which is hidden when the panel is full-screen).",
+      "solution": "Add a visible close button in the search input row, shown only on mobile viewports and hidden on desktop where Escape is available."
+    },
+    "footerScrolledAway": {
+      "issue": "If the footer is inside the scroll container with the results list, it scrolls out of view when the list is long, making keyboard hints invisible.",
+      "solution": "Use a flex-column panel layout: search input (shrink-0), results list (flex-1 min-h-0 overflow-y-auto), footer (shrink-0). Only the results list scrolls."
+    },
+    "navigationOrderMismatch": {
+      "issue": "When results are grouped by category, the score-sorted flat list order diverges from the visual group-by-group render order. Arrow key navigation follows the flat list, causing the active row to appear to jump forward across groups and then snap back — a confusing and broken-feeling experience.",
+      "solution": "After grouping, rebuild the flat navigation list by concatenating groups in render order (Array.from(groupMap.values()).flat()). Arrow keys must always walk this visual-order list, never the raw score-sorted array."
+    },
+    "scrollInducedHoverFight": {
+      "issue": "Arrow key navigation calls scrollIntoView to keep the active row visible. The resulting scroll moves list items under the stationary mouse cursor, triggering mouseenter events that immediately overwrite the keyboard-selected active row. The user sees the highlight flicker or jump back on every key press.",
+      "solution": "Track a pointer-moved boolean flag (e.g. via ref or variable). Set it to false on every ArrowUp/ArrowDown key press. Reset it to true on the pointermove event (real physical mouse movement). Only update the active row from mouseenter when the flag is true. This is the same pattern used by VS Code, Linear, and cmdk."
+    }
+  },
+  "outputConstraints": {
+    "must": [
+      "Detect and use only the project's existing framework and styling system.",
+      "Use existing design tokens and naming conventions for overlay, input, list, and focus states.",
+      "Implement reliable keyboard-first open, navigation, execution, and close behavior.",
+      "Implement modal focus trap and focus restoration on close.",
+      "Provide accessible labels/roles/states for dialog, input, and command rows.",
+      "Handle loading, empty, error, and executing states.",
+      "Keep command execution idempotent-safe by preventing duplicate submits while pending.",
+      "Derive the keyboard navigation order from the visual (grouped) render order, not from the raw score-sorted list.",
+      "Suppress mouseenter-based active row updates during keyboard-triggered scrollIntoView by tracking a pointer-moved flag.",
+      "Use flex-column panel layout: search input and footer are shrink-0, results list is flex-1 min-h-0 overflow-y-auto — the footer must always remain at the bottom regardless of list length.",
+      "On mobile, render the panel as full-screen (h-dvh, no margin, no rounding, no border) and show a visible close button in the search input row since touch devices have no Escape key."
+    ],
+    "mustNot": [
+      "Introduce a new styling system or dependency only for this component.",
+      "Use inline style attributes when project conventions are class-based.",
+      "Execute destructive commands without confirmation when requiresConfirmation is true.",
+      "Leave focus trapped or orphaned after closing palette.",
+      "Allow stale async results to override latest query results.",
+      "Use a raw score-sorted array for arrow key navigation when results are rendered in grouped order — this causes the active row to jump between groups unpredictably.",
+      "Update the active row on mouseenter without checking whether the pointer has physically moved — scrollIntoView can trigger mouseenter on a stationary cursor and fight keyboard navigation.",
+      "Rely only on Escape key for closing the palette — mobile devices have no Escape key, so a visible close button is required on mobile viewports.",
+      "Place both the results list and the footer inside the same scroll container — the footer must remain fixed at the panel bottom, not scroll with the list."
+    ]
+  },
+  "testingChecklist": [
+    "Cmd/Ctrl+K opens the palette from standard app contexts.",
+    "Escape closes palette and restores focus to trigger.",
+    "Input is focused immediately on open.",
+    "Typing query filters results with fuzzy matching.",
+    "Result ranking prioritizes exact and context-relevant matches.",
+    "ArrowDown and ArrowUp move active row correctly in visual (grouped) order — never jumping across groups unexpectedly.",
+    "Arrow navigation order matches rendered group order, not raw score order, when a search query is active.",
+    "Arrow navigation with scrollIntoView does not cause hover flicker when the mouse cursor is stationary over the list.",
+    "Arrow navigation skips disabled commands.",
+    "Enter executes active command once.",
+    "Clicking a command executes same behavior as Enter.",
+    "Pending execution prevents duplicate triggering.",
+    "Destructive commands require explicit confirmation.",
+    "Empty query can show recent or suggested commands.",
+    "No-result query shows helpful empty state.",
+    "Async search loading state is visible and non-blocking.",
+    "Stale async responses do not replace newer result sets.",
+    "Permission-restricted commands are hidden or disabled correctly.",
+    "Dialog has proper role and accessible name.",
+    "Search input has proper accessible label.",
+    "Result count announcements are exposed via polite live region.",
+    "Focus trap prevents focus leaving dialog while open.",
+    "Focus return on close works for keyboard and pointer scenarios.",
+    "Visible focus styles meet contrast requirements.",
+    "Touch targets are at least 44px on mobile.",
+    "Mobile panel is full-screen with no margin, rounding, or border.",
+    "Mobile close button is visible and functional (since there is no Escape key on touch devices).",
+    "Footer with keyboard hints stays fixed at the bottom and does not scroll with the results list.",
+    "Mobile sheet/dialog remains usable with virtual keyboard open.",
+    "Long command labels truncate safely without breaking layout.",
+    "Very large command lists remain performant.",
+    "Reduced-motion mode minimizes transforms.",
+    "Styling matches project conventions (Tailwind, SCSS, CSS Modules, styled-components, etc.).",
+    "No inline styles when class-based styling is expected."
+  ],
+  "meta": {
+    "created": "2026-02-22",
+    "updated": "2026-02-23",
+    "webUrl": "https://uipotion.com/potions/components/command-palette",
+    "relatedPotions": [
+      {
+        "id": "navbar",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Add a command palette trigger and shortcut hint in the global navigation bar.",
+        "required": false
+      },
+      {
+        "id": "dashboard",
+        "category": "layouts",
+        "relationship": "used-in",
+        "description": "Optional: Command Palette is commonly paired with dashboard layouts for fast navigation.",
+        "required": false
+      },
+      {
+        "id": "ai-agent-chat",
+        "category": "layouts",
+        "relationship": "complements",
+        "description": "Optional: Use Command Palette for prompt presets, tool actions, and context switches in chat apps.",
+        "required": false
+      }
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/components/command-palette.json",
+    "markdownUrl": "https://uipotion.com/potions/components/command-palette.md"
+  }
+}

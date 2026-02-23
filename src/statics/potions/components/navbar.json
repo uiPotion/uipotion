@@ -553,8 +553,31 @@
   "aiImplementationPrompt": "Implement a responsive Navigation Bar component with mobile hamburger menu as a modal dialog (role=\"dialog\" aria-modal=\"true\") including focus trap, focus restoration, inert background, and body scroll lock. Support sticky scroll behavior and optional transparent-to-solid transition (marketing recommended only). Add dropdown navigation: on desktop, implement disclosure dropdowns (button controlling a panel of links with aria-expanded/aria-controls; avoid role=\"menu\" unless fully implementing ARIA menu semantics). On mobile/tablet, integrate dropdown items as accordion sections inside the dialog (aria-expanded/aria-controls), and expanding must not close the dialog. Close the mobile dialog on Escape/backdrop/link click. Close desktop dropdown on outside click/Escape and restore focus to its toggle. Implement smooth animations and prefers-reduced-motion (reduce durations to <= tokens.motion.reducedMotionDurationMs and avoid transform-based motion where possible). Adapt to {{USER_FRAMEWORK}} and {{USER_STYLING_LIBRARY}}. CRITICAL: Use ONLY the detected styling system. If vanilla CSS is detected, create CSS classes in a stylesheet; never use inline style attributes. If React is detected, separate effects into single-concern hooks.",
   "meta": {
     "created": "2026-01-12",
-    "updated": "2026-01-17",
+    "updated": "2026-02-22",
     "webUrl": "https://uipotion.com/potions/components/navbar.html",
+    "relatedPotions": [
+      {
+        "id": "command-palette",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Add a global command surface in the header for keyboard-first navigation and actions.",
+        "required": false
+      },
+      {
+        "id": "dashboard",
+        "category": "layouts",
+        "relationship": "used-in",
+        "description": "Optional: Navigation Bar commonly appears in dashboard and admin interfaces.",
+        "required": false
+      },
+      {
+        "id": "ai-agent-chat",
+        "category": "layouts",
+        "relationship": "used-in",
+        "description": "Optional: Navigation Bar patterns can be adapted for AI chat app headers and top-level actions.",
+        "required": false
+      }
+    ],
     "agentGuideUrl": "https://uipotion.com/potions/components/navbar.json",
     "markdownUrl": "https://uipotion.com/potions/components/navbar.md"
   }

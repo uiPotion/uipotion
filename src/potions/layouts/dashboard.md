@@ -886,6 +886,7 @@ const notifications = [
 This dashboard layout commonly uses these components:
 
 - **[Navbar Component](/potions/components/navbar)** - For the header navigation bar
+- **[Command Palette](/potions/components/command-palette)** - Add keyboard-first navigation and quick actions for dense admin workflows
 - **[Data Table Component](/potions/components/data-table)** - For displaying tabular data in the main content area
 - **[Button](/potions/components/button)** - For header CTAs, sidebar actions, table actions, and dialog footers
 - **[File Upload Component](/potions/components/file-upload)** - For settings, profile, or document sections (e.g. avatar, CSV import, document management)

@@ -233,12 +233,10 @@ Container
 
 ### Keyboard Navigation
 
-| Key | Action |
-|-----|--------|
-| Tab | Focus input |
-| Shift+Tab | Move focus away |
-| Escape | Clear value (optional) |
-| Enter | Submit form (if in form) |
+- `Tab`: Focus input
+- `Shift+Tab`: Move focus away
+- `Escape`: Clear value (optional)
+- `Enter`: Submit form (if in form)
 
 ### Screen Reader Behavior
 

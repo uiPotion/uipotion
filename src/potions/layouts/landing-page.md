@@ -1097,13 +1097,11 @@ If the mobile hamburger menu works intermittently or not at all, check:
 
 **Common Issues:**
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Button not clickable | Covered by overlay | Check z-index, ensure `pointer-events: auto` |
-| Works in DevTools, not on device | Touch target too small | Use 48x48px minimum |
-| Intermittent failure | Event listener before DOM ready | Use `DOMContentLoaded` or `defer` script |
-| Menu closes immediately | Document click fires too soon | Use `e.stopPropagation()` on button |
-| Button disappears | Navbar transition affects button | Check CSS transitions on navbar |
+- **Button not clickable**: Cause: covered by overlay. Fix: check z-index and ensure `pointer-events: auto`.
+- **Works in DevTools, not on device**: Cause: touch target too small. Fix: use 48x48px minimum.
+- **Intermittent failure**: Cause: event listener before DOM ready. Fix: use `DOMContentLoaded` or `defer` script.
+- **Menu closes immediately**: Cause: document click fires too soon. Fix: use `e.stopPropagation()` on button.
+- **Button disappears**: Cause: navbar transition affects button. Fix: check CSS transitions on navbar.
 
 ### Long Headlines
 - Reduce font size on mobile if headline is very long

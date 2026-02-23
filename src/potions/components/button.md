@@ -148,12 +148,10 @@ Behavior rules: loading implies disabled interaction; submit buttons must not do
 
 ### Keyboard Navigation
 
-| Key | Action |
-|-----|--------|
-| Tab | Move focus to button if focusable |
-| Shift+Tab | Move focus away |
-| Enter | Activate button; activate link when as='a' |
-| Space | Activate native button; for anchor-as-button, prevent default and trigger click so page does not scroll |
+- `Tab`: Move focus to button if focusable
+- `Shift+Tab`: Move focus away
+- `Enter`: Activate button; activate link when as='a'
+- `Space`: Activate native button; for anchor-as-button, prevent default and trigger click so page does not scroll
 
 ### ARIA and Semantics
 
