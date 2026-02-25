@@ -417,8 +417,29 @@
       "created": "2026-02-22",
       "updated": "2026-02-22",
       "markdownUrl": "https://uipotion.com/potions/components/command-palette.md"
+    },
+    {
+      "id": "documentation",
+      "name": "Documentation Website Layout",
+      "category": "layouts",
+      "tags": [
+        "layouts",
+        "documentation",
+        "sidebar",
+        "table-of-contents",
+        "responsive",
+        "search",
+        "scroll-spy",
+        "a11y"
+      ],
+      "excerpt": "A three-column documentation website layout with hierarchical sidebar navigation, prose content area, and scroll-spy table of contents. Inspired by Next.js docs, Nextra, Docusaurus, and Mintlify.",
+      "webUrl": "https://uipotion.com/potions/layouts/documentation",
+      "agentGuideUrl": "https://uipotion.com/potions/layouts/documentation.json",
+      "created": "2026-02-24",
+      "updated": "2026-02-24",
+      "markdownUrl": "https://uipotion.com/potions/layouts/documentation.md"
     }
   ],
-  "totalCount": 19,
-  "lastUpdated": "2026-02-22"
+  "totalCount": 20,
+  "lastUpdated": "2026-02-24"
 }

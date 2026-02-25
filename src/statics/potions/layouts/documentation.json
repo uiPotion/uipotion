@@ -1,0 +1,1489 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
+  "id": "documentation",
+  "version": "1.0.0",
+  "name": "Documentation Website Layout",
+  "category": "layouts",
+  "tags": [
+    "documentation",
+    "sidebar",
+    "table-of-contents",
+    "responsive",
+    "search",
+    "scroll-spy",
+    "a11y"
+  ],
+  "description": "A three-column documentation website layout with hierarchical sidebar navigation, prose content area, and scroll-spy table of contents. Inspired by Next.js docs, Nextra, Docusaurus, and Mintlify. Designed for developer documentation, knowledge bases, and technical reference pages.",
+  "tokens": {
+    "layout": {
+      "sidebarWidthPx": 260,
+      "tocWidthPx": 220,
+      "headerHeightPx": 60,
+      "contentMaxWidthPx": 768,
+      "contentMinWidthPx": 0,
+      "zIndex": {
+        "base": 0,
+        "toc": 10,
+        "sidebarDesktop": 30,
+        "header": 40,
+        "mobileBackdrop": 40,
+        "mobileSidebarDrawer": 50,
+        "searchOverlay": 60,
+        "tooltips": 70
+      }
+    },
+    "motion": {
+      "defaultDurationMs": 300,
+      "defaultEasing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "fastDurationMs": 150,
+      "sidebarDrawerMs": 300,
+      "backdropFadeMs": 200,
+      "sectionExpandMs": 180,
+      "scrollSpyTransitionMs": 150,
+      "searchOverlayMs": 200
+    },
+    "breakpoints": {
+      "tabletMinPx": 768,
+      "desktopMinPx": 1280
+    }
+  },
+  "layoutPresets": {
+    "default": {
+      "sidebarWidthPx": 260,
+      "tocWidthPx": 220,
+      "contentMaxWidthPx": 768
+    },
+    "compact": {
+      "sidebarWidthPx": 240,
+      "tocWidthPx": 200,
+      "contentMaxWidthPx": 640
+    },
+    "wide": {
+      "sidebarWidthPx": 280,
+      "tocWidthPx": 240,
+      "contentMaxWidthPx": 860
+    }
+  },
+  "layoutModel": {
+    "type": "grid",
+    "scrollRegion": "page",
+    "positioningContract": {
+      "header": "sticky-top",
+      "sidebar": "fixed-left-below-header",
+      "content": "scrollable-center",
+      "toc": "sticky-right-below-header",
+      "footer": "flow-after-content"
+    },
+    "invariants": [
+      "Header is always visible (sticky top)",
+      "Sidebar is fixed below header on desktop, off-canvas drawer on mobile",
+      "Content scrolls naturally with the page (not in a container)",
+      "TOC is sticky on desktop, hidden on tablet, collapsible inline on mobile",
+      "Footer flows after content (not fixed)",
+      "No horizontal page scroll at any breakpoint",
+      "Three-column grid on desktop, two on tablet, one on mobile"
+    ]
+  },
+  "aiAgentInstructions": {
+    "summary": "Implement a three-column documentation reading layout (sidebar + content + TOC) with hierarchical navigation, scroll-spy table of contents, and Cmd+K search trigger. The layout is framework-agnostic and should adapt to the user's chosen stack and styling approach.",
+    "keyFeatures": [
+      "Three-column CSS Grid layout: sidebar (260px) + content (max 768px) + TOC (220px)",
+      "Hierarchical sidebar navigation with collapsible sections and active page highlighting",
+      "Scroll-spy table of contents using Intersection Observer API",
+      "Cmd+K / Ctrl+K search trigger with full Command Palette implementation — MUST use the Command Palette component potion (potions/components/command-palette) as the spec for the search overlay. Read and follow that potion's full specification for fuzzy matching, grouped results, keyboard navigation (ArrowUp/Down, Enter, Escape), pointer-moved flag, active row tracking, ARIA, and mobile full-screen takeover.",
+      "Sticky header with logo, nav links, search, theme toggle, and GitHub link",
+      "Mobile-responsive: off-canvas sidebar drawer with focus trap and scroll lock",
+      "Breadcrumbs, prev/next page navigation, page meta (last updated, edit link)",
+      "Code blocks with syntax highlighting, copy button, and file name labels",
+      "Callout/admonition blocks (info, warning, tip, danger)",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems.",
+      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes.",
+      "CRITICAL: When detecting React, extract logic into separate custom hooks (useScrollSpy, useSidebarNavigation, useBodyScrollLock, useFocusTrap, useMediaQuery)."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine: (a) package.json for framework and styling dependencies, (b) existing component files for import patterns, (c) config files (tailwind.config.js, vite.config.js, etc.), (d) existing style files and structure.",
+      "0a. Detect framework patterns: Check component structure (hooks in React, composition API in Vue, etc.), state management, and routing approach.",
+      "0b. Detect styling conventions: Identify class naming, import patterns, design system tokens, and utility functions (cn, clsx, classnames, etc.).",
+      "0c. If detection is uncertain, ask the user about their styling approach and framework before proceeding.",
+      "1. Create the layout shell using CSS Grid: three columns on desktop (sidebar + content + TOC), two on tablet, one on mobile.",
+      "2. Implement the sticky header with logo, nav links, search trigger, theme toggle, and GitHub link.",
+      "3. Build the sidebar navigation tree with collapsible sections, active page highlighting, and auto-expansion of the section containing the active page.",
+      "4. Create the main content area with breadcrumbs, prose styling, heading anchors, code blocks (syntax highlight + copy + file label), and callout blocks.",
+      "5. Implement the TOC with scroll-spy using Intersection Observer API to track H2/H3 headings.",
+      "6. Add prev/next page navigation and page meta (last updated, edit link) below content.",
+      "7. Build the footer with multi-column link grid.",
+      "8. Implement mobile responsiveness: off-canvas sidebar drawer with backdrop, focus trap, scroll lock, and Escape to close.",
+      "9. Collapse TOC into inline 'On this page' disclosure on mobile.",
+      "10. Implement the search overlay as a full Command Palette — read and follow the Command Palette component potion (potions/components/command-palette) for the complete specification. The palette must include: a command registry populated from the sidebar navigation tree, fuzzy matching with scoring, grouped results in visual render order, keyboard navigation (ArrowUp/Down in visual group order, Enter to execute, Escape to clear then close), active row highlighting with pointer-moved flag to prevent scroll-induced hover fights, match highlighting in result labels, recent commands persisted in localStorage, screen reader announcements via aria-live region, aria-activedescendant on the input, mobile full-screen takeover with a visible close button, and a footer with keyboard shortcut hints.",
+      "11. Add ARIA attributes, keyboard navigation, and screen reader support.",
+      "12. Use ONLY the detected styling system. Match existing component styling patterns exactly."
+    ]
+  },
+  "structure": {
+    "hierarchy": {
+      "DocsContainer": {
+        "description": "Root container, CSS Grid layout managing three-column documentation structure",
+        "children": {
+          "Header": {
+            "description": "Sticky header spanning full viewport width with navigation and actions",
+            "children": [
+              "Logo",
+              "NavigationLinks",
+              "SearchTrigger",
+              "ThemeToggle",
+              "GitHubLink",
+              "MobileMenuToggle"
+            ]
+          },
+          "Sidebar": {
+            "description": "Left sidebar with hierarchical navigation tree; fixed on desktop, off-canvas drawer on mobile",
+            "children": [
+              "NavigationTree"
+            ]
+          },
+          "ContentArea": {
+            "description": "Main prose content area with centered max-width for readability",
+            "children": [
+              "Breadcrumbs",
+              "PageTitle",
+              "ProseContent",
+              "PageMeta",
+              "PrevNextNavigation"
+            ]
+          },
+          "TOC": {
+            "description": "Right sidebar table of contents with scroll-spy; sticky on desktop, hidden on tablet, inline on mobile",
+            "children": [
+              "TOCHeader",
+              "TOCLinks"
+            ]
+          },
+          "Footer": {
+            "description": "Multi-column footer with link grid, flows after content",
+            "children": [
+              "LinkColumns",
+              "SocialIcons",
+              "Copyright"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "Header": {
+      "description": "Sticky header bar spanning full viewport width with navigation and utility actions",
+      "dimensions": {
+        "heightPx": 60,
+        "width": "100vw",
+        "position": "sticky top"
+      },
+      "layout": "[Logo] [NavigationLinks] [spacer] [SearchTrigger] [ThemeToggle] [GitHubLink] [MobileMenuToggle]",
+      "elements": {
+        "Logo": {
+          "heightPx": "24-32",
+          "behavior": "Links to homepage"
+        },
+        "NavigationLinks": {
+          "fontSizePx": "14-16",
+          "weight": 500,
+          "gapPx": "24-32",
+          "items": ["Docs", "Blog", "API Reference"],
+          "activeIndicator": "Underline or color change",
+          "mobileVisibility": "Hidden, moved to hamburger menu"
+        },
+        "SearchTrigger": {
+          "appearance": "Pill-shaped button with 'Search docs...' text and Cmd+K badge",
+          "minWidthPx": 200,
+          "mobileAppearance": "Icon-only (magnifying glass)",
+          "behavior": "Opens Command Palette overlay on click or Cmd+K / Ctrl+K. The search overlay MUST be implemented following the Command Palette component potion (potions/components/command-palette) — not a simple filter input.",
+          "ariaLabel": "Search documentation",
+          "ariaKeyshortcuts": "Meta+K"
+        },
+        "ThemeToggle": {
+          "sizePx": "36-40",
+          "icons": "Sun/Moon",
+          "behavior": "Toggles light/dark/system theme (see Dark/Light Mode pattern potion)"
+        },
+        "GitHubLink": {
+          "sizePx": "36-40",
+          "icon": "GitHub logo",
+          "behavior": "Opens repo in new tab"
+        },
+        "MobileMenuToggle": {
+          "sizePx": 40,
+          "icon": "Hamburger / close",
+          "visibility": "Hidden on desktop (>=1280px), visible below",
+          "ariaLabel": "Toggle navigation menu",
+          "ariaExpanded": "dynamic",
+          "ariaControls": "docs-sidebar"
+        }
+      },
+      "behavior": {
+        "position": "Sticky at top during scroll",
+        "border": "Subtle bottom border for separation",
+        "responsive": "Collapses nav links into hamburger menu on mobile"
+      }
+    },
+    "Sidebar": {
+      "description": "Left sidebar with hierarchical page navigation tree",
+      "dimensions": {
+        "widthPx": 260,
+        "height": "Full viewport minus header height",
+        "topOffsetPx": 60,
+        "position": "Fixed on desktop, off-canvas drawer on mobile"
+      },
+      "states": [
+        "visible (desktop default)",
+        "hidden (mobile default)",
+        "drawer-open (mobile overlay)"
+      ],
+      "elements": {
+        "NavigationTree": {
+          "sectionHeaders": {
+            "fontSizePx": "12-13",
+            "weight": "500-600",
+            "textTransform": "uppercase",
+            "color": "muted"
+          },
+          "pageLinks": {
+            "fontSizePx": 14,
+            "weight": 400,
+            "nestingIndentPx": "12-16 per level",
+            "maxDepth": 3,
+            "verticalGapPx": "2-4 between items, 16-24 between sections"
+          },
+          "activeIndicator": {
+            "background": "Primary color at 8-12% opacity",
+            "border": "2-3px left border in primary color",
+            "textColor": "Primary color"
+          },
+          "expandCollapse": {
+            "icon": "Chevron, 12-16px",
+            "rotationOnToggle": "90deg",
+            "animationMs": 150
+          },
+          "scrollbar": {
+            "widthPx": 6,
+            "style": "Custom thin scrollbar",
+            "color": "Subtle, matching sidebar theme"
+          }
+        }
+      },
+      "behavior": {
+        "desktop": "Always visible, fixed position alongside content",
+        "mobile": {
+          "drawer": "Slides in from left with backdrop",
+          "backdrop": "Semi-transparent overlay, click dismisses",
+          "focusTrap": "Focus trapped within drawer when open",
+          "scrollLock": "Body scroll locked when open",
+          "closeOnNavigation": "Closes when user clicks a page link",
+          "closeOnEscape": "Closes on Escape key press"
+        },
+        "activePageOnLoad": "Auto-expand section containing active page, scroll into view",
+        "accessibility": "Tab navigation, Enter/Space to activate links and toggle sections"
+      }
+    },
+    "ContentArea": {
+      "description": "Main prose content area centered between sidebar and TOC",
+      "dimensions": {
+        "maxWidthPx": 768,
+        "paddingHorizontalPx": "32-48",
+        "paddingVerticalPx": 32,
+        "position": "Centered in available space",
+        "minHeight": "Fill available viewport"
+      },
+      "elements": {
+        "Breadcrumbs": {
+          "fontSizePx": "13-14",
+          "color": "Muted text",
+          "separator": "Chevron or slash",
+          "pattern": "Section > Subsection > Current Page",
+          "lastItem": "Not a link, slightly bolder",
+          "ariaLabel": "Breadcrumb",
+          "position": "Above page title"
+        },
+        "PageTitle": {
+          "element": "h1",
+          "fontSizePx": "30-36",
+          "weight": 700,
+          "lineHeight": 1.2,
+          "marginBottomPx": "16-24",
+          "constraint": "Only one H1 per page"
+        },
+        "ProseContent": {
+          "fontSizePx": 16,
+          "weight": 400,
+          "lineHeight": "1.7-1.8",
+          "paragraphSpacingPx": "16-24",
+          "characterWidth": "65-75 characters per line"
+        },
+        "Headings": {
+          "h2": {
+            "fontSizePx": "22-26",
+            "weight": 600,
+            "lineHeight": 1.3,
+            "marginTopPx": "32-48",
+            "marginBottomPx": 16
+          },
+          "h3": {
+            "fontSizePx": "18-20",
+            "weight": 600,
+            "lineHeight": 1.4,
+            "marginTopPx": "24-32",
+            "marginBottomPx": 12
+          },
+          "anchorLink": {
+            "icon": "# symbol or link icon",
+            "visibility": "Hover-revealed or always visible",
+            "behavior": "Click copies anchor URL or scrolls to heading",
+            "idGeneration": "Auto-generated kebab-case from heading text"
+          }
+        },
+        "CodeBlocks": {
+          "background": "Slightly different from page (darker in light mode, lighter in dark mode)",
+          "borderRadiusPx": 8,
+          "paddingPx": 16,
+          "fontFamily": "Monospace (JetBrains Mono, Fira Code, Menlo, or system monospace)",
+          "fontSizePx": "13-14",
+          "syntaxHighlighting": "Build-time via Shiki or similar",
+          "copyButton": {
+            "position": "Top-right corner",
+            "icon": "Clipboard icon",
+            "visibility": "On hover or always visible",
+            "behavior": "Copies code content to clipboard"
+          },
+          "fileLabel": {
+            "position": "Top bar above code",
+            "fontSizePx": "12-13",
+            "background": "Slightly different shade from code background",
+            "content": "File path (e.g., app/layout.tsx)"
+          },
+          "overflow": "Horizontal scroll for long lines (no wrapping)",
+          "lineNumbers": "Optional, muted color"
+        },
+        "Callouts": {
+          "types": {
+            "info": {
+              "color": "Blue",
+              "icon": "Info circle",
+              "background": "#eff6ff (light), reduced opacity (dark)",
+              "border": "#3b82f6"
+            },
+            "warning": {
+              "color": "Amber",
+              "icon": "Warning triangle",
+              "background": "#fffbeb (light), reduced opacity (dark)",
+              "border": "#f59e0b"
+            },
+            "tip": {
+              "color": "Green",
+              "icon": "Lightbulb",
+              "background": "#f0fdf4 (light), reduced opacity (dark)",
+              "border": "#22c55e"
+            },
+            "danger": {
+              "color": "Red",
+              "icon": "Exclamation",
+              "background": "#fef2f2 (light), reduced opacity (dark)",
+              "border": "#ef4444"
+            }
+          },
+          "structure": "Left border (3-4px) + tinted background + icon + optional title + content",
+          "borderRadiusPx": "6-8",
+          "paddingPx": "12-16",
+          "iconSizePx": 20,
+          "fontSizePx": "14-15"
+        },
+        "PrevNextNavigation": {
+          "position": "Bottom of content, full width",
+          "layout": "Two-column: Previous (left) and Next (right)",
+          "content": "Direction label + page title",
+          "paddingPx": 16,
+          "border": "1px border with hover highlight",
+          "borderRadiusPx": 8
+        },
+        "PageMeta": {
+          "lastUpdated": "Text: 'Last updated: [date]', 13px, muted",
+          "editLink": "Link: 'Edit this page on GitHub', 13px",
+          "feedback": "Optional: 'Was this helpful?' thumbs up/down widget",
+          "position": "Below content, above prev/next navigation"
+        }
+      },
+      "behavior": {
+        "scroll": "Natural page-level scroll (not container scroll)",
+        "anchorScroll": "Smooth scroll to heading on TOC link click",
+        "headingAnchors": "Update URL hash without full page reload",
+        "scrollMarginTop": "Header height + 16-24px on heading elements for proper offset"
+      }
+    },
+    "TOC": {
+      "description": "Right sidebar table of contents with scroll-spy active state tracking",
+      "dimensions": {
+        "widthPx": 220,
+        "position": "Sticky, top offset: header height + 16-24px",
+        "maxHeight": "Viewport minus header and padding"
+      },
+      "states": [
+        "visible (desktop)",
+        "hidden (tablet)",
+        "inline-collapsible (mobile)"
+      ],
+      "elements": {
+        "TOCHeader": {
+          "text": "On this page",
+          "fontSizePx": "12-13",
+          "weight": "500-600",
+          "textTransform": "uppercase",
+          "color": "muted"
+        },
+        "TOCLinks": {
+          "source": "H2 and H3 headings from current page content",
+          "h2FontSizePx": "13-14",
+          "h3FontSizePx": "13-14",
+          "h3IndentPx": "12-16",
+          "verticalGapPx": "6-8",
+          "defaultColor": "Muted (#6b7280 light, #71717a dark)",
+          "hoverColor": "Darker (#374151 light, #a1a1aa dark)",
+          "activeColor": "Primary color",
+          "activeTransitionMs": 150
+        }
+      },
+      "behavior": {
+        "scrollSpy": {
+          "implementation": "Intersection Observer API",
+          "observedElements": "All H2 and H3 in content area",
+          "rootMargin": "-60px 0px -70% 0px (offset for sticky header, activate in top ~30%)",
+          "activeRule": "Heading nearest top of viewport",
+          "singleActive": "Only one heading active at a time"
+        },
+        "clickBehavior": "Smooth-scroll to heading, update URL hash",
+        "visibility": {
+          "desktop": "Visible, sticky alongside content",
+          "tablet": "Hidden (insufficient width for three columns)",
+          "mobile": "Inline collapsible 'On this page' disclosure above content",
+          "hideWhen": "Page has fewer than 2 H2/H3 headings"
+        },
+        "overflow": "Independent scroll if TOC longer than viewport (overflow-y: auto)"
+      }
+    },
+    "Footer": {
+      "description": "Multi-column footer with link grid, social icons, and copyright",
+      "dimensions": {
+        "width": "100% viewport",
+        "paddingVerticalPx": "32-48",
+        "paddingHorizontalPx": "24-32"
+      },
+      "layout": "[LinkColumns grid] [SocialIcons] [Copyright]",
+      "elements": {
+        "LinkColumns": {
+          "columnCount": "3-4 on desktop",
+          "columnHeader": {
+            "fontSizePx": "13-14",
+            "weight": 600
+          },
+          "columnLinks": {
+            "fontSizePx": 14,
+            "weight": 400,
+            "color": "Muted, hover: primary"
+          }
+        },
+        "SocialIcons": {
+          "icons": ["GitHub", "X/Twitter", "Discord"],
+          "sizePx": "20-24",
+          "gapPx": 16
+        },
+        "Copyright": {
+          "fontSizePx": 13,
+          "color": "Muted"
+        }
+      },
+      "behavior": {
+        "position": "Flows after content (NOT fixed)",
+        "border": "Top border for separation",
+        "responsive": "3-4 columns on desktop, 2 on tablet, 1 on mobile"
+      }
+    }
+  },
+  "responsiveBreakpoints": {
+    "desktop": {
+      "minWidth": "1280px",
+      "layout": "Three columns: Sidebar (260px) + Content (flexible, max 768px) + TOC (220px)",
+      "header": "Full navigation visible, pill-shaped search trigger",
+      "sidebar": "Fixed position, always visible",
+      "toc": "Sticky, visible",
+      "footer": "3-4 column link grid"
+    },
+    "tablet": {
+      "minWidth": "768px",
+      "maxWidth": "1279px",
+      "layout": "Two columns: Sidebar (260px) + Content (fills remaining)",
+      "header": "May collapse some nav links, search trigger shrinks",
+      "sidebar": "Visible on larger tablets (>=1024px), off-canvas drawer on smaller",
+      "toc": "Hidden or collapsed inline above content",
+      "footer": "2 column link grid"
+    },
+    "mobile": {
+      "maxWidth": "767px",
+      "layout": "Single column: Content only",
+      "header": "Hamburger menu, icon-only search",
+      "sidebar": "Off-canvas drawer (slide from left)",
+      "toc": "Collapsible 'On this page' disclosure above content",
+      "content": "Reduced padding (16-20px)",
+      "footer": "Single column stacked links"
+    },
+    "resizeHandling": {
+      "debounceMs": 200,
+      "behavior": "Close mobile sidebar drawer when resizing to desktop, toggle TOC visibility based on breakpoint",
+      "implementation": "Use matchMedia listeners or resize observer with debounce"
+    }
+  },
+  "stateManagement": {
+    "statesToTrack": {
+      "sidebarOpen": {
+        "type": "boolean",
+        "description": "Mobile sidebar drawer visibility",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "activePage": {
+        "type": "string",
+        "description": "Current documentation page identifier",
+        "determination": "Sync with router current route or URL path",
+        "persistence": "sync with router/URL"
+      },
+      "expandedSections": {
+        "type": "array",
+        "description": "Which sidebar nav sections are expanded. Auto-expand section containing active page on load.",
+        "default": [],
+        "persistence": "sessionStorage recommended",
+        "notes": "On initial load, expand the section containing the active page. Preserve user's expand/collapse choices within a session."
+      },
+      "activeHeading": {
+        "type": "string",
+        "description": "Currently visible heading ID for scroll-spy TOC highlighting",
+        "default": "",
+        "persistence": "component state only",
+        "determination": "Derived from Intersection Observer watching H2/H3 elements"
+      },
+      "searchOpen": {
+        "type": "boolean",
+        "description": "Whether the search overlay (Command Palette) is open",
+        "default": false,
+        "persistence": "component state only"
+      }
+    },
+    "ssrConsiderations": {
+      "sessionStorage": "Only access sessionStorage in onMounted/useEffect",
+      "scrollSpy": "Initialize Intersection Observer only on client side",
+      "expandedSections": "Derive default from active page URL on server, expand on client",
+      "themeFlash": "Prevent flash of wrong theme by injecting script in <head> to set data-theme attribute before render"
+    }
+  },
+  "persistence": {
+    "storage": "sessionStorage",
+    "keys": {
+      "expandedSections": "uipotion.docs.expandedSections.v1"
+    }
+  },
+  "navigationBehavior": {
+    "onRouteChange": {
+      "mobileSidebar": "close",
+      "activeHeading": "reset (re-observe new page headings)",
+      "expandedSections": "auto-expand section containing new active page"
+    }
+  },
+  "internationalization": {
+    "rtl": {
+      "supported": true,
+      "sidebarSide": "start (left in LTR, right in RTL)",
+      "tocSide": "end (right in LTR, left in RTL)",
+      "useLogicalProperties": true,
+      "notes": "Use logical CSS properties (inset-inline-start/end, margin-inline-start/end, padding-inline-start/end) so sidebar and TOC swap sides in RTL layouts."
+    }
+  },
+  "mobileSafeArea": {
+    "applyTo": ["header"],
+    "topInset": "env(safe-area-inset-top)",
+    "notes": "On mobile devices with notches, add safe-area padding to sticky header."
+  },
+  "motionPreferences": {
+    "prefersReducedMotion": {
+      "behavior": "reduce",
+      "rules": [
+        "Disable sidebar drawer slide animation (use instant show/hide)",
+        "Disable section expand/collapse animation",
+        "Disable smooth scroll (use instant jump)",
+        "Keep TOC active state color change (subtle, non-motion)",
+        "Keep backdrop opacity change but reduce to 100ms"
+      ]
+    }
+  },
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "useState for UI state, custom hooks for scroll spy and sidebar logic, Context API for shared docs state (active page, navigation tree)",
+      "customHooks": "Extract logic into separate hooks: useScrollSpy(headingSelector) for Intersection Observer, useSidebarNavigation(activePage) for expand/collapse, useBodyScrollLock(isLocked), useFocusTrap(containerRef, isActive), useMediaQuery(query) for responsive. Each hook handles ONE concern only.",
+      "example": "const { activeHeading } = useScrollSpy('article h2, article h3'); const { expandedSections, toggleSection } = useSidebarNavigation(currentPage);",
+      "componentStructure": "<DocsLayout><DocsHeader onMenuToggle={toggleSidebar} onSearchOpen={openSearch} /><DocsSidebar navigation={tree} activePage={currentPage} open={sidebarOpen} onClose={closeSidebar} /><DocsContent><Breadcrumbs items={path} /><article>{children}</article><PageMeta lastUpdated={meta.updated} editUrl={meta.editUrl} /><PrevNextNav previous={prev} next={next} /></DocsContent><DocsTOC headings={pageHeadings} activeId={activeHeading} /><DocsFooter /></DocsLayout>"
+    },
+    "vue": {
+      "stateManagement": "ref() for UI state, composables for scroll spy and sidebar, provide/inject for shared navigation tree",
+      "example": "const activeHeading = useScrollSpy('article h2, article h3'); const { expandedSections, toggleSection } = useSidebarNavigation(activePage);",
+      "componentStructure": "<DocsLayout><DocsHeader @menu-toggle='toggleSidebar' @search-open='openSearch' /><DocsSidebar :navigation='tree' :active-page='currentPage' :open='sidebarOpen' @close='closeSidebar' /><DocsContent><Breadcrumbs :items='path' /><article><slot /></article><PageMeta :last-updated='meta.updated' :edit-url='meta.editUrl' /><PrevNextNav :previous='prev' :next='next' /></DocsContent><DocsTOC :headings='pageHeadings' :active-id='activeHeading' /><DocsFooter /></DocsLayout>"
+    },
+    "angular": {
+      "stateManagement": "Component properties and Angular services, RxJS BehaviorSubject for shared state, Angular CDK for scroll monitoring",
+      "example": "private activeHeading$ = new BehaviorSubject<string>(''); ngAfterViewInit(){ this.observeHeadings(); }",
+      "componentStructure": "<app-docs-layout><app-docs-header (menuToggle)='toggleSidebar()' (searchOpen)='openSearch()' /><app-docs-sidebar [navigation]='tree' [activePage]='currentPage' [open]='sidebarOpen' (close)='closeSidebar()' /><main class='docs-content'><app-breadcrumbs [items]='path' /><article><router-outlet></router-outlet></article><app-page-meta [lastUpdated]='meta.updated' [editUrl]='meta.editUrl' /><app-prev-next-nav [previous]='prev' [next]='next' /></main><app-docs-toc [headings]='pageHeadings' [activeId]='activeHeading' /><app-docs-footer /></app-docs-layout>"
+    },
+    "svelte": {
+      "stateManagement": "writable stores for UI state, derived stores for computed values, onMount for client-side initialization",
+      "example": "import { writable, derived } from 'svelte/store'; export const activeHeading = writable(''); onMount(() => { observeHeadings(); });",
+      "componentStructure": "<DocsLayout><DocsHeader on:menutoggle={toggleSidebar} on:searchopen={openSearch} /><DocsSidebar {navigation} {activePage} {sidebarOpen} on:close={closeSidebar} /><DocsContent><Breadcrumbs {items} /><article><slot /></article><PageMeta {lastUpdated} {editUrl} /><PrevNextNav {previous} {next} /></DocsContent><DocsTOC {headings} {activeHeading} /><DocsFooter /></DocsLayout>"
+    }
+  },
+  "stylingApproaches": {
+    "note": "These are implementation examples showing how to apply the designSystem specifications using different styling tools. The designSystem section contains the authoritative design values.",
+    "tailwindCSS": {
+      "description": "Use utility classes with CSS Grid for three-column layout. Use arbitrary values for exact pixel values matching tokens.",
+      "layoutExample": "class='grid grid-cols-[260px_minmax(0,1fr)_220px]' for desktop three-column layout",
+      "sidebarExample": "class='fixed top-[60px] start-0 h-[calc(100vh-60px)] w-[260px] overflow-y-auto border-e'",
+      "contentExample": "class='max-w-[768px] mx-auto px-8 py-8'",
+      "tocExample": "class='sticky top-[76px] h-[calc(100vh-76px)] w-[220px] overflow-y-auto'",
+      "key": "Use CSS Grid utilities for the three-column layout. Prefer logical properties (start/end) for RTL support.",
+      "note": "Map token values directly. Hide TOC with lg:hidden and show with xl:block breakpoints."
+    },
+    "cssModules": {
+      "description": "Scoped CSS classes with CSS Grid layout. Apply token values in CSS variables.",
+      "approach": "Define .docsLayout with CSS Grid, .sidebar, .content, .toc as grid children. Use CSS custom properties for token values.",
+      "example": ".docsLayout { display: grid; grid-template-columns: 260px minmax(0, 1fr) 220px; } .sidebar { position: fixed; top: 60px; } .content { max-width: 768px; margin: 0 auto; }",
+      "note": "Use @media queries for responsive column changes. Prefer logical properties."
+    },
+    "styledComponents": {
+      "description": "CSS-in-JS with responsive Grid layout. Map token values to theme or constants.",
+      "approach": "Styled Grid container with responsive columns, styled sidebar/content/toc children",
+      "example": "const DocsGrid = styled.div`display: grid; grid-template-columns: ${p => p.showToc ? '260px minmax(0,1fr) 220px' : '260px minmax(0,1fr)'};`",
+      "note": "Extract tokens into a shared constants module or theme."
+    },
+    "vanillaCSS": {
+      "description": "Standard CSS with CSS Grid and class toggles. CRITICAL: ALWAYS create CSS classes, NEVER inline styles.",
+      "approach": "Define .docs-layout with CSS Grid, use @media queries for responsive breakpoints. Toggle sidebar drawer with .docs-sidebar--open class.",
+      "example": ".docs-layout{display:grid;grid-template-columns:260px minmax(0,1fr) 220px} @media(max-width:1279px){.docs-layout{grid-template-columns:260px minmax(0,1fr)}} @media(max-width:767px){.docs-layout{grid-template-columns:1fr}}",
+      "note": "Use CSS custom properties for token values. Apply classes via className/class attribute."
+    },
+    "sass": {
+      "description": "SCSS with variables, mixins, and CSS Grid. Define token values as SCSS variables.",
+      "approach": "Create SCSS variables for token values, use mixins for responsive breakpoints and grid layouts.",
+      "example": "$sidebar-width: 260px; $toc-width: 220px; $content-max: 768px; .docs-layout { display: grid; grid-template-columns: $sidebar-width minmax(0, 1fr) $toc-width; }",
+      "note": "Map tokens to SCSS variables for maintainability. Use @media mixins for breakpoints."
+    }
+  },
+  "animations": {
+    "sidebarDrawer": {
+      "durationMs": 300,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "transform": "translateX(-100%) to translateX(0)",
+      "closeMs": 250,
+      "performance": {
+        "useTransform": "Use transform for GPU-accelerated slide animation",
+        "willChange": "Set will-change: transform on sidebar drawer element"
+      }
+    },
+    "backdrop": {
+      "fadeInMs": 200,
+      "fadeOutMs": 150,
+      "easing": "ease",
+      "opacity": "0 to 0.5"
+    },
+    "sectionExpandCollapse": {
+      "durationMs": 180,
+      "easing": "ease-in-out",
+      "property": "max-height or grid-template-rows",
+      "chevronRotation": "0deg to 90deg in 180ms"
+    },
+    "scrollSpyHighlight": {
+      "durationMs": 150,
+      "property": "color",
+      "easing": "ease"
+    },
+    "anchorScroll": {
+      "behavior": "smooth",
+      "implementation": "CSS scroll-behavior: smooth on html, or programmatic scrollTo with behavior: 'smooth'",
+      "offset": "scroll-margin-top on heading elements equal to header height + 16-24px"
+    },
+    "searchOverlay": {
+      "fadeInMs": 200,
+      "fadeOutMs": 150,
+      "easing": "ease-out",
+      "optionalScale": "scale(0.98) to scale(1) with opacity"
+    }
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Info and Relationships - Semantic HTML with proper landmark roles (nav, main, aside, header, footer)",
+        "1.4.3": "Contrast Minimum - 4.5:1 for body text, 3:1 for large text",
+        "2.1.1": "Keyboard - All interactive elements keyboard accessible",
+        "2.1.2": "No Keyboard Trap - Focus trapping only in mobile sidebar drawer",
+        "2.4.2": "Page Titled - Descriptive title reflecting current docs page",
+        "2.4.3": "Focus Order - Logical tab order (Header > Sidebar > Content > TOC > Footer)",
+        "2.4.4": "Link Purpose - All links have descriptive text",
+        "2.4.5": "Multiple Ways - Sidebar navigation and search provide multiple paths to content",
+        "2.4.7": "Focus Visible - Clear focus indicators on all interactive elements",
+        "3.2.1": "On Focus - No context changes on focus",
+        "4.1.2": "Name, Role, Value - All elements have accessible names and roles"
+      }
+    },
+    "keyboardNavigation": {
+      "tabOrder": "Header (logo, nav, search, theme, github) > Sidebar navigation > Main content links > TOC links > Footer links",
+      "sidebarItems": {
+        "arrowKeys": "Move between items within current section",
+        "enterSpace": "Navigate to page or expand/collapse section",
+        "escape": "Close mobile drawer"
+      },
+      "tocItems": {
+        "tab": "Move between TOC links",
+        "enter": "Scroll to heading"
+      },
+      "searchShortcut": {
+        "keys": "Cmd+K (Mac) / Ctrl+K (Windows/Linux)",
+        "behavior": "Opens search overlay"
+      },
+      "focusTrap": {
+        "when": "Mobile sidebar drawer is open",
+        "implementation": "Use focus-trap library or manual implementation",
+        "behavior": "Tab cycles within drawer, Shift+Tab cycles backwards"
+      },
+      "focusRestoration": "Return focus to hamburger button when mobile drawer closes",
+      "focusManagement": {
+        "onDrawerOpen": "Move focus to first focusable element in sidebar",
+        "onDrawerClose": "Return focus to mobile menu toggle button",
+        "onEscape": "Close drawer and restore focus"
+      }
+    },
+    "ariaAttributes": {
+      "required": {
+        "sidebarDesktop": {
+          "element": "nav",
+          "aria-label": "Documentation navigation"
+        },
+        "sidebarMobileDrawer": {
+          "role": "dialog",
+          "aria-modal": "true",
+          "aria-label": "Documentation navigation"
+        },
+        "mobileMenuToggle": {
+          "aria-label": "Toggle navigation menu",
+          "aria-expanded": "dynamic (true/false)",
+          "aria-controls": "docs-sidebar"
+        },
+        "activePage": {
+          "aria-current": "page (on current page link only)"
+        },
+        "toc": {
+          "element": "nav",
+          "aria-label": "On this page"
+        },
+        "searchTrigger": {
+          "aria-label": "Search documentation",
+          "aria-keyshortcuts": "Meta+K"
+        },
+        "sectionToggle": {
+          "element": "button",
+          "aria-expanded": "dynamic (true/false)",
+          "aria-controls": "section-content-id"
+        },
+        "themeToggle": {
+          "aria-label": "Switch to dark/light theme (update dynamically based on current state)"
+        },
+        "mainContent": {
+          "element": "main",
+          "id": "main-content"
+        },
+        "breadcrumbs": {
+          "element": "nav",
+          "aria-label": "Breadcrumb",
+          "list": "ol with li items, current page marked with aria-current='page'"
+        },
+        "backdrop": {
+          "aria-hidden": "true",
+          "role": "presentation"
+        }
+      },
+      "optional": {
+        "header": {
+          "element": "header",
+          "role": "banner (semantic <header> preferred)"
+        },
+        "footer": {
+          "element": "footer",
+          "role": "contentinfo (semantic <footer> preferred)"
+        }
+      }
+    },
+    "screenReader": {
+      "announcements": {
+        "sidebarState": "Announce drawer open/close via aria-live region",
+        "pageNavigation": "Announce via document title update on route change"
+      },
+      "labels": {
+        "iconOnlyButtons": "All icon-only buttons (theme, github, copy, hamburger) must have aria-label",
+        "decorativeIcons": "Use aria-hidden='true' on decorative icons"
+      },
+      "hiddenText": {
+        "purpose": "Provide context for screen readers where visual cues alone are used",
+        "css": ".sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }"
+      },
+      "landmarks": {
+        "header": "Site header (banner)",
+        "sidebarNav": "Documentation navigation",
+        "main": "Page content",
+        "tocNav": "On this page",
+        "footer": "Site footer (contentinfo)"
+      }
+    },
+    "focusManagement": {
+      "focusVisible": {
+        "required": true,
+        "css": "outline: 2px solid [primary-color], outline-offset: 2px",
+        "fallback": "Use :focus-visible for modern browsers, :focus for older",
+        "example": "a:focus-visible, button:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }"
+      },
+      "focusOrder": {
+        "principle": "Logical reading order",
+        "order": "Header > Sidebar > Content > TOC > Footer"
+      }
+    },
+    "colorContrast": {
+      "requirement": "WCAG AA: 4.5:1 for normal text, 3:1 for large text (18pt+ or 14pt+ bold)",
+      "verification": "Use WebAIM Contrast Checker or similar tool",
+      "criticalAreas": [
+        "Body text on content background",
+        "Heading text on content background",
+        "Sidebar link text on sidebar background",
+        "TOC link text (default and active states)",
+        "Muted text (breadcrumbs, meta, section headers)",
+        "Code text on code block background",
+        "Callout text on callout background",
+        "Active indicators against adjacent colors",
+        "Focus outlines"
+      ],
+      "recommendation": "Aim for 7:1 for body text (WCAG AAA)"
+    },
+    "implementationChecklist": [
+      "All landmark regions properly labeled (nav, main, aside, header, footer)",
+      "All icon-only buttons have aria-label",
+      "Active page link has aria-current='page'",
+      "Sidebar section toggles have aria-expanded",
+      "Search trigger has aria-keyshortcuts",
+      "Mobile drawer has role='dialog' and aria-modal='true'",
+      "Focus trapped in mobile sidebar drawer",
+      "Focus restored to hamburger button when drawer closes",
+      "Breadcrumbs use nav with aria-label='Breadcrumb'",
+      "Focus visible on all interactive elements",
+      "Color contrast verified with contrast checker tool",
+      "Keyboard navigation works throughout (Tab, Enter, Space, Escape, Arrows)",
+      "Screen reader tested with NVDA, VoiceOver, or JAWS",
+      "Reduced motion respects prefers-reduced-motion"
+    ]
+  },
+  "designSystem": {
+    "note": "These design specifications are tool-agnostic. Implement using the project's chosen styling approach. The stylingApproaches section provides implementation examples, but these values are the source of truth.",
+    "colorGuidelines": {
+      "note": "Dark mode uses a modern 2026 aesthetic, near-black backgrounds (#0a0a0a), zinc grays for text (#a1a1aa, #71717a), refined borders (rgba 0.06).",
+      "header": {
+        "background": {
+          "light": "White (#ffffff) or very light gray (#f9fafb)",
+          "dark": "#0a0a0a"
+        },
+        "border": {
+          "style": "1px solid bottom border",
+          "color": {
+            "light": "rgba(0, 0, 0, 0.08)",
+            "dark": "rgba(255, 255, 255, 0.06)"
+          }
+        },
+        "text": {
+          "light": "#1f2937",
+          "dark": "#fafafa"
+        },
+        "icons": {
+          "default": "#6b7280 (light), #71717a (dark)",
+          "hover": "#374151 (light), #fafafa (dark)"
+        }
+      },
+      "sidebar": {
+        "background": {
+          "light": "White (#ffffff) or very light gray (#fafafa)",
+          "dark": "#0f0f0f"
+        },
+        "border": {
+          "style": "1px solid end border",
+          "color": {
+            "light": "rgba(0, 0, 0, 0.08)",
+            "dark": "rgba(255, 255, 255, 0.06)"
+          }
+        },
+        "sectionHeaders": {
+          "light": "#6b7280",
+          "dark": "#71717a"
+        },
+        "pageLinks": {
+          "light": {
+            "default": "#374151",
+            "hover": "#111827"
+          },
+          "dark": {
+            "default": "#a1a1aa",
+            "hover": "#fafafa"
+          }
+        },
+        "activeItem": {
+          "background": "Primary color at 8-12% opacity",
+          "border": "2-3px start border in primary color",
+          "text": "Primary color"
+        },
+        "hover": {
+          "background": "Neutral at 5-8% opacity",
+          "transition": "150ms"
+        }
+      },
+      "content": {
+        "background": {
+          "light": "White (#ffffff)",
+          "dark": "#0a0a0a"
+        },
+        "bodyText": {
+          "light": "#1f2937 or #374151",
+          "dark": "#a1a1aa"
+        },
+        "headingText": {
+          "light": "#111827",
+          "dark": "#fafafa"
+        },
+        "linkColor": "Primary color, underline on hover",
+        "mutedText": {
+          "light": "#6b7280",
+          "dark": "#71717a"
+        }
+      },
+      "toc": {
+        "background": "Transparent (same as content)",
+        "header": {
+          "light": "#6b7280",
+          "dark": "#71717a"
+        },
+        "links": {
+          "default": {
+            "light": "#6b7280",
+            "dark": "#71717a"
+          },
+          "hover": {
+            "light": "#374151",
+            "dark": "#a1a1aa"
+          },
+          "active": "Primary color (#6366f1)"
+        }
+      },
+      "codeBlocks": {
+        "background": {
+          "light": "#f8fafc or #f5f5f5",
+          "dark": "#171717"
+        },
+        "border": {
+          "light": "rgba(0, 0, 0, 0.08)",
+          "dark": "rgba(255, 255, 255, 0.06)"
+        },
+        "fileLabel": {
+          "background": "Slightly different shade from code background"
+        },
+        "copyButton": {
+          "default": "Muted icon",
+          "hover": "Full opacity"
+        }
+      },
+      "callouts": {
+        "info": {
+          "background": {
+            "light": "#eff6ff",
+            "dark": "rgba(59, 130, 246, 0.08)"
+          },
+          "border": "#3b82f6"
+        },
+        "warning": {
+          "background": {
+            "light": "#fffbeb",
+            "dark": "rgba(245, 158, 11, 0.08)"
+          },
+          "border": "#f59e0b"
+        },
+        "tip": {
+          "background": {
+            "light": "#f0fdf4",
+            "dark": "rgba(34, 197, 94, 0.08)"
+          },
+          "border": "#22c55e"
+        },
+        "danger": {
+          "background": {
+            "light": "#fef2f2",
+            "dark": "rgba(239, 68, 68, 0.08)"
+          },
+          "border": "#ef4444"
+        }
+      },
+      "footer": {
+        "background": {
+          "light": "#f9fafb or white",
+          "dark": "#0a0a0a"
+        },
+        "border": {
+          "style": "1px solid top border",
+          "color": {
+            "light": "rgba(0, 0, 0, 0.08)",
+            "dark": "rgba(255, 255, 255, 0.06)"
+          }
+        },
+        "text": {
+          "light": "#6b7280",
+          "dark": "#71717a"
+        },
+        "links": {
+          "default": "Match footer text",
+          "hover": "Primary color or lighter"
+        }
+      },
+      "backdrop": {
+        "background": "rgba(0, 0, 0, 0.5)",
+        "blur": "Optional: backdrop-filter: blur(4px)",
+        "dark": {
+          "background": "rgba(0, 0, 0, 0.7)",
+          "blur": "backdrop-filter: blur(8px)"
+        }
+      },
+      "searchOverlay": {
+        "panel": {
+          "background": "var(--bg-page) or inherited from content",
+          "dark": {
+            "shadow": "0 24px 80px rgba(0, 0, 0, 0.5)"
+          }
+        },
+        "activeRow": "Primary color at 8-12% opacity (--bg-active)",
+        "layout": "Flex column: search input (shrink-0), results list (flex-1 min-h-0 overflow-y-auto), footer (shrink-0). Only results scroll."
+      }
+    },
+    "typography": {
+      "fontFamily": {
+        "note": "Use project's font stack (system-ui, -apple-system, sans-serif or custom)",
+        "code": "Monospace (JetBrains Mono, Fira Code, Menlo, or system monospace)"
+      },
+      "sizes": {
+        "body": "16px, regular (400), line-height 1.7-1.8",
+        "h1": "30-36px, bold (700), line-height 1.2",
+        "h2": "22-26px, semibold (600), line-height 1.3",
+        "h3": "18-20px, semibold (600), line-height 1.4",
+        "sidebarNavItems": "14px, regular (400)",
+        "sidebarSectionHeaders": "12-13px, medium (500), uppercase",
+        "tocLinks": "13-14px, regular (400)",
+        "breadcrumbs": "13-14px, regular (400)",
+        "code": "13-14px, monospace",
+        "footer": "13-14px, regular (400)",
+        "callout": "14-15px, regular (400)"
+      }
+    },
+    "spacing": {
+      "scale": "4, 8, 12, 16, 20, 24, 32, 48, 64px",
+      "header": "16-24px horizontal, 16px vertical",
+      "sidebar": "16-20px horizontal, 8-12px vertical per item",
+      "content": "32-48px horizontal, 32px vertical (desktop), 16-20px (mobile)",
+      "toc": "16px start padding",
+      "footer": "32-48px vertical, 24-32px horizontal",
+      "betweenSections": "24-32px",
+      "betweenParagraphs": "16-24px"
+    },
+    "shadows": {
+      "mobileSidebarDrawer": {
+        "light": "4px 0 16px rgba(0, 0, 0, 0.1)",
+        "dark": "4px 0 16px rgba(0, 0, 0, 0.3)"
+      },
+      "prevNextHover": {
+        "light": "0 2px 8px rgba(0, 0, 0, 0.08)",
+        "dark": "0 2px 8px rgba(0, 0, 0, 0.2)"
+      }
+    },
+    "borderRadius": {
+      "codeBlocks": "8px",
+      "callouts": "6-8px",
+      "searchTrigger": "8px or pill (9999px)",
+      "prevNextCards": "8px",
+      "headerButtons": "6-8px"
+    },
+    "visualHierarchy": {
+      "principles": [
+        "Header provides consistent top-level navigation context",
+        "Sidebar provides clear hierarchical page navigation",
+        "Content area uses generous whitespace for comfortable reading",
+        "TOC provides lightweight secondary navigation without competing with content",
+        "Active states are clearly distinguishable from hover states",
+        "Code blocks and callouts are visually distinct from prose",
+        "Footer is clearly separated from content with border"
+      ]
+    }
+  },
+  "overflowPolicy": {
+    "page": "noHorizontalScroll",
+    "sidebar": {
+      "x": "hidden",
+      "y": "auto (independent scroll)"
+    },
+    "toc": {
+      "x": "hidden",
+      "y": "auto (when longer than viewport)"
+    },
+    "codeBlocks": {
+      "x": "auto (horizontal scroll for long lines)",
+      "y": "hidden"
+    }
+  },
+  "dataStructures": {
+    "navigationTree": {
+      "description": "Hierarchical sidebar navigation structure",
+      "example": [
+        {
+          "id": "getting-started",
+          "label": "Getting Started",
+          "type": "section",
+          "children": [
+            {
+              "id": "installation",
+              "label": "Installation",
+              "href": "/docs/getting-started/installation",
+              "type": "page"
+            },
+            {
+              "id": "quickstart",
+              "label": "Quickstart",
+              "href": "/docs/getting-started/quickstart",
+              "type": "page"
+            },
+            {
+              "id": "project-structure",
+              "label": "Project Structure",
+              "href": "/docs/getting-started/project-structure",
+              "type": "page"
+            }
+          ]
+        },
+        {
+          "id": "guides",
+          "label": "Guides",
+          "type": "section",
+          "children": [
+            {
+              "id": "routing",
+              "label": "Routing",
+              "href": "/docs/guides/routing",
+              "type": "page"
+            },
+            {
+              "id": "data-fetching",
+              "label": "Data Fetching",
+              "type": "section",
+              "children": [
+                {
+                  "id": "server-side",
+                  "label": "Server-Side",
+                  "href": "/docs/guides/data-fetching/server-side",
+                  "type": "page"
+                },
+                {
+                  "id": "client-side",
+                  "label": "Client-Side",
+                  "href": "/docs/guides/data-fetching/client-side",
+                  "type": "page"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "breadcrumbs": {
+      "description": "Array of breadcrumb items for current page path",
+      "example": [
+        { "label": "Docs", "href": "/docs" },
+        { "label": "Guides", "href": "/docs/guides" },
+        { "label": "Data Fetching", "href": "/docs/guides/data-fetching" },
+        { "label": "Server-Side", "current": true }
+      ]
+    },
+    "pageHeadings": {
+      "description": "Array of H2/H3 headings extracted from current page for TOC",
+      "example": [
+        { "id": "overview", "text": "Overview", "level": 2 },
+        { "id": "installation", "text": "Installation", "level": 2 },
+        { "id": "npm", "text": "npm", "level": 3 },
+        { "id": "yarn", "text": "yarn", "level": 3 },
+        { "id": "configuration", "text": "Configuration", "level": 2 },
+        { "id": "api-reference", "text": "API Reference", "level": 2 }
+      ]
+    },
+    "prevNextPages": {
+      "description": "Previous and next page in documentation sequence",
+      "example": {
+        "previous": { "label": "Installation", "href": "/docs/getting-started/installation" },
+        "next": { "label": "Project Structure", "href": "/docs/getting-started/project-structure" }
+      }
+    }
+  },
+  "commonVariations": {
+    "withVersionSwitcher": "Add dropdown in sidebar header or main header for documentation version selection. URL pattern: /docs/v2/...",
+    "withApiReference": "Wider content area or two-panel layout (description + code example side by side) for auto-generated API docs.",
+    "withSearchResults": "Replace content area with search results list while maintaining sidebar context.",
+    "withFeedbackWidget": "'Was this helpful?' thumbs up/down at page bottom with optional comment field.",
+    "withTabbedContent": "Inline tabs for showing code in multiple languages or framework variants."
+  },
+  "zIndexLayers": {
+    "base": 0,
+    "toc": 10,
+    "sidebarDesktop": 30,
+    "header": 40,
+    "mobileBackdrop": 40,
+    "mobileSidebarDrawer": 50,
+    "searchOverlay": 60,
+    "tooltips": 70
+  },
+  "implementationDetails": {
+    "scrollSpy": {
+      "api": "Intersection Observer",
+      "observe": "All H2 and H3 elements within the content article",
+      "rootMargin": "-60px 0px -70% 0px (header offset, activate in top ~30% of viewport)",
+      "activeRule": "When multiple headings intersect, use the one closest to the top",
+      "cleanup": "Disconnect observer on unmount or page change",
+      "debounce": "Not needed (Intersection Observer is already efficient)"
+    },
+    "bodyScrollLock": {
+      "when": "Mobile sidebar drawer is open",
+      "how": "Prefer fixed body + preserved scroll position. Fallback: document.body.style.overflow = 'hidden'.",
+      "cleanup": "Restore previous overflow/position styles on close"
+    },
+    "focusManagement": {
+      "trapFocus": "Use focus-trap library or manual implementation within mobile sidebar drawer",
+      "restoreFocus": "Return focus to hamburger button when drawer closes"
+    },
+    "anchorScrolling": {
+      "method": "scroll-margin-top CSS property on heading elements (value = header height + 16-24px)",
+      "urlHash": "Update window.location.hash on scroll-spy change or heading click",
+      "smoothScroll": "CSS scroll-behavior: smooth on html, or programmatic scrollTo"
+    },
+    "searchKeyboard": {
+      "shortcut": "Cmd+K (Mac) / Ctrl+K (Windows/Linux)",
+      "implementation": "Add global keydown listener for metaKey+k / ctrlKey+k, call event.preventDefault(), open search state",
+      "cleanup": "Remove listener on unmount"
+    },
+    "sidebarAutoExpand": {
+      "onLoad": "Find the section containing the active page and expand it (and its parents)",
+      "onNavigation": "Expand the section containing the newly active page",
+      "scrollIntoView": "Scroll sidebar to make active page link visible"
+    },
+    "printStyles": {
+      "hide": "Header nav, sidebar, TOC, footer, search trigger",
+      "show": "Content at full width",
+      "expand": "All code blocks fully visible"
+    }
+  },
+  "edgeCases": {
+    "longSidebarNavigation": "Sidebar scrolls independently, active page scrolled into view on load, maintain scroll position within session",
+    "shortPages": "Hide TOC when page has fewer than 2 H2/H3 headings, content expands to fill available width",
+    "longHeadings": "TOC links truncate with ellipsis after 2 lines (line-clamp: 2), sidebar links truncate after 1 line",
+    "deepNesting": "Max recommended sidebar depth: 3 levels. Beyond that, flatten or use separate section.",
+    "codeBlockOverflow": "Horizontal scroll within code block container, never expand beyond content width",
+    "rapidScroll": "Intersection Observer handles efficiently by design, no additional debounce needed",
+    "routeChangeOnMobile": "Close sidebar drawer after navigation on mobile",
+    "printStyles": "Hide sidebar, TOC, header nav, footer. Show content at full width."
+  },
+  "accessibilityExamples": {
+    "sidebarDesktop": {
+      "html": "<nav id='docs-sidebar' aria-label='Documentation navigation'>",
+      "note": "Standard nav landmark for desktop sidebar"
+    },
+    "sidebarMobileDrawer": {
+      "html": "<div role='dialog' aria-modal='true' aria-label='Documentation navigation'>",
+      "note": "Dialog role for mobile drawer with focus trap"
+    },
+    "activePage": {
+      "html": "<a href='/docs/guides/routing' aria-current='page' class='nav-link active'>Routing</a>",
+      "note": "Only set aria-current on the current page link"
+    },
+    "toc": {
+      "html": "<nav aria-label='On this page'><h2 class='toc-header'>On this page</h2><ul><li><a href='#overview' class='toc-link toc-link--active'>Overview</a></li></ul></nav>",
+      "note": "Labeled nav landmark for table of contents"
+    },
+    "searchTrigger": {
+      "html": "<button aria-label='Search documentation' aria-keyshortcuts='Meta+K'>Search docs... <kbd>⌘K</kbd></button>",
+      "note": "Include keyboard shortcut in aria-keyshortcuts attribute"
+    },
+    "sectionToggle": {
+      "html": "<button aria-expanded='true' aria-controls='section-getting-started'>Getting Started <svg aria-hidden='true'>...</svg></button><div id='section-getting-started'>...</div>",
+      "note": "Toggle button with aria-expanded and aria-controls"
+    },
+    "breadcrumbs": {
+      "html": "<nav aria-label='Breadcrumb'><ol><li><a href='/docs'>Docs</a></li><li><a href='/docs/guides'>Guides</a></li><li><span aria-current='page'>Routing</span></li></ol></nav>",
+      "note": "Breadcrumb nav with ordered list, current page not a link"
+    },
+    "focusVisible": {
+      "css": "a:focus-visible, button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }"
+    },
+    "screenReaderOnly": {
+      "css": ".sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }"
+    }
+  },
+  "projectDetection": {
+    "framework": {
+      "description": "Detect the project's framework by examining package.json, existing component files, and project structure.",
+      "detectionSteps": [
+        "Check package.json for framework dependencies (react, next, vue, nuxt, @angular/core, svelte, sveltekit, astro)",
+        "Examine existing component files for framework-specific patterns (JSX for React, .vue files for Vue, etc.)",
+        "Check build configuration (next.config.js, nuxt.config.ts, angular.json, svelte.config.js, astro.config.mjs)",
+        "Look for documentation-specific frameworks (nextra, docusaurus, vitepress, starlight) which may have built-in patterns"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect the project's styling approach. Use the detected system exclusively.",
+      "detectionSteps": [
+        "Check package.json for styling dependencies: tailwindcss, styled-components, emotion, sass, less, css-modules",
+        "Look for config files: tailwind.config.js, postcss.config.js, sass config",
+        "Examine existing component files to see how styles are imported and applied",
+        "Check for style files: .css, .scss, .module.css, styled-components patterns",
+        "Identify class naming conventions and utility functions (cn, clsx, classnames)",
+        "If no styling system detected, use vanilla CSS with semantic class names"
+      ],
+      "adaptationRules": [
+        "If Tailwind: Use utility classes with CSS Grid, respect existing config, use arbitrary values for token pixel values",
+        "If SCSS/CSS: Create SCSS/CSS files matching project structure, use CSS Grid, follow naming conventions",
+        "If styled-components: Use styled-components with CSS Grid, follow existing patterns",
+        "If CSS Modules: Use .module.css files with CSS Grid, follow existing module patterns",
+        "If no styling system: Use vanilla CSS with semantic class names (.docs-layout, .docs-sidebar, .docs-toc)"
+      ]
+    },
+    "designTokens": {
+      "description": "Identify existing design tokens, color systems, and spacing scales. Use them instead of inventing new values.",
+      "detectionSteps": [
+        "Check for design token files (tokens.json, theme.js, design-tokens.css)",
+        "Examine Tailwind config theme values if using Tailwind",
+        "Look at existing components for color, spacing, and typography patterns",
+        "Check CSS custom properties (--color-*, --spacing-*) in global styles",
+        "If tokens exist, use them. If not, use values matching existing component styles"
+      ]
+    }
+  },
+  "outputConstraints": {
+    "must": [
+      "Detect and use ONLY the project's existing framework - match existing component patterns",
+      "Detect and use ONLY the project's existing styling system - match existing styling patterns",
+      "Use CSS Grid for the three-column layout structure",
+      "Implement scroll-spy TOC with Intersection Observer API",
+      "Use project's existing design tokens, color system, and spacing scales if available",
+      "Use project's class composition utility (cn, clsx, classnames) if it exists",
+      "Follow project's naming conventions (BEM, camelCase, kebab-case)",
+      "Match the structure and patterns of existing components in the project"
+    ],
+    "mustNot": [
+      "Do NOT introduce new styling systems (if project uses Tailwind, don't add SCSS; if SCSS, don't add Tailwind)",
+      "Do NOT add <style> blocks unless that's the project's convention (e.g., Vue SFC <style> blocks)",
+      "Do NOT use inline style attributes unless necessary for dynamic values",
+      "Do NOT hardcode colors/values - use project's design tokens or match existing component values",
+      "Do NOT import new UI libraries or styling dependencies",
+      "CRITICAL: When vanilla CSS is detected, NEVER use inline style attributes. ALWAYS create CSS classes in a stylesheet.",
+      "CRITICAL: When React is detected, NEVER put multiple concerns in a single useEffect. ALWAYS extract into separate custom hooks (useScrollSpy, useSidebarNavigation, useBodyScrollLock, useFocusTrap, useMediaQuery)."
+    ]
+  },
+  "testingChecklist": [
+    "Three-column layout renders correctly on desktop (>=1280px)",
+    "Two-column layout works on tablet (sidebar + content, no TOC)",
+    "Single-column layout works on mobile (content only, sidebar as drawer)",
+    "Sidebar navigation tree expands and collapses sections",
+    "Active page is highlighted in sidebar with visual indicator",
+    "Active page's parent section auto-expands on load",
+    "Sidebar scrolls independently and active page is visible on load",
+    "TOC displays H2/H3 headings from current page",
+    "Scroll spy correctly highlights current heading in TOC",
+    "Clicking TOC link smooth-scrolls to heading with proper offset for sticky header",
+    "URL hash updates when scrolling to or clicking headings",
+    "Cmd+K / Ctrl+K opens search overlay",
+    "Search trigger button opens search overlay on click",
+    "Mobile sidebar drawer opens and closes with smooth animation",
+    "Mobile backdrop dismisses sidebar on click",
+    "Focus is trapped in mobile sidebar drawer",
+    "Focus returns to hamburger button when drawer closes",
+    "Body scroll is locked when mobile drawer is open",
+    "Escape key closes mobile drawer",
+    "Sidebar closes after navigation on mobile",
+    "Breadcrumbs display correct hierarchical path",
+    "Prev/Next navigation links show correct pages and work on click",
+    "Code blocks have syntax highlighting and working copy button",
+    "Code block file labels display correctly when specified",
+    "Callout blocks render with correct type-specific styling (info, warning, tip, danger)",
+    "Theme toggle switches between light and dark mode",
+    "Keyboard navigation works throughout (Tab, Enter, Space, Escape, Arrow keys in sidebar)",
+    "Screen reader landmarks are correctly identified",
+    "All icon-only buttons have descriptive aria-label",
+    "aria-current='page' set on active sidebar link",
+    "aria-expanded updated on sidebar section toggles",
+    "Color contrast meets WCAG AA (4.5:1 for body text, 3:1 for large text)",
+    "Responsive at all breakpoints (no horizontal scroll)",
+    "Window resize transitions between layouts correctly",
+    "TOC hides on pages with fewer than 2 headings",
+    "Footer renders below content (not fixed) with multi-column links",
+    "Print styles hide navigation and show content at full width",
+    "Prefers-reduced-motion reduces or disables animations",
+    "SSR/hydration safe (no sessionStorage/Intersection Observer during SSR)",
+    "Styling uses only project conventions (no ad-hoc CSS)"
+  ],
+  "aiImplementationPrompt": "Create a three-column documentation website layout with: (1) Sticky header (60px) with logo, nav links, Cmd+K search trigger, theme toggle, and GitHub link. (2) Left sidebar (260px) with hierarchical navigation tree, collapsible sections, active page highlighting, and auto-expand of active section. Off-canvas drawer on mobile with backdrop, focus trap, scroll lock. (3) Main content area (max 768px) centered with breadcrumbs, prose styling, heading anchors, code blocks (syntax highlight + copy button + file label), callout blocks (info/warning/tip/danger), prev/next page navigation, and page meta (last updated, edit link). (4) Right TOC sidebar (220px) with scroll-spy using Intersection Observer to highlight current heading, hidden on tablet, collapsible inline on mobile. (5) Multi-column footer below content. Use CSS Grid: grid-template-columns: 260px minmax(0,1fr) 220px for desktop, drop TOC column on tablet, single column on mobile. Include ARIA landmarks, keyboard navigation, and WCAG AA compliance. Implement Cmd+K keyboard shortcut for search — the search overlay MUST be a full Command Palette following the Command Palette component potion (potions/components/command-palette) with fuzzy matching, grouped results, keyboard navigation, and ARIA. Do NOT implement a simple filter input. Respect prefers-reduced-motion. Adapt to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. CRITICAL: Detect framework/styling first. If vanilla CSS, create classes not inline styles. If React, extract into custom hooks.",
+  "meta": {
+    "created": "2026-02-24",
+    "updated": "2026-02-25",
+    "webUrl": "https://uipotion.com/potions/layouts/documentation.html",
+    "agentGuideUrl": "https://uipotion.com/potions/layouts/documentation.json",
+    "markdownUrl": "https://uipotion.com/potions/layouts/documentation.md",
+    "relatedPotions": [
+      {
+        "id": "command-palette",
+        "category": "components",
+        "relationship": "requires",
+        "description": "Required for the Cmd+K search overlay. The documentation search MUST be implemented as a Command Palette following this potion's full specification.",
+        "required": true
+      },
+      {
+        "id": "navbar",
+        "category": "components",
+        "relationship": "complements",
+        "description": "For the header navigation bar with responsive mobile menu behavior.",
+        "required": false
+      },
+      {
+        "id": "tabs",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "For content variant switching within documentation (e.g., npm/yarn/pnpm installation commands, framework-specific examples).",
+        "required": false
+      },
+      {
+        "id": "dark-light-mode",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "For the theme toggle functionality with system preference detection and persistence.",
+        "required": false
+      },
+      {
+        "id": "button",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "For header actions, code block copy buttons, prev/next navigation, and feedback widgets.",
+        "required": false
+      }
+    ]
+  }
+}
