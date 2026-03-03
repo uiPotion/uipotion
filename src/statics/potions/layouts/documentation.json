@@ -1457,6 +1457,13 @@
         "required": true
       },
       {
+        "id": "sidebar-navigation",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: A standalone sidebar navigation component with collapsible icon-only mode, multi-level groups, and inline search. Use for a more feature-rich docs sidebar than the one embedded in this layout.",
+        "required": false
+      },
+      {
         "id": "navbar",
         "category": "components",
         "relationship": "complements",

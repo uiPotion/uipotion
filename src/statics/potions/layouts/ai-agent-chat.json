@@ -1088,6 +1088,13 @@
     "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
     "relatedPotions": [
       {
+        "id": "sidebar-navigation",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: A standalone sidebar navigation component for conversation history, agent switching, or settings panels alongside the chat area.",
+        "required": false
+      },
+      {
         "id": "command-palette",
         "category": "components",
         "relationship": "complements",

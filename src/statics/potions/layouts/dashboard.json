@@ -1127,6 +1127,13 @@
     "webUrl": "https://uipotion.com/potions/layouts/dashboard.html",
     "relatedPotions": [
       {
+        "id": "sidebar-navigation",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: A detailed standalone sidebar navigation component with collapsible icon-only mode, multi-level groups, badges, and inline search. Use this for a more feature-rich sidebar than the one embedded in this layout.",
+        "required": false
+      },
+      {
         "id": "navbar",
         "category": "components",
         "relationship": "complements",

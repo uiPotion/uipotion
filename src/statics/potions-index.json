@@ -438,8 +438,29 @@
       "created": "2026-02-24",
       "updated": "2026-02-24",
       "markdownUrl": "https://uipotion.com/potions/layouts/documentation.md"
+    },
+    {
+      "id": "sidebar-navigation",
+      "name": "Sidebar Navigation",
+      "category": "components",
+      "tags": [
+        "components",
+        "sidebar",
+        "navigation",
+        "collapsible",
+        "multi-level",
+        "responsive",
+        "overlay",
+        "a11y"
+      ],
+      "excerpt": "A responsive sidebar navigation component with collapsible icon-only mode, multi-level nested groups, badge support, inline search, and mobile overlay. The primary navigation pattern for SaaS dashboards, admin panels, and application shells.",
+      "webUrl": "https://uipotion.com/potions/components/sidebar-navigation",
+      "agentGuideUrl": "https://uipotion.com/potions/components/sidebar-navigation.json",
+      "created": "2026-03-03",
+      "updated": "2026-03-03",
+      "markdownUrl": "https://uipotion.com/potions/components/sidebar-navigation.md"
     }
   ],
-  "totalCount": 20,
-  "lastUpdated": "2026-02-24"
+  "totalCount": 21,
+  "lastUpdated": "2026-03-03"
 }

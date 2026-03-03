@@ -1,0 +1,731 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
+  "id": "sidebar-navigation",
+  "version": "1.0.0",
+  "name": "Sidebar Navigation",
+  "category": "components",
+  "tags": [
+    "sidebar",
+    "navigation",
+    "collapsible",
+    "multi-level",
+    "responsive",
+    "overlay",
+    "a11y"
+  ],
+  "description": "A responsive sidebar navigation component with collapsible icon-only mode, multi-level nested groups, badge support, inline search, and mobile overlay. The primary navigation pattern for SaaS dashboards, admin panels, and application shells.",
+  "tokens": {
+    "layout": {
+      "sidebarWidthExpandedPx": 260,
+      "sidebarWidthCollapsedPx": 64,
+      "headerHeightPx": 64,
+      "itemHeightPx": 40,
+      "itemPaddingXPx": 12,
+      "nestedIndentPx": 16,
+      "iconSizePx": 20,
+      "badgeMinWidthPx": 20,
+      "borderRadiusPx": 6,
+      "footerHeightPx": 56,
+      "desktopBreakpointPx": 1024,
+      "tabletBreakpointPx": 768,
+      "zIndex": {
+        "sidebar": 40,
+        "backdrop": 30,
+        "tooltip": 50
+      }
+    },
+    "motion": {
+      "collapseTransitionMs": 200,
+      "mobileSlideMs": 300,
+      "mobileSlideCloseMs": 250,
+      "backdropFadeMs": 200,
+      "groupExpandMs": 200,
+      "tooltipDelayMs": 400,
+      "tooltipFadeMs": 150,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "reducedMotionDurationMs": 100
+    }
+  },
+  "projectDetection": {
+    "framework": {
+      "description": "Identify the UI framework and routing primitives so the sidebar matches existing conventions.",
+      "detectionSteps": [
+        "Inspect package.json dependencies to identify the framework (React/Vue/Angular/Svelte) and router (Next.js, react-router, Vue Router, etc.).",
+        "Open 2-3 existing components to confirm patterns (hooks vs composition API, state conventions, folder structure).",
+        "Confirm SSR/hydration constraints (e.g., Next.js/Nuxt): do not access window/document before mount."
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect the project's styling approach and use ONLY that approach (no new styling systems).",
+      "detectionSteps": [
+        "Inspect package.json for tailwindcss, sass, styled-components, @emotion/*, vanilla-extract, css-modules tooling.",
+        "Inspect existing components: Tailwind utility usage vs CSS Modules vs SCSS imports vs styled-components/emotion patterns.",
+        "Inspect config files (tailwind.config.*, postcss.config.*, vite/webpack configs) to confirm the styling pipeline."
+      ],
+      "adaptationRules": [
+        "If Tailwind is present, use Tailwind utility classes and existing token conventions; do not add new CSS files.",
+        "If CSS Modules are used, create/extend a module stylesheet and follow existing naming conventions; avoid inline style attributes.",
+        "If SCSS is used, create/extend SCSS in the existing structure; keep mixins/variables consistent.",
+        "If styled-components/emotion is used, implement styles using that library; do not introduce class-based stylesheets.",
+        "If vanilla CSS is used, define reusable classes in a stylesheet (no inline style attributes)."
+      ]
+    },
+    "designTokens": {
+      "description": "Align spacing, typography, color surfaces, and elevation to existing project tokens.",
+      "detectionSteps": [
+        "Locate token sources (CSS variables, Tailwind theme, theme files, design system packages).",
+        "Identify surface/background colors for sidebar, active item, and hover states.",
+        "Identify spacing/typography scales used in existing navigation or layout components.",
+        "Check for existing sidebar or navigation patterns to extend rather than duplicate."
+      ]
+    }
+  },
+  "outputConstraints": {
+    "must": [
+      "Match existing framework component patterns and routing/link components.",
+      "Match existing styling conventions exactly (Tailwind/CSS Modules/SCSS/styled-components/etc.).",
+      "Use a <nav> landmark with a descriptive aria-label.",
+      "Implement mobile overlay with focus trap + focus restoration.",
+      "Persist collapsed state in localStorage so the preference survives page reloads.",
+      "Show tooltips on navigation items when sidebar is collapsed (icon-only mode).",
+      "Support nested navigation groups with expand/collapse.",
+      "Be SSR/hydration safe (no DOM access before mount).",
+      "Respect prefers-reduced-motion: reduce durations to <= tokens.motion.reducedMotionDurationMs and avoid transform-based animations where possible.",
+      "In collapsed mode, render badges as small dot indicators positioned absolutely on the icon (not as inline/flow elements) to prevent layout overflow in the narrow 64px sidebar."
+    ],
+    "mustNot": [
+      "Do not introduce a new styling system.",
+      "Do not add <style> blocks in frameworks that use utility classes or CSS-in-JS.",
+      "Do not use inline style attributes when vanilla CSS or CSS Modules are detected.",
+      "Do not use role=\"menu\" / role=\"menuitem\" unless fully implementing the ARIA menu pattern.",
+      "Do not hardcode colors if the project uses design tokens or theme variables.",
+      "Do not put navigation items inside a scrollable container without ensuring keyboard focus scrolls them into view."
+    ]
+  },
+  "aiAgentInstructions": {
+    "summary": "Implement a responsive sidebar navigation component with collapsible icon-only mode on desktop, multi-level nested groups, badge indicators, optional inline search, and a mobile overlay with focus trap. The sidebar is the primary navigation surface for SaaS applications and admin dashboards. Ensure WCAG AA compliance with correct ARIA, keyboard support, focus management, and reduced-motion behavior.",
+    "keyFeatures": [
+      "Collapsible: Desktop sidebar toggles between expanded (260px) and collapsed/icon-only (64px) modes",
+      "Multi-level groups: Navigation items can have nested children with expand/collapse disclosure",
+      "Badges: Optional count or status badges on navigation items (e.g., unread count, new indicator)",
+      "Header slot: Logo/brand area at the top; collapses to icon-only logo in collapsed mode",
+      "Footer slot: User avatar/menu or settings shortcut pinned at the bottom",
+      "Inline search: Optional search input to filter navigation items (useful for large navigation trees)",
+      "Mobile overlay: Full-height slide-in overlay with backdrop on mobile/tablet, with focus trap and body scroll lock",
+      "Tooltips: Show item labels as tooltips on hover/focus when sidebar is collapsed",
+      "Active item: Highlights current route with visual indicator and aria-current=\"page\"",
+      "Persistence: Collapsed/expanded preference saved in localStorage",
+      "Responsive: Fixed sidebar on desktop, overlay on tablet/mobile",
+      "Accessibility: WCAG AA, nav landmark, keyboard navigation, focus management, screen reader support",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system.",
+      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect framework + router + styling system + design tokens using projectDetection before writing code.",
+      "1. Build component anatomy: Root (aside element), Header (logo/brand), Search (optional), NavigationGroups (labeled sections), NavigationItems (icon + label + badge), NestedGroups (disclosure children), CollapseToggle, Footer (user/settings), MobileOverlay, Backdrop.",
+      "2. Implement controlled/uncontrolled state for collapsed (desktop) and mobileOpen (mobile/tablet).",
+      "3. Persist collapsed preference to localStorage; read on mount (SSR-safe: default to expanded, update after hydration).",
+      "4. Implement navigation groups with expand/collapse: each group header is a disclosure button (aria-expanded) controlling its children panel.",
+      "5. Implement active item detection: compare current URL/route to item hrefs, apply visual highlight and aria-current=\"page\".",
+      "6. Implement collapsed mode (icon-only): hide labels, show only icons, add tooltips on hover/focus for each item.",
+      "7. Implement inline search (optional): filter navigation items by label, show 'no results' state, clear button.",
+      "8. Implement badge rendering on navigation items: count badges (number), dot badges (boolean), status badges (string). IMPORTANT: In collapsed mode, do NOT render full badges (count numbers, status text) as flow siblings alongside the icon — they overflow the narrow 64px sidebar. Instead, render a small dot indicator (6-8px) positioned absolutely on the icon element (top-right corner). The icon wrapper must have position: relative. Only render full-size badges in expanded mode.",
+      "9. Mobile overlay: slide-in from left (or right if position=right), backdrop, focus trap, initial focus, focus restoration to trigger, Escape close, backdrop click close, body scroll lock.",
+      "10. Apply ARIA: <nav aria-label>, aria-current=\"page\" on active item, aria-expanded on group toggles, disclosure semantics for nested groups, dialog semantics for mobile overlay.",
+      "11. Keyboard navigation: Tab through items, Enter/Space to activate links and toggle groups, Escape to close mobile overlay, Home/End to jump to first/last item.",
+      "12. Add animations: sidebar width transition (collapse/expand), mobile slide-in/out, group expand/collapse height, tooltip fade. Apply prefers-reduced-motion.",
+      "13. Use ONLY the detected styling system and match naming/import conventions exactly.",
+      "14. Provide a test checklist covering keyboard + screen reader flows for both desktop and mobile states."
+    ]
+  },
+  "componentSpec": {
+    "goal": "Provide a responsive sidebar navigation component that serves as the primary navigation surface for SaaS applications, with collapsible icon-only mode, multi-level groups, badge support, and accessible mobile overlay.",
+    "anatomy": {
+      "slots": [
+        "root",
+        "header",
+        "search",
+        "scrollArea",
+        "navigationGroup",
+        "groupLabel",
+        "navigationItem",
+        "itemIcon",
+        "itemLabel",
+        "itemBadge",
+        "groupToggle",
+        "nestedGroup",
+        "collapseToggle",
+        "footer",
+        "mobileOverlay",
+        "backdrop",
+        "tooltip"
+      ],
+      "hierarchy": "Root (aside) → Header (logo/brand + collapse toggle) | Search (optional) | ScrollArea → NavigationGroup[] → GroupLabel | NavigationItem[] (icon + label + badge + group toggle) → NestedGroup[] | Footer (user/settings) — MobileOverlay (contains Root clone) → Backdrop"
+    },
+    "stateModel": {
+      "collapsed": {
+        "type": "boolean",
+        "description": "Whether the sidebar is in collapsed/icon-only mode (desktop only). When collapsed, width shrinks to tokens.layout.sidebarWidthCollapsedPx, labels are hidden, and tooltips appear on hover/focus.",
+        "default": false,
+        "persistence": "localStorage (key: 'sidebar-collapsed')",
+        "determination": "User toggle or prop override. On mount, read from localStorage (SSR-safe: default expanded, update after hydration)."
+      },
+      "mobileOpen": {
+        "type": "boolean",
+        "description": "Whether the mobile/tablet overlay sidebar is visible.",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "activeItemId": {
+        "type": "string",
+        "description": "ID of the currently active navigation item (matches current route).",
+        "default": "",
+        "persistence": "sync with router/URL",
+        "determination": "Compare current URL/route with navigation item hrefs. Update on route change."
+      },
+      "expandedGroupIds": {
+        "type": "array",
+        "description": "IDs of navigation groups whose children are currently visible.",
+        "default": [],
+        "persistence": "component state (optionally localStorage for cross-session persistence)",
+        "notes": "Auto-expand the group containing the active item on initial render. Allow multiple groups open simultaneously."
+      },
+      "variant": {
+        "type": "enum",
+        "description": "Visual style variant of the sidebar.",
+        "default": "default",
+        "allowedValues": [
+          "default",
+          "compact",
+          "floating"
+        ],
+        "persistence": "props/config",
+        "notes": "default: solid background flush with viewport edge. compact: narrower expanded width (200px), tighter spacing. floating: detached from edge with border-radius and shadow, inset by 8-12px."
+      },
+      "position": {
+        "type": "enum",
+        "description": "Which side of the viewport the sidebar is positioned on.",
+        "default": "left",
+        "allowedValues": [
+          "left",
+          "right"
+        ],
+        "persistence": "props/config",
+        "notes": "RTL layouts may want right positioning. Mobile overlay slides from the corresponding side."
+      },
+      "searchQuery": {
+        "type": "string",
+        "description": "Current value of the inline search filter (if search is enabled).",
+        "default": "",
+        "persistence": "component state only",
+        "notes": "Filters visible navigation items by label match. Empty string shows all items."
+      },
+      "hoverExpanded": {
+        "type": "boolean",
+        "description": "Whether the sidebar is temporarily expanded due to mouse hover while in collapsed mode.",
+        "default": false,
+        "persistence": "component state only",
+        "notes": "Optional behavior (controlled by hoverExpand prop). When enabled, hovering over the collapsed sidebar temporarily expands it; moving the mouse away collapses it again. Do not persist this state."
+      }
+    },
+    "interactions": [
+      {
+        "event": "collapseToggleClick",
+        "result": "toggleCollapsed",
+        "sideEffects": [
+          "updateSidebarWidth",
+          "persistCollapsedState",
+          "updateAriaLabel"
+        ],
+        "accessibilityNotes": "The collapse toggle button should have aria-label describing the action: 'Collapse sidebar' or 'Expand sidebar'."
+      },
+      {
+        "event": "navigationItemClick",
+        "result": "navigateToRoute",
+        "sideEffects": [
+          "updateActiveItemId",
+          "updateAriaCurrent",
+          "closeMobileOverlayIfOpen"
+        ],
+        "accessibilityNotes": "Active item receives aria-current=\"page\". If clicked in mobile overlay, close overlay and restore focus."
+      },
+      {
+        "event": "groupToggleClick",
+        "result": "toggleGroupExpanded",
+        "sideEffects": [
+          "updateAriaExpanded",
+          "animateGroupPanel"
+        ],
+        "accessibilityNotes": "Group toggle button has aria-expanded and aria-controls pointing to the nested group panel."
+      },
+      {
+        "event": "mobileOpenTrigger",
+        "result": "openMobileOverlay",
+        "sideEffects": [
+          "showBackdrop",
+          "lockBodyScroll",
+          "setFocusToFirstItem",
+          "enableFocusTrap",
+          "setBackgroundInert"
+        ],
+        "accessibilityNotes": "Mobile overlay uses dialog semantics. Focus moves to the first focusable element inside."
+      },
+      {
+        "event": "escapeKey",
+        "when": "mobileOpen",
+        "result": "closeMobileOverlay",
+        "sideEffects": [
+          "hideBackdrop",
+          "unlockBodyScroll",
+          "restoreFocusToTrigger",
+          "disableFocusTrap",
+          "unsetBackgroundInert"
+        ],
+        "preventDefault": true,
+        "stopPropagation": true,
+        "accessibilityNotes": "Escape closes the mobile overlay and restores focus to the element that triggered it."
+      },
+      {
+        "event": "backdropClick",
+        "when": "mobileOpen",
+        "result": "closeMobileOverlay",
+        "sideEffects": [
+          "hideBackdrop",
+          "unlockBodyScroll",
+          "restoreFocusToTrigger",
+          "disableFocusTrap",
+          "unsetBackgroundInert"
+        ],
+        "stopPropagation": true
+      },
+      {
+        "event": "mouseEnterSidebar",
+        "when": "collapsed && hoverExpand",
+        "result": "setHoverExpanded",
+        "sideEffects": [
+          "expandSidebarWidth",
+          "showLabels"
+        ],
+        "accessibilityNotes": "Hover expand is a progressive enhancement. Keyboard users can still access all items via tooltips or by toggling collapsed state."
+      },
+      {
+        "event": "mouseLeaveSidebar",
+        "when": "hoverExpanded",
+        "result": "clearHoverExpanded",
+        "sideEffects": [
+          "collapseSidebarWidth",
+          "hideLabels"
+        ]
+      },
+      {
+        "event": "searchInput",
+        "when": "searchEnabled",
+        "result": "filterNavigationItems",
+        "sideEffects": [
+          "updateVisibleItems",
+          "expandMatchingGroups",
+          "showNoResultsIfEmpty"
+        ]
+      },
+      {
+        "event": "keyDown",
+        "when": "focusInsideSidebar",
+        "result": "handleKeyboardNavigation",
+        "sideEffects": [
+          "moveFocusToTarget"
+        ],
+        "accessibilityNotes": "Tab moves between interactive elements in DOM order. Enter/Space activates links and toggles groups. Home/End move focus to first/last visible navigation item."
+      },
+      {
+        "event": "windowResize",
+        "when": "mobileOpen",
+        "result": "closeMobileOverlayIfDesktop",
+        "sideEffects": [
+          "hideBackdrop",
+          "unlockBodyScroll",
+          "restoreFocusToTrigger",
+          "disableFocusTrap",
+          "unsetBackgroundInert"
+        ],
+        "accessibilityNotes": "Close mobile overlay when viewport crosses the desktop breakpoint (>=1024px)."
+      },
+      {
+        "event": "routeChange",
+        "result": "updateActiveItem",
+        "sideEffects": [
+          "updateAriaCurrent",
+          "autoExpandActiveGroup",
+          "closeMobileOverlayIfOpen"
+        ],
+        "accessibilityNotes": "On route change, update aria-current=\"page\" on the new active item and auto-expand its parent group if collapsed."
+      }
+    ],
+    "responsiveBehavior": {
+      "mobile": {
+        "maxWidthPx": 767,
+        "behavior": "Sidebar is hidden by default. A trigger button (hamburger or sidebar icon) opens a full-height overlay from the left (or right). Overlay includes backdrop, focus trap, body scroll lock. Width is 260px or 85vw (whichever is smaller).",
+        "mobileOverlay": "Full-height slide-in overlay with backdrop (rgba(0,0,0,0.5)). Focus trapped while open. Escape and backdrop click close it."
+      },
+      "tablet": {
+        "minWidthPx": 768,
+        "maxWidthPx": 1023,
+        "behavior": "Same as mobile: overlay pattern. Trigger button is typically in the top navbar or header area."
+      },
+      "desktop": {
+        "minWidthPx": 1024,
+        "behavior": "Fixed sidebar on the left (or right). Expanded by default (260px). Can be collapsed to icon-only mode (64px) via toggle button. Content area adjusts its margin/padding to accommodate sidebar width. Hover-expand is optionally available in collapsed mode."
+      }
+    },
+    "variants": {
+      "default": "Solid background sidebar flush with the viewport edge. Full height from below the top navbar (or full viewport height if no navbar). Standard spacing and item sizes.",
+      "compact": "Narrower expanded width (200px), tighter item height (36px), smaller icons (16px). Suitable for applications with dense navigation trees.",
+      "floating": "Detached from viewport edge with border-radius (8px) and shadow. Inset by 8-12px from the edge and top. Creates a card-like appearance. Often used with transparent page backgrounds."
+    },
+    "dataContract": {
+      "navigationItems": {
+        "description": "Hierarchical navigation structure. Supports groups (labeled sections) containing items, where items can have nested children.",
+        "shape": {
+          "groups": "array of NavigationGroup",
+          "NavigationGroup": {
+            "id": "string (unique group identifier)",
+            "label": "string (section label, e.g., 'Main', 'Settings', 'Support')",
+            "items": "array of NavigationItem"
+          },
+          "NavigationItem": {
+            "id": "string (unique item identifier)",
+            "label": "string (display text)",
+            "href": "string (route/URL, optional if item has children only)",
+            "icon": "string | Component (icon identifier or component reference)",
+            "badge": "{ type: 'count' | 'dot' | 'status', value: number | boolean | string } (optional)",
+            "disabled": "boolean (optional, default false)",
+            "external": "boolean (optional, opens in new tab if true)",
+            "children": "array of NavigationItem (optional, creates nested group)"
+          }
+        },
+        "notes": "If an item has children, it acts as a collapsible group toggle. The parent item may optionally also have an href (clicking the label navigates, clicking the toggle expands children). Badge values update dynamically (e.g., unread message count)."
+      },
+      "header": {
+        "description": "Sidebar header content configuration.",
+        "shape": {
+          "logo": "string | Component (logo image or component)",
+          "logoCollapsed": "string | Component (optional smaller logo for collapsed mode)",
+          "title": "string (optional app name shown when expanded)"
+        }
+      },
+      "footer": {
+        "description": "Sidebar footer content configuration.",
+        "shape": {
+          "userAvatar": "string (optional avatar URL)",
+          "userName": "string (optional display name)",
+          "userEmail": "string (optional email)",
+          "items": "array of { id, label, href | onSelect, icon } (optional footer action items)"
+        }
+      }
+    }
+  },
+  "animations": {
+    "collapseExpand": {
+      "durationMs": 200,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": [
+        "width",
+        "padding"
+      ],
+      "trigger": "Collapse toggle click or hover expand/leave",
+      "notes": "Animate sidebar width between expanded and collapsed values. Content area should also transition its margin/padding. Labels fade out before width shrinks, fade in after width expands."
+    },
+    "mobileSlideIn": {
+      "durationMs": 300,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "sidebar": "translateX(-100%) → translateX(0) (left position) or translateX(100%) → translateX(0) (right position)",
+      "backdrop": "opacity: 0 → 0.5 (200ms)",
+      "notes": "On open: mount the overlay elements first in their off-screen state (translateX(-100%), opacity 0), then on the next animation frame trigger the transition to on-screen state. This two-phase approach (mount → wait a frame → animate) ensures the browser paints the initial state before the transition begins."
+    },
+    "mobileSlideOut": {
+      "durationMs": 250,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "sidebar": "translateX(0) → translateX(-100%) (left) or translateX(0) → translateX(100%) (right)",
+      "backdrop": "opacity: 0.5 → 0 (150ms)",
+      "notes": "CRITICAL: Do NOT unmount the overlay elements immediately on close — this kills the exit animation. Instead, trigger the CSS transition to the off-screen state and keep elements mounted. Unmount only after the transition completes (use a timeout matching the duration). Release scroll lock and focus trap immediately on close (before the animation finishes) for correct UX."
+    },
+    "groupExpand": {
+      "durationMs": 200,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": [
+        "height",
+        "opacity"
+      ],
+      "notes": "Animate nested group height from 0 to auto (use max-height or grid row technique). Children fade in as the group expands."
+    },
+    "groupCollapse": {
+      "durationMs": 200,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": [
+        "height",
+        "opacity"
+      ],
+      "notes": "Animate nested group height from current to 0. Children fade out as the group collapses."
+    },
+    "tooltipShow": {
+      "delayMs": 400,
+      "durationMs": 150,
+      "easing": "ease-out",
+      "properties": [
+        "opacity",
+        "transform"
+      ],
+      "notes": "Tooltip appears after a delay when hovering/focusing a collapsed sidebar item. Positioned to the right (or left if position=right) of the item."
+    },
+    "activeItemIndicator": {
+      "durationMs": 150,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "properties": [
+        "background-color",
+        "border-left-color"
+      ],
+      "notes": "Active item gets a background highlight and optional left border indicator. Transition on route change."
+    },
+    "reducedMotion": {
+      "behavior": "When prefers-reduced-motion is active, reduce all durations to tokens.motion.reducedMotionDurationMs (100ms) or use opacity-only transitions. Avoid transform-based slide animations for mobile overlay; use opacity fade instead."
+    }
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Navigation structure uses semantic markup: <nav> landmark, <ul>/<li> for item lists, headings or visible labels for groups.",
+        "1.4.3": "Text and icons meet 4.5:1 contrast ratio against sidebar background. Active item indicator meets 3:1 contrast.",
+        "2.1.1": "All sidebar controls operable via keyboard; focus trapped within mobile overlay while open.",
+        "2.1.2": "Escape closes mobile overlay; no keyboard trap beyond intended modal focus trap.",
+        "2.4.3": "Logical focus order following visual layout; focus returns to trigger when mobile overlay closes.",
+        "2.4.7": "Visible focus indicators for all interactive elements (items, toggles, search input).",
+        "4.1.2": "Correct ARIA roles, names, and relationships for navigation, groups, and overlay."
+      }
+    },
+    "keyboardNavigation": {
+      "tabKey": "Moves focus between interactive elements in DOM order (search input, navigation items, group toggles, collapse toggle, footer items). Mobile overlay traps focus while open.",
+      "enterSpace": "Activates navigation link (navigate) or toggles group expand/collapse.",
+      "escapeKey": "Closes mobile overlay when open; restores focus to the trigger element.",
+      "homeEnd": "Moves focus to the first or last visible navigation item within the sidebar.",
+      "initialFocus": "On opening mobile overlay, move focus to the first focusable element (search input if present, otherwise first navigation item)."
+    },
+    "ariaAttributes": {
+      "required": {
+        "sidebarRoot": {
+          "element": "aside or nav",
+          "role": "navigation (if using aside, add role='navigation')",
+          "aria-label": "Sidebar navigation"
+        },
+        "collapseToggle": {
+          "element": "button",
+          "aria-label": "'Collapse sidebar' when expanded, 'Expand sidebar' when collapsed",
+          "aria-expanded": "true when expanded, false when collapsed"
+        },
+        "groupToggle": {
+          "element": "button",
+          "aria-expanded": "true/false (dynamically updated)",
+          "aria-controls": "nested-group-{groupId}"
+        },
+        "nestedGroupPanel": {
+          "id": "nested-group-{groupId}",
+          "role": "group",
+          "aria-labelledby": "group-toggle-{groupId}"
+        },
+        "activeNavItem": {
+          "aria-current": "page (on the item matching the current route)"
+        },
+        "mobileOverlay": {
+          "role": "dialog",
+          "aria-modal": "true",
+          "aria-label": "Navigation menu",
+          "note": "Mobile overlay uses dialog semantics because it is modal with focus trap. Inside the dialog, include <nav aria-label='Sidebar navigation'> wrapping the item list."
+        },
+        "disabledItem": {
+          "aria-disabled": "true",
+          "note": "Disabled items remain focusable but do not activate on click/Enter. Use aria-disabled rather than the disabled attribute so screen readers can still announce the item."
+        },
+        "badge": {
+          "aria-label": "Include badge info in the parent item's accessible name, e.g., 'Messages (3 unread)' or 'Notifications (new)'",
+          "note": "Badge content must be available to screen readers via the item's aria-label or visually hidden text."
+        },
+        "searchInput": {
+          "role": "searchbox",
+          "aria-label": "Search navigation"
+        }
+      },
+      "optional": {
+        "tooltip": {
+          "role": "tooltip",
+          "id": "tooltip-{itemId}",
+          "note": "Collapsed-mode tooltips use role='tooltip' and are referenced by aria-describedby on the navigation item."
+        }
+      }
+    },
+    "focusManagement": {
+      "notes": [
+        "Mobile overlay: implement focus trap and restore focus to the trigger element on close.",
+        "Desktop collapsed: tooltips appear on focus as well as hover so keyboard users get item labels.",
+        "Group toggle: focus stays on the toggle button after expanding/collapsing; the child list is revealed but focus does not jump into it.",
+        "Auto-expand: when navigating to a route whose item is inside a collapsed group, expand that group automatically and scroll the item into view.",
+        "Search: when search input is cleared, focus remains on the search input."
+      ]
+    },
+    "implementationChecklist": [
+      "Sidebar uses <nav> or <aside role='navigation'> with a descriptive aria-label",
+      "Navigation items are structured as <ul>/<li> lists",
+      "Active item has aria-current=\"page\"",
+      "Group toggles have aria-expanded and aria-controls",
+      "Nested group panels have role=\"group\" and aria-labelledby",
+      "Collapse toggle has dynamic aria-label and aria-expanded",
+      "Mobile overlay uses role=\"dialog\" + aria-modal=\"true\"",
+      "Focus is trapped within mobile overlay while open",
+      "Focus is restored to trigger when mobile overlay closes",
+      "Background content is inert/aria-hidden while mobile overlay is open",
+      "Body scroll lock is applied when mobile overlay is open and cleaned up on close",
+      "Collapsed mode shows tooltips on hover AND focus for navigation items",
+      "Badge information is included in the item's accessible name",
+      "Disabled items use aria-disabled and remain focusable",
+      "All interactive elements have visible focus indicators",
+      "Tab order follows visual layout (top to bottom)",
+      "Home/End keys move focus to first/last visible navigation item",
+      "Prefers-reduced-motion reduces durations and avoids transform-based motion"
+    ]
+  },
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "useState for collapsed, mobileOpen, expandedGroupIds, searchQuery; custom hooks for focus trap, scroll lock, outside click, localStorage sync, route matching, and reduced motion detection.",
+      "customHooks": "Keep one concern per hook: useLocalStorage(key, default), useBodyScrollLock(isLocked), useFocusTrap(ref, isActive), useActiveRoute(items), useReducedMotion(), useSidebarCollapse(defaultCollapsed).",
+      "componentStructure": "<Sidebar variant={variant} position={position} collapsed={collapsed} onCollapsedChange={setCollapsed} navigationGroups={groups} header={header} footer={footer} searchEnabled />"
+    },
+    "vue": {
+      "stateManagement": "ref/reactive for state; composables for localStorage sync, focus trap, scroll lock; watch for route changes to update active item.",
+      "componentStructure": "<Sidebar :variant='variant' :position='position' v-model:collapsed='collapsed' :navigation-groups='groups' :header='header' :footer='footer' search-enabled />"
+    },
+    "angular": {
+      "stateManagement": "Component inputs for config; signals or BehaviorSubject for collapsed state; Router events subscription for active item; HostListener for Escape and resize.",
+      "componentStructure": "<app-sidebar [variant]='variant' [position]='position' [(collapsed)]='collapsed' [navigationGroups]='groups' [header]='header' [footer]='footer' [searchEnabled]='true'></app-sidebar>"
+    },
+    "svelte": {
+      "stateManagement": "writable stores for collapsed and expandedGroupIds; derived store for filtered items; onMount for localStorage hydration; actions for focus trap and outside click.",
+      "componentStructure": "<Sidebar {variant} {position} bind:collapsed {navigationGroups} {header} {footer} searchEnabled />"
+    }
+  },
+  "edgeCases": {
+    "ssrHydrationMismatch": {
+      "issue": "Collapsed state read from localStorage causes SSR hydration mismatch.",
+      "solution": "Default to expanded during SSR. Read localStorage on mount (useEffect/onMounted) and update collapsed state. Use a brief opacity transition to mask the layout shift if needed."
+    },
+    "deepNesting": {
+      "issue": "Navigation trees with 3+ nesting levels become hard to navigate and visually cluttered.",
+      "solution": "Support arbitrary nesting depth via recursive rendering, but recommend max 2-3 levels for usability. Increase indent per level by tokens.layout.nestedIndentPx. Beyond 3 levels, consider flattening the hierarchy or using a different navigation pattern."
+    },
+    "longLabels": {
+      "issue": "Long navigation item labels overflow the sidebar width.",
+      "solution": "Truncate with text-overflow: ellipsis. Show full label in a tooltip on hover/focus. In collapsed mode, the tooltip already shows the label."
+    },
+    "badgeCountOverflow": {
+      "issue": "Badge count values can be very large numbers.",
+      "solution": "For count badges > 99, display '99+'. Use aria-label to convey the actual count: 'Messages (142 unread)'."
+    },
+    "badgesInCollapsedMode": {
+      "issue": "Full-size badges (count pills, status text) rendered as flow siblings in collapsed mode overflow or break the 64px sidebar layout.",
+      "solution": "In collapsed mode, replace all badge types with a small dot indicator (6-8px circle) positioned absolutely on the icon element's top-right corner. The icon wrapper must have position: relative so the dot anchors correctly. Use a ring (2px white) to visually separate the dot from the icon. Convey the full badge info via the item's tooltip and accessible label instead."
+    },
+    "noSearchResults": {
+      "issue": "Inline search filter can return zero matching items.",
+      "solution": "Show a 'No results' empty state inside the scroll area. Include a clear button to reset the search. Do not hide the search input itself."
+    },
+    "navbarOverlap": {
+      "issue": "Sidebar may overlap with a fixed top navbar.",
+      "solution": "Sidebar should start below the navbar (top offset = navbar height). Use CSS custom properties or tokens to coordinate. On mobile, the overlay is full-height including the navbar area (z-index above navbar)."
+    },
+    "routeToCollapsedGroup": {
+      "issue": "Navigating to a route whose item is inside a collapsed group leaves the active item hidden.",
+      "solution": "Auto-expand the parent group of the newly active item. Scroll the item into view if it's outside the visible scroll area."
+    },
+    "mobileOverlayExitAnimation": {
+      "issue": "Conditionally rendering the mobile overlay (e.g., {mobileOpen && <Overlay/>}) causes the overlay to unmount instantly on close, making exit animations impossible.",
+      "solution": "Use separate 'visible' (controls mount) and 'animating' (controls CSS classes) states. On close, set animating to 'closing' and keep elements mounted. After the transition duration elapses (setTimeout), set visible to false to unmount. On open, set visible to true first, then on the next animation frame set animating to 'opening' so the browser paints the initial off-screen state before transitioning."
+    },
+    "horizontalScrollbarFlashOnTransition": {
+      "issue": "During the collapse/expand width transition, content (labels, badges, search input) momentarily overflows the sidebar, causing a horizontal scrollbar to flash.",
+      "solution": "Apply overflow-x: hidden (or overflow: hidden) on both the sidebar root container and the inner scrollable navigation area. The scrollable area needs explicit overflow-x: hidden because overflow-y: auto implicitly sets overflow-x to auto, which allows the flash."
+    }
+  },
+  "testingChecklist": [
+    "Sidebar renders correctly in expanded mode with all navigation groups and items",
+    "Sidebar collapses to icon-only mode on toggle click; labels hidden, tooltips appear on hover/focus",
+    "Collapsed state persists in localStorage and restores on page reload",
+    "Navigation item click navigates to the correct route and updates active indicator",
+    "Active item has aria-current=\"page\" and visual highlight",
+    "Group toggle expands/collapses nested children with animation",
+    "Group toggle has correct aria-expanded and aria-controls",
+    "Multiple groups can be expanded simultaneously",
+    "Auto-expand works when navigating to an item inside a collapsed group",
+    "Inline search filters items by label; 'No results' state shown when no matches",
+    "Badges render correctly (count, dot, status) with accessible labels",
+    "Mobile overlay opens with slide-in animation and backdrop",
+    "Mobile overlay has focus trap; Tab cycles within overlay elements",
+    "Focus is restored to trigger element when mobile overlay closes",
+    "Mobile overlay closes on Escape key press",
+    "Mobile overlay closes on backdrop click",
+    "Mobile overlay closes when navigating to an item",
+    "Body scroll is locked while mobile overlay is open and restored on close",
+    "Window resize closes mobile overlay when crossing desktop breakpoint",
+    "Hover expand works when enabled: hovering over collapsed sidebar expands it temporarily",
+    "All interactive elements have visible focus indicators",
+    "Tab order follows visual layout top to bottom",
+    "Home/End keys move focus to first/last visible navigation item",
+    "Disabled items are focusable but not activatable",
+    "Prefers-reduced-motion reduces animation durations and avoids transform-based motion",
+    "Screen reader announces navigation landmark, group states, active item, and badge information",
+    "SSR/hydration safe: no DOM access before mount, no hydration mismatch on collapsed state",
+    "Right-positioned sidebar (position='right') mirrors all behavior correctly",
+    "Floating variant renders with border-radius and shadow, detached from viewport edge"
+  ],
+  "aiImplementationPrompt": "Implement a responsive Sidebar Navigation component as the primary navigation surface for a SaaS application. On desktop (≥1024px), render a fixed sidebar on the left (or right) that can be collapsed to icon-only mode (64px) via a toggle button, with the expanded width at 260px. Persist the collapsed preference in localStorage. Show tooltips on hover/focus when collapsed. Support multi-level navigation with collapsible groups using disclosure semantics (aria-expanded, aria-controls, role=\"group\"). Highlight the active item with a visual indicator and aria-current=\"page\"; auto-expand the parent group of the active item. Support optional inline search to filter navigation items. Render badges (count/dot/status) on items with accessible labels. On mobile/tablet (<1024px), hide the sidebar and show it as a slide-in overlay with backdrop, focus trap, body scroll lock, Escape/backdrop close, and focus restoration. Animate all transitions (collapse, slide, group expand) with prefers-reduced-motion support. Use <nav> landmark with aria-label. Adapt to {{USER_FRAMEWORK}} and {{USER_STYLING_LIBRARY}}. CRITICAL: Use ONLY the detected styling system. If vanilla CSS is detected, create CSS classes in a stylesheet; never use inline style attributes.",
+  "meta": {
+    "created": "2026-03-03",
+    "updated": "2026-03-03",
+    "webUrl": "https://uipotion.com/potions/components/sidebar-navigation.html",
+    "relatedPotions": [
+      {
+        "id": "dashboard",
+        "category": "layouts",
+        "relationship": "used-in",
+        "description": "Sidebar Navigation is the primary navigation component used within the Dashboard Layout. The dashboard embeds its own sidebar spec, but this standalone component provides a more detailed and reusable specification.",
+        "required": false
+      },
+      {
+        "id": "navbar",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Sidebar Navigation typically pairs with a top Navbar: the navbar handles global actions (search, notifications, user menu) while the sidebar handles primary app navigation.",
+        "required": false
+      },
+      {
+        "id": "command-palette",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Command Palette provides keyboard-first navigation that complements sidebar's visual navigation. Items from the sidebar can be surfaced as commands in the palette.",
+        "required": false
+      },
+      {
+        "id": "documentation",
+        "category": "layouts",
+        "relationship": "used-in",
+        "description": "Documentation layouts use a hierarchical sidebar for navigating docs sections and pages.",
+        "required": false
+      },
+      {
+        "id": "ai-agent-chat",
+        "category": "layouts",
+        "relationship": "used-in",
+        "description": "AI chat layouts commonly use a sidebar for conversation history, agent switching, and settings.",
+        "required": false
+      }
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/components/sidebar-navigation.json",
+    "markdownUrl": "https://uipotion.com/potions/components/sidebar-navigation.md"
+  }
+}
