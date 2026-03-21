@@ -1,4 +1,4 @@
-{{> head title="Potion Kit - CLI for Harold & UI Potion" description="Build websites with Harold and UI Potion using an interactive AI chat. Potion Kit is a CLI that uses the UI Potion catalog so the model can only suggest components from real specs." currentPath="potion-kit" }}
+{{> head title="Potion Kit - CLI for Harold & UI Potion" description="Scaffold and build websites with Harold and UI Potion using an AI chat CLI. Potion Kit uses the UI Potion catalog so the model can only suggest components from real specs." currentPath="potion-kit" }}
 
 <div class="about-page">
   <header class="about-hero">
@@ -12,7 +12,7 @@
       <h1 class="about-hero-title">Potion Kit</h1>
 
       <p class="about-hero-description">
-        CLI to build websites with <a href="https://haroldjs.com" target="_blank" rel="noopener noreferrer">Harold</a> and UI Potion: static sites with Handlebars, Markdown, and SCSS only. Chat with the AI to design and build your site; the model uses the UI Potion catalog and Harold conventions and can only suggest components from real specs.
+        CLI to scaffold and build websites with <a href="https://haroldjs.com" target="_blank" rel="noopener noreferrer">Harold</a> and UI Potion: static sites with Handlebars, Markdown, and SCSS only. Chat with the AI to design and build your site; the model uses the UI Potion catalog and Harold conventions and can only suggest components from real specs.
       </p>
     </div>
   </header>
@@ -27,10 +27,12 @@
         <section class="about-section">
           <h2>Commands</h2>
           <ul>
+            <li><strong><code>potion-kit init &lt;directory&gt;</code></strong> — Scaffold a new static site project with pages, partials, SCSS, and a sample post.</li>
             <li><strong><code>potion-kit chat</code></strong> — Interactive chat.</li>
             <li><strong><code>potion-kit chat "message"</code></strong> — Send one message and exit (one-shot).</li>
+            <li><strong><code>potion-kit doctor</code></strong> — Validate LLM configuration, provider connectivity, project structure, and remote dependencies.</li>
             <li><strong><code>potion-kit clear</code></strong> — Clear chat state for this project (history, summary cache, and event trace ledger).</li>
-            <li><strong><code>potion-kit</code></strong> or <strong><code>potion-kit --help</code></strong> — Show usage and available commands. Unknown commands also show help and do not call the API.</li>
+            <li><strong><code>potion-kit</code></strong> or <strong><code>potion-kit --help</code></strong> — Show usage and available commands. Unknown commands (for example <code>potion-kit clean</code>) also show help and do not call the API.</li>
           </ul>
         </section>
 
@@ -45,21 +47,31 @@
           <pre><code>npm install -g potion-kit
 potion-kit chat</code></pre>
 
-          <h3>Run in your project</h3>
+          <h3>Start a New Project</h3>
           <ol>
-            <li><strong>Go to the directory</strong> where you want to work (new site or existing project). It can be an empty folder.</li>
-            <li><strong>Create a <code>.env</code> file</strong> with your LLM provider and API key. Minimal contents:</li>
+            <li><strong>Scaffold a site</strong> with <code>init</code>:</li>
+          </ol>
+          <pre><code>npx potion-kit init my-site
+cd my-site</code></pre>
+          <p>This creates a ready-to-build project with pages, partials, SCSS, a sample post, and package scripts.</p>
+          <ol start="2">
+            <li><strong>Create a <code>.env</code> file</strong> in that directory with your LLM provider and API key. Minimal contents:</li>
           </ol>
           <pre><code>POTION_KIT_PROVIDER=openai
 OPENAI_API_KEY=sk-your-key-here</code></pre>
-          <p>For Anthropic use <code>POTION_KIT_PROVIDER=anthropic</code> and <code>ANTHROPIC_API_KEY=...</code>. For Moonshot use <code>POTION_KIT_PROVIDER=moonshot</code> and <code>MOONSHOT_API_KEY=...</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">Potion Kit README</a> for all options and security notes.</p>
+          <p>For Anthropic use <code>POTION_KIT_PROVIDER=anthropic</code> and <code>ANTHROPIC_API_KEY=...</code>. For Kimi (by Moonshot) use <code>POTION_KIT_PROVIDER=moonshot</code> and <code>MOONSHOT_API_KEY=...</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">Potion Kit README</a> for all options and security notes.</p>
           <ol start="3">
-            <li><strong>Run Potion Kit</strong> from that same directory:</li>
+            <li><strong>Check your setup</strong> (optional but recommended):</li>
+          </ol>
+          <pre><code>npx potion-kit doctor</code></pre>
+          <ol start="4">
+            <li><strong>Start chatting</strong> from that same directory:</li>
           </ol>
           <pre><code>npx potion-kit chat
 # or, if installed globally:
 potion-kit chat</code></pre>
-          <p>The tool reads <code>.env</code> from the current working directory, so always run <code>potion-kit</code> from the directory that contains your <code>.env</code>.</p>
+          <p>The tool reads <code>.env</code> from the current working directory, so always run <code>potion-kit</code> from the directory that contains your <code>.env</code> and where you want the AI to read and write files.</p>
+          <p>You can also run <code>potion-kit chat</code> in any existing project directory or empty folder; <code>init</code> is optional.</p>
         </section>
 
         <section class="about-section">
@@ -71,9 +83,16 @@ npx potion-kit chat</code></pre>
           <p><strong>One-shot (single message then exit):</strong></p>
           <pre><code>npx potion-kit chat "I want a blog with a header and footer"
 npx potion-kit chat "Add the navbar potion to the layout"</code></pre>
+          <p><strong>Scaffold and go:</strong></p>
+          <pre><code>npx potion-kit init my-blog
+cd my-blog
+# add .env with your provider + key
+npx potion-kit chat "Add a navbar and about page"</code></pre>
           <p><strong>Start a new conversation:</strong></p>
           <pre><code>npx potion-kit clear
 npx potion-kit chat "Let's build a docs site"</code></pre>
+          <p><strong>Check configuration before chatting:</strong></p>
+          <pre><code>npx potion-kit doctor</code></pre>
         </section>
 
         <section class="about-section">
@@ -84,19 +103,33 @@ npx potion-kit chat "Let's build a docs site"</code></pre>
             <li><code>.env</code> in the current working directory (loaded only for variables not already set)</li>
             <li><code>./config.json</code> in the current working directory — provider, model, and optional <code>maxHistoryMessages</code>, <code>maxToolSteps</code>, <code>maxOutputTokens</code>; do not put API keys there.</li>
           </ol>
-          <p>Key variables: <code>POTION_KIT_PROVIDER</code> (required: <code>openai</code>, <code>anthropic</code>, or <code>moonshot</code>), one of <code>OPENAI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, or <code>MOONSHOT_API_KEY</code>, and optionally <code>POTION_KIT_MODEL</code>, <code>POTION_KIT_API_KEY</code>, <code>POTION_KIT_BASE_URL</code>, <code>POTION_KIT_MAX_HISTORY_MESSAGES</code>, <code>POTION_KIT_MAX_TOOL_STEPS</code>, <code>POTION_KIT_MAX_OUTPUT_TOKENS</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> for full details.</p>
-          <p><strong>Security:</strong> Potion Kit never sends <code>.env</code> or API keys to the model. Never commit <code>.env</code>; add it to <code>.gitignore</code>. Never put API keys in <code>./config.json</code>. Never paste API keys in chat, logs, or issues.</p>
+          <p>Key variables: <code>POTION_KIT_PROVIDER</code> (required: <code>openai</code>, <code>anthropic</code>, or <code>moonshot</code>), one of <code>OPENAI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, or <code>MOONSHOT_API_KEY</code>, and optionally <code>POTION_KIT_MODEL</code> (defaults: <code>gpt-5.2</code> / <code>claude-sonnet-4-5</code> / <code>kimi-k2.5</code>), <code>POTION_KIT_API_KEY</code>, <code>POTION_KIT_BASE_URL</code>, <code>POTION_KIT_MAX_HISTORY_MESSAGES</code>, <code>POTION_KIT_MAX_TOOL_STEPS</code>, <code>POTION_KIT_MAX_OUTPUT_TOKENS</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> for full details.</p>
+          <p><strong>Minimal <code>.env</code>:</strong></p>
+          <pre><code>POTION_KIT_PROVIDER=openai
+OPENAI_API_KEY=sk-your-key-here</code></pre>
+          <p><strong>With an optional model override:</strong></p>
+          <pre><code>POTION_KIT_PROVIDER=openai
+POTION_KIT_MODEL=gpt-5.2
+OPENAI_API_KEY=sk-your-key-here</code></pre>
+          <p><strong>Security:</strong> Potion Kit never sends <code>.env</code> or API keys to the model. Never commit <code>.env</code>; add it to <code>.gitignore</code>. Never put API keys in <code>./config.json</code>. Never paste API keys in chat, logs, or issues. Keep one <code>.env</code> in the directory from which you run <code>potion-kit</code>, usually your project root.</p>
         </section>
 
         <section class="about-section">
           <h2>Chat History</h2>
-          <p>Conversation is stored under <code>.potion-kit/</code> in the directory where you run <code>potion-kit chat</code>: <code>chat-history.json</code> (messages), <code>chat-summary.json</code> (cached summary for long conversations), and <code>chat-events.json</code> (per-turn tool traces). Each request keeps the first user message, may include a condensed summary of the middle conversation when history gets long, and sends the most recent messages (default 10). Set <code>POTION_KIT_MAX_HISTORY_MESSAGES</code>, <code>POTION_KIT_MAX_TOOL_STEPS</code>, or <code>POTION_KIT_MAX_OUTPUT_TOKENS</code> (or <code>maxHistoryMessages</code>, <code>maxToolSteps</code>, <code>maxOutputTokens</code> in <code>./config.json</code>) to tune behavior. Add <code>.potion-kit/</code> to <code>.gitignore</code> if you do not want to commit chat state. Use <code>potion-kit clear</code> to reset history, summary cache, and event traces for that project.</p>
+          <p>Conversation is stored under <code>.potion-kit/</code> in the directory where you run <code>potion-kit chat</code>: <code>chat-history.json</code> (messages), <code>chat-summary.json</code> (cached summary for long conversations), and <code>chat-events.json</code> (per-turn tool traces). Each request keeps the first user message, may include a condensed summary of the middle conversation when history gets long, and sends the most recent messages (default 10). When a turn records verified file reads or changes, the CLI prints a small turn-result footer from the same trace instead of relying on reply wording alone.</p>
+          <ul>
+            <li><strong><code>chat-history.json</code></strong> — Raw conversation in order as <code>{ role, content }</code> entries.</li>
+            <li><strong><code>chat-summary.json</code></strong> — Cached rolling summary state for long conversations.</li>
+            <li><strong><code>chat-events.json</code></strong> — Per-turn trace metadata, including tool activity and whether the turn had a verified write via <code>write_project_file</code> or <code>edit_project_file</code>.</li>
+          </ul>
+          <p>Set <code>POTION_KIT_MAX_HISTORY_MESSAGES</code>, <code>POTION_KIT_MAX_TOOL_STEPS</code>, or <code>POTION_KIT_MAX_OUTPUT_TOKENS</code> (or <code>maxHistoryMessages</code>, <code>maxToolSteps</code>, <code>maxOutputTokens</code> in <code>./config.json</code>) to tune behavior. Add <code>.potion-kit/</code> to <code>.gitignore</code> if you do not want to commit chat state. Use <code>potion-kit clear</code> to reset history, summary cache, and event traces for that project.</p>
         </section>
 
         <section class="about-section">
           <h2>Legal</h2>
           <p>Potion Kit uses UI Potion specifications and catalog. By using Potion Kit you are using UI Potion's service and agree to the <a href="/legal">UI Potion legal disclaimer and privacy policy</a>. That page covers disclaimers on AI-generated code, liability, and user responsibility. Please read it before use.</p>
-          <p>You choose the model and provider (e.g. OpenAI, Anthropic, Kimi). By using a provider you agree to that provider's terms of service and data policies. Potion Kit does not control how providers retain or process your prompts and responses. If your prompts include sensitive data, consider what you send and which provider you use.</p>
+          <p><strong>AI providers and your data:</strong> You choose the model and provider (for example OpenAI, Anthropic, or Kimi/Moonshot). By using a provider you agree to that provider's terms of service, acceptable use rules, and data policies. Potion Kit does not control how providers retain, process, or review your prompts and responses.</p>
+          <p><strong>Sensitive data and cloud LLM risk:</strong> If your prompts include proprietary code, secrets, customer data, financials, or internal docs, the main risk is that you are voluntarily sending sensitive material to a third party. The exact risk depends on the provider's retention, access controls, internal review practices, and breach likelihood, so consider what you send and which provider you use.</p>
         </section>
 
         <section class="about-section">

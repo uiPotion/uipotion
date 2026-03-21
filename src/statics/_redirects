@@ -1,6 +1,7 @@
 # Netlify Pretty URLs: .html → pretty (301). Auto-generated — do not edit by hand.
 /index.html / 301!
 /about.html /about 301!
+/potion-kit.html /potion-kit 301!
 /potions.html /potions 301!
 /contribute.html /contribute 301!
 /validator.html /validator 301!
