@@ -1,0 +1,1295 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
+  "id": "ecommerce-product-page",
+  "version": "1.0.0",
+  "name": "Ecommerce Product Page",
+  "category": "layouts",
+  "tags": [
+    "ecommerce",
+    "product-page",
+    "product-detail-page",
+    "pdp",
+    "conversion",
+    "reviews",
+    "responsive",
+    "merchandising"
+  ],
+  "description": "A conversion-oriented ecommerce product detail page layout with a high-clarity media gallery, purchase panel, variant selection, shipping and return context, reviews, and mobile sticky purchase actions. Designed around current PDP UX guidance: shoppers should be able to inspect the product, understand availability and fulfillment, and purchase without hunting for core information.",
+  "tokens": {
+    "layout": {
+      "contentMaxWidthPx": 1280,
+      "mediaColumnMinPx": 560,
+      "buyBoxWidthPx": 420,
+      "purchaseRegionGapDesktopPx": 48,
+      "purchaseRegionGapMobilePx": 24,
+      "sectionPaddingDesktopPx": 64,
+      "sectionPaddingMobilePx": 24,
+      "stickyBuyBoxTopPx": 96,
+      "mobileActionBarHeightPx": 72,
+      "zIndex": {
+        "base": 0,
+        "stickyHeader": 40,
+        "stickyBuyBox": 30,
+        "mobileActionBar": 70,
+        "galleryOverlay": 90,
+        "modal": 100
+      }
+    },
+    "motion": {
+      "defaultDurationMs": 220,
+      "defaultEasing": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      "fastDurationMs": 140,
+      "slowDurationMs": 320
+    },
+    "breakpoints": {
+      "tabletMinPx": 768,
+      "desktopMinPx": 1024
+    }
+  },
+  "layoutPresets": {
+    "default": {
+      "name": "Standard PDP",
+      "purchaseRegion": "split gallery + buy box",
+      "detailsNavigation": "stacked sections desktop, accordions mobile",
+      "stickyBuyBox": true
+    },
+    "editorial": {
+      "name": "Story-Led PDP",
+      "purchaseRegion": "wider gallery with supporting brand narrative",
+      "detailsNavigation": "anchored sections with richer content blocks",
+      "stickyBuyBox": true
+    },
+    "compact": {
+      "name": "Fast Buy",
+      "purchaseRegion": "tighter spacing and reduced supporting copy",
+      "detailsNavigation": "accordion-heavy",
+      "stickyBuyBox": false
+    }
+  },
+  "layoutModel": {
+    "type": "custom",
+    "scrollRegion": "page",
+    "positioningContract": {
+      "desktop": "Two-column purchase region above the fold, stacked decision-support sections below",
+      "tablet": "Narrow split or early stack depending content density",
+      "mobile": "Single-column flow with sticky purchase bar",
+      "galleryOverlay": "Fullscreen dialog or sheet layered above the page"
+    },
+    "invariants": [
+      "The product title, pricing, availability, required variant controls, and primary CTA remain within the same purchase summary zone",
+      "Media inspection is available without sending the shopper away from the product context",
+      "Shipping, returns, or pickup expectations appear near the purchase action",
+      "Reviews, specifications, and FAQs remain easy to reach but do not displace the buy box above the fold",
+      "No horizontal page scroll is introduced at any breakpoint",
+      "Recommendations appear after the main decision content rather than before it"
+    ]
+  },
+  "aiAgentInstructions": {
+    "summary": "Implement a modern ecommerce product detail page (PDP) layout with a large product media gallery, a conversion-focused purchase panel, decision-support detail sections, reviews, and mobile sticky purchase affordances. The layout must adapt to the user's framework and styling system, while preserving current PDP UX expectations around image inspection, variant clarity, fulfillment transparency, and fast purchase actions.",
+    "keyFeatures": [
+      "Two-column desktop purchase region with gallery and buy box visible together",
+      "Large product media gallery with thumbnails, zoom/fullscreen support, optional video, and stable aspect ratios",
+      "Purchase panel containing title, review summary, price stack, variant selectors, quantity, CTA, and fulfillment context",
+      "Required variant gating before purchase, with unavailable combinations visibly disabled rather than hidden",
+      "Trust and delivery strip near the purchase region for shipping, returns, pickup, or warranty signals",
+      "Decision-support detail sections for highlights, description, specifications, fit or dimensions, materials and care, FAQ, or compatibility information",
+      "Review summary near the top with deeper review filtering, sorting, and optional media reviews below the fold",
+      "Recommendations placed after the core product decision content",
+      "Sticky mobile purchase bar that appears only when the main CTA scrolls out of view",
+      "SEO-friendly structure that can support variant-aware Product and Offer structured data when the project already manages head metadata",
+      "CRITICAL: Styling MUST match the project's existing conventions. Detect the framework and styling system first and use ONLY that system.",
+      "CRITICAL: When vanilla CSS is detected, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements.",
+      "CRITICAL: Split large page implementations into smaller components instead of one oversized page component.",
+      "CRITICAL: When React is detected, split concerns into small hooks such as useVariantSelection(), useStickyActionBar(), useMediaGallery(), and useAddToCartStatus()."
+    ],
+    "implementationSteps": [
+      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine package.json, existing component files, config files, and style imports. Use ONLY the detected system.",
+      "0a. Detect framework patterns: component structure, routing, state management, commerce data patterns, and how async requests are modeled.",
+      "0b. Detect styling conventions: class naming, token usage, utility helpers, spacing rhythm, and whether the project already has storefront card and form patterns.",
+      "0c. Detect design tokens and reusable commerce primitives before introducing new spacing or color values.",
+      "1. Build the overall product page shell with header, breadcrumbs, purchase region, detail sections, reviews, recommendations, and footer",
+      "1a. Split the page into smaller components with clear responsibilities; avoid implementing the full PDP in one oversized component.",
+      "2. Implement the product media gallery with active media state, thumbnail navigation, and accessible zoom or fullscreen inspection",
+      "3. Build the purchase panel with title, rating summary, pricing, variant selectors, quantity, CTA, and fulfillment messaging",
+      "4. Implement deterministic variant resolution: valid combinations stay selectable, invalid combinations become visibly unavailable, and price/inventory updates when the active variant changes",
+      "5. Add shipping, returns, pickup, or warranty messaging close to the purchase controls",
+      "6. Implement details sections as stacked blocks or anchors on desktop and accordions on mobile",
+      "7. Add reviews and Q&A with rating summary, filtering, sorting, and media support where applicable",
+      "8. Add recommendation modules after the main product decision content",
+      "9. Implement mobile sticky purchase behavior only when the main purchase controls are out of view",
+      "10. Wire dynamic status messaging for add-to-cart loading, success, failure, and inventory states",
+      "11. If the project manages SEO metadata, keep Product/Offer structured data synchronized with the selected variant",
+      "12. Ensure keyboard accessibility, focus management, live-region announcements, and reduced-motion behavior",
+      "13. Use ONLY the detected styling system. Do NOT add inline styles, ad-hoc UI libraries, or a new design language."
+    ]
+  },
+  "structure": {
+    "hierarchy": {
+      "ProductPage": {
+        "description": "Root product detail page container",
+        "children": {
+          "SiteHeader": {
+            "description": "Shared storefront header with brand, search, account, and cart access"
+          },
+          "Breadcrumbs": {
+            "description": "Lightweight category path above the product content"
+          },
+          "PurchaseRegion": {
+            "description": "Primary decision area combining product inspection and purchase actions",
+            "children": {
+              "ProductMediaGallery": {
+                "description": "Large image and media inspection area",
+                "children": [
+                  "MainMediaFrame",
+                  "ThumbnailRail",
+                  "MediaBadges",
+                  "ZoomTrigger"
+                ]
+              },
+              "PurchasePanel": {
+                "description": "Primary product summary and purchase controls",
+                "children": [
+                  "ProductHeader",
+                  "ReviewSummaryAnchor",
+                  "PriceStack",
+                  "VariantSelectors",
+                  "QuantitySelector",
+                  "PurchaseActions",
+                  "FulfillmentSummary",
+                  "TrustSignals"
+                ]
+              }
+            }
+          },
+          "TrustDeliveryStrip": {
+            "description": "Short reassurance strip for shipping, returns, pickup, or warranty"
+          },
+          "ProductDetailsRegion": {
+            "description": "Longer supporting content for product decision-making",
+            "children": [
+              "Highlights",
+              "Description",
+              "Specifications",
+              "FitOrDimensions",
+              "MaterialsAndCare",
+              "FAQ"
+            ]
+          },
+          "ReviewsAndQA": {
+            "description": "Customer proof and feedback section",
+            "children": [
+              "RatingSummary",
+              "ReviewFilters",
+              "ReviewList",
+              "CustomerQuestions"
+            ]
+          },
+          "RecommendationsSection": {
+            "description": "Complementary, related, or recently viewed products",
+            "children": [
+              "SectionHeading",
+              "RecommendationGrid"
+            ]
+          },
+          "SiteFooter": {
+            "description": "Shared storefront footer"
+          },
+          "StickyMobilePurchaseBar": {
+            "description": "Mobile purchase shortcut when the buy box is out of view",
+            "children": [
+              "PriceSummary",
+              "VariantSummary",
+              "PrimaryCTA"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "Breadcrumbs": {
+      "description": "Compact navigational trail that provides category context without crowding the purchase region",
+      "dimensions": {
+        "maxWidthPx": 1280,
+        "paddingTopPx": "16-24",
+        "paddingBottomPx": "12-20"
+      },
+      "states": [
+        "default",
+        "truncated"
+      ],
+      "elements": {
+        "Links": {
+          "fontSizePx": "13-14",
+          "separator": "Chevron or slash with muted color",
+          "maxVisibleLevels": "3-4 before truncation"
+        }
+      },
+      "behavior": {
+        "overflow": "Collapse middle levels if taxonomy is deep",
+        "currentPage": "Render as plain text, not a link",
+        "accessibility": "Wrap in nav with aria-label='Breadcrumb'"
+      }
+    },
+    "ProductMediaGallery": {
+      "description": "Primary product inspection area combining large media, thumbnail navigation, and optional zoom/video experiences",
+      "dimensions": {
+        "desktopColumnShare": "55-65% of purchase region",
+        "mainMediaAspectRatio": "1:1, 4:5, or product-specific ratio preserved across states",
+        "thumbnailSizePx": "64-88",
+        "overlayMaxWidthPx": 1440
+      },
+      "states": [
+        "default",
+        "hover",
+        "active-thumbnail",
+        "zoomed",
+        "overlay-open",
+        "video-active"
+      ],
+      "elements": {
+        "MainMediaFrame": {
+          "content": "High-resolution product image or video",
+          "loading": "Primary asset eager-loaded, later assets lazy-loaded",
+          "stability": "Reserve layout space to avoid shift"
+        },
+        "ThumbnailRail": {
+          "layout": "Vertical desktop rail or horizontal mobile row",
+          "selectionIndicator": "Visible border, ring, or contrast change",
+          "keyboardSupport": "Arrow keys optional, Tab mandatory"
+        },
+        "MediaTypes": {
+          "recommended": [
+            "studio image",
+            "detail close-up",
+            "scale/context image",
+            "lifestyle image",
+            "video or 360 view",
+            "optional user-generated image"
+          ]
+        },
+        "ZoomTrigger": {
+          "desktop": "Hover zoom or explicit zoom button",
+          "mobile": "Tap to open fullscreen viewer",
+          "fallback": "Explicit button if gesture-based zoom is not reliable"
+        }
+      },
+      "behavior": {
+        "galleryNavigation": "Changing thumbnails updates the active media without page jump",
+        "fullscreen": "Open media in accessible dialog or sheet, restore focus on close",
+        "video": "Do not autoplay with sound; keep controls discoverable",
+        "performance": "Prioritize the first media item and defer non-primary assets"
+      }
+    },
+    "PurchasePanel": {
+      "description": "Primary product summary and action module where the shopper confirms fit, price, availability, and purchase intent",
+      "dimensions": {
+        "desktopWidthPx": "360-440",
+        "stickyTopPx": 96,
+        "ctaMinHeightPx": 48
+      },
+      "states": [
+        "default",
+        "selection-incomplete",
+        "ready-to-purchase",
+        "adding",
+        "added",
+        "error",
+        "low-stock",
+        "out-of-stock",
+        "backorder"
+      ],
+      "elements": {
+        "ProductHeader": {
+          "titleFontSizePx": "32-44 desktop, 24-32 mobile",
+          "subtitleFontSizePx": "14-16",
+          "badges": "Optional new, bestseller, limited, or sale labels"
+        },
+        "ReviewSummaryAnchor": {
+          "content": "Star rating, review count, optional shortcut to Q&A",
+          "placement": "Above price or immediately below title"
+        },
+        "PriceStack": {
+          "currentPriceFontSizePx": "28-36",
+          "compareAtPrice": "Muted struck-through style when applicable",
+          "promoMessage": "Savings or financing copy in compact supporting text",
+          "taxCopy": "Show when region or business model requires it"
+        },
+        "VariantSelectors": {
+          "types": [
+            "swatches",
+            "radio chips",
+            "button groups",
+            "dropdown fallback"
+          ],
+          "requiredLabeling": "Each group requires a visible label or legend",
+          "selectionFeedback": "Show currently selected value inline"
+        },
+        "QuantitySelector": {
+          "default": 1,
+          "minHeightPx": 44,
+          "placement": "Near primary CTA"
+        },
+        "PurchaseActions": {
+          "primary": "Add to Cart or Buy Now",
+          "secondary": [
+            "wishlist",
+            "save for later",
+            "share"
+          ],
+          "feedback": "Inline status, mini-cart, or toast"
+        },
+        "FulfillmentSummary": {
+          "content": [
+            "delivery estimate",
+            "pickup availability",
+            "return window",
+            "shipping threshold",
+            "warranty or authenticity"
+          ],
+          "placement": "Below CTA within the same scan zone"
+        }
+      },
+      "behavior": {
+        "selectionGate": "Primary CTA stays disabled or guarded until required variant choices are complete",
+        "variantSync": "Price, SKU, availability, and media may update with active variant",
+        "errorHandling": "Inline field-level guidance points to the missing or invalid selection",
+        "stickyDesktop": "Allowed only if the panel fits the viewport without hiding critical actions",
+        "statusMessaging": "Inventory and add-to-cart outcomes should be announced politely"
+      }
+    },
+    "TrustDeliveryStrip": {
+      "description": "Compact reassurance bar for fulfillment and purchase confidence signals",
+      "dimensions": {
+        "itemCount": "3-5 max",
+        "minHeightPx": "72-96"
+      },
+      "states": [
+        "default",
+        "dense"
+      ],
+      "elements": {
+        "TrustItem": {
+          "content": "Icon, short label, short explanation",
+          "examples": [
+            "Ships by Thursday",
+            "Free returns in 30 days",
+            "Store pickup available",
+            "2-year warranty"
+          ]
+        }
+      },
+      "behavior": {
+        "density": "Keep copy concise; do not turn this strip into a long policy section",
+        "responsive": "Collapse to 2-column grid or stacked list on small screens"
+      }
+    },
+    "ProductDetailsRegion": {
+      "description": "Decision-support content after the buy zone, covering what the product is, how it fits, and whether it suits the shopper",
+      "dimensions": {
+        "sectionGapPx": "32-48 desktop, 20-24 mobile",
+        "contentMaxWidthPx": 1280
+      },
+      "states": [
+        "default",
+        "accordion-collapsed",
+        "accordion-expanded"
+      ],
+      "elements": {
+        "Highlights": {
+          "format": "Short bullets or short cards",
+          "purpose": "Summarize value quickly"
+        },
+        "Description": {
+          "format": "Short narrative paragraphs with supportive bullets",
+          "priority": "Benefits first, brand story second"
+        },
+        "Specifications": {
+          "format": "Structured key-value content",
+          "notes": "Use stacked lists or definition lists when tables are not desired"
+        },
+        "FitOrDimensions": {
+          "examples": [
+            "size guidance",
+            "measurements",
+            "compatibility"
+          ]
+        },
+        "MaterialsAndCare": {
+          "examples": [
+            "material composition",
+            "fabric details",
+            "care instructions"
+          ]
+        },
+        "FAQ": {
+          "format": "Accordion or compact stacked list"
+        }
+      },
+      "behavior": {
+        "desktop": "Use stacked sections or anchor links if content is long",
+        "mobile": "Prefer accordions to reduce overwhelming page length",
+        "priority": "Place specs, dimensions, compatibility, or materials before purely promotional storytelling"
+      }
+    },
+    "ReviewsAndQA": {
+      "description": "Social proof section combining review summary, review content, and customer questions",
+      "dimensions": {
+        "summaryCardMinWidthPx": 260,
+        "reviewCardGapPx": "16-24"
+      },
+      "states": [
+        "default",
+        "filtered",
+        "sorted",
+        "empty",
+        "loading"
+      ],
+      "elements": {
+        "RatingSummary": {
+          "content": "Average rating, rating distribution bars, review count, optional recommendation percentage"
+        },
+        "FiltersAndSort": {
+          "controls": [
+            "rating",
+            "media-only",
+            "use case",
+            "size/fit",
+            "most recent",
+            "most helpful"
+          ],
+          "placement": "Inline toolbar desktop, sheet or drawer mobile"
+        },
+        "ReviewCards": {
+          "content": [
+            "rating",
+            "headline",
+            "body",
+            "verified badge",
+            "variant context",
+            "date",
+            "optional customer media"
+          ]
+        },
+        "CustomerQuestions": {
+          "content": "Common questions, answered Q&A, or FAQ continuation"
+        }
+      },
+      "behavior": {
+        "topAnchor": "Expose a jump link near the title or price",
+        "filtering": "Do not reload the whole page for simple review filtering when the stack supports client-side updates",
+        "noReviews": "Show helpful empty state with invitation to be first reviewer if appropriate"
+      }
+    },
+    "RecommendationsSection": {
+      "description": "Related or complementary merchandise shown after the core product decision content",
+      "dimensions": {
+        "desktopColumns": "3-4",
+        "tabletColumns": "2-3",
+        "mobileColumns": "2 or horizontal rail"
+      },
+      "states": [
+        "default",
+        "loading",
+        "empty"
+      ],
+      "elements": {
+        "SectionHeading": {
+          "examples": [
+            "You may also like",
+            "Complete the look",
+            "Frequently bought together",
+            "Recently viewed"
+          ]
+        },
+        "RecommendationCard": {
+          "content": "Image, title, price, quick badge, optional quick action"
+        }
+      },
+      "behavior": {
+        "placement": "After reviews or after key details, not ahead of the buy box",
+        "relevance": "Prioritize contextual relevance over aggressive volume"
+      }
+    },
+    "StickyMobilePurchaseBar": {
+      "description": "Mobile-only persistent purchase shortcut shown when the main purchase controls are off-screen",
+      "dimensions": {
+        "heightPx": 72,
+        "paddingPx": "12-16",
+        "safeAreaInset": "env(safe-area-inset-bottom)"
+      },
+      "states": [
+        "hidden",
+        "visible",
+        "selection-incomplete",
+        "ready"
+      ],
+      "elements": {
+        "PriceSummary": {
+          "fontSizePx": "16-20"
+        },
+        "VariantSummary": {
+          "content": "Selected option labels or prompt to choose options"
+        },
+        "PrimaryCTA": {
+          "minHeightPx": 44,
+          "label": "Add to Cart or Select Options"
+        }
+      },
+      "behavior": {
+        "visibility": "Appear only when main purchase controls are not visible in the viewport",
+        "safeArea": "Respect device bottom inset",
+        "focus": "Do not create duplicate confusing focus loops with the main CTA"
+      }
+    }
+  },
+  "responsiveBreakpoints": {
+    "desktop": {
+      "minWidth": "1024px",
+      "purchaseRegion": "12-column grid, typically 7 columns media and 5 columns buy box",
+      "gallery": "Thumbnail rail visible, larger inspection surface",
+      "purchasePanel": "May stick within viewport after initial scroll if height allows",
+      "details": "Stacked sections or anchor navigation"
+    },
+    "tablet": {
+      "minWidth": "768px",
+      "maxWidth": "1023px",
+      "purchaseRegion": "Either a tighter split or early stack depending content density and image ratio",
+      "gallery": "Horizontal thumbnail rail if vertical rail becomes cramped",
+      "purchasePanel": "Prefer non-sticky or limited sticky behavior when content grows tall",
+      "details": "Stacked sections with larger touch-friendly controls"
+    },
+    "mobile": {
+      "maxWidth": "767px",
+      "purchaseRegion": "Single-column flow with media near top and purchase actions soon after",
+      "gallery": "Horizontal thumbnails or dots plus explicit fullscreen trigger",
+      "purchasePanel": "Full-width stack with large touch targets",
+      "details": "Accordion presentation recommended",
+      "stickyActionBar": "Visible when main purchase controls leave viewport"
+    },
+    "resizeHandling": {
+      "debounceMs": 120,
+      "preserveState": "Keep selected variant, quantity, and active media when crossing breakpoints",
+      "stickyRules": "Recompute sticky buy box and mobile action bar visibility on resize and orientation change",
+      "overlayRules": "Fullscreen gallery must recalculate dimensions or close safely when viewport changes dramatically"
+    }
+  },
+  "stateManagement": {
+    "statesToTrack": {
+      "selectedVariant": {
+        "type": "object",
+        "description": "Currently resolved variant, including option values, SKU, price, availability, and media mapping",
+        "default": {},
+        "persistence": "component state only, optionally mirrored to URL or router state",
+        "notes": "Resolve from default variant or option selections; avoid impossible combinations"
+      },
+      "selectedQuantity": {
+        "type": "number",
+        "description": "Current quantity selection for purchase",
+        "default": 1,
+        "persistence": "component state only"
+      },
+      "activeMediaIndex": {
+        "type": "number",
+        "description": "Currently active media item in the gallery",
+        "default": 0,
+        "persistence": "component state only"
+      },
+      "galleryOverlayOpen": {
+        "type": "boolean",
+        "description": "Whether fullscreen or zoom overlay is open",
+        "default": false,
+        "persistence": "component state only"
+      },
+      "purchaseStatus": {
+        "type": "enum",
+        "description": "Current CTA status for add-to-cart flow",
+        "default": "idle",
+        "allowedValues": [
+          "idle",
+          "adding",
+          "added",
+          "error"
+        ],
+        "persistence": "component state only"
+      },
+      "inventoryStatus": {
+        "type": "enum",
+        "description": "Current availability state for the resolved variant",
+        "default": "in-stock",
+        "allowedValues": [
+          "in-stock",
+          "low-stock",
+          "backorder",
+          "out-of-stock",
+          "preorder"
+        ],
+        "determination": "Derived from selected variant inventory and sellable rules"
+      },
+      "detailsAccordionOpen": {
+        "type": "array",
+        "description": "Open detail section identifiers, primarily used on mobile accordion layouts",
+        "default": [
+          "highlights"
+        ],
+        "persistence": "component state only"
+      },
+      "reviewFiltersState": {
+        "type": "object",
+        "description": "Active review sort and filter controls",
+        "default": {},
+        "persistence": "component state only or URL query parameters"
+      },
+      "stickyMobileBarVisible": {
+        "type": "boolean",
+        "description": "Whether the sticky mobile purchase bar is currently visible",
+        "default": false,
+        "determination": "Derived from viewport size and whether the main purchase controls are out of view"
+      }
+    },
+    "ssrConsiderations": {
+      "viewportState": "Compute sticky bar and sticky buy box only after mount when viewport APIs are available",
+      "mediaOverlay": "Guard document and window access in fullscreen gallery logic",
+      "variantInitialization": "Render deterministic default variant state on first paint to avoid hydration mismatches"
+    }
+  },
+  "persistence": {
+    "storage": "custom",
+    "keys": {
+      "variantSelection": "Optional URL query or route state key for deep-linked variant selection",
+      "deliveryLocation": "Optional persisted shipping destination or pickup store selection if the storefront supports it"
+    }
+  },
+  "overflowPolicy": {
+    "page": "noHorizontalScroll",
+    "galleryOverlay": "lockBodyScrollWhenOpen",
+    "detailsSections": "Allow natural vertical growth; avoid clipped specification content",
+    "mobileActionBar": "Reserve bottom spacing so content and footer are not obscured"
+  },
+  "zIndexLayers": {
+    "base": 0,
+    "stickyBuyBox": 30,
+    "stickyHeader": 40,
+    "mobileActionBar": 70,
+    "galleryOverlay": 90,
+    "modal": 100
+  },
+  "navigationBehavior": {
+    "breadcrumbs": {
+      "role": "Return path and category context"
+    },
+    "sectionAnchors": {
+      "enabled": true,
+      "targets": [
+        "details",
+        "specifications",
+        "reviews",
+        "faq"
+      ]
+    },
+    "onRouteChange": {
+      "galleryOverlay": "close",
+      "reviewSheets": "close",
+      "stickyBar": "recompute"
+    }
+  },
+  "internationalization": {
+    "pricing": {
+      "currency": "Use locale-aware currency formatting and tax labels",
+      "discounts": "Handle compare-at and savings copy with locale-safe number formatting"
+    },
+    "contentLength": {
+      "note": "Allow longer localized labels for variant names, shipping text, and CTA support copy"
+    },
+    "rtl": {
+      "note": "Mirror thumbnail rails, breadcrumbs separators, and buy-box secondary action layout when RTL is active"
+    },
+    "regionalPolicy": {
+      "note": "Shipping, returns, and pickup promises may vary by shopper region and should not be hardcoded globally"
+    }
+  },
+  "mobileSafeArea": {
+    "applyTo": [
+      "StickyMobilePurchaseBar"
+    ],
+    "bottomInset": "env(safe-area-inset-bottom)",
+    "notes": "Ensure the sticky purchase bar and any drawer actions clear device home indicators and browser chrome."
+  },
+  "motionPreferences": {
+    "prefersReducedMotion": {
+      "behavior": "reduce",
+      "rules": [
+        "Disable non-essential gallery transitions beyond simple fades",
+        "Avoid dramatic sticky bar slide-ins; use subtle appearance changes",
+        "Remove parallax or scroll-linked motion in media and recommendation rails",
+        "Keep success and error state transitions short and non-disorienting"
+      ]
+    }
+  },
+  "frameworkPatterns": {
+    "react": {
+      "stateManagement": "useState for UI state, custom hooks for variant resolution, sticky action visibility, media overlay, and add-to-cart status; optionally Context for shared product state if the page is deeply composed",
+      "example": "const { selectedOptions, activeVariant, setOptionValue, isPurchasable } = useVariantSelection(product); const stickyBarVisible = useStickyActionBar({ rootRef: buyBoxRef, minWidth: 0, maxWidth: 767 });",
+      "customHooks": "Extract logic into focused hooks such as useVariantSelection(), useMediaGallery(), useStickyActionBar(), and useAddToCartStatus().",
+      "componentStructure": "<ProductPage><Breadcrumbs items={breadcrumbs} /><PurchaseRegion><ProductMediaGallery media={media} activeVariant={activeVariant} /><PurchasePanel product={product} activeVariant={activeVariant} onOptionChange={setOptionValue} /></PurchaseRegion><TrustDeliveryStrip items={trustItems} /><ProductDetailsRegion sections={detailsSections} /><ReviewsAndQA reviews={reviews} questions={questions} /><RecommendationsSection items={recommendations} /><StickyMobilePurchaseBar activeVariant={activeVariant} /></ProductPage>"
+    },
+    "vue": {
+      "stateManagement": "ref() and computed() for selected options, active variant, pricing, and sticky action visibility; composables for reusable PDP logic",
+      "example": "const { selectedOptions, activeVariant, setOptionValue, isPurchasable } = useVariantSelection(product); const stickyBarVisible = useStickyActionBar(buyBoxRef);",
+      "componentStructure": "<ProductPage><Breadcrumbs :items='breadcrumbs' /><PurchaseRegion><ProductMediaGallery :media='media' :active-variant='activeVariant' /><PurchasePanel :product='product' :active-variant='activeVariant' @option-change='setOptionValue' /></PurchaseRegion><TrustDeliveryStrip :items='trustItems' /><ProductDetailsRegion :sections='detailsSections' /><ReviewsAndQA :reviews='reviews' :questions='questions' /><RecommendationsSection :items='recommendations' /><StickyMobilePurchaseBar :active-variant='activeVariant' /></ProductPage>"
+    },
+    "angular": {
+      "stateManagement": "Component properties for view state, services or utility classes for variant matching and purchase messaging, RxJS streams for async cart actions and viewport observation",
+      "example": "activeVariant$ = this.variantService.activeVariant$(this.product$, this.selectedOptions$); stickyBarVisible$ = this.viewportService.observeStickyAction(this.buyBoxRef);",
+      "componentStructure": "<app-product-page><app-breadcrumbs [items]='breadcrumbs'></app-breadcrumbs><section class='purchase-region'><app-product-media-gallery [media]='media' [activeVariant]='activeVariant'></app-product-media-gallery><app-purchase-panel [product]='product' [activeVariant]='activeVariant' (optionChange)='setOptionValue($event)'></app-purchase-panel></section><app-trust-delivery-strip [items]='trustItems'></app-trust-delivery-strip><app-product-details-region [sections]='detailsSections'></app-product-details-region><app-reviews-qa [reviews]='reviews' [questions]='questions'></app-reviews-qa><app-recommendations-section [items]='recommendations'></app-recommendations-section><app-sticky-mobile-purchase-bar [activeVariant]='activeVariant'></app-sticky-mobile-purchase-bar></app-product-page>"
+    },
+    "svelte": {
+      "stateManagement": "Local state plus derived values or stores for selected options, active variant, gallery state, and CTA visibility",
+      "example": "const variantSelection = createVariantSelection(product); $: activeVariant = $variantSelection.activeVariant; $: stickyBarVisible = shouldShowStickyBar(buyBoxVisible, viewportWidth);",
+      "componentStructure": "<ProductPage><Breadcrumbs {breadcrumbs} /><PurchaseRegion><ProductMediaGallery {media} {activeVariant} /><PurchasePanel {product} {activeVariant} on:optionchange={setOptionValue} /></PurchaseRegion><TrustDeliveryStrip items={trustItems} /><ProductDetailsRegion sections={detailsSections} /><ReviewsAndQA {reviews} {questions} /><RecommendationsSection items={recommendations} /><StickyMobilePurchaseBar {activeVariant} /></ProductPage>"
+    }
+  },
+  "stylingApproaches": {
+    "note": "These are implementation examples showing how to apply the designSystem specifications using different styling tools. The designSystem section contains the authoritative design values.",
+    "tailwindCSS": {
+      "description": "Use utility classes with responsive modifiers and semantic grouping",
+      "purchaseRegionExample": "class='mx-auto grid max-w-[1280px] gap-6 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-12'",
+      "galleryExample": "class='grid gap-4 lg:grid-cols-[80px_minmax(0,1fr)]'",
+      "buyBoxExample": "class='rounded-2xl border border-slate-200 bg-white p-6 lg:sticky lg:top-24'",
+      "stickyBarExample": "class='fixed inset-x-0 bottom-0 z-[70] border-t border-slate-200 bg-white/95 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 backdrop-blur'"
+    },
+    "cssModules": {
+      "description": "Scoped classes with media queries for purchase-region density, sticky behaviors, and accordion transitions",
+      "approach": "Create modules such as ProductPage.module.css or split modules by gallery, purchase panel, and reviews. Keep class names semantic and reflect page regions."
+    },
+    "styledComponents": {
+      "description": "CSS-in-JS with theme tokens and breakpoint helpers",
+      "approach": "Use styled sections for purchase region, buy box, and sticky bar. Pull pricing, spacing, and border radii from the project theme."
+    },
+    "chakraUI": {
+      "components": "Use Box, Container, Grid, Stack, AspectRatio, Button, Accordion, Tabs, Drawer, and Modal",
+      "approach": "Translate the gallery/buy-box split into Grid and Stack primitives, and use Chakra responsive props for sticky desktop and mobile action bar behavior"
+    },
+    "materialUI": {
+      "components": "Use Box, Container, Grid, Stack, Accordion, Tabs, Modal, Button, and Card",
+      "approach": "Model the purchase region with Grid, keep sticky behavior in sx or styled APIs, and align form controls with existing theme density"
+    },
+    "vanillaCSS": {
+      "description": "Standard CSS with semantic class names. CRITICAL: ALWAYS create CSS classes, NEVER use inline styles.",
+      "approach": "Define classes such as .product-page, .purchase-region, .media-gallery, .purchase-panel, .trust-strip, .details-accordion, and .sticky-purchase-bar with media queries."
+    },
+    "sass": {
+      "description": "SCSS with spacing tokens, breakpoint mixins, and small state modifiers",
+      "approach": "Use SCSS variables for spacing, sticky offsets, and z-index layers, and keep modifier classes for loading, selected, and unavailable states"
+    }
+  },
+  "animations": {
+    "galleryTransition": {
+      "animation": "fade between media assets with optional short scale correction",
+      "durationMs": 180,
+      "easing": "ease-out"
+    },
+    "thumbnailState": {
+      "animation": "border-color and shadow transition",
+      "durationMs": 140,
+      "easing": "ease-out"
+    },
+    "buyBoxStickyTransition": {
+      "properties": [
+        "box-shadow",
+        "transform"
+      ],
+      "durationMs": 180,
+      "easing": "ease-out"
+    },
+    "detailsAccordion": {
+      "animation": "height + opacity",
+      "durationMs": 180,
+      "easing": "ease-in-out"
+    },
+    "addToCartFeedback": {
+      "animation": "subtle inline status or mini-cart confirmation",
+      "durationMs": 220,
+      "easing": "ease-out"
+    },
+    "mobileActionBarEntrance": {
+      "animation": "translateY(16px to 0) + opacity",
+      "durationMs": 200,
+      "easing": "ease-out"
+    },
+    "prefersReducedMotion": {
+      "disable": [
+        "galleryTransition",
+        "mobileActionBarEntrance"
+      ],
+      "keep": [
+        "thumbnailState",
+        "buyBoxStickyTransition",
+        "detailsAccordion"
+      ],
+      "implementation": "@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }"
+    }
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.1.1": "Non-text Content - Product images, review media, and icons have appropriate alt text or are marked decorative",
+        "1.3.1": "Info and Relationships - Use semantic structure, fieldsets for option groups, and clearly associated labels",
+        "1.4.3": "Contrast Minimum - 4.5:1 for text and 3:1 for essential UI boundaries, badges, and form affordances",
+        "2.1.1": "Keyboard - Gallery controls, selectors, accordions, reviews filters, and CTAs are fully keyboard accessible",
+        "2.4.3": "Focus Order - Maintain logical order from gallery to purchase controls to supporting details",
+        "2.4.7": "Focus Visible - Strong focus indicators for thumbnails, selector chips, buttons, and filter controls",
+        "4.1.2": "Name, Role, Value - Variant controls, dialog overlays, and status messages expose accessible names and state",
+        "4.1.3": "Status Messages - Inventory changes and add-to-cart outcomes are announced via polite live regions"
+      }
+    },
+    "keyboardNavigation": {
+      "tabOrder": "Header actions -> Breadcrumbs -> Gallery controls -> Review summary anchor -> Price and selectors -> Quantity and primary CTA -> Secondary actions -> Details anchors or accordions -> Reviews filters and items -> Recommendations -> Footer links",
+      "implementation": "Avoid hidden focus targets inside off-screen sticky bars or collapsed accordions"
+    },
+    "ariaAttributes": {
+      "required": {
+        "breadcrumbs": {
+          "html": "<nav aria-label='Breadcrumb'>...</nav>"
+        },
+        "variantGroups": {
+          "html": "<fieldset><legend>Size</legend>...</fieldset>",
+          "note": "Use radio buttons or button groups with clear state exposure"
+        },
+        "inventoryStatus": {
+          "html": "<p aria-live='polite'>In stock. Ships by Thursday.</p>"
+        },
+        "galleryOverlay": {
+          "html": "<div role='dialog' aria-modal='true' aria-label='Product image gallery'>...</div>"
+        },
+        "reviewAnchor": {
+          "html": "<a href='#reviews' aria-describedby='review-count'>4.8 stars</a>"
+        },
+        "detailsAccordion": {
+          "html": "<button aria-expanded='false' aria-controls='details-specs'>Specifications</button>"
+        },
+        "stickyPurchaseBar": {
+          "html": "<div role='region' aria-label='Sticky purchase bar'>...</div>"
+        }
+      }
+    },
+    "screenReader": {
+      "headingHierarchy": {
+        "structure": "One product title heading (<h1>), <h2> for major regions such as details, reviews, and recommendations, <h3> for nested subsections",
+        "requirement": "Do not skip levels or make review card titles compete with structural headings"
+      },
+      "altText": {
+        "productMedia": "Describe angle or context when useful: front view, side view, detail close-up, model wearing product, etc.",
+        "decorative": "Decorative icons and flourishes should be hidden from assistive tech"
+      },
+      "statusMessages": {
+        "inventory": "Announce changes after variant selection",
+        "cart": "Announce success or failure after purchase attempts"
+      }
+    },
+    "focusManagement": {
+      "focusVisible": {
+        "required": true,
+        "implementation": "Visible outline or ring for all interactive controls",
+        "css": ".control:focus-visible{outline:2px solid var(--focus-color);outline-offset:2px;}"
+      },
+      "dialogs": {
+        "galleryOverlay": "Trap focus when open and restore focus to the invoking control on close"
+      },
+      "dynamicRegions": {
+        "stickyBar": "Avoid shifting focus automatically when the sticky bar appears"
+      }
+    },
+    "colorContrast": {
+      "requirement": "WCAG AA: 4.5:1 for normal text, 3:1 for large text and key UI boundaries",
+      "criticalAreas": [
+        "Price and promo text",
+        "Selected and unavailable variant controls",
+        "Primary CTA and focus ring",
+        "Trust-strip text and icons",
+        "Accordion labels and review filter chips"
+      ]
+    },
+    "implementationChecklist": [
+      "Gallery thumbnails, media controls, and fullscreen viewer are keyboard accessible",
+      "Variant groups expose selected and unavailable states correctly",
+      "Add-to-cart and inventory updates are announced with polite live regions",
+      "One H1 is used for the product title",
+      "Review summary anchor and details anchors point to valid IDs",
+      "Sticky mobile purchase bar does not duplicate or trap focus",
+      "Contrast is verified for CTA, prices, badges, and disabled/unavailable states"
+    ]
+  },
+  "designSystem": {
+    "note": "These design specifications are tool-agnostic and should be implemented using the project's chosen styling approach.",
+    "colorGuidelines": {
+      "page": {
+        "background": "Use the storefront's neutral page background with enough contrast to separate product surfaces",
+        "surfaces": "Use slightly elevated surfaces for the buy box, review summary cards, and recommendation cards when the brand system supports it"
+      },
+      "purchasePanel": {
+        "background": "Solid surface with strong content contrast",
+        "primaryCTA": "High-contrast brand color or neutral inverted style that clearly outranks secondary controls",
+        "secondaryActions": "Lower visual weight but still clearly interactive",
+        "availability": {
+          "inStock": "Positive but restrained",
+          "lowStock": "Attention color with readable contrast",
+          "outOfStock": "Muted but unmistakable"
+        }
+      },
+      "trustStrip": {
+        "background": "Subtle neutral or low-contrast band distinct from page background",
+        "icons": "Use the project's icon style; avoid decorative overload"
+      },
+      "detailsAndReviews": {
+        "headings": "High contrast against the page background",
+        "body": "Readable neutral text for longer content",
+        "chips": "Selected filter states must remain visually clear at small sizes"
+      }
+    },
+    "typography": {
+      "fontFamily": "Use the project's existing font stack",
+      "productHeader": {
+        "title": "32-44px desktop, 24-32px mobile, weight 600-800, line-height 1.1-1.2",
+        "subtitle": "14-16px, medium contrast"
+      },
+      "pricing": {
+        "currentPrice": "28-36px desktop, 22-28px mobile, weight 600-700",
+        "supportingPriceText": "13-15px"
+      },
+      "details": {
+        "sectionHeading": "24-32px desktop, 20-24px mobile, weight 600-700",
+        "body": "16-18px with generous line-height",
+        "specLabel": "14-16px medium",
+        "specValue": "14-16px regular"
+      },
+      "reviews": {
+        "summaryValue": "28-40px for rating average",
+        "body": "14-16px"
+      }
+    },
+    "spacing": {
+      "scale": "Use a consistent spacing scale such as 4, 8, 12, 16, 24, 32, 40, 48, 64, 80px",
+      "purchaseRegion": {
+        "desktopGap": "40-48px",
+        "mobileGap": "20-24px"
+      },
+      "buyBox": {
+        "padding": "20-32px depending density",
+        "elementGap": "12-20px between price, selectors, CTA, and fulfillment blocks"
+      },
+      "sections": {
+        "desktopPadding": "56-72px vertical",
+        "mobilePadding": "24-40px vertical"
+      },
+      "recommendations": {
+        "cardGap": "16-24px"
+      }
+    },
+    "shadows": {
+      "buyBox": {
+        "default": "Subtle border or low-elevation shadow",
+        "sticky": "Slightly stronger elevation when sticky to maintain separation"
+      },
+      "cards": {
+        "default": "Light elevation or border depending brand language",
+        "hover": "Optional small lift for recommendation cards"
+      }
+    },
+    "borderRadius": {
+      "media": "8-20px depending visual direction",
+      "buyBox": "12-24px if surfaced; 0 if page language is flatter",
+      "buttons": "8-14px",
+      "selectorChips": "9999px for pill chips or 8-12px for boxy selectors"
+    },
+    "visualHierarchy": {
+      "principles": [
+        "The gallery and purchase panel are the first focal points on desktop",
+        "Title, price, availability, and primary CTA dominate the buy box",
+        "Trust signals support the decision without competing with the CTA",
+        "Specs, fit, and FAQ remain easy to scan before reviews or recommendations overwhelm the shopper",
+        "Recommendation content feels secondary to the core product decision"
+      ]
+    }
+  },
+  "dataStructures": {
+    "product": {
+      "description": "Core PDP payload",
+      "example": {
+        "id": "prod_organic-cotton-tee",
+        "title": "Organic Cotton Tee",
+        "subtitle": "Soft heavyweight everyday T-shirt",
+        "ratingAverage": 4.8,
+        "reviewCount": 218,
+        "price": {
+          "amount": 48,
+          "currency": "USD",
+          "compareAt": 58
+        },
+        "availability": "in-stock",
+        "shippingMessage": "Ships in 1-2 business days",
+        "returnMessage": "Free returns for 30 days"
+      }
+    },
+    "media": {
+      "description": "Ordered gallery media items",
+      "example": [
+        {
+          "id": "media-front",
+          "type": "image",
+          "alt": "Front view of the organic cotton tee in off-white",
+          "role": "studio"
+        },
+        {
+          "id": "media-detail",
+          "type": "image",
+          "alt": "Close-up of the fabric texture and collar stitching",
+          "role": "detail"
+        },
+        {
+          "id": "media-video",
+          "type": "video",
+          "alt": "Model wearing the tee outdoors and showing fit"
+        }
+      ]
+    },
+    "variants": {
+      "description": "Sellable SKU combinations derived from product options",
+      "example": [
+        {
+          "id": "var_offwhite_m",
+          "sku": "TEE-OFF-M",
+          "options": {
+            "color": "Off White",
+            "size": "M"
+          },
+          "price": 48,
+          "availability": "in-stock",
+          "mediaId": "media-front"
+        },
+        {
+          "id": "var_offwhite_l",
+          "sku": "TEE-OFF-L",
+          "options": {
+            "color": "Off White",
+            "size": "L"
+          },
+          "price": 48,
+          "availability": "low-stock",
+          "mediaId": "media-front"
+        }
+      ]
+    },
+    "reviews": {
+      "description": "Customer review list",
+      "example": [
+        {
+          "id": "review_001",
+          "rating": 5,
+          "title": "Exactly the fit I wanted",
+          "body": "Heavyweight but still soft. The size guide was accurate.",
+          "author": "Maya",
+          "verified": true,
+          "date": "2026-03-02",
+          "context": {
+            "size": "M",
+            "fit": "True to size"
+          }
+        }
+      ]
+    },
+    "recommendations": {
+      "description": "Recommendation cards shown after the main decision sections",
+      "example": [
+        {
+          "id": "rec_001",
+          "title": "French Terry Zip Hoodie",
+          "price": 78,
+          "badge": "Pairs well"
+        }
+      ]
+    }
+  },
+  "commonVariations": {
+    "variantPresentation": "Swatches, pill buttons, segmented controls, dropdown fallback, image-backed selectors",
+    "pricingPresentation": "Standard price, compare-at sale, volume discount, subscription toggle, financing copy",
+    "detailsNavigation": "Stacked sections, anchor-linked sections, desktop tabs plus mobile accordions",
+    "reviewDepth": "Short proof summary only, full filtered review system, reviews plus Q&A",
+    "recommendationStrategy": "Related products, complete the look, bundle builder, recently viewed",
+    "fulfillmentModules": "Delivery estimate, pickup availability, local inventory, return window, gift options"
+  },
+  "implementationDetails": {
+    "mediaGallery": {
+      "criticalRequirements": [
+        "Include enough media variety to answer inspection questions: front, detail, context, and optional video",
+        "Do not rely on a single hero image for products that require texture, scale, or fit judgment",
+        "Reserve image space before load to avoid layout shift",
+        "Keep zoom or fullscreen behavior discoverable and accessible"
+      ]
+    },
+    "buySection": {
+      "criticalRequirements": [
+        "Keep title, price, availability, variant selectors, shipping or returns summary, and primary CTA in the same visual cluster",
+        "Do not hide required purchase inputs behind tabs or distant accordions",
+        "If a product has complex variant logic, show unavailable combinations rather than silently removing them"
+      ]
+    },
+    "variantResolution": {
+      "algorithm": "Derive sellable combinations from the variant matrix, filter incompatible options as the shopper selects values, and update active variant details only when the selection resolves to a concrete SKU",
+      "errorHandling": "If no valid SKU remains, show inline guidance and keep CTA disabled"
+    },
+    "reviewsAndProof": {
+      "guidance": [
+        "Expose top-level review summary near the title or price",
+        "Keep full reviews in a deeper section with filter and sort support when volume is high",
+        "If media reviews exist, provide explicit controls and alt text rather than autoplaying them"
+      ]
+    },
+    "structuredData": {
+      "guidance": "If the project already manages SEO head metadata, keep Product, Offer, AggregateRating, shipping and returns, and variant structured data synchronized with the resolved variant state",
+      "notes": "Do not hardcode stale price or availability values into structured data"
+    },
+    "recommendations": {
+      "guidance": "Recommendations should feel contextually relevant and secondary. Avoid placing aggressive cross-sells before the shopper has seen the buy box, specs, or reviews."
+    },
+    "performance": {
+      "guidance": [
+        "Eager-load the primary above-the-fold image",
+        "Lazy-load below-the-fold media and recommendations",
+        "Compress high-resolution gallery assets and provide responsive sizes"
+      ]
+    }
+  },
+  "edgeCases": {
+    "longProductTitles": "Allow multi-line wrapping without pushing price and CTA too far down on mobile",
+    "variantExplosion": "If there are many option values, use grouping, scrollable chips, or dropdown fallbacks while keeping state legible",
+    "outOfStock": "Replace primary CTA with notify-me, store locator, or waitlist action as appropriate",
+    "noReviews": "Show a balanced empty state rather than collapsing the whole proof section",
+    "shippingUnavailable": "Explain why fulfillment messaging is missing or location-dependent",
+    "largeSpecSets": "Use structured stacked lists or grouped accordions so the content remains scannable",
+    "mediaHeavyProducts": "Avoid overloading the first viewport; prioritize the first few assets and defer the rest",
+    "stickyBarOverlap": "Ensure the mobile sticky bar does not obscure error messages, toast feedback, or system browser chrome"
+  },
+  "projectDetection": {
+    "framework": {
+      "description": "Detect the project's framework by examining package.json, the component tree, and the storefront's rendering setup.",
+      "detectionSteps": [
+        "Check package.json for framework dependencies such as react, vue, @angular/core, or svelte",
+        "Examine existing storefront pages and product-related components for framework patterns",
+        "Look at routing and data-fetching conventions used by the project",
+        "Prefer the framework already used by the current storefront, not a new one"
+      ]
+    },
+    "stylingSystem": {
+      "description": "Detect the project's styling approach and follow it exactly.",
+      "detectionSteps": [
+        "Check package.json for styling dependencies such as tailwindcss, sass, styled-components, emotion, or component libraries",
+        "Look for config files such as tailwind.config.js, postcss.config.js, theme files, or CSS module usage",
+        "Examine existing product cards, buttons, forms, and modals to understand naming and density conventions",
+        "Inspect how the project handles responsive spacing, states, and design tokens"
+      ],
+      "adaptationRules": [
+        "If Tailwind is detected: use Tailwind utility classes exclusively and match existing composition patterns",
+        "If SCSS or CSS is detected: create stylesheet classes that match project organization and naming",
+        "If CSS Modules are detected: use module files and scoped class names",
+        "If styled-components or Emotion are detected: use the project's CSS-in-JS patterns and theme tokens",
+        "If a component library is detected: compose the layout with its primitives rather than bypassing it",
+        "If no styling system is present: use semantic vanilla CSS classes, never inline styles"
+      ]
+    },
+    "designTokens": {
+      "description": "Identify existing design tokens, commerce patterns, and state colors before choosing values.",
+      "detectionSteps": [
+        "Check for token files, theme configuration, and CSS variables",
+        "Inspect existing buttons, chips, cards, badges, and form controls for spacing and radius patterns",
+        "Look at current storefront colors for success, warning, muted, and surface states",
+        "Reuse existing product card or gallery tokens if they exist"
+      ]
+    }
+  },
+  "outputConstraints": {
+    "must": [
+      "Detect and use ONLY the project's existing framework",
+      "Detect and use ONLY the project's existing styling system",
+      "Keep title, price, availability, variant selectors, and purchase CTA within the same primary summary zone",
+      "Provide accessible product media inspection with explicit controls",
+      "Expose shipping, returns, pickup, or warranty context close to purchase actions",
+      "Show clear state for unavailable or invalid variant combinations",
+      "Use semantic HTML for major page regions and fieldsets for grouped selectors",
+      "Preserve mobile accessibility with large touch targets and safe-area-aware sticky purchase actions",
+      "Split large page implementations into smaller components with clear responsibilities"
+    ],
+    "mustNot": [
+      "Do NOT introduce a new styling system or UI library",
+      "Do NOT use inline style attributes unless the project already relies on them",
+      "Do NOT hide core purchase requirements inside distant tabs or buried accordions",
+      "Do NOT remove unavailable variant values without explanation if the product has combinational logic",
+      "Do NOT autoplay media with sound",
+      "Do NOT let recommendation modules dominate the buy box or move ahead of core product information",
+      "Do NOT implement the entire PDP in one oversized page component",
+      "CRITICAL: When vanilla CSS is detected, NEVER use inline style attributes. ALWAYS create CSS classes in a stylesheet.",
+      "CRITICAL: When React is detected, NEVER put variant logic, sticky visibility, and async purchase status into one large useEffect."
+    ]
+  },
+  "testingChecklist": [
+    "Gallery renders without layout shift and the primary image loads eagerly",
+    "Thumbnail navigation updates the active media correctly",
+    "Fullscreen or zoom gallery opens, traps focus, and restores focus on close",
+    "Required variant selectors must be completed before purchase",
+    "Unavailable combinations are visibly disabled and do not lead to invalid purchase attempts",
+    "Price, SKU, inventory, and fulfillment messaging update with variant changes",
+    "Low-stock, out-of-stock, backorder, and preorder states are visually distinct and announced correctly",
+    "Add-to-cart shows loading, success, and error feedback",
+    "Shipping and returns context remains visible near the purchase controls",
+    "Details sections remain scannable on desktop and accordions work on mobile",
+    "Review summary anchor jumps to the reviews section",
+    "Review filters and sorting work without breaking keyboard navigation",
+    "Recommendation modules appear after the main decision content",
+    "Sticky mobile purchase bar appears only when needed and respects safe-area insets",
+    "No horizontal page scroll appears at any breakpoint",
+    "Large touch targets are preserved on mobile",
+    "Color contrast meets WCAG AA for CTA, price, selectors, badges, and muted text",
+    "One H1 is used for the product title and heading order remains logical",
+    "Structured product data stays synchronized with the active variant when SEO metadata is in scope",
+    "No console errors or accessibility regressions are introduced"
+  ],
+  "aiImplementationPrompt": "Create a modern ecommerce product detail page layout with: (1) a large media gallery that supports thumbnails, explicit zoom/fullscreen inspection, and optional video; (2) a purchase panel containing product title, review summary anchor, price stack, variant selectors, quantity, primary CTA, secondary actions, and shipping/returns context; (3) a trust or fulfillment strip near the buy box; (4) product details sections for highlights, description, specifications, fit or dimensions, materials and care, and FAQ; (5) reviews and Q&A with summary, filters, and media support; (6) a recommendations section placed after the main decision content; and (7) a mobile sticky purchase bar that appears when the main CTA is off-screen. Desktop should use a two-column purchase region with gallery and buy box visible together, while mobile uses a single-column flow and accordion details. Keep all required purchase information in the same summary zone, show unavailable variant combinations clearly, announce inventory and cart feedback accessibly, and support Product/Offer structured data synchronization if the project already manages SEO metadata. Split large page UI into smaller components with clear responsibilities instead of one oversized page component. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. CRITICAL: If vanilla CSS is detected, create CSS classes in a stylesheet, never use inline styles. If React is detected, split logic into focused custom hooks rather than a monolithic component.",
+  "meta": {
+    "created": "2026-03-24",
+    "updated": "2026-03-24",
+    "webUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page",
+    "relatedPotions": [
+      {
+        "id": "button",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: For primary purchase actions, secondary wishlist actions, and compact CTAs throughout the page.",
+        "required": false
+      },
+      {
+        "id": "dropdown-select",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Useful as a compact fallback when variant selectors cannot be represented as swatches or chips.",
+        "required": false
+      },
+      {
+        "id": "tabs",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Can support desktop details navigation when the product information is short and highly scannable.",
+        "required": false
+      },
+      {
+        "id": "toast-notifications",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: Helpful for non-blocking add-to-cart success and cart update feedback.",
+        "required": false
+      }
+    ],
+    "agentGuideUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page.json",
+    "markdownUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page.md"
+  }
+}

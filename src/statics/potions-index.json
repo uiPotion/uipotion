@@ -459,8 +459,30 @@
       "created": "2026-03-03",
       "updated": "2026-03-03",
       "markdownUrl": "https://uipotion.com/potions/components/sidebar-navigation.md"
+    },
+    {
+      "id": "ecommerce-product-page",
+      "name": "Ecommerce Product Page",
+      "category": "layouts",
+      "tags": [
+        "layouts",
+        "ecommerce",
+        "merchandising",
+        "product-page",
+        "product-detail-page",
+        "pdp",
+        "conversion",
+        "reviews",
+        "responsive"
+      ],
+      "excerpt": "A conversion-oriented ecommerce product detail page layout with media gallery, buy box, variant selectors, shipping and returns context, reviews, and mobile sticky purchase actions.",
+      "webUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page",
+      "agentGuideUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page.json",
+      "created": "2026-03-24",
+      "updated": "2026-03-24",
+      "markdownUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page.md"
     }
   ],
-  "totalCount": 21,
-  "lastUpdated": "2026-03-03"
+  "totalCount": 22,
+  "lastUpdated": "2026-03-24"
 }
