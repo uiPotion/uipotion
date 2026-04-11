@@ -12,7 +12,7 @@
       <h1 class="about-hero-title">Potion Kit</h1>
 
       <p class="about-hero-description">
-        CLI to scaffold and build websites with <a href="https://haroldjs.com" target="_blank" rel="noopener noreferrer">Harold</a> and UI Potion: static sites with Handlebars, Markdown, and SCSS only. Chat with the AI to design and build your site; the model uses the UI Potion catalog and Harold conventions and can only suggest components from real specs.
+        CLI to build static sites with <a href="https://haroldjs.com" target="_blank" rel="noopener noreferrer">Harold</a> and UI Potion: Handlebars, Markdown, and SCSS only. Chat with the AI to design and build your site; the model uses the UI Potion catalog and potion-kit project conventions, can only suggest components from real specs, can safely inspect or move allowed project directories, can delete empty allowed project directories, can safely move or delete allowed project files inside the current working directory, and can optionally search current web topics with Tavily-backed web research or read a public URL as plain text.
       </p>
     </div>
   </header>
@@ -21,7 +21,7 @@
     <div class="about-main-container">
       <article class="about-article">
         <section class="about-section">
-          <p><strong>Note:</strong> Potion Kit is actively developed. For the best experience we recommend the newest OpenAI or Anthropic models; for a good cheaper option, use Kimi K2.5. Extensive use consumes API tokens and costs depend on your provider's pricing. By using the tool you accept it as-is; only you decide whether and how much to use it. We hope you enjoy building with it.</p>
+          <p><strong>Note:</strong> Potion Kit is actively vibe coded — we're improving and optimizing it over time. For the best experience we recommend the newest OpenAI or Anthropic models; they handle the outcome quality best. For a good cheaper option, use Kimi K2.5. Extensive use consumes API tokens and costs depend on your provider's pricing. By using the tool you accept it as-is; only you decide whether and how much to use it. We hope you enjoy building with it.</p>
         </section>
 
         <section class="about-section">
@@ -30,7 +30,7 @@
             <li><strong><code>potion-kit init &lt;directory&gt;</code></strong> — Scaffold a new static site project with pages, partials, SCSS, and a sample post.</li>
             <li><strong><code>potion-kit chat</code></strong> — Interactive chat.</li>
             <li><strong><code>potion-kit chat "message"</code></strong> — Send one message and exit (one-shot).</li>
-            <li><strong><code>potion-kit doctor</code></strong> — Validate LLM configuration, provider connectivity, project structure, and remote dependencies.</li>
+            <li><strong><code>potion-kit doctor</code></strong> — Validate LLM configuration, provider connectivity, project structure, remote dependencies, and optional Tavily web research when configured.</li>
             <li><strong><code>potion-kit clear</code></strong> — Clear chat state for this project (history, summary cache, and event trace ledger).</li>
             <li><strong><code>potion-kit</code></strong> or <strong><code>potion-kit --help</code></strong> — Show usage and available commands. Unknown commands (for example <code>potion-kit clean</code>) also show help and do not call the API.</li>
           </ul>
@@ -96,14 +96,39 @@ npx potion-kit chat "Let's build a docs site"</code></pre>
         </section>
 
         <section class="about-section">
+          <h2>Current Web Research (Optional)</h2>
+          <p>If you set <code>TAVILY_API_KEY</code>, chat can search the public web for current information and then read selected pages as plain text. Even without Tavily, chat can still read a public URL that you provide directly.</p>
+          <p><strong>Example prompts:</strong></p>
+          <pre><code>npx potion-kit chat "Research the latest CSS nesting support and summarize the sources"
+npx potion-kit chat "Read https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting and summarize the key points"</code></pre>
+          <p>The web reader is text-only: it does not execute page JavaScript, does not download binary files, and blocks localhost, private IPs, and other internal-only addresses.</p>
+        </section>
+
+        <section class="about-section">
+          <h2>Project File and Directory Operations</h2>
+          <p>Chat can safely work with project files and directories inside the current working directory.</p>
+          <ul>
+            <li><strong>File operations</strong> — search, read, write, targeted edit, move, and delete allowed project files.</li>
+            <li><strong>Directory operations</strong> — inspect directory trees, move allowed directories, and delete empty allowed directories.</li>
+            <li><strong>Destructive safety</strong> — file delete/move requires a fresh file hash from <code>read_project_file</code>; directory move/delete requires a fresh <code>treeHash</code> from <code>inspect_project_directory</code>.</li>
+            <li><strong>Directory limits in v1</strong> — recursive directory delete is not supported, destination overwrite is not supported, and empty-directory delete is the only delete mode for directories.</li>
+          </ul>
+          <p><strong>Example prompts:</strong></p>
+          <pre><code>npx potion-kit chat "Rename src/components to src/ui/components"
+npx potion-kit chat "Inspect src/sections and tell me whether it is safe to move"
+npx potion-kit chat "Delete the empty src/tmp directory"
+npx potion-kit chat "Move src/posts/draft.md to src/posts/archive/draft.md"</code></pre>
+        </section>
+
+        <section class="about-section">
           <h2>Config &amp; .env</h2>
           <p>Config precedence (highest to lowest):</p>
           <ol>
             <li>Environment variables already present in your shell or process</li>
             <li><code>.env</code> in the current working directory (loaded only for variables not already set)</li>
-            <li><code>./config.json</code> in the current working directory — provider, model, and optional <code>maxHistoryMessages</code>, <code>maxToolSteps</code>, <code>maxOutputTokens</code>; do not put API keys there.</li>
+            <li><code>./config.json</code> in the current working directory — provider, model, optional <code>maxHistoryMessages</code>, <code>maxToolSteps</code>, <code>maxOutputTokens</code>, and optional Tavily web-research defaults under <code>webSearch</code>; do not put API keys there.</li>
           </ol>
-          <p>Key variables: <code>POTION_KIT_PROVIDER</code> (required: <code>openai</code>, <code>anthropic</code>, or <code>moonshot</code>), one of <code>OPENAI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, or <code>MOONSHOT_API_KEY</code>, and optionally <code>POTION_KIT_MODEL</code> (defaults: <code>gpt-5.2</code> / <code>claude-sonnet-4-5</code> / <code>kimi-k2.5</code>), <code>POTION_KIT_API_KEY</code>, <code>POTION_KIT_BASE_URL</code>, <code>POTION_KIT_MAX_HISTORY_MESSAGES</code>, <code>POTION_KIT_MAX_TOOL_STEPS</code>, <code>POTION_KIT_MAX_OUTPUT_TOKENS</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> for full details.</p>
+          <p>Key variables: <code>POTION_KIT_PROVIDER</code> (required: <code>openai</code>, <code>anthropic</code>, or <code>moonshot</code>), one of <code>OPENAI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, or <code>MOONSHOT_API_KEY</code>, and optionally <code>POTION_KIT_MODEL</code> (defaults: <code>gpt-5.2</code> / <code>claude-sonnet-4-5</code> / <code>kimi-k2.5</code>), <code>POTION_KIT_API_KEY</code>, <code>POTION_KIT_BASE_URL</code>, <code>POTION_KIT_MAX_HISTORY_MESSAGES</code>, <code>POTION_KIT_MAX_TOOL_STEPS</code>, <code>POTION_KIT_MAX_OUTPUT_TOKENS</code>. For optional web research: <code>TAVILY_API_KEY</code>, <code>POTION_KIT_WEB_SEARCH_MAX_RESULTS</code>, <code>POTION_KIT_WEB_SEARCH_COUNTRY</code>. See the <a href="https://github.com/uiPotion/potion-kit/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> for full details.</p>
           <p><strong>Minimal <code>.env</code>:</strong></p>
           <pre><code>POTION_KIT_PROVIDER=openai
 OPENAI_API_KEY=sk-your-key-here</code></pre>
@@ -111,7 +136,24 @@ OPENAI_API_KEY=sk-your-key-here</code></pre>
           <pre><code>POTION_KIT_PROVIDER=openai
 POTION_KIT_MODEL=gpt-5.2
 OPENAI_API_KEY=sk-your-key-here</code></pre>
-          <p><strong>Security:</strong> Potion Kit never sends <code>.env</code> or API keys to the model. Never commit <code>.env</code>; add it to <code>.gitignore</code>. Never put API keys in <code>./config.json</code>. Never paste API keys in chat, logs, or issues. Keep one <code>.env</code> in the directory from which you run <code>potion-kit</code>, usually your project root.</p>
+          <p><strong>With optional web search:</strong></p>
+          <pre><code>POTION_KIT_PROVIDER=openai
+OPENAI_API_KEY=sk-your-key-here
+TAVILY_API_KEY=tvly-your-key-here
+POTION_KIT_WEB_SEARCH_COUNTRY=united states</code></pre>
+          <p><strong>Example <code>config.json</code>:</strong></p>
+          <pre><code>{
+  "provider": "openai",
+  "model": "gpt-5.2",
+  "maxHistoryMessages": 10,
+  "maxToolSteps": 16,
+  "maxOutputTokens": 16384,
+  "webSearch": {
+    "maxResults": 5,
+    "country": "united states"
+  }
+}</code></pre>
+          <p><strong>Security:</strong> Potion Kit never sends <code>.env</code> or API keys to the model. Never commit <code>.env</code>; add it to <code>.gitignore</code>. Never put API keys in <code>./config.json</code>. Never paste API keys in chat, logs, or issues. Keep one <code>.env</code> in the directory from which you run <code>potion-kit</code>, usually your project root. Project file and directory tools are limited to the current working directory and reject sensitive or generated paths. Web research is GET-only, text-only, and blocks localhost and private addresses.</p>
         </section>
 
         <section class="about-section">
@@ -120,7 +162,7 @@ OPENAI_API_KEY=sk-your-key-here</code></pre>
           <ul>
             <li><strong><code>chat-history.json</code></strong> — Raw conversation in order as <code>{ role, content }</code> entries.</li>
             <li><strong><code>chat-summary.json</code></strong> — Cached rolling summary state for long conversations.</li>
-            <li><strong><code>chat-events.json</code></strong> — Per-turn trace metadata, including tool activity and whether the turn had a verified write via <code>write_project_file</code> or <code>edit_project_file</code>.</li>
+            <li><strong><code>chat-events.json</code></strong> — Per-turn trace metadata, including tool activity, web-tool metadata, directory metadata such as <code>entryCount</code> and <code>treeHash</code>, and whether the turn had a verified project mutation (file or directory write, edit, move, or delete).</li>
           </ul>
           <p>Set <code>POTION_KIT_MAX_HISTORY_MESSAGES</code>, <code>POTION_KIT_MAX_TOOL_STEPS</code>, or <code>POTION_KIT_MAX_OUTPUT_TOKENS</code> (or <code>maxHistoryMessages</code>, <code>maxToolSteps</code>, <code>maxOutputTokens</code> in <code>./config.json</code>) to tune behavior. Add <code>.potion-kit/</code> to <code>.gitignore</code> if you do not want to commit chat state. Use <code>potion-kit clear</code> to reset history, summary cache, and event traces for that project.</p>
         </section>
