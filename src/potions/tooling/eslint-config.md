@@ -22,36 +22,45 @@ path: 'potions/tooling/eslint-config'
 
 A comprehensive ESLint configuration generator for modern UI projects. Supports React, Vue, Angular, and Svelte with accessibility linting, TypeScript support, and Prettier integration.
 
-## CRITICAL: ESLint Version and Config Format
+## Config Format Selection
 
-**Before implementing, you MUST detect the ESLint version to use the correct configuration format:**
+ESLint has two configuration formats. The right one to use is determined by the **installed ESLint version**, not by a hardcoded rule in this guide. Before generating any file, detect the format the project needs.
 
-### ESLint v9.0.0+ (Current)
-- **Config file**: `eslint.config.js` (flat config format) - **REQUIRED**
-- **Ignore patterns**: Integrated into `eslint.config.js` using `ignores` array
-- **Legacy files**: `.eslintrc.*` and `.eslintignore` **will NOT work**
-- **Format**: ES Module with `export default [...]`
+### Flat Config (current default)
 
-### ESLint v8.x.x and Earlier (Legacy)
-- **Config file**: `.eslintrc.js` (or `.eslintrc.json`)
-- **Ignore patterns**: Separate `.eslintignore` file required
-- **Format**: CommonJS with `module.exports = {...}`
-- **Status**: Deprecated - consider upgrading to v9+
+- **Config file**: `eslint.config.js`, `eslint.config.mjs`, or `eslint.config.cjs`
+- **Module system** (this is the part that trips agents up):
+  - `eslint.config.js` follows the host project's module system — ES Module only when `package.json` declares `"type": "module"`, otherwise CommonJS
+  - `eslint.config.mjs` is always ES Module (`export default [...]`)
+  - `eslint.config.cjs` is always CommonJS (`module.exports = [...]`)
+- **Ignore patterns**: integrated into the config via an `ignores` array
+- **Status**: the standard, forward-compatible format. Used by current ESLint releases and all future versions.
 
-### How to Detect ESLint Version
+### Legacy Config (older projects)
 
-```bash
-# Check installed version
-npx eslint --version
+- **Config file**: `.eslintrc.js` / `.eslintrc.cjs` / `.eslintrc.json` / `.eslintrc.yml`
+- **Format**: CommonJS with `module.exports = {...}` (or JSON / YAML equivalents)
+- **Ignore patterns**: separate `.eslintignore` file
+- **Status**: deprecated. ESLint v9.x no longer auto-searches for eslintrc but can still load it via `ESLINT_USE_FLAT_CONFIG=false`. **ESLint v10+ removed both the auto-search and the `ESLINT_USE_FLAT_CONFIG` env var** — eslintrc files and `.eslintignore` are no longer honored at all. Treat this format as usable only when the project is pinned to an ESLint release that still supports it.
 
-# Or check package.json
-cat package.json | grep '"eslint"'
-```
+### How to Detect the Required Format
 
-**Detection steps for AI agents:**
-1. Check `package.json` devDependencies for eslint version
-2. If no ESLint installed, install latest (will be v9+)
-3. Generate config in the appropriate format based on detected version
+Do not hardcode a version number. Instead:
+
+1. Read the installed ESLint version from the project: `npx eslint --version` or inspect `package.json`.
+2. Consult the ESLint documentation **for that major version** — the docs site has a version switcher, and URLs follow `https://eslint.org/docs/v{N}/use/configure/`. Reading `/docs/latest/` to reason about an older installed release can give the wrong answer.
+3. If ESLint is not installed yet, install the latest version and use flat config.
+4. If migrating an existing project, prefer flat config unless pinned dependencies require otherwise.
+
+### How to Pick the Module System for `eslint.config.js`
+
+Before writing the file, read `package.json`:
+
+- `"type": "module"` present → emit ES Module (`import … from …; export default [...]`)
+- no `type` field, or `"type": "commonjs"` → emit CommonJS (`const … = require(…); module.exports = [...]`)
+- If you need to force one system regardless of `package.json`, use `eslint.config.mjs` (ESM) or `eslint.config.cjs` (CJS)
+
+**Rule of thumb**: default to flat config for all new work. Generate legacy config only when the project is locked to an older ESLint release that does not support flat config, or when the user has intentionally opted into eslintrc via `ESLINT_USE_FLAT_CONFIG=false`.
 
 ---
 
@@ -76,34 +85,36 @@ This tooling potion provides ESLint configurations tailored to different JavaScr
 - Import/export linting with eslint-plugin-import
 - Best practices and code quality rules
 - Configurable rule severity levels
-- Support for multiple config formats (JS, JSON, YAML)
+- Format detection: flat config (default) or legacy config
 - Auto-detection of project framework and TypeScript usage
 
 ## What This Provides
 
 When an AI agent implements this configuration generator, it will:
 
-1. **Detect your project setup** - Framework, TypeScript, Prettier
-2. **Generate appropriate ESLint config** - Tailored to your stack
-3. **Provide installation commands** - For all required dependencies
-4. **Create .eslintignore file** - With common ignore patterns
-5. **Add npm scripts** - For easy linting (lint, lint:fix)
-6. **Include VS Code integration** - For auto-fix on save
+1. **Detect the project setup** — framework, TypeScript, Prettier, installed ESLint version
+2. **Choose the correct config format** — flat or legacy, based on what the installed ESLint supports
+3. **Generate the config file** — in the appropriate format
+4. **Provide installation commands** — for all required dependencies
+5. **Handle ignore patterns** — inline (flat) or separate `.eslintignore` (legacy)
+6. **Add npm scripts** — `lint` and `lint:fix`
+7. **Include editor integration** — VS Code auto-fix on save
 
 ## Configuration Examples
 
-### ESLint v9+ Flat Config (REQUIRED for v9+)
+### Flat Config (default — use unless the project pins an older ESLint)
+
+The examples below show the ES Module form. Use this shape directly in `eslint.config.mjs`, or in `eslint.config.js` when `package.json` has `"type": "module"`. For a CommonJS project (no `"type": "module"` in `package.json`, or using `eslint.config.cjs`), convert the imports/exports as shown in the **CommonJS variant** note below each example.
 
 #### Vanilla JavaScript
 
-**File**: `eslint.config.js`
+**File**: `eslint.config.js` (ESM form — `package.json` has `"type": "module"`, or file is `eslint.config.mjs`)
 
 ```javascript
 import js from '@eslint/js';
 import importPlugin from 'eslint-plugin-import';
 
 export default [
-  // Ignore patterns (replaces .eslintignore)
   {
     ignores: [
       'node_modules/',
@@ -115,8 +126,6 @@ export default [
       'coverage/',
     ],
   },
-  
-  // Main configuration
   {
     files: ['**/*.js'],
     languageOptions: {
@@ -156,9 +165,20 @@ export default [
 ];
 ```
 
+**CommonJS variant** (no `"type": "module"` in `package.json`, or using `eslint.config.cjs`) — replace the imports and export:
+
+```javascript
+const js = require('@eslint/js');
+const importPlugin = require('eslint-plugin-import');
+
+module.exports = [
+  // ...same config objects as above
+];
+```
+
 #### React with Flat Config
 
-**File**: `eslint.config.js`
+**File**: `eslint.config.js` (ESM form — `package.json` has `"type": "module"`, or file is `eslint.config.mjs`)
 
 ```javascript
 import js from '@eslint/js';
@@ -213,9 +233,15 @@ export default [
 ];
 ```
 
+**CommonJS variant** — replace the imports and export with `require(...)` / `module.exports = [...]`, keeping the config objects identical.
+
+> For framework-specific plugin APIs (Vue, Angular, Svelte) in flat config, consult the plugin's current docs — their flat-config exports evolve across plugin releases and the example above shows the shape to follow.
+
 ---
 
-## Legacy Config Examples (ESLint v8 and Earlier)
+## Legacy Config Examples (for projects on older ESLint)
+
+Use these only when the project pins an ESLint release that does not support flat config.
 
 ### React with TypeScript
 
@@ -395,9 +421,37 @@ module.exports = {
 };
 ```
 
-## .eslintignore File
+## Ignore Patterns
 
-Create a `.eslintignore` file in your project root with common ignore patterns:
+### Flat Config
+
+Add an `ignores` array as the first config object in `eslint.config.js`.
+
+ESM form (file is `.mjs`, or `package.json` has `"type": "module"`):
+
+```javascript
+export default [
+  {
+    ignores: ['node_modules/', 'dist/', 'build/', 'coverage/'],
+  },
+  // ... rest of config
+];
+```
+
+CommonJS form (file is `.cjs`, or no `"type": "module"` in `package.json`):
+
+```javascript
+module.exports = [
+  {
+    ignores: ['node_modules/', 'dist/', 'build/', 'coverage/'],
+  },
+  // ... rest of config
+];
+```
+
+### Legacy Config
+
+Create a `.eslintignore` file in your project root:
 
 ```
 node_modules/
@@ -417,8 +471,19 @@ public/
 
 ## npm Scripts
 
-Add these scripts to your `package.json`:
+Add these scripts to your `package.json`. With flat config, ESLint infers file extensions from `files` globs in the config, so `--ext` is typically not needed. With legacy config, pass `--ext` explicitly.
 
+**Flat config (default):**
+```json
+{
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  }
+}
+```
+
+**Legacy config:**
 ```json
 {
   "scripts": {
@@ -428,25 +493,7 @@ Add these scripts to your `package.json`:
 }
 ```
 
-For Vue:
-```json
-{
-  "scripts": {
-    "lint": "eslint . --ext .js,.vue,.ts",
-    "lint:fix": "eslint . --ext .js,.vue,.ts --fix"
-  }
-}
-```
-
-For Svelte:
-```json
-{
-  "scripts": {
-    "lint": "eslint . --ext .js,.svelte,.ts",
-    "lint:fix": "eslint . --ext .js,.svelte,.ts --fix"
-  }
-}
-```
+Adapt the extensions list (`.vue`, `.svelte`, etc.) to the project framework when using legacy config.
 
 ## Prettier Integration
 
@@ -456,7 +503,9 @@ If you're using Prettier, add these dependencies to avoid conflicts:
 npm install --save-dev prettier eslint-config-prettier eslint-plugin-prettier
 ```
 
-Then add `'prettier'` as the **LAST** item in your `extends` array:
+**Flat config**: import (ESM) or `require` (CommonJS) `eslint-config-prettier` and spread it as the **last** entry in the exported config array.
+
+**Legacy config**: add `'prettier'` as the **last** item in your `extends` array:
 
 ```javascript
 extends: [
@@ -601,39 +650,46 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
       - run: npm ci
       - run: npm run lint
 ```
 
 ## Troubleshooting
 
-### Wrong Config Format Error (ESLint v9+)
+### "ESLint couldn't find an eslint.config.(js|mjs|cjs) file"
 
-**Problem**: Error message: `ESLint couldn't find an eslint.config.(js|mjs|cjs) file`
+**Cause**: The installed ESLint no longer auto-searches for eslintrc files and expected a flat config, but only legacy `.eslintrc.*` files exist.
 
-**Solution**: You're using ESLint v9+ which requires flat config format. Delete all `.eslintrc.*` files and create `eslint.config.js` instead:
+**Two valid fixes**, depending on intent:
 
-```bash
-# Remove legacy files
-rm .eslintrc.js .eslintrc.json .eslintignore
+1. **Migrate to flat config** (recommended). Create `eslint.config.js` (or `.mjs` / `.cjs`), port rules over, then remove the legacy files:
 
-# Create flat config
-touch eslint.config.js
-```
+   ```bash
+   rm .eslintrc.js .eslintrc.cjs .eslintrc.json .eslintrc.yml .eslintignore
+   touch eslint.config.js
+   ```
 
-### .eslintignore Deprecation Warning
+   Only delete files you've actually replaced — check first, don't run this blindly.
 
-**Problem**: Warning: `The ".eslintignore" file is no longer supported`
+2. **Keep legacy config for now — only works on ESLint v9.x**. Set `ESLINT_USE_FLAT_CONFIG=false` in the environment (or in the lint script) and leave the `.eslintrc.*` files in place. This escape hatch was removed in ESLint v10.0.0; on v10+ both the env var and eslintrc auto-loading are gone. Check `npx eslint --version` before recommending this — if the installed ESLint is v10 or newer, the only fix is option 1.
 
-**Solution**: ESLint v9+ integrates ignore patterns into the config file:
+### ".eslintignore" deprecation warning
+
+**Cause**: The installed ESLint no longer honors `.eslintignore` under flat config.
+
+**Solution**: Move ignore patterns into the flat config file (`eslint.config.js` / `.mjs` / `.cjs`). Use `export default` for ESM (`.mjs`, or `.js` when `package.json` has `"type": "module"`) and `module.exports` for CommonJS (`.cjs`, or `.js` otherwise):
 
 ```javascript
-// eslint.config.js
+// ESM
 export default [
-  {
-    ignores: ['node_modules/', 'dist/', 'build/', 'coverage/'],
-  },
+  { ignores: ['node_modules/', 'dist/', 'build/', 'coverage/'] },
+  // ... rest of config
+];
+
+// CommonJS
+module.exports = [
+  { ignores: ['node_modules/', 'dist/', 'build/', 'coverage/'] },
   // ... rest of config
 ];
 ```
@@ -673,44 +729,35 @@ settings: {
 
 **Problem**: ESLint formatting rules conflict with Prettier
 
-**Solution**: Add `eslint-config-prettier` as LAST item in extends array:
-
-```javascript
-extends: [
-  'eslint:recommended',
-  'plugin:react/recommended',
-  'prettier' // MUST be last
-]
-```
+**Solution**: Add `eslint-config-prettier` as the LAST item in the config chain (last in `extends` for legacy, last in the exported array for flat).
 
 ## Usage Instructions
 
-**STEP 0 (CRITICAL)**: Check ESLint version to determine correct config format
-```bash
-npx eslint --version
-# v9.x.x = use eslint.config.js (flat config)
-# v8.x.x or lower = use .eslintrc.js (legacy config)
-```
+**STEP 0**: Determine the required config format and module system
+- Run `npx eslint --version` or read `package.json`.
+- Check the ESLint docs for that major version (`https://eslint.org/docs/v{N}/use/configure/`) to confirm which formats it supports. Do not rely on `/docs/latest/` when the installed ESLint is older.
+- Default to flat config for new projects and when the version supports it.
+- Read `package.json` `type` to decide the module system for `eslint.config.js` (`"module"` → ESM, otherwise CJS). Use `.mjs` / `.cjs` to force a specific system.
 
-**STEP 1**: Install ESLint and plugins using the appropriate command for your framework
+**STEP 1**: Install ESLint and plugins using the appropriate command for your framework.
 
-**STEP 2**: Create config file in correct format based on version:
-- **ESLint v9+**: Create `eslint.config.js` with flat config format (see examples above)
-- **ESLint v8 or earlier**: Create `.eslintrc.js` with legacy format (see legacy examples above)
+**STEP 2**: Create the config file in the selected format:
+- Flat config → `eslint.config.js` (ESM or CJS depending on `package.json` `type`), or `eslint.config.mjs` / `.cjs` to force a system
+- Legacy config → `.eslintrc.js` / `.eslintrc.cjs` with `module.exports = {...}`
 
 **STEP 3**: Handle ignore patterns:
-- **ESLint v9+**: Add `ignores` array to `eslint.config.js`
-- **ESLint v8 or earlier**: Create separate `.eslintignore` file
+- Flat config → `ignores` array inside `eslint.config.js`
+- Legacy config → separate `.eslintignore` file
 
-**STEP 4**: Add lint scripts to package.json
+**STEP 4**: Add lint scripts to `package.json`.
 
-**STEP 5**: Run linting: `npm run lint`
+**STEP 5**: Run linting: `npm run lint`.
 
-**STEP 6**: Auto-fix issues: `npm run lint:fix`
+**STEP 6**: Auto-fix issues: `npm run lint:fix`.
 
-**STEP 7** (Optional): Install ESLint VS Code extension for auto-fix on save
+**STEP 7** (optional): Install the ESLint VS Code extension for auto-fix on save.
 
-**STEP 8** (Optional): Add ESLint check to CI/CD pipeline
+**STEP 8** (optional): Add ESLint to the CI/CD pipeline.
 
 ## Common Rule Severity Levels
 
@@ -732,7 +779,7 @@ rules: {
 ## Framework-Specific Notes
 
 ### React
-- JSX runtime support (`plugin:react/jsx-runtime`) removes need for `import React`
+- JSX runtime support removes the need for `import React`
 - React Hooks rules enforce hooks best practices
 - JSX-A11y provides accessibility linting
 
@@ -758,23 +805,25 @@ Use this template when asking an AI agent to set up ESLint:
 ```
 Set up ESLint for my [Framework] project with TypeScript support and accessibility linting.
 
-CRITICAL REQUIREMENTS:
-1. FIRST: Detect installed ESLint version (check package.json or run npx eslint --version)
-2. Use CORRECT config format:
-   - ESLint v9+ = eslint.config.js (flat config, REQUIRED)
-   - ESLint v8 or earlier = .eslintrc.js (legacy config)
-3. Detect my project framework and TypeScript usage
-4. Install all required ESLint dependencies
-5. Generate configuration with:
+REQUIREMENTS:
+1. Detect the installed ESLint version (check package.json or run npx eslint --version).
+2. Choose the config format. Default to flat config. Legacy (.eslintrc.*) is only viable if the installed version still honors it — ESLint v10+ removed eslintrc and the ESLINT_USE_FLAT_CONFIG=false escape hatch entirely, so on v10+ flat config is the only option. For uncertainty, consult the ESLint docs for that specific major at https://eslint.org/docs/v{N}/use/configure/ (not /docs/latest/).
+3. For flat config, decide the module system:
+   - Read package.json "type". If "module", emit ESM (import / export default). Otherwise emit CommonJS (require / module.exports).
+   - Or use eslint.config.mjs (always ESM) / eslint.config.cjs (always CJS) to bypass package.json.
+   - Do NOT emit ESM into eslint.config.js of a CommonJS project — it throws "Cannot use import statement outside a module".
+4. Detect my project framework and TypeScript usage.
+5. Install all required ESLint dependencies.
+6. Generate configuration with:
    - Framework-specific rules
    - TypeScript support
    - Accessibility linting (jsx-a11y or vuejs-accessibility)
    - Import/export organization
    - Best practices rules
-6. Handle ignore patterns correctly for detected version
-7. Add npm scripts for linting (lint, lint:fix)
-8. Include Prettier integration if Prettier is detected
-9. Provide VS Code settings for auto-fix on save
+7. Handle ignore patterns using the approach appropriate to the selected format.
+8. Add npm scripts for linting (lint, lint:fix).
+9. Include Prettier integration if Prettier is detected.
+10. Provide VS Code settings for auto-fix on save.
 
 Reference: UI Potion ESLint Config Generator
 ```
@@ -782,6 +831,7 @@ Reference: UI Potion ESLint Config Generator
 ## Additional Resources
 
 - [ESLint Documentation](https://eslint.org/docs/latest/)
+- [ESLint Configuration Guide](https://eslint.org/docs/latest/use/configure/)
 - [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react)
 - [eslint-plugin-jsx-a11y](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y)
 - [eslint-plugin-vue](https://eslint.vuejs.org/)
@@ -793,28 +843,22 @@ Reference: UI Potion ESLint Config Generator
 
 ## Summary for AI Agents
 
-This ESLint configuration generator provides production-ready linting setups for React, Vue, Angular, Svelte, and vanilla JavaScript projects. Key implementation points:
+This ESLint configuration generator provides production-ready linting setups for React, Vue, Angular, Svelte, and vanilla JavaScript projects.
 
-**CRITICAL FIRST STEP**: Always detect ESLint version before generating config
-- ESLint v9.0.0+ requires flat config (`eslint.config.js`) - **NOT OPTIONAL**
-- ESLint v8.x.x and earlier use legacy config (`.eslintrc.js`)
-- Check version with `npx eslint --version` or examine `package.json`
+**Key rules**:
+- Do not hardcode ESLint version numbers in the decision logic. Detect the installed version and consult the docs for that specific major (`https://eslint.org/docs/v{N}/use/configure/`) — not `/docs/latest/`.
+- Default to flat config. Legacy (`.eslintrc.*`) is only valid when the installed ESLint still honors it. ESLint v10+ removed eslintrc support and the `ESLINT_USE_FLAT_CONFIG=false` escape hatch — on v10+ flat config is mandatory.
+- For `eslint.config.js`, the module system follows `package.json` `type`: `"module"` → ESM, otherwise CommonJS. Use `.mjs` / `.cjs` to force one. Do NOT emit ESM into an `eslint.config.js` of a CommonJS project.
 
-**Implementation Steps**:
-1. **Version Detection**: Check ESLint version to determine config format
-2. **Framework Detection**: Examine package.json for framework and TypeScript
-3. **Config Generation**: Use appropriate format (flat or legacy) for detected version
-4. **Ignore Patterns**: Integrate into config (v9+) or separate file (v8 or earlier)
-5. **Dependencies**: Provide installation commands for all required packages
-6. **Accessibility**: Include a11y linting rules (jsx-a11y, vuejs-accessibility)
-7. **Best Practices**: Include code quality, import organization, and TypeScript rules
-8. **Integration**: Provide VS Code settings and CI/CD workflow examples
-9. **Documentation**: Note which ESLint version and format was used
+**Implementation steps**:
+1. **Version detection** — read `package.json` / run `npx eslint --version`.
+2. **Format selection** — flat config (`eslint.config.js` / `.mjs` / `.cjs`) unless the installed version is old enough to only support `.eslintrc.*`.
+3. **Module system selection (flat config only)** — read `package.json` `type` to pick ESM vs CommonJS for `eslint.config.js`, or use `.mjs` / `.cjs` for an unambiguous choice.
+4. **Framework detection** — examine `package.json` for React, Vue, Angular, or Svelte.
+5. **TypeScript detection** — check for `typescript` dependency and `tsconfig.json`.
+6. **Config generation** — use the selected format and module system with framework plugins, TS parser, a11y plugins, and import ordering.
+7. **Ignore patterns** — `ignores` array (flat) or `.eslintignore` (legacy, only on ESLint releases that still honor it).
+8. **Dependencies** — provide install commands for the selected framework and format.
+9. **Integration** — npm scripts, VS Code settings, CI/CD workflow.
 
-**Config Format Rules**:
-- **v9+**: Must use `eslint.config.js` with `export default [...]` format
-- **v9+**: Ignores are array objects in config, not separate `.eslintignore` file
-- **v8 or earlier**: Use `.eslintrc.js` with `module.exports = {}` format
-- **v8 or earlier**: Require separate `.eslintignore` file
-
-Generate clean, well-organized ESLint configurations that match both the project's framework AND the installed ESLint version. Prioritize code quality, accessibility, and developer experience.
+Generate clean, well-organized ESLint configurations that match both the project's framework and the format the installed ESLint version supports. Prioritize code quality, accessibility, and developer experience.
