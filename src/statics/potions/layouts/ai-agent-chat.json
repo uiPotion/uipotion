@@ -1084,9 +1084,16 @@
   },
   "meta": {
     "created": "2026-02-01",
-    "updated": "2026-02-22",
+    "updated": "2026-04-18",
     "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
     "relatedPotions": [
+      {
+        "id": "ai-response-rendering",
+        "category": "patterns",
+        "relationship": "composes-with",
+        "description": "Companion pattern for what goes inside an assistant message bubble: streaming cursor, incremental Markdown, tool-call cards, collapsible reasoning, citations, artifact cards, per-message controls, and in-place error recovery. This layout owns the chat shell; the pattern owns the bubble interior. Hide this layout's typing indicator as soon as the pattern's streaming cursor appears.",
+        "required": false
+      },
       {
         "id": "sidebar-navigation",
         "category": "components",

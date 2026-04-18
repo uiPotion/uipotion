@@ -1130,6 +1130,7 @@ const quickActions = [
 
 This AI agent chat layout commonly uses these components:
 
+- **[AI Response Rendering Pattern](/potions/patterns/ai-response-rendering)** - The companion pattern that defines what goes inside an assistant message bubble: streaming cursor, incremental Markdown, tool-call cards, collapsible reasoning, citations, artifact cards, and per-message controls. This layout owns the chat shell; that pattern owns the bubble interior. Designed to compose; hide this layout's typing indicator as soon as the pattern's streaming cursor appears
 - **[Command Palette](/potions/components/command-palette)** - Add quick prompt, tool, and conversation-switch actions with keyboard-first access
 - **[Text Input Component](/potions/components/text-input)** - For the message input field
 - **[Button](/potions/components/button)** - For send button, toolbar actions, and dialog action footers

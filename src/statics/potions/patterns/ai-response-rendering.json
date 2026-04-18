@@ -1,0 +1,523 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/patterns.schema.json",
+  "id": "ai-response-rendering",
+  "version": "1.0.0",
+  "name": "AI Response Rendering Pattern - Streaming, Tool Calls, and Optional Reasoning",
+  "category": "patterns",
+  "tags": [
+    "patterns",
+    "ai",
+    "streaming",
+    "markdown",
+    "tool-calls",
+    "reasoning",
+    "citations",
+    "artifacts",
+    "a11y"
+  ],
+  "description": "A framework-agnostic pattern for rendering an AI assistant reply: streaming tokens, incremental Markdown, code blocks, tool-call cards, citations, artifacts, message-level controls, and recovery from mid-stream errors. Optional reasoning-status surface when the provider explicitly exposes it. Companion to the AI Agent Chat Layout - this pattern defines what fills an assistant message bubble; the layout defines the bubble and chat shell.",
+  "aiAgentInstructions": {
+    "summary": "Implement an AI assistant message renderer as a state machine over a typed block list (text, code, tool-call, citation, artifact-ref, error). Stream deltas into the trailing block, render a streaming cursor while active, use an incremental sanitized Markdown parser, render tool calls as lifecycle cards with stable ids, resolve citations to source affordances, surface artifacts as cards. Reasoning is an optional block type: include it only when the model provider explicitly exposes a reasoning channel AND the product has decided to surface it. When included, prefer a summary or status affordance ('Thought for 4s', 'Reasoning...') over verbatim text; show verbatim content only when the provider's terms allow it and the product requires it. Preserve partial content on cancel and error. Use a single polite live region for lifecycle events (never per token). Compose with the AI Agent Chat Layout: this pattern owns the bubble interior; the layout owns the message list, scroller, and conversation-level typing indicator. Detect the project framework and styling system before writing code.",
+    "keyFeatures": [
+      "Typed block list as message representation: text, code, tool-call, citation, artifact-ref, error, plus optional reasoning when the provider exposes it - never a single growing string",
+      "Streaming cursor at the trailing edge during the streaming and tool-running states; removed on complete, cancelled, errored",
+      "Incremental Markdown rendering that tolerates unclosed code fences, partial links, and partial emphasis",
+      "Tool-call cards with explicit lifecycle states (pending, running, success, error, cancelled), stable id-based mutation, expandable input and output",
+      "Optional reasoning-status surface: include only when the provider explicitly exposes a reasoning channel and the product has decided to display it. Prefer a summary or status affordance ('Thought for 4s', 'Reasoning...') over verbatim content. If verbatim is shown, default to collapsed; the answer must remain visually primary",
+      "Citation markers resolved to focusable, hoverable source pills with title, domain, snippet, and link",
+      "Artifact references rendered as cards in the bubble that route the body to a side surface",
+      "Per-message controls (Copy, Regenerate, Stop, Edit, Feedback) keyboard-reachable; Stop must be active immediately during streaming",
+      "Error blocks rendered in place on network drop, rate limit, refusal, tool failure, timeout, truncation - partial content preserved with retry where applicable",
+      "Auto-scroll only when user is already pinned to bottom; a 'jump to latest' control appears when scrolled up",
+      "requestAnimationFrame-batched DOM updates; completed blocks memoized so they never re-render",
+      "Single conversation-level aria-live=polite region for lifecycle events; never announce per token",
+      "Reduced-motion compliance: no cursor blink, no entrance animation, no smooth auto-scroll when prefers-reduced-motion: reduce",
+      "Output sanitization on every render; model output is treated as untrusted",
+      "Composes with AI Agent Chat Layout: this pattern fills the assistant bubble; the layout owns the chat shell"
+    ],
+    "implementationSteps": [
+      "1. Detect project framework (React, Vue, Angular, Svelte) and styling system (Tailwind, CSS Modules, SCSS, styled-components, Chakra) from package.json, config files, and existing components - use ONLY the detected stack",
+      "2. Detect existing AI Agent Chat Layout in the project; if absent, recommend installing it; if present, ensure this pattern integrates with the layout's message list, auto-scroll, and typing indicator (the layout-level typing indicator must hide once this pattern's streaming cursor is shown)",
+      "3. Define the block model: an immutable record per block with fields { id, type, state, content, meta }. Required types: text, code, tool-call, citation, artifact-ref, error. Optional type: reasoning (include only when the provider exposes a reasoning channel and the product has decided to surface it). Unknown types must render as a labelled raw block, never silently dropped",
+      "4. Implement the message state machine with states idle, queued, streaming, tool-running, complete, cancelled, errored and the documented transitions",
+      "5. Implement a stream consumer that reads transport events and dispatches block-level mutations (append block, grow trailing text, grow trailing code, update tool-call by id). Coalesce updates within a single requestAnimationFrame; do not commit per delta",
+      "6. Render the streaming cursor as a CSS-only animation (no per-frame re-render); show it on streaming and tool-running, hide on terminal states",
+      "7. Use an incremental sanitized Markdown renderer that tolerates incomplete input. Re-parse only the trailing block on update; never re-parse finalized blocks. Sanitize on every render",
+      "8. Render tool-call cards: name, status line, expandable input arguments, expandable result or error. Mutate cards by id when lifecycle updates arrive; never recreate a card",
+      "9. If the provider exposes reasoning AND the product has opted to surface it: render a reasoning-status affordance (label such as 'Thought for 4s', optional duration or step count). Prefer showing a summary or status only; display verbatim content only when the provider's terms allow it and the product requires it, defaulting to collapsed. The answer must remain visually primary. If the provider does not expose reasoning, omit this block entirely",
+      "10. Render citations: inline marker is a focusable element; hover or focus reveals a popover with source title, domain, snippet; click opens the source. Add a consolidated source list at the foot for messages with three or more sources. If the source is missing, omit the marker (never render bare numbers)",
+      "11. Render artifact references as cards (title, type icon, optional preview, open action) that route activation to a side panel, drawer, or full-screen view",
+      "12. Render error blocks in place: network drop, rate limit, refusal, tool failure, timeout, truncation - each with distinct messaging. Preserve all partial content. Offer retry where the API supports it",
+      "13. Wire per-message controls (Copy, Regenerate, Stop, Edit, Feedback) with keyboard-accessible focus order. Stop must be available immediately during streaming and tool-running",
+      "14. Implement auto-scroll using the pinned-to-bottom rule: only follow when user is already at the bottom; otherwise show a 'New content below' jump button. Coordinate with the chat layout (implement once at the layout level)",
+      "15. Set up a single aria-live=polite region per conversation that announces lifecycle events (started, tool X running, complete, stopped, failed). Do NOT include the streaming text in the live region",
+      "16. Respect prefers-reduced-motion: disable cursor blink, disable entrance transitions, snap auto-scroll instead of smooth-scroll",
+      "17. Memoize completed block components (React.memo, OnPush, shallowRef, etc.) so finalized blocks never re-render",
+      "18. Defer expensive work: do not syntax-highlight code blocks during streaming; show plain monospace and upgrade to highlighted on completion. Lazy-load citation popovers",
+      "19. Verify the testing checklist (streaming cursor, unclosed fence, tool-call lifecycle, optional reasoning surface if included, citation popover, artifact card, cancel preservation, error states, auto-scroll behaviour, RAF batching, live region, reduced motion, keyboard reach, contrast)"
+    ]
+  },
+  "patternSpec": {
+    "problem": "Modern AI assistants emit a stream of typed events (text deltas, tool calls, tool results, citations, artifacts, stop reasons; some providers also expose a reasoning channel). Naive rendering causes layout shift on every token, broken Markdown when fences are not yet closed, opaque JSON tool-call dumps, bare citation numbers with no resolution, lost context on cancellation or error, screen reader spam from per-token announcements, and missing post-stream affordances like copy or regenerate. Products that choose to surface reasoning also need to do so without letting it overwhelm the answer, and must respect the provider's terms for how reasoning may be exposed. Without a coherent renderer, the assistant feels unstable and inaccessible.",
+    "solution": "Treat the assistant message as a state machine over a typed, ordered block list (text, code, tool-call, citation, artifact-ref, error). Append blocks and grow the trailing block as deltas arrive. Show an explicit streaming cursor while active. Use an incremental sanitized Markdown renderer. Render tool calls as lifecycle cards with stable ids. Resolve citation markers to source affordances. Surface artifacts as cards routing to a side panel. If - and only if - the model provider explicitly exposes a reasoning channel and the product has decided to surface it, add an optional reasoning block that prefers a summary or status affordance over verbatim content. Preserve partial content on cancel or error and offer in-place retry. Announce lifecycle changes through a single polite live region; never announce per token. Compose with the AI Agent Chat Layout, which owns the chat shell and message list.",
+    "do": [
+      "Model the message as a typed block list, not a string",
+      "Render a streaming cursor and remove it on terminal state (complete, cancelled, errored)",
+      "Use an incremental, sanitized Markdown renderer that tolerates incomplete input",
+      "Render tool calls as lifecycle cards (pending, running, success, error, cancelled) with stable id-based mutation",
+      "Show tool-call name, status line, expandable arguments, and expandable result or error",
+      "Treat reasoning as optional: include only when the provider explicitly exposes a reasoning channel and the product has decided to surface it. Prefer a summary or status affordance ('Thought for 4s', 'Reasoning...') over verbatim content. If verbatim is shown, default to collapsed and keep the answer visually primary",
+      "Resolve citation markers to focusable source pills with title, domain, snippet, and link",
+      "Add a consolidated source list at the foot of messages with three or more sources",
+      "Render artifact references as cards in the bubble; route the body to a side surface",
+      "Auto-scroll only when the user is already pinned to bottom; otherwise show a 'jump to latest' button",
+      "Throttle DOM updates with requestAnimationFrame; coalesce deltas per frame",
+      "Use a single conversation-level aria-live=polite region; announce only lifecycle events",
+      "Sanitize all rendered output; treat model content as untrusted",
+      "Preserve partial content on cancel and error; offer retry in place",
+      "Make Copy, Stop, Regenerate, Edit, and Feedback controls reachable by keyboard",
+      "Activate Stop immediately during streaming and tool-running; never block on completion",
+      "Respect prefers-reduced-motion for cursor blink, entrance animation, and smooth scroll",
+      "Memoize finalized blocks so they never re-render",
+      "Compose explicitly with the AI Agent Chat Layout: this pattern fills the assistant bubble; the layout owns the message list and conversation-level typing indicator"
+    ],
+    "dont": [
+      "Re-render the entire message tree on every delta",
+      "Animate per-token appearance (causes motion problems and reads as jitter)",
+      "Yank the scroll position when the user has scrolled up to read earlier content",
+      "Render tool calls as raw JSON dumps without a card or lifecycle states",
+      "Include a reasoning block when the provider does not expose a reasoning channel, or when the provider's terms disallow surfacing it",
+      "Show verbatim reasoning by default when a summary or status affordance would suffice; never let reasoning dominate the answer",
+      "Render bare citation numbers with no source link or popover",
+      "Push artifact bodies inline; the bubble becomes unscannable",
+      "Announce every token to assistive technology",
+      "Treat model output as HTML without sanitization",
+      "Discard the message on error - users lose context and trust",
+      "Block message-level controls until streaming finishes (Stop must work immediately)",
+      "Use blocking parsers that throw on incomplete Markdown",
+      "Run the layout-level typing indicator and the in-bubble streaming cursor at the same time",
+      "Re-parse completed blocks on every update",
+      "Highlight code syntax during streaming (defer until completion)"
+    ],
+    "examples": [
+      "Block list snapshot during streaming: [{id:'b1', type:'text', state:'final', content:'Sure, here is what I found.'}, {id:'b2', type:'tool-call', state:'running', meta:{name:'search_web', args:{q:'2026 UI trends'}}}, {id:'b3', type:'text', state:'streaming', content:'Top results indicate'}]",
+      "Tool-call lifecycle: pending -> running -> success. The card with id 'b2' is mutated in place; the surrounding text blocks are untouched",
+      "Streaming cursor: a CSS-only blinking caret rendered at the end of the streaming text or code block. Removed when the message reaches complete, cancelled, or errored",
+      "Incremental Markdown: text content '```js\\nconst x = 1' (no closing fence) renders as a code block with language js and a single line of code, not as escaped backticks",
+      "Citation marker: superscript [1] is a button with aria-label 'Source: Example Article from example.com'; focus or hover reveals a popover; click opens example.com in a new tab",
+      "Optional reasoning status (only when provider exposes it AND product surfaces it): renders as a compact label 'Thought for 4s' or 'Reasoning'. Default form is summary or status only. If the product has decided to show verbatim content, the label is a disclosure that expands to the text; collapsing returns focus to the disclosure. If the provider does not expose reasoning, this block is absent entirely",
+      "Artifact card: title 'Quarterly Report', type doc, open action routes to a right-side drawer that renders the document",
+      "Mid-stream network drop: the stream stops at a partial sentence; an error block 'Connection lost' appears under the partial content with a Retry button; the partial sentence is preserved",
+      "Auto-scroll: while the user is pinned to bottom, new tokens follow; once the user scrolls up by more than a threshold, scrolling stops and a 'New content below' button appears in the corner",
+      "Live region announcement sequence for one response: 'Assistant is responding' (on streaming start), 'Searching the web' (on tool-call running), 'Response complete' (on terminal). No per-token announcements",
+      "Reduced motion: with prefers-reduced-motion: reduce, the cursor does not blink, blocks appear instantly, and the message list snaps to the bottom instead of smooth-scrolling"
+    ],
+    "antiPatterns": [
+      "String accumulation - storing the message as one growing string and re-parsing it from scratch on every delta causes O(n^2) parse cost and severe layout thrash",
+      "Per-token animation - fading or sliding each character is visually unstable and triggers vestibular discomfort",
+      "Forced auto-scroll - dragging the viewport down even when the user is reading earlier content disrupts reading and erodes trust",
+      "Raw JSON tool calls - dumping invocation arguments and results as unstyled JSON makes responses unreadable to non-developers",
+      "Forcing reasoning into every product - not all providers expose a reasoning channel and not all products should surface it; defaulting reasoning into the UI produces empty or misleading affordances",
+      "Verbatim reasoning by default - opening raw chain-of-thought by default buries the answer and may conflict with provider terms when a summary would suffice",
+      "Bare citation numbers - rendering [1] [2] with no resolution leaves the reader unable to verify claims",
+      "Per-token live region - placing streaming content inside aria-live exhausts screen-reader users with constant announcements",
+      "Discarding on error - replacing the partial message with a generic error wipes user context and the partial answer",
+      "Blocking controls - requiring stream completion before Stop becomes interactive denies users the most important action: cancellation",
+      "Double indicator - showing the layout-level typing indicator and the in-bubble streaming cursor simultaneously is redundant and visually noisy",
+      "HTML pass-through - rendering model output as HTML without sanitization is a direct injection vector"
+    ],
+    "checklist": [
+      "Streaming message renders a visible cursor that disappears on terminal state",
+      "Markdown with an unclosed code fence renders as a code block, not as escaped text",
+      "Tool call passes through pending, running, success or error visibly; card identity is stable across updates",
+      "If the provider does NOT expose reasoning, no reasoning surface is rendered",
+      "If the provider exposes reasoning AND the product surfaces it, the surface defaults to a summary or status affordance; any verbatim disclosure is collapsed by default and keeps the answer visually primary",
+      "Citation marker exposes source title, domain, and URL via hover, focus, and click",
+      "Source list appears at the foot of messages with three or more sources",
+      "Artifact reference renders as a card with an open action that routes to a side surface",
+      "Cancellation preserves partial content; cursor disappears; Stop becomes Regenerate",
+      "Mid-stream network drop renders an error block in place; partial content remains; retry available",
+      "Rate limit, refusal, timeout, and truncation render distinct, recognisable messaging",
+      "Auto-scroll follows the bottom only when the user is pinned; otherwise a jump-to-latest control appears",
+      "requestAnimationFrame batching is in place; completed blocks do not re-render on subsequent deltas",
+      "Conversation-level live region announces lifecycle events but not token deltas",
+      "Reduced motion disables cursor blink, entrance animation, and smooth scroll",
+      "Copy copies Markdown source; Regenerate, Stop, Edit, Feedback are keyboard reachable",
+      "Stop is interactive immediately during streaming and tool-running",
+      "All controls have accessible names; tool-call cards expose state changes to assistive tech",
+      "All rendered output is sanitized; model output is treated as untrusted",
+      "Color contrast meets WCAG AA for text, code, citation pills, and tool-call labels in light and dark themes",
+      "The layout-level typing indicator (from the AI Agent Chat Layout) is hidden once the in-bubble streaming cursor appears"
+    ]
+  },
+  "implementationDetails": {
+    "blockModel": {
+    "description": "Typed block list that represents one assistant message. Renderers must handle every type; unknown types fall back to a labelled raw block, never silently dropped.",
+    "blockTypes": [
+      {
+        "type": "text",
+        "purpose": "Streamed prose, rendered through an incremental sanitized Markdown pipeline. May contain inline citation markers.",
+        "growable": true,
+        "states": ["streaming", "final"]
+      },
+      {
+        "type": "code",
+        "purpose": "Fenced code block with language hint. Tolerates absent closing fence during streaming. Includes a copy control.",
+        "growable": true,
+        "states": ["streaming", "final"],
+        "notes": "Defer syntax highlighting until final state."
+      },
+      {
+        "type": "tool-call",
+        "purpose": "An assistant request to invoke a tool, plus its eventual result. Rendered as a card with lifecycle states.",
+        "growable": false,
+        "states": ["pending", "running", "success", "error", "cancelled"],
+        "notes": "Mutate by stable id; never recreate a card on lifecycle update."
+      },
+      {
+        "type": "reasoning",
+        "optional": true,
+        "purpose": "OPTIONAL status surface for a model's reasoning channel. Include ONLY when the provider explicitly exposes reasoning AND the product has decided to surface it. Preferred form is a summary or status label ('Thought for 4s', 'Reasoning'); verbatim content is shown only when the provider's terms allow and the product requires it.",
+        "growable": true,
+        "states": ["streaming", "final"],
+        "defaultExpanded": false,
+        "defaultPresentation": "summary-or-status",
+        "notes": "If the provider does not expose a reasoning channel, omit this block type entirely - do not render an empty or placeholder reasoning surface."
+      },
+      {
+        "type": "citation",
+        "purpose": "Inline marker that resolves to a source. Focusable, hoverable, clickable. Never render bare numbers.",
+        "growable": false,
+        "states": ["final"]
+      },
+      {
+        "type": "artifact-ref",
+        "purpose": "Pointer to a separately rendered artifact (document, code file, diagram, canvas). Card with title, type, optional preview, open action.",
+        "growable": false,
+        "states": ["final"]
+      },
+      {
+        "type": "error",
+        "purpose": "In-message recoverable error (network drop, rate limit, refusal, tool failure, timeout, truncation). Rendered in place; preserves context; offers retry where applicable.",
+        "growable": false,
+        "states": ["final"]
+      }
+    ]
+  },
+    "messageLifecycle": {
+    "description": "States and transitions for a single assistant message. UI affordances depend on the current state.",
+    "states": [
+      {"state": "idle", "purpose": "No response yet"},
+      {"state": "queued", "purpose": "Request accepted, waiting for the model"},
+      {"state": "streaming", "purpose": "Blocks are being appended or the trailing block is growing"},
+      {"state": "tool-running", "purpose": "One or more tool-call blocks are pending or running"},
+      {"state": "complete", "purpose": "Terminal stop reason received; all blocks finalized"},
+      {"state": "cancelled", "purpose": "User stopped the response; partial content preserved"},
+      {"state": "errored", "purpose": "Terminal failure; partial content preserved with an error block"}
+    ],
+    "transitions": [
+      "idle -> queued on send",
+      "queued -> streaming on first delta",
+      "streaming -> tool-running when a tool-call enters running",
+      "tool-running -> streaming when text resumes",
+      "any non-terminal -> complete on natural stop",
+      "any non-terminal -> cancelled on user stop",
+      "any non-terminal -> errored on unrecoverable failure"
+    ],
+    "affordancesByState": {
+      "streaming": ["Stop", "in-bubble cursor"],
+      "tool-running": ["Stop", "tool-call card animation", "in-bubble cursor"],
+      "complete": ["Copy", "Regenerate", "Edit (on preceding user message)", "Feedback"],
+      "cancelled": ["Copy", "Regenerate", "Edit (on preceding user message)"],
+      "errored": ["Copy", "Regenerate", "Retry (on the failing block where applicable)"]
+    }
+  },
+    "toolCallCard": {
+    "description": "Lifecycle card for a tool invocation. Mutate by stable id; never recreate.",
+    "requiredSurface": [
+      "Human-readable tool name (not internal id)",
+      "Short status line for the current state",
+      "Disclosure for input arguments (JSON or labelled fields)",
+      "Disclosure for result on success or error payload on failure"
+    ],
+    "states": [
+      {"state": "pending", "indicator": "muted skeleton"},
+      {"state": "running", "indicator": "animated indicator, optional progress text"},
+      {"state": "success", "indicator": "summarized result, expandable raw output"},
+      {"state": "error", "indicator": "error summary, expandable details, optional retry"},
+      {"state": "cancelled", "indicator": "cancelled label"}
+    ],
+    "resultSummarization": [
+      "One short line: a count, a title, or a snippet",
+      "Long results live behind a disclosure - never inline",
+      "Structured results may render as compact lists with a 'Show all' affordance"
+    ]
+  },
+    "errorStates": {
+    "description": "All errors render in place; partial content is preserved.",
+    "kinds": [
+      {"kind": "network-drop", "messaging": "Connection lost mid-stream", "recovery": "Retry from failure point if API supports, else full Regenerate"},
+      {"kind": "rate-limit", "messaging": "Rate limit reached", "recovery": "Optional cooldown countdown; Retry"},
+      {"kind": "refusal", "messaging": "Content policy refusal", "recovery": "Render or annotate the refusal content; never silently truncate"},
+      {"kind": "tool-failure", "messaging": "Tool failed", "recovery": "Error inside the offending tool-call card; the surrounding response continues"},
+      {"kind": "timeout", "messaging": "Response timed out", "recovery": "Retry; preserve partial content"},
+      {"kind": "truncation", "messaging": "Response truncated by max tokens", "recovery": "Continue if supported"}
+    ]
+  },
+    "autoScroll": {
+    "description": "Pinned-to-bottom strategy. Implement once at the chat layout level; this pattern coordinates with that behavior.",
+    "rules": [
+      "Pinned to bottom: continuously follow new content",
+      "Scrolled up: do not yank; show a 'New content below' jump button",
+      "Re-pin when the user scrolls back to the bottom"
+    ]
+  },
+    "perMessageControls": {
+    "description": "Controls at or near the foot of the bubble. Always keyboard reachable.",
+    "controls": [
+      {"name": "Copy", "purpose": "Copy the rendered Markdown source", "availableIn": ["complete", "cancelled", "errored"]},
+      {"name": "Regenerate", "purpose": "Request a new response for the same prompt", "availableIn": ["complete", "cancelled", "errored"]},
+      {"name": "Stop", "purpose": "Cancel the active stream", "availableIn": ["streaming", "tool-running"], "notes": "Must be active immediately; never blocked on completion"},
+      {"name": "Edit", "purpose": "Edit the preceding user prompt and re-send", "availableIn": ["complete", "cancelled", "errored"]},
+      {"name": "Feedback", "purpose": "Thumbs up or down with optional comment", "availableIn": ["complete"]},
+      {"name": "Share", "purpose": "Generate a shareable link", "availableIn": ["complete"], "notes": "Product-dependent"}
+    ]
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "level": "AA",
+      "requirements": {
+        "1.3.1": "Info and Relationships - blocks have semantic structure; tool calls expose name, state, and value",
+        "1.4.3": "Contrast Minimum - 4.5:1 for normal text and tool-call labels; 3:1 for large text and UI",
+        "2.1.1": "Keyboard - Copy, Stop, Regenerate, expand reasoning, expand tool-call, citation pills are all reachable and operable",
+        "2.2.2": "Pause Stop Hide - cursor blink and progress animation respect prefers-reduced-motion",
+        "2.4.7": "Focus Visible - clear focus rings on all controls inside the bubble",
+        "4.1.2": "Name Role Value - tool-call cards expose accessible name, role, and current state",
+        "4.1.3": "Status Messages - one polite live region announces lifecycle changes; never per token"
+      }
+    },
+    "liveRegionStrategy": "Use a single aria-live=polite region per conversation. Announce only state transitions and meaningful events: started, tool X running, response complete, response stopped, response failed. Do NOT include the streaming text inside an aria-live region. Provide an opt-in setting for users who prefer full-text streaming with a long debounce.",
+    "keyboardMap": {
+      "tab": "Move into and across controls within the bubble",
+      "enterOrSpace": "Activate the focused control",
+      "escapeInsideExpandedPanel": "Collapse and return focus to the disclosure",
+      "chatLevelStop": "The chat-level Stop shortcut (e.g. Esc on the input) should also stop the active stream"
+    },
+    "reducedMotion": "prefers-reduced-motion: reduce - disable cursor blink, disable block entrance transitions, snap auto-scroll instead of smooth-scroll"
+  },
+  "responsiveBreakpoints": {
+    "desktop": {
+      "minWidthPx": 1024,
+      "behavior": "Bubble width up to the message max-width set by the host chat layout. Tool-call cards may show input and output side-by-side."
+    },
+    "tablet": {
+      "minWidthPx": 768,
+      "maxWidthPx": 1023,
+      "behavior": "Tool-call cards stack input above output; artifact cards remain horizontal."
+    },
+    "mobile": {
+      "maxWidthPx": 767,
+      "behavior": "All internal cards stack vertically. Per-message controls collapse into an overflow menu when more than three. Citation popovers anchor to the viewport. Code blocks scroll horizontally rather than wrapping."
+    }
+  },
+    "performance": {
+    "rules": [
+      "Coalesce stream deltas within a single requestAnimationFrame",
+      "Re-parse only the trailing block on update",
+      "Memoize completed blocks so they never re-render once finalized",
+      "Virtualize the conversation message list at the chat layout level (not per-block inside one message)",
+      "Defer syntax highlighting on completed code blocks; show plain monospace during streaming, upgrade after stop",
+      "Lazy-load citation popovers on hover or focus"
+    ]
+  },
+    "compositionWithChatLayout": {
+    "description": "This pattern is the companion to the AI Agent Chat Layout. The two are designed to compose; do not duplicate behaviors across both.",
+    "ownedByChatLayout": [
+      "Sidebar, header, and conversation switching",
+      "Message list scroller and virtualization",
+      "Conversation-level typing indicator",
+      "Auto-scroll behavior (implemented once at the layout level)",
+      "Input area, send button, and quick actions",
+      "User-message bubble styling (this pattern does NOT apply to user bubbles)"
+    ],
+    "ownedByThisPattern": [
+      "Block list inside one assistant message bubble",
+      "Streaming cursor",
+      "Tool-call cards",
+      "Reasoning blocks",
+      "Citation markers and source pills",
+      "Artifact reference cards",
+      "Per-message controls (Copy, Regenerate, Stop, Edit, Feedback)",
+      "In-message error blocks"
+    ],
+    "coordinationRules": [
+      "The chat layout's typing indicator must be hidden as soon as this pattern shows its in-bubble streaming cursor; never run both simultaneously",
+      "Auto-scroll rules described in this pattern and in the chat layout describe the same behavior from two sides; implement once at the layout level",
+      "The chat-level Stop shortcut (e.g. Esc on the input) should call into this pattern's Stop handler",
+      "User bubbles use the chat layout's user-message styling and do not use this pattern's block model"
+    ]
+  }
+  },
+  "frameworkPatterns": {
+    "react": {
+      "note": "Use a ref-based stream consumer for raw deltas; commit batched updates to React state once per frame. Memoize completed block components with React.memo using id and finalized flag.",
+      "approach": "Custom hooks: useStreamingResponse (state machine), useToolCall (lifecycle card), useReasoning (collapse state), useCitation (popover and resolution). Block list keyed by stable id."
+    },
+    "vue": {
+      "note": "Reactive store (Pinia or composable) holding the block list keyed by id. shallowRef for the active streaming block to avoid deep reactivity overhead.",
+      "approach": "Composables: useResponseStream, useToolCallCard, useReasoningPanel, useCitationPopover."
+    },
+    "angular": {
+      "note": "Signal-based store for blocks. OnPush change detection on block components and trackBy by id in the message list.",
+      "approach": "Services: ResponseStreamService, ToolCallRegistryService, CitationResolverService."
+    },
+    "svelte": {
+      "note": "Writable store for the block list; tick after batched updates. Per-block components subscribe to derived stores keyed by id.",
+      "approach": "Stores: responseStream, toolCalls, citations."
+    }
+  },
+  "stylingApproaches": {
+    "tailwindCSS": {
+      "note": "Utility classes on block wrappers. Use group-hover for control reveal. Use data-state attributes for tool-call lifecycle styling.",
+      "approach": "Configure data-state variants. Example: data-[state=running]:animate-pulse on tool-call cards."
+    },
+    "cssModules": {
+      "note": "One module per block type. data-state attributes drive lifecycle visuals.",
+      "approach": ".toolCall { ... } .toolCall[data-state='running'] { ... }"
+    },
+    "styledComponents": {
+      "note": "One styled wrapper per block type. Theme tokens for cursor, tool-call card, reasoning surface.",
+      "approach": "const ToolCall = styled.div<{$state: ToolCallState}>` ...`; theme tokens drive colors."
+    },
+    "vanillaCSSorSCSS": {
+      "note": "BEM-style class names per block. CRITICAL: define classes; never use inline style attributes.",
+      "approach": ".message-block, .message-block--code, .tool-call, .tool-call--running, .reasoning, .citation, .artifact-ref, .message-error"
+    },
+    "componentLibraries": {
+      "note": "Compose host library primitives.",
+      "approach": "Use the library's Box, Card, Collapsible, Skeleton, and Popover primitives; do not introduce a parallel system."
+    }
+  },
+  "animations": {
+    "streamingCursor": {
+      "type": "CSS-only blink",
+      "durationMs": 1000,
+      "notes": "No JS-driven animation. Disabled by prefers-reduced-motion."
+    },
+    "blockEntrance": {
+      "durationMs": 200,
+      "easing": "ease-out",
+      "notes": "Whole-block only; never per-token. Disabled by prefers-reduced-motion."
+    },
+    "toolCallStateChange": {
+      "durationMs": 150,
+      "easing": "ease-out",
+      "notes": "Subtle background or border transition between lifecycle states."
+    },
+    "autoScroll": {
+      "durationMs": 200,
+      "behavior": "smooth when motion allowed, snap when reduced"
+    },
+    "citationPopoverFade": {
+      "durationMs": 120,
+      "easing": "ease-out"
+    },
+    "reducedMotion": "When prefers-reduced-motion: reduce, all animations become instantaneous: cursor does not blink, blocks appear immediately, scrolling snaps."
+  },
+  "outputConstraints": {
+    "must": [
+      "Sanitize all rendered Markdown and HTML; treat model output as untrusted",
+      "Use stable ids for every block; never key by index",
+      "Render a streaming cursor only during streaming and tool-running states",
+      "Render tool calls as cards with explicit lifecycle state attributes",
+      "Resolve every citation marker to a source affordance",
+      "Place lifecycle announcements in a single conversation-level aria-live=polite region",
+      "Respect prefers-reduced-motion across cursor, entrance, and auto-scroll",
+      "Coalesce stream updates with requestAnimationFrame; commit once per frame",
+      "Make Stop interactive immediately when streaming begins",
+      "Use only the project's detected styling system"
+    ],
+    "mustNot": [
+      "Store the message as a single growing string",
+      "Animate per-token entrance",
+      "Render tool calls as raw JSON dumps",
+      "Render a reasoning surface when the provider does not expose a reasoning channel",
+      "Default the reasoning surface to verbatim content when a summary or status affordance would suffice, or expand it by default",
+      "Render citation markers as bare numbers without resolution",
+      "Push artifact bodies inline",
+      "Place streaming text inside an aria-live region",
+      "Block per-message controls until the stream completes",
+      "Run the chat layout typing indicator and the in-bubble streaming cursor simultaneously",
+      "Re-render or re-parse finalized blocks on subsequent deltas",
+      "Render model output as HTML without sanitization",
+      "Introduce a styling system that the project does not already use"
+    ]
+  },
+  "testingChecklist": [
+    "Streaming message renders a visible cursor that disappears on complete, cancelled, or errored",
+    "Markdown with an unclosed code fence renders as a code block, not as escaped backticks",
+    "Tool call passes through pending, running, success or error visibly; card identity is stable across updates",
+    "If the provider does NOT expose reasoning, no reasoning surface is rendered",
+    "If the provider exposes reasoning AND the product surfaces it, the default is a summary or status label; any verbatim disclosure is collapsed by default and does not dominate the answer",
+    "Citation marker exposes source title, domain, and URL via hover, focus, and click",
+    "Source list appears at the foot of messages with three or more sources",
+    "Artifact reference renders as a card with an open action that routes to a side surface",
+    "Cancellation preserves partial content and the cursor disappears",
+    "Mid-stream network drop renders an error block in place; partial content remains; retry available",
+    "Rate limit, refusal, timeout, and truncation render distinct messaging",
+    "Auto-scroll follows the bottom only when the user is pinned; otherwise a jump-to-latest control appears",
+    "requestAnimationFrame batching is in place; completed blocks do not re-render on subsequent deltas",
+    "Conversation-level live region announces lifecycle events but not token deltas",
+    "Reduced motion disables cursor blink, entrance animation, and smooth scroll",
+    "Copy copies Markdown source; Regenerate, Stop, Edit, Feedback are keyboard reachable",
+    "Stop is interactive immediately during streaming and tool-running",
+    "All controls have accessible names; tool-call cards expose state changes to assistive tech",
+    "Color contrast meets WCAG AA in light and dark themes for text, code, citation pills, and tool-call labels",
+    "Sanitization is verified: model output containing script or HTML is escaped",
+    "The layout-level typing indicator from the AI Agent Chat Layout is hidden as soon as this pattern shows its streaming cursor"
+  ],
+  "meta": {
+    "created": "2026-04-18",
+    "updated": "2026-04-18",
+    "webUrl": "https://uipotion.com/potions/patterns/ai-response-rendering",
+    "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.json",
+    "markdownUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.md",
+    "relatedPotions": [
+      {
+        "id": "ai-agent-chat",
+        "category": "layouts",
+        "relationship": "composes-with",
+        "description": "The AI Agent Chat Layout owns the chat shell, message list, and conversation-level typing indicator. This pattern fills the assistant message bubble inside that layout. The two are designed to compose; the chat layout's typing indicator must be hidden once this pattern shows its in-bubble streaming cursor.",
+        "required": false
+      },
+      {
+        "id": "toast-notifications",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: surface non-blocking feedback such as 'Message copied' or 'Regenerated'.",
+        "required": false
+      },
+      {
+        "id": "dialog",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: confirmation flows for clearing feedback, reporting a refusal, or deleting an artifact.",
+        "required": false
+      },
+      {
+        "id": "dark-light-mode",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "Optional: tool-call cards, reasoning surfaces, and citation pills must use theme tokens to remain readable in both modes.",
+        "required": false
+      },
+      {
+        "id": "form-validation",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "Optional: applies to the edit-and-resend control on the preceding user message.",
+        "required": false
+      }
+    ]
+  }
+}
