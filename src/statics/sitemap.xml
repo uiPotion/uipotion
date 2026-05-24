@@ -8,49 +8,49 @@
   <!-- Static Pages -->
   <url>
     <loc>https://uipotion.com/</loc>
-    <lastmod>2026-04-18</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
     <loc>https://uipotion.com/about</loc>
-    <lastmod>2026-04-18</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://uipotion.com/potion-kit</loc>
-    <lastmod>2026-04-18</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://uipotion.com/potions</loc>
-    <lastmod>2026-04-18</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://uipotion.com/contribute</loc>
-    <lastmod>2026-04-18</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://uipotion.com/validator</loc>
-    <lastmod>2026-04-18</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://uipotion.com/legal</loc>
-    <lastmod>2026-04-18</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
@@ -190,6 +190,13 @@
   </url>
 
   <url>
+    <loc>https://uipotion.com/potions/patterns/ai-action-review</loc>
+    <lastmod>2026-05-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://uipotion.com/potions/patterns/ai-response-rendering</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
@@ -220,14 +227,14 @@
   <!-- API/Discovery Endpoints for AI Agents -->
   <url>
     <loc>https://uipotion.com/uipotion-manifest.json</loc>
-    <lastmod>2026-04-18</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://uipotion.com/potions-index.json</loc>
-    <lastmod>2026-04-18</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>

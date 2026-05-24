@@ -503,8 +503,30 @@
       "created": "2026-04-18",
       "updated": "2026-04-18",
       "markdownUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.md"
+    },
+    {
+      "id": "ai-action-review",
+      "name": "AI Action Review Pattern",
+      "category": "patterns",
+      "tags": [
+        "patterns",
+        "ai",
+        "agent",
+        "approval",
+        "review",
+        "permissions",
+        "undo",
+        "audit-log",
+        "a11y"
+      ],
+      "excerpt": "A framework-agnostic pattern for reviewing AI-proposed actions before execution: plan preview, risk labels, scoped permissions, approve/reject/edit controls, undo, progress, and audit trail.",
+      "webUrl": "https://uipotion.com/potions/patterns/ai-action-review",
+      "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-action-review.json",
+      "created": "2026-05-23",
+      "updated": "2026-05-23",
+      "markdownUrl": "https://uipotion.com/potions/patterns/ai-action-review.md"
     }
   ],
-  "totalCount": 23,
-  "lastUpdated": "2026-04-18"
+  "totalCount": 24,
+  "lastUpdated": "2026-05-23"
 }

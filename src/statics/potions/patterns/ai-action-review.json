@@ -1,0 +1,627 @@
+{
+  "$schema": "https://uipotion.com/schema/categories/patterns.schema.json",
+  "id": "ai-action-review",
+  "version": "1.0.0",
+  "name": "AI Action Review Pattern",
+  "category": "patterns",
+  "tags": [
+    "patterns",
+    "ai",
+    "agent",
+    "approval",
+    "review",
+    "permissions",
+    "undo",
+    "audit-log",
+    "a11y"
+  ],
+  "description": "A framework-agnostic pattern for reviewing AI-proposed actions before execution: plan preview, affected data, risk labels, scoped permissions, approve/reject/edit controls, undo, progress, partial failure handling, and audit trail. Complements AI Agent Chat Layout and AI Response Rendering Pattern by defining the control surface for consequential agent actions.",
+  "aiAgentInstructions": {
+    "summary": "Implement an AI action review surface as a structured state machine over one or more proposed actions. Show what the agent plans to do, why, which objects and permissions are affected, whether each action is reversible, and what level of risk applies. Let users approve, reject, edit, approve selected actions, request a revised plan, pause or stop execution, retry failures, undo reversible actions, and inspect an audit trail. Detect the host framework, styling system, design tokens, component primitives, auth/permission conventions, and existing AI/chat infrastructure before writing code.",
+    "keyFeatures": [
+      "Structured action model with stable ids, action type, affected objects, permission scope, destination, inputs, risk level, reversibility, state, and audit metadata",
+      "Plain-language plan summary followed by progressive disclosure for dense tool inputs, raw payloads, policy checks, and source evidence",
+      "Risk levels for low, medium, high, and blocked actions, rendered with text and icon rather than color alone",
+      "Review controls: Approve, Approve selected, Reject, Edit, Ask for revision",
+      "Execution controls: Pause, Stop, Retry, Undo, View log",
+      "Confirmation rules that scale with consequence: single approve for low risk, explicit confirmation for high risk, stronger safeguard for irreversible actions, blocked approval for invalid or unauthorized actions",
+      "Lifecycle states: proposed, reviewing, needs-changes, approved, executing, paused, completed, partially-completed, failed, cancelled, reverted",
+      "Partial failure handling that preserves completed, failed, skipped, cancelled, and reverted action states",
+      "Task-scoped permission request surface for missing access; avoid broad persistent grants by default",
+      "Audit trail with action id, actor, timestamp, tool or integration, inputs, outputs, outcome, and rollback state",
+      "Accessible modal, drawer, side-panel, or inline review behavior with predictable focus, keyboard selection, status announcements, and reduced-motion support",
+      "Responsive behavior for desktop side panels, tablet stacked review, and mobile full-height sheet or full-screen review"
+    ],
+    "implementationSteps": [
+      "1. Detect project framework (React, Vue, Angular, Svelte, or vanilla) from package.json and existing source files; use only the detected stack",
+      "2. Detect styling system (Tailwind, CSS Modules, SCSS, styled-components, component library tokens, design system primitives) and reuse it; do not introduce a new styling system",
+      "3. Detect existing components for dialog, drawer, sheet, side panel, buttons, checkboxes, disclosures, toasts, data tables, and badges; compose those primitives where available",
+      "4. Detect existing AI/chat infrastructure, including AI Agent Chat Layout, AI Response Rendering Pattern, tool-call card models, action schemas, auth/permission services, and audit logging conventions",
+      "5. Define the action review data model with stable ids and fields for title, summary, actionType, riskLevel, reversibility, affectedObjects, permissions, inputs, destination, state, and auditMetadata",
+      "6. Map incoming agent proposals into typed action items. Unknown action types must render as reviewable items and must not be auto-approved",
+      "7. Implement the review state machine: proposed, reviewing, needs-changes, approved, executing, paused, completed, partially-completed, failed, cancelled, reverted",
+      "8. Render the review header with goal, lifecycle status, highest selected risk, and primary controls",
+      "9. Render the plan summary before dense details: what will happen, why, data sources, reversibility, permission scope, and estimated steps or duration",
+      "10. Render the action list with selectable items when partial approval is supported. Each item shows affected objects, destination, permission scope, risk label, reversibility, and a preview or diff when available",
+      "11. Add details disclosures for raw payload, tool name, integration, parameters, policy check, source evidence, and audit metadata. Keep these reachable but visually secondary",
+      "12. Apply confirmation rules by risk: low can approve directly, medium shows affected objects and reversibility, high requires explicit consequence review, irreversible uses typed confirmation or equivalent safeguard, blocked actions cannot be approved",
+      "13. Wire editing flows for user-editable parameters. Validate edited values using the project's existing form validation conventions",
+      "14. Wire execution controls: Pause, Stop, Retry failed item, Undo reversible completed item, View log. Keep Stop reachable as soon as execution begins",
+      "15. Preserve partial results. Never replace the review surface with a generic error; show completed, failed, skipped, cancelled, and reverted items in place",
+      "16. Implement permission handling with least privilege: request only task-scoped access where possible and show why the permission is needed",
+      "17. Record audit events for proposal created, approved, rejected, edited, executing, completed, failed, cancelled, retried, and reverted",
+      "18. Implement accessibility: semantic controls, focus management, aria-live status updates, text/icon risk labels, keyboard selection, and modal focus trapping when the review is modal",
+      "19. Implement responsive layouts: side panel or inline split view on desktop, stacked review on tablet, full-height sheet or full-screen review on mobile with sticky controls that do not cover focus",
+      "20. Test all checklist items, including high-risk confirmation, blocked approval, partial failure, undo, audit trail, keyboard flow, screen reader announcements, reduced motion, and mobile sticky controls"
+    ]
+  },
+  "patternSpec": {
+    "problem": "AI agents can draft emails, update records, run tools, create files, schedule meetings, and call APIs. If consequential actions execute without a clear review step, users may not know what the agent plans to do, which data or people are affected, whether an action is reversible, what permission scope is being used, how to correct the plan, how to interrupt execution, or what happened afterward. Simple confirmation dialogs are often too vague and too binary for agent workflows that need editing, partial approval, scoped permissions, undo, and auditability.",
+    "solution": "Treat AI action review as a structured state machine over one or more proposed action items. Convert the agent proposal into typed actions, summarize the goal in plain language, show affected objects, permissions, destination, data sources, timing, and reversibility, label risk with text and icon, and provide controls for approve, approve selected, reject, edit, ask for revision, pause, stop, retry, undo, and view log. Scale confirmation strength to risk. Preserve partial outcomes and record an audit trail. Compose with the host app's existing chat, response rendering, dialog, toast, table, form, and button conventions.",
+    "do": [
+      "Show proposed actions before execution",
+      "Use a structured action model with stable ids; never rely on generated prose alone",
+      "Summarize the goal in plain language before showing technical payloads",
+      "Show affected objects, destination, permission scope, data sources, and reversibility",
+      "Label risk as low, medium, high, or blocked with text and icon, not color alone",
+      "Let users approve, reject, edit, approve selected actions, or ask the assistant for a revised plan",
+      "Require stronger confirmation for high-risk or irreversible actions",
+      "Block approval when permissions are missing, parameters are invalid, or policy checks fail",
+      "Keep Pause, Stop, Cancel, Retry, Undo, and View log controls reachable during and after execution when applicable",
+      "Preserve partial execution results in place",
+      "Distinguish completed, failed, skipped, cancelled, and reverted items",
+      "Request the narrowest permission scope that can complete the current task",
+      "Record audit events with action id, actor, timestamp, tool or integration, inputs, outputs, outcome, and rollback state",
+      "Use existing project primitives for buttons, dialogs, drawers, checkboxes, disclosures, toasts, tables, and forms",
+      "Detect framework, styling system, design tokens, component conventions, permission services, and AI infrastructure before writing code"
+    ],
+    "dont": [
+      "Execute consequential actions directly from an assistant message without review",
+      "Hide recipients, affected records, file paths, destinations, or permissions behind generic text",
+      "Treat every action as the same risk level",
+      "Use color alone to communicate risk or status",
+      "Approve blocked, invalid, missing-permission, or policy-failing actions",
+      "Use vague confirmation copy like 'Are you sure?' without concrete consequences",
+      "Force all-or-nothing approval when independent action items can be selected safely",
+      "Replace partial execution with a generic error message",
+      "Move keyboard focus unexpectedly during progress updates",
+      "Auto-grant broad or persistent permissions when task-scoped access is enough",
+      "Hide raw payloads or audit details completely from users who need to inspect them",
+      "Introduce a new component system for review controls when the project already has one",
+      "Let a high-risk action use the same one-click approval affordance as a low-risk draft action"
+    ],
+    "examples": [
+      "Email send review: show recipients, subject, message body, attachments, source context, send timing, and external recipient risk. Let the user edit copy, remove recipients, save as draft, approve, or ask for a softer tone.",
+      "Bulk record update: show 43 proposed customer updates grouped by risk, with a sample diff and selectable rows. The user can approve selected low-risk changes while rejecting one high-risk item.",
+      "Calendar scheduling: show attendees, time zone, conflicts, conferencing details, external guests, agenda, and whether personal calendar access is being used. Let the user edit time or attendees before approval.",
+      "File share: show file name, current access, proposed recipients, access level, expiration, inherited permissions, and whether the share can be revoked. Require explicit confirmation for public links.",
+      "Code change: show touched files, diff, commands the agent wants to run, permission to execute those commands, test plan, and rollback instructions. Run commands only after approval.",
+      "Payment or order: show amount, account, recipient, invoice, due date, fees, and whether the transaction can be cancelled. Use high-risk confirmation and audit logging.",
+      "Permission request: show the exact missing scope, why it is needed for this action, duration of access, and alternative manual path when available.",
+      "Partial failure: five actions were approved. Three completed, one failed validation, and one was skipped because it depended on the failed action. The review remains visible with retry and undo for the completed actions."
+    ],
+    "antiPatterns": [
+      "One-button autonomy: the assistant says 'I handled it' without showing what changed",
+      "Vague confirmation: a generic 'Are you sure?' prompt with no affected objects, destination, permission, or reversibility",
+      "Hidden recipients: an email, calendar invite, share, or notification executes without showing who receives it",
+      "All-or-nothing batch approval: one risky action forces the user to reject an otherwise useful independent batch",
+      "Permission sprawl: asking for broad, persistent access for a narrow one-time task",
+      "Non-recoverable progress: execution starts and the user cannot pause, stop, or inspect what is happening",
+      "Audit trail as an afterthought: logs omit inputs, actor, tool, timestamps, partial failures, or rollback state",
+      "Color-only risk: red or yellow labels without text, icon, accessible name, or structural difference",
+      "Invisible policy failure: the action is blocked but the UI gives no path to fix parameters, request permission, or switch to a manual path"
+    ],
+    "checklist": [
+      "Proposed actions appear before execution",
+      "Each action has a stable id and structured metadata",
+      "Plan summary explains what will happen and why",
+      "Affected objects, destination, permission scope, data sources, and reversibility are visible",
+      "Risk labels include text and icon and do not rely only on color",
+      "Low, medium, high, and blocked actions render distinct review behavior",
+      "Approve, Approve selected, Reject, Edit, and Ask for revision controls work",
+      "High-risk or irreversible actions require stronger confirmation",
+      "Blocked actions cannot be approved",
+      "Permission requests are task-scoped where possible",
+      "Pause, Stop, Cancel, Retry, Undo, and View log controls are reachable when applicable",
+      "Partial completion preserves completed, failed, skipped, cancelled, and reverted states",
+      "Audit trail records actor, timestamp, action id, tool or integration, inputs, outputs, outcome, and rollback state",
+      "Modal review traps focus and returns focus to the invoking control on close",
+      "Inline, drawer, or side-panel review moves focus predictably to the heading when opened",
+      "Screen readers announce lifecycle changes without repeated noise",
+      "Keyboard users can select individual actions and expand details",
+      "Mobile sticky controls do not obscure focused content, errors, or status messages",
+      "Reduced motion disables nonessential progress and state-change animation",
+      "Project implementation uses existing framework, styling, token, component, auth, and AI conventions"
+    ],
+    "accessibility": {
+      "wcagCompliance": {
+        "level": "AA",
+        "requirements": {
+          "1.3.1": "Info and Relationships - action groups, details, labels, status, and errors are programmatically associated",
+          "1.4.1": "Use of Color - risk and status are not communicated by color alone",
+          "1.4.3": "Contrast Minimum - text and status labels meet contrast requirements",
+          "1.4.11": "Non-text Contrast - focus rings, controls, icons, borders, and risk indicators meet contrast requirements",
+          "2.1.1": "Keyboard - all review, selection, disclosure, approval, and execution controls operate by keyboard",
+          "2.4.3": "Focus Order - focus follows the review task order and does not jump during progress updates",
+          "2.4.7": "Focus Visible - all interactive controls have visible focus indicators",
+          "2.5.8": "Target Size Minimum - interactive controls meet at least 24 by 24 CSS pixels or provide sufficient spacing",
+          "3.2.2": "On Input - selecting an item or editing a parameter does not unexpectedly execute the action",
+          "3.3.1": "Error Identification - blocked, invalid, failed, and rollback-failed states are identified in text",
+          "3.3.3": "Error Suggestion - validation and permission failures explain how to proceed",
+          "3.3.4": "Error Prevention - high-impact submissions can be reviewed, confirmed, corrected, or cancelled",
+          "4.1.2": "Name, Role, Value - buttons, checkboxes, disclosures, and modal surfaces expose correct roles and states",
+          "4.1.3": "Status Messages - lifecycle updates are announced without moving focus"
+        }
+      },
+      "keyboardNavigation": {
+        "description": "The review surface must support complete keyboard operation without unexpected execution.",
+        "requirements": [
+          "Tab reaches all primary controls, action checkboxes, detail disclosures, and execution controls",
+          "Shift+Tab moves backward through the same logical order",
+          "Space toggles individual action selection and disclosure buttons where appropriate",
+          "Enter activates the focused button or disclosure",
+          "Escape closes modal review only when no high-risk confirmation is actively awaiting explicit input",
+          "Focus does not move during progress updates unless the user triggers a new surface",
+          "When a modal opens, focus moves to the review heading or first safe control",
+          "When a modal closes, focus returns to the invoking control"
+        ]
+      },
+      "screenReaderSupport": {
+        "description": "Screen reader users must understand proposal, risk, selection, execution status, and outcome.",
+        "requirements": [
+          "Use semantic headings for review title, plan summary, action list, and audit trail",
+          "Each selectable action has an accessible name containing title and consequence summary",
+          "Risk labels include text in the accessible name",
+          "Use aria-describedby to connect actions to consequence, permission, and reversibility summaries",
+          "Use aria-live='polite' or role='status' for lifecycle updates such as executing, completed, failed, cancelled, and reverted",
+          "Use role='alert' only for urgent failures that require immediate attention",
+          "Do not stream dense progress logs into a live region",
+          "Details disclosures expose expanded/collapsed state"
+        ]
+      },
+      "focusManagement": {
+        "description": "Focus should support review and correction without surprise jumps.",
+        "requirements": [
+          "Open review surface focuses the title or first safe review control",
+          "High-risk confirmations default focus to the least destructive action",
+          "Validation failure moves focus to the first invalid editable field",
+          "Permission failure moves focus to the missing permission explanation or scoped permission request",
+          "After undo, focus remains near the affected action and status is announced",
+          "Sticky mobile controls never cover the focused element"
+        ]
+      }
+    }
+  },
+  "dataStructures": {
+    "actionItem": {
+      "description": "Canonical action item shape. Adapt field names to the host codebase, but preserve the semantics.",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "notes": "Stable id; never key by index"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "notes": "Human-readable action title"
+        },
+        {
+          "name": "summary",
+          "type": "string",
+          "required": true,
+          "notes": "Plain-language consequence summary"
+        },
+        {
+          "name": "actionType",
+          "type": "enum",
+          "required": true,
+          "notes": "message, record-update, file-operation, schedule, code-change, payment-or-order, external-api, system-setting, unknown"
+        },
+        {
+          "name": "riskLevel",
+          "type": "enum",
+          "required": true,
+          "notes": "low, medium, high, blocked"
+        },
+        {
+          "name": "reversibility",
+          "type": "enum",
+          "required": true,
+          "notes": "reversible, partially-reversible, irreversible, unknown"
+        },
+        {
+          "name": "affectedObjects",
+          "type": "array",
+          "required": true,
+          "notes": "Records, files, users, recipients, settings, invoices, orders, or other impacted entities"
+        },
+        {
+          "name": "permissions",
+          "type": "array",
+          "required": true,
+          "notes": "Scopes required or already available for this action"
+        },
+        {
+          "name": "inputs",
+          "type": "object",
+          "required": false,
+          "notes": "Editable or inspectable parameters"
+        },
+        {
+          "name": "destination",
+          "type": "object",
+          "required": false,
+          "notes": "External system, recipient, repository, account, or integration"
+        },
+        {
+          "name": "state",
+          "type": "enum",
+          "required": true,
+          "notes": "proposed, selected, blocked, approved, executing, completed, failed, skipped, cancelled, reverted"
+        },
+        {
+          "name": "auditMetadata",
+          "type": "object",
+          "required": true,
+          "notes": "Actor, timestamp, tool, integration, policy checks, input hash, output reference, rollback id"
+        }
+      ]
+    },
+    "riskLevels": {
+      "low": "Reversible, local, expected, limited scope",
+      "medium": "Changes shared data, multiple targets, or saved state",
+      "high": "External-facing, sensitive, costly, permission-changing, destructive, or difficult to reverse",
+      "blocked": "Invalid, missing permission, policy failure, unsupported action, or missing prerequisite"
+    },
+    "reversibility": {
+      "reversible": "System can automatically undo or restore the previous state",
+      "partially-reversible": "Some parts can be undone, but side effects may remain",
+      "irreversible": "Action cannot be undone once executed",
+      "unknown": "System cannot guarantee rollback; treat as elevated risk"
+    }
+  },
+  "stateManagement": {
+    "reviewLifecycle": {
+      "states": [
+        {
+          "state": "proposed",
+          "purpose": "Agent proposal is available but not reviewed"
+        },
+        {
+          "state": "reviewing",
+          "purpose": "User is inspecting, selecting, or editing action items"
+        },
+        {
+          "state": "needs-changes",
+          "purpose": "User edited inputs or requested a revised plan"
+        },
+        {
+          "state": "approved",
+          "purpose": "Selected actions are approved but not yet running"
+        },
+        {
+          "state": "executing",
+          "purpose": "One or more approved actions are in progress"
+        },
+        {
+          "state": "paused",
+          "purpose": "Execution is intentionally paused"
+        },
+        {
+          "state": "completed",
+          "purpose": "All approved actions completed successfully"
+        },
+        {
+          "state": "partially-completed",
+          "purpose": "Some actions completed and others failed, were skipped, or were cancelled"
+        },
+        {
+          "state": "failed",
+          "purpose": "No approved action completed successfully"
+        },
+        {
+          "state": "cancelled",
+          "purpose": "User stopped execution before completion"
+        },
+        {
+          "state": "reverted",
+          "purpose": "Completed action was undone or rolled back"
+        }
+      ],
+      "transitions": [
+        "proposed -> reviewing when the review surface opens",
+        "reviewing -> needs-changes when user edits parameters or asks for revision",
+        "needs-changes -> proposed when the agent returns a revised plan",
+        "reviewing -> approved when user approves eligible selected actions",
+        "approved -> executing when execution begins",
+        "executing -> paused when user pauses a multi-step run",
+        "paused -> executing when user resumes",
+        "executing -> completed when all approved actions succeed",
+        "executing -> partially-completed when at least one action succeeds and another fails, skips, or cancels",
+        "executing -> failed when no action succeeds",
+        "executing -> cancelled when user stops remaining actions",
+        "completed or partially-completed -> reverted when undo or rollback succeeds"
+      ]
+    },
+    "itemStates": [
+      "proposed",
+      "selected",
+      "blocked",
+      "approved",
+      "executing",
+      "completed",
+      "failed",
+      "skipped",
+      "cancelled",
+      "reverted"
+    ],
+    "selectionRules": [
+      "Only eligible proposed actions can be selected for approval",
+      "Blocked actions remain visible but cannot be selected for execution",
+      "Dependent actions should reveal their dependency and become skipped if a required prior action fails",
+      "Approving selected items must not implicitly approve unselected items",
+      "Selection state must survive opening and closing details disclosures"
+    ]
+  },
+  "implementationDetails": {
+    "reviewSurfaceVariants": {
+      "inlineCard": "Best for low-risk actions inside an assistant response or activity feed",
+      "sidePanel": "Best for multi-action plans where users need to compare plan summary and item details",
+      "drawerOrSheet": "Best for mobile and tablet workflows where the review should stay connected to the current task",
+      "modalDialog": "Best for urgent, blocking, high-risk, or irreversible confirmation steps",
+      "fullScreen": "Best for long plans, dense diffs, or workflows requiring focused review"
+    },
+    "actionTypeGuidance": [
+      "message actions must show recipients, channel, body preview, attachments, send timing, and external audience risk",
+      "record-update actions must show object identity, fields changing, before/after values, and bulk selection",
+      "file-operation actions must show file path, owner, access changes, sharing destination, and revocation options",
+      "schedule actions must show attendees, time zone, conflicts, location or conferencing, notes, and external guests",
+      "code-change actions must show touched files, diff, commands, test plan, permissions, and rollback",
+      "payment-or-order actions must show amount, account, recipient, fees, due date, cancellation window, and audit id",
+      "external-api actions must show integration, endpoint or operation name, data sent, data received, and permission scope",
+      "system-setting actions must show current value, new value, affected users or systems, and rollback support"
+    ],
+    "confirmationRules": {
+      "low": "One approve button is acceptable if affected object and reversibility are visible",
+      "medium": "Show affected objects and reversibility before approval; support edit where parameters matter",
+      "high": "Require an explicit consequence review step; default focus to the least destructive action",
+      "irreversible": "Require typed confirmation, a hold-to-confirm alternative, or equivalent strong safeguard that is accessible and keyboard operable",
+      "blocked": "Disable approval and show what must change before approval is possible"
+    },
+    "permissionHandling": [
+      "Display permission scope in human-readable language",
+      "Prefer one-time or task-scoped access over broad persistent grants",
+      "Explain why the scope is needed for this action",
+      "Offer a manual path when permission is denied and the workflow supports it",
+      "Log permission requests and grants as audit events"
+    ],
+    "auditTrail": {
+      "minimumFields": [
+        "action id",
+        "review id",
+        "actor",
+        "approver",
+        "timestamp",
+        "tool or integration",
+        "permission scope",
+        "input summary or input hash",
+        "output reference",
+        "state transitions",
+        "error reason",
+        "rollback id or undo result"
+      ],
+      "presentation": "Show a compact activity log by default and allow expandable technical details for users who need them."
+    },
+    "partialFailureHandling": [
+      "Keep all action items visible after failure",
+      "Show each item state independently",
+      "Retry only failed or skipped items when safe",
+      "Do not rerun completed actions unless the user explicitly chooses to",
+      "If rollback is available, show what will be reverted before undo",
+      "If rollback fails, preserve rollback failure state and show escalation path"
+    ]
+  },
+  "responsiveBreakpoints": {
+    "desktop": {
+      "minWidthPx": 1024,
+      "behavior": "Prefer side panel, inline split view, or full-screen review for dense plans. Summary and action list may sit beside details."
+    },
+    "tablet": {
+      "minWidthPx": 768,
+      "maxWidthPx": 1023,
+      "behavior": "Stack summary above action list. Keep dense metadata in disclosures. Use sticky footer controls only when they do not obscure focus."
+    },
+    "mobile": {
+      "maxWidthPx": 767,
+      "behavior": "Use full-height sheet or full-screen review. Keep primary actions sticky, but reserve safe-area padding and ensure focused fields and alerts are not covered."
+    }
+  },
+  "frameworkPatterns": {
+    "react": {
+      "approach": "Use a reducer or state machine hook for review lifecycle and item states. Memoize action rows by stable id. Compose existing Button, Checkbox, Dialog/Drawer, Disclosure, Toast, and Table primitives.",
+      "notes": "Use React Hook Form, Formik, or existing form conventions for editable parameters when present."
+    },
+    "vue": {
+      "approach": "Use a composable or Pinia store for review lifecycle. Render action rows with keyed v-for by stable id. Compose existing modal, drawer, checkbox, disclosure, and toast components.",
+      "notes": "Use VeeValidate, Vuelidate, or existing form conventions for editable parameters when present."
+    },
+    "angular": {
+      "approach": "Use a service or signal store for review lifecycle and item states. Use OnPush and trackBy stable ids for action lists. Compose existing Material/CDK or project primitives.",
+      "notes": "Use Angular Reactive Forms or existing form conventions for editable parameters when present."
+    },
+    "svelte": {
+      "approach": "Use writable or derived stores for review lifecycle and item states. Key each action block by stable id. Compose existing sheet, modal, checkbox, disclosure, and toast components.",
+      "notes": "Use Felte, svelte-forms-lib, or existing form conventions for editable parameters when present."
+    }
+  },
+  "stylingApproaches": {
+    "tailwindCSS": {
+      "approach": "Use existing utility patterns and data-state/data-risk attributes. Keep risk styling tokenized and include text/icon labels.",
+      "example": "data-[risk=high] for border or icon treatment; never rely on color alone"
+    },
+    "cssModules": {
+      "approach": "Use module classes for review shell, action item, risk label, details disclosure, and audit log. State and risk can be data attributes."
+    },
+    "scss": {
+      "approach": "Use BEM-style classes and project variables or CSS custom properties. Keep review-specific styles close to existing AI/chat or workflow surfaces."
+    },
+    "styledComponents": {
+      "approach": "Use theme tokens for surface, border, risk, focus, and status colors. Pass lifecycle and risk via props or data attributes."
+    },
+    "componentLibraries": {
+      "approach": "Compose library primitives for Dialog, Drawer, Button, Checkbox, Badge, Accordion/Disclosure, Toast, Table, and Progress. Do not build parallel primitives unless the project has none."
+    }
+  },
+  "animations": {
+    "stateChange": {
+      "durationMs": 150,
+      "easing": "ease-out",
+      "notes": "Use subtle background or border transitions for item state changes. Avoid motion that distracts from review."
+    },
+    "progress": {
+      "durationMs": 200,
+      "easing": "linear",
+      "notes": "Progress indicators should communicate state without requiring constant motion."
+    },
+    "surfaceEntrance": {
+      "durationMs": 200,
+      "easing": "ease-out",
+      "notes": "Use existing drawer, sheet, or dialog motion conventions from the project."
+    },
+    "reducedMotion": "When prefers-reduced-motion: reduce, disable nonessential progress animation and state-change transitions. Preserve status text."
+  },
+  "outputConstraints": {
+    "must": [
+      "Detect and use the project's existing framework, styling system, design tokens, component primitives, permission conventions, and AI infrastructure",
+      "Use stable ids for review and action items; never key action rows by array index",
+      "Show proposed actions before execution",
+      "Show affected objects, destination, permission scope, data sources, and reversibility",
+      "Render risk with text and icon in addition to any color treatment",
+      "Block approval for invalid, missing-permission, policy-failing, or explicitly blocked actions",
+      "Keep Stop or Cancel reachable once execution begins",
+      "Preserve partial execution outcomes in place",
+      "Record audit trail events for proposal, approval, rejection, edit, execution, failure, cancellation, retry, undo, and rollback",
+      "Support keyboard operation and screen reader status announcements",
+      "Respect reduced motion"
+    ],
+    "mustNot": [
+      "Execute consequential actions from generated prose alone",
+      "Use vague confirmation copy without concrete consequences",
+      "Hide recipients, affected objects, destinations, or permissions",
+      "Use color alone for risk or status",
+      "Auto-grant broad persistent permissions for task-scoped actions",
+      "Treat high-risk and low-risk actions with identical approval UI",
+      "Replace partial execution with a generic error",
+      "Move focus during progress updates without user initiation",
+      "Introduce a new component or styling system when the project already has one",
+      "Silently drop unknown action types"
+    ]
+  },
+  "testingChecklist": [
+    "Framework, styling system, tokens, component primitives, permission services, and AI infrastructure are detected before implementation",
+    "Proposed actions appear before execution",
+    "Each action item has a stable id and structured metadata",
+    "Plan summary explains what will happen and why",
+    "Affected objects, destination, permission scope, data sources, and reversibility are visible",
+    "Low, medium, high, and blocked risk levels render distinct behavior",
+    "Risk labels include text and icon and pass contrast requirements",
+    "Approve executes only eligible selected actions",
+    "Approve selected does not execute unselected actions",
+    "Reject declines the proposal and preserves audit event",
+    "Edit changes parameters and validates edited inputs",
+    "Ask for revision returns a corrective instruction to the assistant or plan generator",
+    "High-risk actions require explicit consequence review",
+    "Irreversible actions require typed confirmation or equivalent strong safeguard",
+    "Blocked actions cannot be approved",
+    "Missing permission state explains scope and offers task-scoped request when available",
+    "Execution progress shows item-level state changes",
+    "Pause and Stop are reachable during execution when supported",
+    "Partial failure preserves completed, failed, skipped, cancelled, and reverted states",
+    "Retry affects only failed or skipped items unless user explicitly chooses otherwise",
+    "Undo shows what will be reverted and records rollback result",
+    "Audit trail records action id, review id, actor, approver, timestamp, tool, permission scope, input summary or hash, output reference, outcome, and rollback id",
+    "Modal review traps focus and restores focus on close",
+    "Side-panel, drawer, or inline review moves focus predictably to the heading when opened",
+    "Keyboard users can select action items, expand details, approve, reject, edit, and undo",
+    "Screen readers announce lifecycle changes without announcing dense logs repeatedly",
+    "Color is not the only risk or status indicator",
+    "Mobile sticky controls do not obscure focused fields, alerts, or status messages",
+    "Reduced motion disables nonessential animation",
+    "Unknown action type renders as reviewable and is not auto-approved"
+  ],
+  "meta": {
+    "created": "2026-05-23",
+    "updated": "2026-05-23",
+    "webUrl": "https://uipotion.com/potions/patterns/ai-action-review",
+    "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-action-review.json",
+    "markdownUrl": "https://uipotion.com/potions/patterns/ai-action-review.md",
+    "relatedPotions": [
+      {
+        "id": "ai-agent-chat",
+        "category": "layouts",
+        "relationship": "composes-with",
+        "description": "Optional: AI Agent Chat Layout can host action review cards, drawers, or side panels inside conversational products.",
+        "required": false
+      },
+      {
+        "id": "ai-response-rendering",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "Optional: AI Response Rendering Pattern renders assistant messages and tool-call cards that can hand off to an action review surface.",
+        "required": false
+      },
+      {
+        "id": "dialog",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Dialog Component works well for urgent, blocking, high-risk, or irreversible confirmations.",
+        "required": false
+      },
+      {
+        "id": "toast-notifications",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Toast Notifications provide completion, undo, retry, and rollback feedback after reviewed actions.",
+        "required": false
+      },
+      {
+        "id": "command-palette",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Command Palette actions can route consequential commands through the same review pattern before execution.",
+        "required": false
+      },
+      {
+        "id": "data-table",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Data Table commonly pairs with bulk action review, selectable affected objects, and partial approval.",
+        "required": false
+      },
+      {
+        "id": "form-validation",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "Optional: Form Validation Pattern applies to editable action parameters and missing-permission forms.",
+        "required": false
+      },
+      {
+        "id": "dark-light-mode",
+        "category": "patterns",
+        "relationship": "complements",
+        "description": "Optional: Dark/Light Mode Pattern keeps risk labels, status colors, and audit surfaces readable in both modes.",
+        "required": false
+      },
+      {
+        "id": "button",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Button Component provides clear approve, reject, destructive, loading, and icon-only action behavior.",
+        "required": false
+      }
+    ]
+  }
+}
