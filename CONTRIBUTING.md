@@ -4,7 +4,7 @@ Thank you for your interest in contributing to UI Potion! This guide will help y
 
 **Want the full guide?** The **[Contribute page on the website](https://uipotion.com/contribute.html)** has schemas, the Schema Validator, example AI prompts, and best practices.
 
-**Try contributing with your AI assistant.** Point your AI at this repo (or the [uipotion-manifest](https://uipotion.com/uipotion-manifest.json) and [potions-index](https://uipotion.com/potions-index.json)), give it the **schemas** in `src/statics/schemas/` and **existing potions** in the same category as references, and ask it to draft a new potion (Markdown + JSON + index entry). Then run `npm run validate`, tweak if needed, and open a PR. Many contributors use AI for the first draft and refine from there.
+**Try contributing with your AI assistant.** Point your AI at this repo (or the [uipotion-manifest](https://uipotion.com/uipotion-manifest.json) and [potions-index](https://uipotion.com/potions-index.json)), give it the **schemas** in `src/statics/schema/` and **existing potions** in the same category as references, and ask it to draft a new potion (Markdown + JSON + index entry). Then run `npm run validate`, tweak if needed, and open a PR. Many contributors use AI for the first draft and refine from there.
 
 ## Quick Start
 
@@ -36,7 +36,7 @@ Choose the appropriate category:
 
 Create `src/statics/potions/[category]/your-potion.json`
 
-Use the **category schema** in `src/statics/schemas/categories/` and an existing potion as template (e.g., `navbar.json` for components, `dashboard.json` for layouts).
+Use the **category schema** in `src/statics/schema/categories/` and an existing potion as template (e.g., `navbar.json` for components, `dashboard.json` for layouts).
 
 Required structure:
 ```json

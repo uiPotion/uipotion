@@ -12,7 +12,7 @@ const addFormats = require('ajv-formats');
 
 // Configuration
 const POTIONS_DIR = 'src/statics/potions';
-const SCHEMAS_DIR = 'src/statics/schemas';
+const SCHEMAS_DIR = 'src/statics/schema';
 const POTIONS_INDEX_FILE = 'src/statics/potions-index.json';
 
 // Schema file mapping
@@ -186,9 +186,9 @@ function resolveReference(ref, loadedSchemas) {
   } else if (ref.startsWith('/schema/')) {
     const relativePath = ref.replace('/schema/', '');
     schemaPath = path.join(SCHEMAS_DIR, relativePath);
-  } else if (ref.startsWith('schemas/')) {
-    // Handle relative paths starting with schemas/
-    const relativePath = ref.replace('schemas/', '');
+  } else if (ref.startsWith('schema/')) {
+    // Handle relative paths starting with schema/
+    const relativePath = ref.replace('schema/', '');
     schemaPath = path.join(SCHEMAS_DIR, relativePath);
   }
 

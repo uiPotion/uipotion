@@ -28,7 +28,7 @@ requests" currentPath="contribute" }}
           <p><strong>Try contributing with your AI assistant.</strong> Point your AI at this repo (or the <a
               href="https://uipotion.com/uipotion-manifest.json" target="_blank" rel="noopener">uipotion-manifest</a>
             and <a href="https://uipotion.com/potions-index.json" target="_blank" rel="noopener">potions-index</a>),
-            give it the schemas in <code>src/statics/schemas/</code> and existing potions in the same category as
+            give it the schemas in <code>src/statics/schema/</code> and existing potions in the same category as
             references, and ask it to draft a new potion (Markdown + JSON + index entry). Then run
             <code>npm run validate</code>, tweak if needed, and open a PR. Many contributors use AI for the first draft
             and refine from there.</p>
@@ -73,7 +73,7 @@ requests" currentPath="contribute" }}
 
           <h3>Step 1: Create JSON File</h3>
           <p>Create <code>src/statics/potions/[category]/your-potion.json</code></p>
-          <p>Use the <strong>category schema</strong> in <code>src/statics/schemas/categories/</code> and an existing
+          <p>Use the <strong>category schema</strong> in <code>src/statics/schema/categories/</code> and an existing
             potion as template (e.g., <code>navbar.json</code> for components, <code>dashboard.json</code> for layouts).
             Include at least: <code>id</code>, <code>name</code>, <code>version</code>, <code>category</code>,
             <code>tags</code>, <code>description</code>, <code>aiAgentInstructions</code>,
@@ -141,42 +141,42 @@ agentManifest: 'potions/components/your-potion.json'
             <div class="schema-card">
               <h3>Base Schema</h3>
               <p>Common structure for all potions (required fields, metadata, AI instructions)</p>
-              <a href="https://uipotion.com/schemas/potion.base.schema.json" target="_blank" rel="noopener">View Schema
+              <a href="https://uipotion.com/schema/potion.base.schema.json" target="_blank" rel="noopener">View Schema
                 →</a>
             </div>
 
             <div class="schema-card">
               <h3>Layouts</h3>
               <p>For full-page layouts: dashboards, app shells, landing pages</p>
-              <a href="https://uipotion.com/schemas/categories/layouts.schema.json" target="_blank" rel="noopener">View
+              <a href="https://uipotion.com/schema/categories/layouts.schema.json" target="_blank" rel="noopener">View
                 Schema →</a>
             </div>
 
             <div class="schema-card">
               <h3>Components</h3>
               <p>For reusable UI components: buttons, dialogs, navbars, forms</p>
-              <a href="https://uipotion.com/schemas/categories/components.schema.json" target="_blank"
+              <a href="https://uipotion.com/schema/categories/components.schema.json" target="_blank"
                 rel="noopener">View Schema →</a>
             </div>
 
             <div class="schema-card">
               <h3>Features</h3>
               <p>For complete user flows: authentication, onboarding, wizards</p>
-              <a href="https://uipotion.com/schemas/categories/features.schema.json" target="_blank" rel="noopener">View
+              <a href="https://uipotion.com/schema/categories/features.schema.json" target="_blank" rel="noopener">View
                 Schema →</a>
             </div>
 
             <div class="schema-card">
               <h3>Patterns</h3>
               <p>For design patterns and guidelines: accessibility patterns, interaction patterns</p>
-              <a href="https://uipotion.com/schemas/categories/patterns.schema.json" target="_blank" rel="noopener">View
+              <a href="https://uipotion.com/schema/categories/patterns.schema.json" target="_blank" rel="noopener">View
                 Schema →</a>
             </div>
 
             <div class="schema-card">
               <h3>Tooling</h3>
               <p>For developer tools: CI validation, generators, token pipelines</p>
-              <a href="https://uipotion.com/schemas/categories/tooling.schema.json" target="_blank" rel="noopener">View
+              <a href="https://uipotion.com/schema/categories/tooling.schema.json" target="_blank" rel="noopener">View
                 Schema →</a>
             </div>
           </div>
@@ -184,11 +184,11 @@ agentManifest: 'potions/components/your-potion.json'
           <h3>Contract Schemas</h3>
           <p>These are reusable building blocks referenced by category schemas:</p>
           <ul>
-            <li><a href="https://uipotion.com/schemas/contracts/accessibility.contract.schema.json" target="_blank"
+            <li><a href="https://uipotion.com/schema/contracts/accessibility.contract.schema.json" target="_blank"
                 rel="noopener">Accessibility Contract</a> - WCAG compliance, ARIA, keyboard navigation</li>
-            <li><a href="https://uipotion.com/schemas/contracts/state.contract.schema.json" target="_blank"
+            <li><a href="https://uipotion.com/schema/contracts/state.contract.schema.json" target="_blank"
                 rel="noopener">State Contract</a> - State definitions and management</li>
-            <li><a href="https://uipotion.com/schemas/contracts/interactions.contract.schema.json" target="_blank"
+            <li><a href="https://uipotion.com/schema/contracts/interactions.contract.schema.json" target="_blank"
                 rel="noopener">Interactions Contract</a> - User interaction patterns</li>
           </ul>
         </section>
@@ -202,7 +202,7 @@ agentManifest: 'potions/components/your-potion.json'
           <div class="example-box">
             <p><strong>Example prompt for AI:</strong></p>
             <pre><code>Create a UI Potion JSON file for a navigation bar component. 
-Use this schema as a reference: https://uipotion.com/schemas/categories/components.schema.json
+Use this schema as a reference: https://uipotion.com/schema/categories/components.schema.json
 
 The component should:
 - Have a logo on the left

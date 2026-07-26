@@ -11,7 +11,7 @@
 - Potion Markdown lives in `src/potions/[category]/[slug].md`.
 - Potion JSON guides live in `src/statics/potions/[category]/[slug].json`.
 - Discovery files live at `src/statics/uipotion-manifest.json`, `src/statics/potions-index.json`, and `src/statics/llms.txt`.
-- JSON schemas live in `src/statics/schemas/`.
+- JSON schemas live in `src/statics/schema/`.
 - Handlebars pages live in `src/pages/`; partials live in `src/partials/`; potion layouts live in `src/potion-layouts/`.
 - SCSS entrypoint is `src/styles/main.scss`, which uses `basic`, `page`, and `uipotion`.
 - Build output in `build/` is generated. Do not edit it by hand.
@@ -59,7 +59,7 @@ agentManifest: 'potions/components/component-name.json'
 
 ## JSON Guides
 - Required base fields include `$schema`, `id`, `version`, `name`, `category`, `tags`, `description`, `aiAgentInstructions`, and `meta`.
-- Use the category schema in `src/statics/schemas/categories/` and a same-category existing guide as the template.
+- Use the category schema in `src/statics/schema/categories/` and a same-category existing guide as the template.
 - `id` must be kebab-case and should match the file slug.
 - `version` is SemVer.
 - `category` is lowercase.

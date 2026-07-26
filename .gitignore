@@ -4,8 +4,6 @@ build/
 
 # Generated potion markdown (copied from src/potions before build; not committed)
 src/statics/potions/**/*.md
-# Generated singular schema URL mirror (source files live in src/statics/schemas)
-src/statics/schema/
 .harold-cache/
 .DS_Store
 *.log

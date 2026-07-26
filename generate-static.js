@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Generate sitemap.xml, _redirects, copy potion markdown, and publish schema aliases.
+ * Generate sitemap.xml, _redirects, and copy potion markdown to statics.
  * Run: node generate-static.js
  * Or: npm run static
  *
@@ -15,8 +15,6 @@ const { execFileSync } = require('child_process');
 // Configuration
 const POTIONS_DIR = 'src/potions';
 const STATICS_POTIONS_DIR = 'src/statics/potions';
-const SCHEMAS_DIR = 'src/statics/schemas';
-const SCHEMA_ALIAS_DIR = 'src/statics/schema';
 const POTIONS_INDEX_FILE = 'src/statics/potions-index.json';
 const OUTPUT_FILE = 'src/statics/sitemap.xml';
 const REDIRECTS_FILE = 'src/statics/_redirects';
@@ -235,16 +233,6 @@ function copyPotionMarkdown(potions) {
   return copied;
 }
 
-function copySchemaAlias() {
-  if (!fs.existsSync(SCHEMAS_DIR)) {
-    throw new Error('Schema source directory not found: ' + SCHEMAS_DIR);
-  }
-
-  // Recreate the generated alias so removed or renamed schemas cannot remain stale.
-  fs.rmSync(SCHEMA_ALIAS_DIR, { recursive: true, force: true });
-  fs.cpSync(SCHEMAS_DIR, SCHEMA_ALIAS_DIR, { recursive: true });
-}
-
 function generateRedirects(potions) {
   // Netlify _redirects: from to status (whitespace-separated). See https://docs.netlify.com/routing/redirects/
   // Use 301! (force) so redirect runs even when the .html file exists; otherwise Netlify serves the file.
@@ -268,7 +256,7 @@ function generateRedirects(potions) {
 }
 
 function main() {
-  console.log('Generating sitemap.xml, _redirects, copying potion markdown, and publishing schema aliases...\n');
+  console.log('Generating sitemap.xml, _redirects, and copying potion markdown...\n');
 
   requireGit();
 
@@ -278,9 +266,6 @@ function main() {
   if (copiedMd > 0) {
     console.log(`Copied ${copiedMd} potion markdown files to ${STATICS_POTIONS_DIR}/`);
   }
-
-  copySchemaAlias();
-  console.log('Copied schema aliases to ' + SCHEMA_ALIAS_DIR + '/');
 
   // Show summary
   console.log(`\nFound ${potions.length} potions:`);

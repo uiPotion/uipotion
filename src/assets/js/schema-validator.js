@@ -44,19 +44,19 @@
 
     // Schema file mapping
     const schemaFiles = {
-      components: 'schemas/categories/components.schema.json',
-      layouts: 'schemas/categories/layouts.schema.json',
-      features: 'schemas/categories/features.schema.json',
-      patterns: 'schemas/categories/patterns.schema.json',
-      tooling: 'schemas/categories/tooling.schema.json'
+      components: '/schema/categories/components.schema.json',
+      layouts: '/schema/categories/layouts.schema.json',
+      features: '/schema/categories/features.schema.json',
+      patterns: '/schema/categories/patterns.schema.json',
+      tooling: '/schema/categories/tooling.schema.json'
     };
 
     // Required schemas for resolution
     const requiredSchemas = [
-      'schemas/potion.base.schema.json',
-      'schemas/contracts/accessibility.contract.schema.json',
-      'schemas/contracts/state.contract.schema.json',
-      'schemas/contracts/interactions.contract.schema.json'
+      '/schema/potion.base.schema.json',
+      '/schema/contracts/accessibility.contract.schema.json',
+      '/schema/contracts/state.contract.schema.json',
+      '/schema/contracts/interactions.contract.schema.json'
     ];
 
     // Enable/disable validate button
@@ -250,17 +250,17 @@
       if (ref.startsWith('https://uipotion.com/schema/')) {
         // Convert production URL to local path for loading
         // The schema file will still have $id pointing to uipotion.com, which is fine
-        schemaPath = ref.replace('https://uipotion.com/schema/', 'schemas/');
+        schemaPath = ref.replace('https://uipotion.com/schema/', '/schema/');
       } else if (ref.startsWith('http://localhost:') || ref.startsWith('http://127.0.0.1:')) {
         // Handle localhost URLs (extract path after /schema/)
         const match = ref.match(/http:\/\/[^/]+\/schema\/(.+)/);
         if (match) {
-          schemaPath = 'schemas/' + match[1];
+          schemaPath = '/schema/' + match[1];
         }
       } else if (ref.startsWith('/schema/')) {
-        schemaPath = ref.replace('/schema/', 'schemas/');
-      } else if (ref.startsWith('schemas/')) {
         schemaPath = ref;
+      } else if (ref.startsWith('schema/')) {
+        schemaPath = '/' + ref;
       }
 
       if (schemaPath && !loadedSchemas.has(ref)) {
