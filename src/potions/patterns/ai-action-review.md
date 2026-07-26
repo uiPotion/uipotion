@@ -315,6 +315,20 @@ An assistant proposes a code edit. The review surface shows a diff, touched file
 - [ ] Mobile sticky controls do not obscure focused content or status messages
 - [ ] Reduced motion disables nonessential progress and state-change animation
 
+## Composing with the AI Potions
+
+This pattern is the control surface of the AI potion suite. When used together with the [AI Agent Chat Layout](/potions/layouts/ai-agent-chat) and the [AI Response Rendering Pattern](/potions/patterns/ai-response-rendering), keep the ownership boundaries clear instead of duplicating behavior:
+
+- The chat layout owns the shell (sidebar, header, message list, input placement) and where inline review cards sit in the conversation
+- The response rendering pattern owns tool-call cards and their lifecycle states (pending, running, success, error, cancelled)
+- This pattern owns the review surface, the action model, risk and confirmation rules, execution controls, partial failure handling, and the audit trail
+- A consequential tool call holds in its pending state and the message enters the rendering pattern's awaiting-review lifecycle state (status line on the held card, running animation and cursor suppressed) while this pattern presents the proposed action; approval moves it to approved, the card turns running only when execution begins, rejection turns it cancelled, and execution failure turns it error
+- Low-risk reviews render as inline cards in the message list; high-risk or dense plans escalate to a side panel, drawer, or modal
+- Only tool calls the product classifies as non-consequential skip review and run immediately: already authorized, read-only, no sensitive data leaving the product, and no meaningful cost
+- When composed with the response rendering pattern, review lifecycle announcements route through its single conversation-level live region; this pattern's own status region applies only when the review surface runs standalone
+
+Each potion remains independently useful. These rules apply only when they are used together.
+
 ## See Also
 
 This pattern complements these potions:

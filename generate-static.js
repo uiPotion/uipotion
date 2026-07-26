@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Generate sitemap.xml, _redirects, and copy potion markdown to statics.
+ * Generate sitemap.xml, _redirects, copy potion markdown, and publish schema aliases.
  * Run: node generate-static.js
  * Or: npm run static
  *
@@ -10,43 +10,123 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 // Configuration
 const POTIONS_DIR = 'src/potions';
 const STATICS_POTIONS_DIR = 'src/statics/potions';
+const SCHEMAS_DIR = 'src/statics/schemas';
+const SCHEMA_ALIAS_DIR = 'src/statics/schema';
+const POTIONS_INDEX_FILE = 'src/statics/potions-index.json';
 const OUTPUT_FILE = 'src/statics/sitemap.xml';
 const REDIRECTS_FILE = 'src/statics/_redirects';
 const BASE_URL = 'https://uipotion.com';
 
-// Static pages with their priorities (pretty URLs, no .html)
+// Static pages with their priorities (pretty URLs, no .html).
+// lastmod derives from the source file's git history (dirty files use
+// today's date). Full-history git is required; the build fails on missing
+// git or shallow clones rather than silently emitting wrong dates.
 const STATIC_PAGES = [
-  { path: '/', priority: '1.0', changefreq: 'weekly' },
-  { path: '/about', priority: '0.8', changefreq: 'monthly' },
-  { path: '/potion-kit', priority: '0.8', changefreq: 'monthly' },
-  { path: '/potions', priority: '0.9', changefreq: 'weekly' },
-  { path: '/contribute', priority: '0.7', changefreq: 'monthly' },
-  { path: '/validator', priority: '0.6', changefreq: 'monthly' },
-  { path: '/legal', priority: '0.3', changefreq: 'yearly' },
+  { path: '/', priority: '1.0', changefreq: 'weekly', source: 'src/pages/index.hbs' },
+  { path: '/about', priority: '0.8', changefreq: 'monthly', source: 'src/pages/about.hbs' },
+  { path: '/potion-kit', priority: '0.8', changefreq: 'monthly', source: 'src/pages/potion-kit.hbs' },
+  { path: '/potions', priority: '0.9', changefreq: 'weekly', source: 'src/pages/potions.hbs' },
+  { path: '/contribute', priority: '0.7', changefreq: 'monthly', source: 'src/pages/contribute.hbs' },
+  { path: '/validator', priority: '0.6', changefreq: 'monthly', source: 'src/pages/validator.hbs' },
+  { path: '/legal', priority: '0.3', changefreq: 'yearly', source: 'src/pages/legal.hbs' },
 ];
 
 // API/Discovery endpoints
 const API_ENDPOINTS = [
-  { path: '/uipotion-manifest.json', priority: '0.9', changefreq: 'weekly' },
-  { path: '/potions-index.json', priority: '0.9', changefreq: 'weekly' },
+  { path: '/uipotion-manifest.json', priority: '0.9', changefreq: 'weekly', source: 'src/statics/uipotion-manifest.json' },
+  { path: '/potions-index.json', priority: '0.9', changefreq: 'weekly', source: 'src/statics/potions-index.json' },
 ];
 
-function getFileLastModified(filepath) {
+function todayDate() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function requireGit() {
   try {
-    const stats = fs.statSync(filepath);
-    return stats.mtime.toISOString().split('T')[0];
+    execFileSync('git', ['rev-parse', '--is-inside-work-tree'], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
   } catch (err) {
-    return new Date().toISOString().split('T')[0];
+    console.error(
+      'Error: sitemap lastmod dates are derived from git history, but git is\n' +
+      'unavailable or this is not a git checkout. File mtimes are not a reliable\n' +
+      'substitute (archive extraction rewrites them), so the build stops here.\n' +
+      'Run this from a git clone with git installed.'
+    );
+    process.exit(1);
   }
+
+  // In a shallow clone, `git log -1 -- <file>` reports the truncation
+  // boundary commit as every file's last change, silently producing wrong
+  // dates. Refuse to run until full history is available.
+  const shallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'], { encoding: 'utf-8' }).trim();
+  if (shallow === 'true') {
+    console.error(
+      'Error: this is a shallow git clone, so file history is truncated and\n' +
+      'sitemap lastmod dates would be wrong (every file would appear last\n' +
+      'modified at the shallow boundary commit). Fetch full history first:\n' +
+      '  git fetch --unshallow\n' +
+      'or configure your CI checkout with full depth (e.g. fetch-depth: 0).'
+    );
+    process.exit(1);
+  }
+}
+
+function getGitLastModified(filepath) {
+  // Git commit dates are deterministic across checkouts, unlike file mtimes.
+  // Files with uncommitted changes (including untracked) use today's date,
+  // since their content genuinely changed now. Uses execFileSync argument
+  // arrays (no shell), so file paths cannot inject commands.
+  const dirty = execFileSync('git', ['status', '--porcelain', '--', filepath], { encoding: 'utf-8' }).trim();
+  if (dirty) return todayDate();
+  const committed = execFileSync('git', ['log', '-1', '--format=%cs', '--', filepath], { encoding: 'utf-8' }).trim();
+  if (!committed) {
+    throw new Error(`No git history found for ${filepath}; cannot derive a lastmod date`);
+  }
+  return committed;
+}
+
+function loadPotionUpdatedDates() {
+  // The potions index carries a maintained per-potion `updated` date
+  // (repo rules require bumping it on every content change), which is the
+  // most accurate lastmod source for potion URLs.
+  try {
+    const index = JSON.parse(fs.readFileSync(POTIONS_INDEX_FILE, 'utf-8'));
+    const map = {};
+    (index.potions || []).forEach(p => {
+      if (p.id && p.category && p.updated) {
+        map[`${p.category}/${p.id}`] = p.updated;
+      }
+    });
+    return map;
+  } catch (err) {
+    return {};
+  }
+}
+
+function getApiEndpointLastModified(endpoint) {
+  // Both discovery files carry their own tracked date fields.
+  try {
+    const data = JSON.parse(fs.readFileSync(endpoint.source, 'utf-8'));
+    const tracked = endpoint.path === '/uipotion-manifest.json'
+      ? data.meta && data.meta.updated
+      : data.lastUpdated;
+    if (tracked) return tracked;
+  } catch (err) {
+    // fall through to git history
+  }
+  return getGitLastModified(endpoint.source);
 }
 
 function findPotions() {
   const potions = [];
   const categories = ['components', 'features', 'layouts', 'patterns', 'tooling'];
+  const updatedDates = loadPotionUpdatedDates();
 
   categories.forEach(category => {
     const categoryDir = path.join(POTIONS_DIR, category);
@@ -64,7 +144,7 @@ function findPotions() {
           path: `/potions/${category}/${slug}`,
           priority: '0.8',
           changefreq: 'monthly',
-          lastmod: getFileLastModified(filepath)
+          lastmod: updatedDates[`${category}/${slug}`] || getGitLastModified(filepath)
         });
       }
     });
@@ -77,7 +157,6 @@ function findPotions() {
 }
 
 function generateSitemap() {
-  const today = new Date().toISOString().split('T')[0];
   const potions = findPotions();
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -94,7 +173,7 @@ function generateSitemap() {
   STATIC_PAGES.forEach(page => {
     xml += `  <url>
     <loc>${BASE_URL}${page.path}</loc>
-    <lastmod>${today}</lastmod>
+    <lastmod>${getGitLastModified(page.source)}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
   </url>
@@ -124,7 +203,7 @@ function generateSitemap() {
   API_ENDPOINTS.forEach(endpoint => {
     xml += `  <url>
     <loc>${BASE_URL}${endpoint.path}</loc>
-    <lastmod>${today}</lastmod>
+    <lastmod>${getApiEndpointLastModified(endpoint)}</lastmod>
     <changefreq>${endpoint.changefreq}</changefreq>
     <priority>${endpoint.priority}</priority>
   </url>
@@ -156,6 +235,16 @@ function copyPotionMarkdown(potions) {
   return copied;
 }
 
+function copySchemaAlias() {
+  if (!fs.existsSync(SCHEMAS_DIR)) {
+    throw new Error('Schema source directory not found: ' + SCHEMAS_DIR);
+  }
+
+  // Recreate the generated alias so removed or renamed schemas cannot remain stale.
+  fs.rmSync(SCHEMA_ALIAS_DIR, { recursive: true, force: true });
+  fs.cpSync(SCHEMAS_DIR, SCHEMA_ALIAS_DIR, { recursive: true });
+}
+
 function generateRedirects(potions) {
   // Netlify _redirects: from to status (whitespace-separated). See https://docs.netlify.com/routing/redirects/
   // Use 301! (force) so redirect runs even when the .html file exists; otherwise Netlify serves the file.
@@ -179,7 +268,9 @@ function generateRedirects(potions) {
 }
 
 function main() {
-  console.log('Generating sitemap.xml, _redirects, and copying potion markdown...\n');
+  console.log('Generating sitemap.xml, _redirects, copying potion markdown, and publishing schema aliases...\n');
+
+  requireGit();
 
   const { xml, potions } = generateSitemap();
 
@@ -187,6 +278,9 @@ function main() {
   if (copiedMd > 0) {
     console.log(`Copied ${copiedMd} potion markdown files to ${STATICS_POTIONS_DIR}/`);
   }
+
+  copySchemaAlias();
+  console.log('Copied schema aliases to ' + SCHEMA_ALIAS_DIR + '/');
 
   // Show summary
   console.log(`\nFound ${potions.length} potions:`);

@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
   "id": "ai-agent-chat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "AI Agent Chat Layout",
   "category": "layouts",
   "tags": [
@@ -1084,7 +1084,7 @@
   },
   "meta": {
     "created": "2026-02-01",
-    "updated": "2026-04-18",
+    "updated": "2026-07-26",
     "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
     "relatedPotions": [
       {
@@ -1092,6 +1092,13 @@
         "category": "patterns",
         "relationship": "composes-with",
         "description": "Companion pattern for what goes inside an assistant message bubble: streaming cursor, incremental Markdown, tool-call cards, collapsible reasoning, citations, artifact cards, per-message controls, and in-place error recovery. This layout owns the chat shell; the pattern owns the bubble interior. Hide this layout's typing indicator as soon as the pattern's streaming cursor appears.",
+        "required": false
+      },
+      {
+        "id": "ai-action-review",
+        "category": "patterns",
+        "relationship": "composes-with",
+        "description": "Companion pattern for consequential agent actions proposed in the conversation: plan preview, risk labels, approve/reject/edit controls, undo, and audit trail. This layout hosts the review surface (inline card in the message list, side panel, drawer, or modal); consequential tool calls rendered inside assistant messages should hand off to that pattern before execution.",
         "required": false
       },
       {

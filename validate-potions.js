@@ -13,6 +13,7 @@ const addFormats = require('ajv-formats');
 // Configuration
 const POTIONS_DIR = 'src/statics/potions';
 const SCHEMAS_DIR = 'src/statics/schemas';
+const POTIONS_INDEX_FILE = 'src/statics/potions-index.json';
 
 // Schema file mapping
 const SCHEMA_FILES = {
@@ -372,6 +373,125 @@ function validatePotion(potion) {
   }
 }
 
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function describeValue(value) {
+  if (value === null) return 'null';
+  if (value === undefined) return 'undefined';
+  if (Array.isArray(value)) return 'an array';
+  const type = typeof value;
+  return type === 'object' ? 'an object' : `a ${type}`;
+}
+
+/**
+ * Check that potions-index.json entries agree with guide metadata.
+ * The sitemap generator trusts index dates, so drift here silently
+ * produces stale lastmod values.
+ */
+function checkIndexConsistency(potions) {
+  let index;
+  try {
+    index = JSON.parse(fs.readFileSync(POTIONS_INDEX_FILE, 'utf-8'));
+  } catch (error) {
+    return [`Could not read ${POTIONS_INDEX_FILE}: ${error.message}`];
+  }
+
+  // Guard structure before touching properties: valid JSON is not
+  // necessarily the expected shape, and a TypeError here would replace the
+  // validation report with a crash.
+  if (!isPlainObject(index)) {
+    return [`${POTIONS_INDEX_FILE}: expected a top-level object, got ${describeValue(index)}`];
+  }
+
+  const errors = [];
+  const entries = new Map();
+  const indexEntries = Array.isArray(index.potions) ? index.potions : null;
+  if (!indexEntries) {
+    errors.push(`${POTIONS_INDEX_FILE}: "potions" must be an array, got ${describeValue(index.potions)}`);
+  }
+
+  // Key by category/id: the sitemap generator identifies potions the same
+  // way, and id alone could collide across categories or mask a wrong
+  // category on an index entry.
+  (indexEntries || []).forEach((entry, i) => {
+    if (!isPlainObject(entry)) {
+      errors.push(`${POTIONS_INDEX_FILE}: entry at position ${i} is not an object, got ${describeValue(entry)}`);
+      return;
+    }
+    if (!entry.id || !entry.category) {
+      errors.push(`${POTIONS_INDEX_FILE}: entry at position ${i} ("${entry.name || entry.id || 'unnamed'}") is missing id or category`);
+      return;
+    }
+    const key = `${entry.category}/${entry.id}`;
+    if (entries.has(key)) {
+      errors.push(`${POTIONS_INDEX_FILE}: duplicate entry for "${key}"`);
+      return;
+    }
+    entries.set(key, entry);
+  });
+
+  const guideKeys = new Map(); // category/id -> first guide file claiming it
+  potions.forEach(({ category, filepath, filename }) => {
+    let data;
+    try {
+      data = JSON.parse(fs.readFileSync(filepath, 'utf-8'));
+    } catch (error) {
+      return; // parse failures are already reported by schema validation
+    }
+    if (!isPlainObject(data)) {
+      return; // non-object guides already fail schema validation
+    }
+
+    const relativePath = path.relative(process.cwd(), filepath);
+
+    // The guide's identity must agree with its location on disk, since
+    // discovery URLs are derived from the directory and filename.
+    const slug = filename.replace(/\.json$/, '');
+    if (data.id !== slug) {
+      errors.push(`${relativePath}: id "${data.id}" does not match the filename slug "${slug}"`);
+    }
+    if (data.category !== category) {
+      errors.push(`${relativePath}: category "${data.category}" does not match its directory "${category}"`);
+    }
+
+    const key = `${data.category}/${data.id}`;
+    if (guideKeys.has(key)) {
+      errors.push(`${relativePath}: duplicate guide identity "${key}" (already defined by ${guideKeys.get(key)})`);
+    } else {
+      guideKeys.set(key, relativePath);
+    }
+
+    const entry = entries.get(key);
+    if (!entry) {
+      errors.push(`${relativePath}: no potions-index.json entry for "${key}"`);
+      return;
+    }
+
+    ['created', 'updated'].forEach(field => {
+      const guideValue = data.meta && data.meta[field];
+      if (guideValue && entry[field] !== guideValue) {
+        errors.push(`${relativePath}: meta.${field} is ${guideValue} but the potions-index.json entry says ${entry[field]}`);
+      }
+    });
+  });
+
+  // Reverse check: an index entry without a guide file is an orphan left
+  // behind by a rename or removal and would expose broken discovery URLs.
+  entries.forEach((entry, key) => {
+    if (!guideKeys.has(key)) {
+      errors.push(`${POTIONS_INDEX_FILE}: entry "${key}" has no matching guide file (orphan after a rename or removal?)`);
+    }
+  });
+
+  if (indexEntries && index.totalCount !== indexEntries.length) {
+    errors.push(`${POTIONS_INDEX_FILE}: totalCount is ${index.totalCount} but there are ${indexEntries.length} entries`);
+  }
+
+  return errors;
+}
+
 /**
  * Main function
  */
@@ -422,6 +542,18 @@ function main() {
       });
     }
   });
+
+  // Cross-check guide metadata against the potions index
+  const indexErrors = checkIndexConsistency(potions);
+  if (indexErrors.length > 0) {
+    console.log('\n✗ potions-index.json consistency check failed:\n');
+    indexErrors.forEach((message, i) => {
+      console.log(`  ${i + 1}. ${message}`);
+    });
+    totalErrors += indexErrors.length;
+  } else {
+    console.log('\n✓ potions-index.json entries match guide metadata');
+  }
 
   // Summary
   const validCount = results.filter(r => r.result.valid).length;

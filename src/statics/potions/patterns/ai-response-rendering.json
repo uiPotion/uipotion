@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/patterns.schema.json",
   "id": "ai-response-rendering",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "AI Response Rendering Pattern - Streaming, Tool Calls, and Optional Reasoning",
   "category": "patterns",
   "tags": [
@@ -20,7 +20,7 @@
     "summary": "Implement an AI assistant message renderer as a state machine over a typed block list (text, code, tool-call, citation, artifact-ref, error). Stream deltas into the trailing block, render a streaming cursor while active, use an incremental sanitized Markdown parser, render tool calls as lifecycle cards with stable ids, resolve citations to source affordances, surface artifacts as cards. Reasoning is an optional block type: include it only when the model provider explicitly exposes a reasoning channel AND the product has decided to surface it. When included, prefer a summary or status affordance ('Thought for 4s', 'Reasoning...') over verbatim text; show verbatim content only when the provider's terms allow it and the product requires it. Preserve partial content on cancel and error. Use a single polite live region for lifecycle events (never per token). Compose with the AI Agent Chat Layout: this pattern owns the bubble interior; the layout owns the message list, scroller, and conversation-level typing indicator. Detect the project framework and styling system before writing code.",
     "keyFeatures": [
       "Typed block list as message representation: text, code, tool-call, citation, artifact-ref, error, plus optional reasoning when the provider exposes it - never a single growing string",
-      "Streaming cursor at the trailing edge during the streaming and tool-running states; removed on complete, cancelled, errored",
+      "Streaming cursor at the trailing edge during the streaming and tool-running states; suppressed during awaiting-review; removed on complete, cancelled, errored",
       "Incremental Markdown rendering that tolerates unclosed code fences, partial links, and partial emphasis",
       "Tool-call cards with explicit lifecycle states (pending, running, success, error, cancelled), stable id-based mutation, expandable input and output",
       "Optional reasoning-status surface: include only when the provider explicitly exposes a reasoning channel and the product has decided to display it. Prefer a summary or status affordance ('Thought for 4s', 'Reasoning...') over verbatim content. If verbatim is shown, default to collapsed; the answer must remain visually primary",
@@ -39,9 +39,9 @@
       "1. Detect project framework (React, Vue, Angular, Svelte) and styling system (Tailwind, CSS Modules, SCSS, styled-components, Chakra) from package.json, config files, and existing components - use ONLY the detected stack",
       "2. Detect existing AI Agent Chat Layout in the project; if absent, recommend installing it; if present, ensure this pattern integrates with the layout's message list, auto-scroll, and typing indicator (the layout-level typing indicator must hide once this pattern's streaming cursor is shown)",
       "3. Define the block model: an immutable record per block with fields { id, type, state, content, meta }. Required types: text, code, tool-call, citation, artifact-ref, error. Optional type: reasoning (include only when the provider exposes a reasoning channel and the product has decided to surface it). Unknown types must render as a labelled raw block, never silently dropped",
-      "4. Implement the message state machine with states idle, queued, streaming, tool-running, complete, cancelled, errored and the documented transitions",
+      "4. Implement the message state machine with states idle, queued, streaming, tool-running, awaiting-review (only when composed with an action review surface), complete, cancelled, errored and the documented transitions",
       "5. Implement a stream consumer that reads transport events and dispatches block-level mutations (append block, grow trailing text, grow trailing code, update tool-call by id). Coalesce updates within a single requestAnimationFrame; do not commit per delta",
-      "6. Render the streaming cursor as a CSS-only animation (no per-frame re-render); show it on streaming and tool-running, hide on terminal states",
+      "6. Render the streaming cursor as a CSS-only animation (no per-frame re-render); show it on streaming and tool-running, hide on awaiting-review and terminal states",
       "7. Use an incremental sanitized Markdown renderer that tolerates incomplete input. Re-parse only the trailing block on update; never re-parse finalized blocks. Sanitize on every render",
       "8. Render tool-call cards: name, status line, expandable input arguments, expandable result or error. Mutate cards by id when lifecycle updates arrive; never recreate a card",
       "9. If the provider exposes reasoning AND the product has opted to surface it: render a reasoning-status affordance (label such as 'Thought for 4s', optional duration or step count). Prefer showing a summary or status only; display verbatim content only when the provider's terms allow it and the product requires it, defaulting to collapsed. The answer must remain visually primary. If the provider does not expose reasoning, omit this block entirely",
@@ -62,7 +62,7 @@
     "solution": "Treat the assistant message as a state machine over a typed, ordered block list (text, code, tool-call, citation, artifact-ref, error). Append blocks and grow the trailing block as deltas arrive. Show an explicit streaming cursor while active. Use an incremental sanitized Markdown renderer. Render tool calls as lifecycle cards with stable ids. Resolve citation markers to source affordances. Surface artifacts as cards routing to a side panel. If - and only if - the model provider explicitly exposes a reasoning channel and the product has decided to surface it, add an optional reasoning block that prefers a summary or status affordance over verbatim content. Preserve partial content on cancel or error and offer in-place retry. Announce lifecycle changes through a single polite live region; never announce per token. Compose with the AI Agent Chat Layout, which owns the chat shell and message list.",
     "do": [
       "Model the message as a typed block list, not a string",
-      "Render a streaming cursor and remove it on terminal state (complete, cancelled, errored)",
+      "Render a streaming cursor and remove it on terminal state (complete, cancelled, errored) and while the message is awaiting review",
       "Use an incremental, sanitized Markdown renderer that tolerates incomplete input",
       "Render tool calls as lifecycle cards (pending, running, success, error, cancelled) with stable id-based mutation",
       "Show tool-call name, status line, expandable arguments, and expandable result or error",
@@ -130,6 +130,7 @@
       "Streaming message renders a visible cursor that disappears on terminal state",
       "Markdown with an unclosed code fence renders as a code block, not as escaped text",
       "Tool call passes through pending, running, success or error visibly; card identity is stable across updates",
+      "A tool call held for an action review surface puts the message in awaiting-review: cursor and running animation are suppressed, Stop stays reachable, and tool-running resumes only when execution begins",
       "If the provider does NOT expose reasoning, no reasoning surface is rendered",
       "If the provider exposes reasoning AND the product surfaces it, the surface defaults to a summary or status affordance; any verbatim disclosure is collapsed by default and keeps the answer visually primary",
       "Citation marker exposes source title, domain, and URL via hover, focus, and click",
@@ -210,7 +211,8 @@
       {"state": "idle", "purpose": "No response yet"},
       {"state": "queued", "purpose": "Request accepted, waiting for the model"},
       {"state": "streaming", "purpose": "Blocks are being appended or the trailing block is growing"},
-      {"state": "tool-running", "purpose": "One or more tool-call blocks are pending or running"},
+      {"state": "tool-running", "purpose": "One or more tool-call blocks are running or pending imminent execution; a block held for approval is awaiting-review instead"},
+      {"state": "awaiting-review", "purpose": "A consequential tool-call block is held in pending while an action review surface presents it for approval. Occurs only when composed with the AI Action Review Pattern; the message is waiting on the user, not working"},
       {"state": "complete", "purpose": "Terminal stop reason received; all blocks finalized"},
       {"state": "cancelled", "purpose": "User stopped the response; partial content preserved"},
       {"state": "errored", "purpose": "Terminal failure; partial content preserved with an error block"}
@@ -219,6 +221,9 @@
       "idle -> queued on send",
       "queued -> streaming on first delta",
       "streaming -> tool-running when a tool-call enters running",
+      "streaming or tool-running -> awaiting-review when a consequential tool call is held in pending for approval (only when composed with an action review surface)",
+      "awaiting-review -> tool-running when approval is given and execution begins",
+      "awaiting-review -> streaming when the action is rejected (card becomes cancelled) and text resumes",
       "tool-running -> streaming when text resumes",
       "any non-terminal -> complete on natural stop",
       "any non-terminal -> cancelled on user stop",
@@ -227,6 +232,7 @@
     "affordancesByState": {
       "streaming": ["Stop", "in-bubble cursor"],
       "tool-running": ["Stop", "tool-call card animation", "in-bubble cursor"],
+      "awaiting-review": ["Stop", "awaiting-review status line on the held tool-call card", "review controls owned by the action review pattern", "streaming cursor and running animation suppressed"],
       "complete": ["Copy", "Regenerate", "Edit (on preceding user message)", "Feedback"],
       "cancelled": ["Copy", "Regenerate", "Edit (on preceding user message)"],
       "errored": ["Copy", "Regenerate", "Retry (on the failing block where applicable)"]
@@ -277,7 +283,7 @@
     "controls": [
       {"name": "Copy", "purpose": "Copy the rendered Markdown source", "availableIn": ["complete", "cancelled", "errored"]},
       {"name": "Regenerate", "purpose": "Request a new response for the same prompt", "availableIn": ["complete", "cancelled", "errored"]},
-      {"name": "Stop", "purpose": "Cancel the active stream", "availableIn": ["streaming", "tool-running"], "notes": "Must be active immediately; never blocked on completion"},
+      {"name": "Stop", "purpose": "Cancel the active stream", "availableIn": ["streaming", "tool-running", "awaiting-review"], "notes": "Must be active immediately; never blocked on completion"},
       {"name": "Edit", "purpose": "Edit the preceding user prompt and re-send", "availableIn": ["complete", "cancelled", "errored"]},
       {"name": "Feedback", "purpose": "Thumbs up or down with optional comment", "availableIn": ["complete"]},
       {"name": "Share", "purpose": "Generate a shareable link", "availableIn": ["complete"], "notes": "Product-dependent"}
@@ -355,6 +361,19 @@
       "Auto-scroll rules described in this pattern and in the chat layout describe the same behavior from two sides; implement once at the layout level",
       "The chat-level Stop shortcut (e.g. Esc on the input) should call into this pattern's Stop handler",
       "User bubbles use the chat layout's user-message styling and do not use this pattern's block model"
+    ]
+  },
+    "compositionWithActionReview": {
+    "description": "Companion to the AI Action Review Pattern for tool calls with real-world consequences (sending messages, changing records, payments, file shares). This pattern owns the tool-call card; the review pattern owns the approval surface, confirmation rules, undo, and audit trail. Compose them instead of duplicating approval UI inside tool-call cards.",
+    "handOffRules": [
+      "A consequential tool call enters this pattern's tool-call card in the pending state and does not start running until reviewed",
+      "While a card is held in pending for review, the message enters the awaiting-review lifecycle state: a distinct awaiting-review status line is shown on the card and the running animation and streaming cursor are suppressed - the message is waiting on the user, not working",
+      "The pending card surfaces or links to the review surface (inline card, side panel, drawer, or modal per the review pattern); the proposed action maps to the review pattern's proposed state",
+      "Approval maps to the review pattern's approved state (approved but not yet running); the tool-call card transitions to running only when execution actually begins (the review pattern's executing state). Rejection transitions the card to cancelled",
+      "Execution failure reported by the review pattern renders as the tool-call card's error state; the surrounding response continues",
+      "Undo, retry, partial failure handling, and the audit trail are owned by the review pattern; this pattern only reflects the resulting tool-call card state",
+      "When composed in a conversation, review lifecycle announcements route through this pattern's single conversation-level polite live region; never run a second announcer for the same transitions",
+      "Only tool calls the product classifies as non-consequential skip review and run immediately: already authorized, read-only, no sensitive data leaving the product, and no meaningful cost. Reads that send sensitive query data to external services, call metered external APIs, or require new permissions are reviewable like any other action"
     ]
   }
   },
@@ -457,6 +476,7 @@
     "Streaming message renders a visible cursor that disappears on complete, cancelled, or errored",
     "Markdown with an unclosed code fence renders as a code block, not as escaped backticks",
     "Tool call passes through pending, running, success or error visibly; card identity is stable across updates",
+    "A tool call held for an action review surface puts the message in awaiting-review: cursor and running animation are suppressed, Stop stays reachable, and tool-running resumes only when execution begins",
     "If the provider does NOT expose reasoning, no reasoning surface is rendered",
     "If the provider exposes reasoning AND the product surfaces it, the default is a summary or status label; any verbatim disclosure is collapsed by default and does not dominate the answer",
     "Citation marker exposes source title, domain, and URL via hover, focus, and click",
@@ -478,7 +498,7 @@
   ],
   "meta": {
     "created": "2026-04-18",
-    "updated": "2026-04-18",
+    "updated": "2026-07-26",
     "webUrl": "https://uipotion.com/potions/patterns/ai-response-rendering",
     "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.json",
     "markdownUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.md",
@@ -488,6 +508,13 @@
         "category": "layouts",
         "relationship": "composes-with",
         "description": "The AI Agent Chat Layout owns the chat shell, message list, and conversation-level typing indicator. This pattern fills the assistant message bubble inside that layout. The two are designed to compose; the chat layout's typing indicator must be hidden once this pattern shows its in-bubble streaming cursor.",
+        "required": false
+      },
+      {
+        "id": "ai-action-review",
+        "category": "patterns",
+        "relationship": "composes-with",
+        "description": "Companion pattern for consequential tool calls. A tool call with real-world consequences holds in this pattern's pending state (presented as awaiting review) while the AI Action Review Pattern presents the proposed action; approval marks it approved, the card transitions to running only when execution begins, rejection transitions it to cancelled, and execution failure to error. This pattern owns the tool-call card; that pattern owns the approval surface, confirmation rules, undo, and audit trail.",
         "required": false
       },
       {

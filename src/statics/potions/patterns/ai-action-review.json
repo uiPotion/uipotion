@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/patterns.schema.json",
   "id": "ai-action-review",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "AI Action Review Pattern",
   "category": "patterns",
   "tags": [
@@ -422,7 +422,31 @@
       "Do not rerun completed actions unless the user explicitly chooses to",
       "If rollback is available, show what will be reverted before undo",
       "If rollback fails, preserve rollback failure state and show escalation path"
-    ]
+    ],
+    "compositionWithAiPotions": {
+      "description": "This pattern is the control surface of the AI potion suite. It composes with the AI Agent Chat Layout and the AI Response Rendering Pattern; do not duplicate behaviors across them. Each potion remains independently useful - these rules apply only when they are used together.",
+      "ownedByChatLayout": [
+        "Chat shell: sidebar, header, message list scroller, and input area placement",
+        "Placement of inline review cards inside the conversation flow"
+      ],
+      "ownedByResponseRendering": [
+        "Tool-call cards and their lifecycle states (pending, running, success, error, cancelled)",
+        "Assistant message blocks, streaming cursor, and per-message controls"
+      ],
+      "ownedByThisPattern": [
+        "The action review surface (inline card, side panel, drawer, modal, or full screen)",
+        "The action model, risk levels, reversibility, and confirmation rules",
+        "Approve, reject, edit, revision, pause, stop, retry, and undo controls",
+        "Execution lifecycle, partial failure handling, audit trail, and permission requests"
+      ],
+      "coordinationRules": [
+        "A consequential tool call rendered by the AI Response Rendering Pattern holds in its pending state while this pattern presents the proposed action for review; the rendering pattern's message enters its awaiting-review lifecycle state (awaiting-review status line on the held card, running animation and streaming cursor suppressed)",
+        "Approval here moves the action to approved (approved but not yet running); the tool-call card transitions to running only when this pattern enters executing. Rejection transitions the card to cancelled; execution failure surfaces as the card's error state",
+        "When hosted in the AI Agent Chat Layout, low-risk reviews render as inline cards in the message list; high-risk or dense plans escalate to side panel, drawer, or modal per reviewSurfaceVariants",
+        "Only tool calls the product classifies as non-consequential skip this pattern and run immediately: already authorized, read-only, no sensitive data leaving the product, and no meaningful cost. Reads that send sensitive query data to external services, call metered external APIs, or require new permissions are reviewable like any other action",
+        "When composed in a conversation that uses the AI Response Rendering Pattern, review lifecycle announcements route through that pattern's single conversation-level polite live region - one announcer, no double announcements through the chat layout's message region. Use this pattern's own role=status region only when the review surface runs standalone outside a conversation"
+      ]
+    }
   },
   "responsiveBreakpoints": {
     "desktop": {
@@ -554,7 +578,7 @@
   ],
   "meta": {
     "created": "2026-05-23",
-    "updated": "2026-05-23",
+    "updated": "2026-07-26",
     "webUrl": "https://uipotion.com/potions/patterns/ai-action-review",
     "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-action-review.json",
     "markdownUrl": "https://uipotion.com/potions/patterns/ai-action-review.md",

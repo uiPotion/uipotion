@@ -31,7 +31,7 @@ This pattern covers:
 - The internal structure of one assistant message bubble
 - How streamed tokens are appended without layout thrash
 - How Markdown, code, tool calls, citations, and (when the provider exposes it) reasoning are rendered
-- The lifecycle of a streaming response (idle, streaming, complete, cancelled, errored)
+- The lifecycle of a streaming response (idle, queued, streaming, tool-running, awaiting-review when composed with an action review surface, complete, cancelled, errored)
 - Per-message controls (stop, regenerate, copy, edit, feedback)
 - Accessibility for live, partially rendered content
 
@@ -113,7 +113,8 @@ A response moves through these states. UI affordances depend on the current stat
 - idle - no response yet, awaiting trigger
 - queued - request accepted, waiting for the model
 - streaming - blocks are being appended or the trailing block is growing
-- tool-running - one or more tool-call blocks are in pending or running
+- tool-running - one or more tool-call blocks are running or pending imminent execution
+- awaiting-review - a consequential tool-call block is held in pending while an action review surface presents it for approval; occurs only when composed with the AI Action Review Pattern. The message is waiting on the user, not working: the streaming cursor and running animation are suppressed, the held card shows an awaiting-review status line, and Stop stays reachable
 - complete - terminal stop reason received, all blocks finalized
 - cancelled - user stopped the response; partial content preserved
 - errored - terminal failure; partial content preserved with an error block
@@ -123,6 +124,9 @@ Transitions:
 - idle to queued on send
 - queued to streaming on first delta
 - streaming to tool-running when a tool-call enters running
+- streaming or tool-running to awaiting-review when a consequential tool call is held for approval (only when composed with an action review surface)
+- awaiting-review to tool-running when approval is given and execution begins
+- awaiting-review to streaming when the action is rejected (the card becomes cancelled) and text resumes
 - tool-running to streaming when text resumes
 - any non-terminal to complete on natural stop
 - any non-terminal to cancelled on user stop
@@ -230,7 +234,7 @@ These controls live at or near the foot of the bubble. They appear on hover, foc
 
 - Copy - copy the rendered Markdown source of the message
 - Regenerate - request a new response for the same prompt; available on complete, cancelled, errored
-- Stop - cancel the active stream; available only during streaming or tool-running
+- Stop - cancel the active stream; available only during streaming, tool-running, or awaiting-review
 - Edit - edit the user's preceding prompt and re-send; available on assistant messages whose preceding user message is editable
 - Feedback - thumbs up or down; optional comment
 - Share - generate a shareable link to the message or conversation; product-dependent
@@ -336,6 +340,17 @@ The two potions are designed to compose:
 - The chat layout's auto-scroll rules and this pattern's pinned-to-bottom rules describe the same behavior from two sides; implement them once at the chat layout level
 - User-message bubbles in the chat layout do not use this pattern; this pattern applies only to assistant messages
 
+## Relationship to the AI Action Review Pattern
+
+Tool calls with real-world consequences (sending messages, changing records, payments, file shares) compose with the [AI Action Review Pattern](/potions/patterns/ai-action-review):
+
+- This pattern owns the tool-call card; the review pattern owns the approval surface, confirmation rules, undo, and audit trail
+- A consequential tool call holds in the card's pending state and does not run until reviewed; the proposed action maps to the review pattern's proposed state
+- While a card is held for review, the message enters the awaiting-review lifecycle state: the held card shows a distinct awaiting-review status line and the running animation and streaming cursor are suppressed - the message is waiting on the user, not working
+- Approval maps to the review pattern's approved state; the card transitions to running only when execution actually begins. Rejection transitions it to cancelled and execution failure to error; the surrounding response continues either way
+- When composed in a conversation, review lifecycle announcements route through this pattern's single conversation-level live region; never run a second announcer for the same transitions
+- Only tool calls the product classifies as non-consequential skip review and run immediately: already authorized, read-only, no sensitive data leaving the product, and no meaningful cost
+
 ## Framework Patterns
 
 ### React
@@ -390,6 +405,7 @@ This pattern is intentionally style-agnostic. Detect the project's styling syste
 - A streaming message renders a visible cursor that disappears on terminal state
 - Markdown with an unclosed code fence renders as a code block, not as escaped text
 - A tool call passes through pending, running, success or error visibly and the card identity is stable
+- A tool call held for an action review surface puts the message in awaiting-review: cursor and running animation are suppressed, Stop stays reachable, and tool-running resumes only when execution begins
 - When the provider does not expose reasoning, no reasoning surface is rendered
 - When the provider exposes reasoning AND the product surfaces it, the surface defaults to a summary or status label; any verbatim disclosure is collapsed by default and keeps the answer visually primary
 - A citation marker exposes the source title and URL via hover, focus, and click
@@ -410,6 +426,7 @@ This pattern is intentionally style-agnostic. Detect the project's styling syste
 This pattern composes with these potions:
 
 - **[AI Agent Chat Layout](/potions/layouts/ai-agent-chat)** - the chat shell this pattern lives inside; the layout provides the bubble, this pattern fills it
+- **[AI Action Review Pattern](/potions/patterns/ai-action-review)** - the approval surface for consequential tool calls; a consequential tool-call card holds in pending during review and moves to running only when execution begins, to cancelled on rejection, or to error on execution failure
 - **[Toast Notifications](/potions/components/toast-notifications)** - for non-blocking feedback such as "Message copied" or "Regenerated"
 - **[Dialog Component](/potions/components/dialog)** - for confirmation flows like clearing feedback, reporting a refusal, or deleting an artifact
 - **[Dark/Light Mode Pattern](/potions/patterns/dark-light-mode)** - tool-call cards, reasoning surfaces, and citation pills must use theme tokens to remain readable in both modes

@@ -300,7 +300,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.json",
       "created": "2026-02-01",
-      "updated": "2026-04-18",
+      "updated": "2026-07-26",
       "markdownUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.md"
     },
     {
@@ -415,7 +415,7 @@
       "webUrl": "https://uipotion.com/potions/components/command-palette",
       "agentGuideUrl": "https://uipotion.com/potions/components/command-palette.json",
       "created": "2026-02-22",
-      "updated": "2026-02-22",
+      "updated": "2026-02-23",
       "markdownUrl": "https://uipotion.com/potions/components/command-palette.md"
     },
     {
@@ -436,7 +436,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/documentation",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/documentation.json",
       "created": "2026-02-24",
-      "updated": "2026-02-24",
+      "updated": "2026-02-25",
       "markdownUrl": "https://uipotion.com/potions/layouts/documentation.md"
     },
     {
@@ -501,7 +501,7 @@
       "webUrl": "https://uipotion.com/potions/patterns/ai-response-rendering",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.json",
       "created": "2026-04-18",
-      "updated": "2026-04-18",
+      "updated": "2026-07-26",
       "markdownUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.md"
     },
     {
@@ -523,10 +523,10 @@
       "webUrl": "https://uipotion.com/potions/patterns/ai-action-review",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-action-review.json",
       "created": "2026-05-23",
-      "updated": "2026-05-23",
+      "updated": "2026-07-26",
       "markdownUrl": "https://uipotion.com/potions/patterns/ai-action-review.md"
     }
   ],
   "totalCount": 24,
-  "lastUpdated": "2026-05-23"
+  "lastUpdated": "2026-07-26"
 }
