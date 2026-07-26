@@ -1,17 +1,17 @@
 # Contributing to UI Potion
 
-Thank you for your interest in contributing to UI Potion! This guide will help you add new UI component specifications to our collection.
+Thank you for your interest in contributing to UI Potion! This guide will help you add new UI specifications to our collection.
 
-**Want the full guide?** The **[Contribute page on the website](https://uipotion.com/contribute.html)** has schemas, the Schema Validator, example AI prompts, and best practices.
+**Want the full guide?** The **[Contribute page on the website](https://uipotion.com/contribute)** has schemas, the Schema Validator, example AI prompts, and best practices.
 
-**Try contributing with your AI assistant.** Point your AI at this repo (or the [uipotion-manifest](https://uipotion.com/uipotion-manifest.json) and [potions-index](https://uipotion.com/potions-index.json)), give it the **schemas** in `src/statics/schema/` and **existing potions** in the same category as references, and ask it to draft a new potion (Markdown + JSON + index entry). Then run `npm run validate`, tweak if needed, and open a PR. Many contributors use AI for the first draft and refine from there.
+**Try contributing with your AI assistant.** Point your AI at this repo (or the [uipotion-manifest](https://uipotion.com/uipotion-manifest.json) and [potions-index](https://uipotion.com/potions-index.json)), give it the **schemas** in `src/statics/schema/` and **existing potions** in the same category as references, and ask it to draft a new potion (Markdown + JSON + index entry). Then run `npm run build`, refine the result, and open a PR. Many contributors use AI for the first draft and refine from there.
 
 ## Quick Start
 
 1. Fork this repository at https://github.com/uiPotion/uipotion
-2. Create your potion (Markdown + JSON) — see Creating a Potion below
-3. Validate using the [Schema Validator](https://uipotion.com/validator.html) or `npm run validate`
-4. Run `npm run static` to update sitemap and redirects (automatic!)
+2. Create your potion (Markdown + JSON + index entry) — see Creating a Potion below
+3. Validate using the [Schema Validator](https://uipotion.com/validator) or `npm run validate`
+4. Run `npm run build` to validate and generate the production site
 5. Submit a pull request
 
 We'll review your potion for schema compliance and best practices, then merge and publish when ready.
@@ -38,24 +38,29 @@ Create `src/statics/potions/[category]/your-potion.json`
 
 Use the **category schema** in `src/statics/schema/categories/` and an existing potion as template (e.g., `navbar.json` for components, `dashboard.json` for layouts).
 
-Required structure:
+Every guide begins with the required base fields below. This excerpt is not a complete category guide; each category schema adds required structures of its own. Start from an existing potion in the same category and validate the result.
+
 ```json
 {
+  "$schema": "https://uipotion.com/schema/categories/components.schema.json",
   "id": "your-potion-id",
-  "name": "Your Potion Name",
   "version": "1.0.0",
+  "name": "Your Potion Name",
   "category": "components",
   "tags": ["tag1", "tag2"],
   "description": "Brief description",
   "aiAgentInstructions": {
-    "summary": "...",
-    "keyFeatures": [...],
-    "implementationSteps": [...]
+    "summary": "Implementation goal",
+    "keyFeatures": ["Primary behavior"],
+    "implementationSteps": ["Detect the project framework and styling system before writing code"]
   },
-  "frameworkPatterns": { ... },
-  "stylingApproaches": { ... },
-  "accessibility": { ... },
-  "testingChecklist": [ ... ]
+  "meta": {
+    "created": "YYYY-MM-DD",
+    "updated": "YYYY-MM-DD",
+    "webUrl": "https://uipotion.com/potions/components/your-potion",
+    "agentGuideUrl": "https://uipotion.com/potions/components/your-potion.json",
+    "markdownUrl": "https://uipotion.com/potions/components/your-potion.md"
+  }
 }
 ```
 
@@ -68,7 +73,7 @@ Required front matter:
 ---
 layout: 'potion'
 title: 'Your Potion Name'
-publicationDate: '2026-01-24'
+publicationDate: 'YYYY-MM-DD'
 excerpt: 'Brief description (1-2 sentences)'
 category: 'Components'
 tags:
@@ -83,21 +88,11 @@ Then write comprehensive specifications in the body (see existing potions for fo
 
 ### Step 3: Validate
 
-Visit https://uipotion.com/validator.html and validate your JSON file.
+Visit https://uipotion.com/validator and validate your JSON file.
 
-### Step 4: Update Sitemap and Redirects (Automatic!)
+### Step 4: Update Potions Index and Dates
 
-After creating your potion files, run:
-
-```bash
-npm run static
-```
-
-This automatically scans all markdown files and updates `src/statics/sitemap.xml` and `src/statics/_redirects`. No manual editing needed!
-
-### Step 5: Update Potions Index
-
-Add your potion to `src/statics/potions-index.json`:
+Add the matching entry to `src/statics/potions-index.json`:
 
 ```json
 {
@@ -106,30 +101,37 @@ Add your potion to `src/statics/potions-index.json`:
   "category": "components",
   "tags": ["tag1", "tag2"],
   "excerpt": "Brief description",
-  "webUrl": "https://uipotion.com/potions/components/your-potion.html",
+  "webUrl": "https://uipotion.com/potions/components/your-potion",
   "agentGuideUrl": "https://uipotion.com/potions/components/your-potion.json",
   "markdownUrl": "https://uipotion.com/potions/components/your-potion.md",
-  "created": "2026-01-24",
-  "updated": "2026-01-24"
+  "created": "YYYY-MM-DD",
+  "updated": "YYYY-MM-DD"
 }
 ```
 
-Update `totalCount` and `lastUpdated` fields at the top.
+Update `totalCount` and top-level `lastUpdated`. Keep the index dates synchronized with the guide `meta.created` and `meta.updated`, and update `src/statics/uipotion-manifest.json` `meta.updated`.
+
+### Step 5: Build and Verify
+
+Run the full production check:
+
+```bash
+npm run build
+```
+
+The build validates every potion, checks index metadata consistency, regenerates the sitemap and redirects, creates the Harold site, and cleans temporary Markdown publishing copies.
 
 ## Testing Locally
 
 ```bash
-# Install dependencies
-npm install
+# Install locked dependencies
+npm ci
 
 # Start dev server
 npm start
 
 # Build for production
 npm run build
-
-# Update sitemap and redirects
-npm run static
 ```
 
 Visit http://localhost:3000 to preview your changes.
@@ -139,7 +141,7 @@ Visit http://localhost:3000 to preview your changes.
 **Before submitting:**
 - JSON validates with no errors (web validator or `npm run validate`)
 - Markdown has correct front matter
-- Ran `npm run static`
+- Ran `npm run build`
 - Updated `potions-index.json`
 - Tested locally with `npm start`
 - Followed existing potion format
@@ -156,14 +158,14 @@ We'll review your potion for schema compliance and best practices, suggest impro
 
 - **Be comprehensive** — Include all necessary details for AI to implement
 - **Be framework-agnostic** — Avoid framework-specific code in descriptions
-- **Include accessibility** — WCAG compliance, ARIA, keyboard navigation
-- **Include responsive specs** — Mobile, tablet, desktop breakpoints
+- **Include accessibility where relevant** — WCAG compliance, ARIA, keyboard navigation
+- **Include responsive specs where relevant** — Mobile, tablet, desktop breakpoints
 - **Include testing checklist** — What to verify after implementation
 
 ## Questions?
 
 - Check existing potions for examples
-- Review the [.cursorrules](/.cursorrules) file for detailed guidelines
+- Review [AGENTS.md](AGENTS.md) for detailed project guidelines
 - Ask in your pull request if unsure
 
 ## License

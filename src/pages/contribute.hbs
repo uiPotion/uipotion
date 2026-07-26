@@ -14,8 +14,8 @@ requests" currentPath="contribute" }}
       <h1 class="about-hero-title">Contribute to UI Potion</h1>
 
       <p class="about-hero-description">
-        Share your UI component specifications with the community. Learn how to create and submit potions that AI agents
-        can use to generate production-ready code.
+        Share your UI specifications with the community. Learn how to create and submit potions that AI agents
+        can use to create project-aligned UI implementations.
       </p>
     </div>
   </header>
@@ -30,7 +30,7 @@ requests" currentPath="contribute" }}
             and <a href="https://uipotion.com/potions-index.json" target="_blank" rel="noopener">potions-index</a>),
             give it the schemas in <code>src/statics/schema/</code> and existing potions in the same category as
             references, and ask it to draft a new potion (Markdown + JSON + index entry). Then run
-            <code>npm run validate</code>, tweak if needed, and open a PR. Many contributors use AI for the first draft
+            <code>npm run build</code>, refine the result, and open a PR. Many contributors use AI for the first draft
             and refine from there.</p>
         </section>
 
@@ -41,10 +41,10 @@ requests" currentPath="contribute" }}
           <ol>
             <li><strong>Fork this repository</strong> at <a href="https://github.com/uiPotion/uipotion" target="_blank"
                 rel="noopener">github.com/uiPotion/uipotion</a></li>
-            <li><strong>Create your potion</strong> (Markdown + JSON) — see Creating a Potion below</li>
+            <li><strong>Create your potion</strong> (Markdown + JSON + index entry) — see Creating a Potion below</li>
             <li><strong>Validate</strong> using the <a href="/validator">Schema Validator</a> or
               <code>npm run validate</code></li>
-            <li><strong>Run <code>npm run static</code></strong> to update sitemap and redirects (automatic!)</li>
+            <li><strong>Run <code>npm run build</code></strong> to validate and generate the production site</li>
             <li><strong>Submit a pull request</strong> with your new potion</li>
           </ol>
 
@@ -75,10 +75,11 @@ requests" currentPath="contribute" }}
           <p>Create <code>src/statics/potions/[category]/your-potion.json</code></p>
           <p>Use the <strong>category schema</strong> in <code>src/statics/schema/categories/</code> and an existing
             potion as template (e.g., <code>navbar.json</code> for components, <code>dashboard.json</code> for layouts).
-            Include at least: <code>id</code>, <code>name</code>, <code>version</code>, <code>category</code>,
-            <code>tags</code>, <code>description</code>, <code>aiAgentInstructions</code>,
-            <code>frameworkPatterns</code>, <code>stylingApproaches</code>, <code>accessibility</code>,
-            <code>testingChecklist</code>. See Available Schemas and Using Schemas with AI below for more.</p>
+            Every guide requires the base fields <code>$schema</code>, <code>id</code>, <code>version</code>,
+            <code>name</code>, <code>category</code>, <code>tags</code>, <code>description</code>,
+            <code>aiAgentInstructions</code>, and <code>meta</code>. Each category schema adds required structures of
+            its own, so start from an existing potion in the same category rather than treating this list as a complete template.
+            See Available Schemas and Using Schemas with AI below for more.</p>
 
           <h3>Step 2: Create Markdown File</h3>
           <p>Create <code>src/potions/[category]/your-potion.md</code></p>
@@ -92,7 +93,7 @@ requests" currentPath="contribute" }}
             <pre><code>---
 layout: 'potion'
 title: 'Your Potion Name'
-publicationDate: '2026-01-24'
+publicationDate: 'YYYY-MM-DD'
 excerpt: 'Brief description (1-2 sentences)'
 category: 'Components'
 tags:
@@ -107,15 +108,16 @@ agentManifest: 'potions/components/your-potion.json'
           <p>Visit the <a href="/validator">Schema Validator</a> or run <code>npm run validate</code>
             to validate your JSON. Fix any errors before continuing.</p>
 
-          <h3>Step 4: Update Sitemap and Redirects</h3>
-          <p>Run <code>npm run static</code>. This scans markdown files and updates <code>src/statics/sitemap.xml</code>
-            and <code>src/statics/_redirects</code>. No manual editing needed.</p>
-
-          <h3>Step 5: Update Potions Index</h3>
-          <p>Add your potion to <code>src/statics/potions-index.json</code> (add an entry with <code>id</code>,
+          <h3>Step 4: Update Potions Index and Dates</h3>
+          <p>Add the matching entry to <code>src/statics/potions-index.json</code>, including <code>id</code>,
             <code>name</code>, <code>category</code>, <code>tags</code>, <code>excerpt</code>, <code>webUrl</code>,
-            <code>agentGuideUrl</code>, <code>markdownUrl</code>, <code>created</code>, <code>updated</code>). Update <code>totalCount</code> and
-            <code>lastUpdated</code> at the top of the file.</p>
+            <code>agentGuideUrl</code>, <code>markdownUrl</code>, <code>created</code>, and <code>updated</code>. Use pretty
+            web URLs without <code>.html</code>. Update <code>totalCount</code> and top-level <code>lastUpdated</code>, keep
+            index dates synchronized with the guide metadata, and update the manifest <code>meta.updated</code>.</p>
+
+          <h3>Step 5: Build and Verify</h3>
+          <p>Run <code>npm run build</code>. The build validates every potion, checks index consistency, regenerates
+            static discovery files, builds the Harold site, and cleans temporary Markdown publishing copies.</p>
         </section>
 
         <section class="about-section">
@@ -229,7 +231,7 @@ The Markdown should:
 The agentManifest should point to: potions/components/your-potion-name.json</code></pre>
           </div>
 
-          <p>The AI will generate properly structured files that you can then validate and submit!</p>
+          <p>Treat the generated files as a draft: review them against a same-category potion, validate them, and refine them before submitting.</p>
         </section>
 
         <section class="about-section">
@@ -256,8 +258,9 @@ node validate-potions.js</code></pre>
           <p>The CLI script:</p>
           <ul>
             <li>Automatically finds all potion JSON files</li>
-            <li>Detects the category from the file path or <code>$schema</code> field</li>
+            <li>Selects the category schema from the potion directory</li>
             <li>Validates each potion against its category schema</li>
+            <li>Checks guide identity and metadata against <code>potions-index.json</code></li>
             <li>Shows detailed error messages for any issues</li>
             <li>Runs automatically before <code>npm run build</code></li>
             <li>Exits with error code if validation fails (useful for CI/CD)</li>
@@ -276,12 +279,12 @@ node validate-potions.js</code></pre>
           <h2>Testing Locally</h2>
           <p>Before submitting a PR, run the project locally:</p>
           <div class="example-box">
-            <pre><code>npm install
+            <pre><code>npm ci
 npm start</code></pre>
           </div>
-          <p>Visit <a href="http://localhost:3000">http://localhost:3000</a> to preview your changes. You can also run
-            <code>npm run build</code> for a production build and <code>npm run static</code> to regenerate sitemap and
-            redirects.</p>
+          <p>Visit <a href="http://localhost:3000">http://localhost:3000</a> to preview your changes. Before
+            submitting, run <code>npm run build</code>; it validates the catalog, regenerates static files, and creates
+            the production build.</p>
         </section>
 
         <section class="about-section">
@@ -292,7 +295,7 @@ npm start</code></pre>
             <li>JSON validates with no errors (<a href="/validator">web validator</a> or
               <code>npm run validate</code>)</li>
             <li>Markdown has correct front matter</li>
-            <li>Ran <code>npm run static</code></li>
+            <li>Ran <code>npm run build</code></li>
             <li>Updated <code>potions-index.json</code></li>
             <li>Tested locally with <code>npm start</code></li>
             <li>Followed existing potion format</li>
@@ -330,7 +333,7 @@ npm start</code></pre>
 
           <h3>Accessibility</h3>
           <ul>
-            <li>Always specify WCAG compliance level (A, AA, or AAA)</li>
+            <li>For user-facing UI, specify the applicable WCAG target and requirements</li>
             <li>Include keyboard navigation requirements</li>
             <li>Document ARIA attributes needed</li>
             <li>Provide screen reader considerations</li>
@@ -349,8 +352,8 @@ npm start</code></pre>
           <ul>
             <li><strong>Be comprehensive</strong> — Include all necessary details for AI to implement</li>
             <li><strong>Be framework-agnostic</strong> — Avoid framework-specific code in descriptions</li>
-            <li><strong>Include accessibility</strong> — WCAG compliance, ARIA, keyboard navigation</li>
-            <li><strong>Include responsive specs</strong> — Mobile, tablet, desktop breakpoints</li>
+            <li><strong>Include accessibility where relevant</strong> — WCAG compliance, ARIA, keyboard navigation</li>
+            <li><strong>Include responsive specs where relevant</strong> — Mobile, tablet, desktop breakpoints</li>
             <li><strong>Include testing checklist</strong> — What to verify after implementation</li>
           </ul>
         </section>
@@ -359,7 +362,7 @@ npm start</code></pre>
           <h2>Questions?</h2>
           <ul>
             <li>Check existing potions for examples</li>
-            <li>Review the <code>.cursorrules</code> file in the repo for detailed guidelines</li>
+            <li>Review <code>AGENTS.md</code> in the repository for detailed project guidelines</li>
             <li>Ask in your pull request if unsure</li>
           </ul>
         </section>

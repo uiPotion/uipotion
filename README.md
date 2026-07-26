@@ -1,34 +1,34 @@
 # UI Potion
 
-> AI-agent-optimized UI component guides for any framework
+> AI-agent-optimized UI specifications for any framework
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Built with Harold](https://img.shields.io/badge/Built%20with-Harold-deeppink)](https://haroldjs.com)
 
 ## What is UI Potion?
 
-UI Potion is a different approach to UI component libraries. Instead of providing ready-to-use code that requires constant maintenance, we provide **comprehensive specifications** that AI coding assistants can understand and implement in any framework.
+UI Potion is a catalog of framework-agnostic, styling-agnostic UI specifications for AI coding assistants. It is not a component library and does not ship ready-to-use component packages. Each "potion" describes the structure, behavior, accessibility, responsive rules, and testing guidance an agent needs to create an implementation that fits an existing project.
 
-Think of it as "recipes for AI" - detailed guides that your AI assistant reads and adapts to your exact technology stack.
+Think of it as "recipes for AI" - detailed guides that your AI assistant reads and adapts to your existing technology stack.
 
 ## Why UI Potion?
 
 ### The Problem with Traditional Component Libraries
 
-- **Maintenance burden**: Every framework update breaks things
-- **Framework lock-in**: Built for one specific framework/version
+- **Maintenance burden**: Framework updates can require library upgrades or migrations
+- **Stack constraints**: Libraries support a defined set of frameworks and versions
 - **Adaptation needed**: Code still needs to be modified for your project
 - **Version conflicts**: Library version vs your project version
 - **Bundle bloat**: Shipping code you might not use
 
 ### The UI Potion Approach
 
-- ✅ **Zero maintenance**: Specifications don't break when frameworks update
-- ✅ **Framework agnostic**: Works with React, Vue, Angular, Svelte, or anything else
-- ✅ **Styling agnostic**: Use Tailwind, CSS Modules, Chakra UI, or whatever you prefer
-- ✅ **AI-powered**: Your coding assistant adapts specs to your exact stack
-- ✅ **Always current**: AI generates code using latest framework patterns
-- ✅ **No bundle overhead**: Generates fresh code for your project
+- ✅ **No UI Potion runtime dependency**: Nothing from UI Potion is installed or executed in your application
+- ✅ **Framework agnostic**: Core guidance is stack-neutral and can be adapted to React, Vue, Angular, Svelte, or other frameworks
+- ✅ **Styling agnostic**: Agents should reuse the styling system and design tokens already present in the project
+- ✅ **Project-aware**: Your coding assistant adapts the specification to the versions, tokens, and conventions already in your project
+- ✅ **Version-compatible guidance**: Agents should use patterns compatible with the framework versions detected in your project
+- ✅ **Independently useful**: Each potion stands on its own; related potions are optional suggestions
 
 ## How It Works
 
@@ -47,12 +47,14 @@ Your assistant uses the guide at that URL to generate code for your stack. You n
 
 Each potion is also available as Markdown source at the same path with `.md` (for example, `https://uipotion.com/potions/layouts/dashboard.md`).
 
+If your assistant cannot open public URLs, download or copy the JSON guide into the chat, attach the file, or provide the Markdown source instead.
+
 **Example**:
 ```
 You: "I need a dashboard with collapsible sidebar. React + Tailwind.
      Use this guide: https://uipotion.com/potions/layouts/dashboard.json"
 
-Your AI assistant uses the guide and adapts it to your stack (e.g. React and Tailwind only if you have them; otherwise it follows your current framework and styling). You paste it, run it, then ask for changes
+Your AI assistant uses the guide and adapts it to your stack (e.g. React and Tailwind only if you have them; otherwise it follows your current framework and styling). You review the project changes, run the relevant checks, then ask for refinements
 (e.g. "make the sidebar 240px" or "add a dark theme") and iterate.
 ```
 
@@ -62,63 +64,42 @@ When a user gives you a UI Potion link (e.g. `https://uipotion.com/potions/layou
 
 1. Open or fetch that URL to read the specification.
 2. Use the spec to generate implementation code in the user's framework and styling (React/Vue/Svelte, Tailwind/CSS Modules, etc.).
-3. Follow the guide's structure, accessibility, and behavior; don't invent details that aren't in the spec.
+3. Follow the guide's structure, accessibility, and behavior; follow existing project conventions and ask about material ambiguities instead of silently guessing.
 
 If the assistant prefers text-first context, use the potion Markdown source at the same path with `.md`.
 
 No need to fetch the main manifest or potions index unless you're building discovery/search. For normal use, the user provides the potion link and you implement from that single guide.
 
-## Potion Kit CLI
+## Potion Kit (optional)
 
 UI Potion also provides `potion-kit`, a CLI to scaffold and build Harold + UI Potion websites via AI chat.
 
-- **Scaffold a project**: `potion-kit init <directory>`
-- **Interactive chat**: `potion-kit chat`
-- **One-shot**: `potion-kit chat "your request"`
-- **Doctor/config check**: `potion-kit doctor`
-- **Clear history**: `potion-kit clear`
-- **Help/usage**: `potion-kit` or `potion-kit --help` (unknown commands also show help and do not call the API)
+Run it without installing with `npx potion-kit --help`, or install it globally. The Potion Kit repository remains the source of truth for providers, models, configuration, security behavior, and release-specific details.
 
-`potion-kit init` creates a starter static site with pages, partials, SCSS, a sample post, and package scripts. `potion-kit doctor` validates provider configuration, connectivity, project structure, and required remote dependencies before you start chatting.
+- **Scaffold a project**: `npx potion-kit init <directory>`
+- **Interactive chat**: `npx potion-kit chat`
+- **One-shot**: `npx potion-kit chat "your request"`
+- **Doctor/config check**: `npx potion-kit doctor`
+- **Clear history**: `npx potion-kit clear`
+- **Help/usage**: `npx potion-kit` or `npx potion-kit --help` (unknown commands also show help and do not call the API)
 
-Configuration is project-local and loaded in this order: environment variables already set in your shell or process, then `.env` in the current directory, then `./config.json` (provider/model/history only, no API keys). Supported providers are OpenAI, Anthropic, and Moonshot (`POTION_KIT_PROVIDER=moonshot` with `MOONSHOT_API_KEY`), with default models `gpt-5.2`, `claude-sonnet-4-5`, and `kimi-k2.5`.
-
-Chat state lives in `.potion-kit/` in the directory where you run `potion-kit`: `chat-history.json`, `chat-summary.json`, and `chat-events.json`. Long conversations keep the first user message, condense the middle history, and retain the latest messages within limits. The CLI also reports verified file reads and writes from the turn trace instead of relying on reply wording alone.
+`potion-kit init` creates a starter static site with pages, partials, SCSS, a sample post, and package scripts. `npx potion-kit doctor` validates provider configuration, connectivity, project structure, and required remote dependencies before you start chatting.
 
 Links:
+
 - npm: https://www.npmjs.com/package/potion-kit
 - GitHub: https://github.com/uiPotion/potion-kit
 
 ## Available Potions
 
-See [uipotion.com](https://uipotion.com) for the full list of potions (layouts, components, features, patterns, tooling).
-
-## What Makes UI Potion Different?
-
-### Traditional component library
-
-You install a package, import components, and hope versions match:
-
-- **Install**: `npm install some-ui-lib@2.3.4`
-- **Use**: `import { Dashboard } from 'some-ui-lib'`
-- **Downsides**: Locked to one framework and styling, breaks on upgrades, still needs customization, adds to bundle size
-
-### UI Potion
-
-You give your AI assistant a link to a potion and iterate in chat:
-
-- **You**: Paste the potion URL in your AI chat (e.g. `https://uipotion.com/potions/layouts/dashboard.json`) and say: "Implement this for my React + Tailwind app."
-- **Your assistant**: Uses the guide and generates code for your stack (your framework, your styling, your conventions).
-- **You**: Paste the code, run it, then ask for changes ("wider sidebar", "add dark mode") and iterate.
-
-No install in your code, no version lock-in. You get code that fits your project and you refine it in conversation.
+See [the potion catalog](https://uipotion.com/potions) for the full list of potions (layouts, components, features, patterns, tooling).
 
 ## Development
 
 ### Prerequisites
 
-- Node.js
-- npm or yarn
+- Node.js 24 or newer
+- npm
 
 ### Installation
 
@@ -127,14 +108,14 @@ No install in your code, no version lock-in. You get code that fits your project
 git clone https://github.com/uiPotion/uipotion.git
 cd uipotion
 
-# Install dependencies
-npm install
+# Install locked dependencies
+npm ci
 ```
 
 ### Development Commands
 
 ```bash
-# Start dev server with hot reload (http://localhost:3000)
+# Start the dev server with source watching (http://localhost:3000)
 npm start
 
 # Build for production (runs validation automatically)
@@ -143,7 +124,7 @@ npm run build
 # Validate all potions against their schemas (optional; also runs on build)
 npm run validate
 
-# Generate sitemap.xml and _redirects
+# Generate sitemap.xml, _redirects, and temporary Markdown publishing copies
 npm run static
 
 # The build output will be in the `build/` directory
@@ -151,8 +132,8 @@ npm run static
 
 ### Dev Server Features
 
-- **Watch mode**: Watches all source files
-- **Fast rebuilds**: Only rebuilds changed files
+- **Watch mode**: Watches project source files
+- **Automatic rebuilds**: Rebuilds the site when source files change; refresh the browser to see updates
 - **Port 3000**: Serves on http://localhost:3000
 
 ## Contributing
@@ -164,27 +145,28 @@ We welcome contributions! UI Potion grows with community input.
 ## What Makes a Good Potion?
 
 ### Human Documentation (Markdown)
+
 - ✅ Clear prose descriptions (no ASCII art in website potion markdown)
-- ✅ Component hierarchy and structure
-- ✅ Exact dimensions and measurements
+- ✅ Structure and hierarchy
+- ✅ Exact dimensions and measurements where relevant
 - ✅ State descriptions and behavior
 - ✅ Interaction patterns
-- ✅ Responsive behavior at each breakpoint
+- ✅ Responsive behavior at relevant breakpoints
 - ✅ Accessibility requirements
-- ✅ Animation specifications
+- ✅ Animation specifications where relevant
 - ✅ Testing checklist
 - ✅ Framework-agnostic examples
 
 ### AI Guide (JSON)
+
 - ✅ Structured, parseable data
-- ✅ Complete specifications (no ambiguity)
-- ✅ Framework-specific patterns for React, Vue, Angular, Svelte
-- ✅ Styling approach examples for Tailwind, CSS Modules, etc.
-- ✅ State management guidance
+- ✅ Complete specifications that minimize ambiguity
+- ✅ Framework-specific patterns where they help agents adapt the specification
+- ✅ Styling approach examples where useful
+- ✅ State management guidance where relevant
 - ✅ Accessibility implementation details
-- ✅ Animation timing values (exact ms, easing functions)
+- ✅ Animation timing values where relevant
 - ✅ Testing verification steps
-- ✅ Complexity level and time estimate
 
 ## Programmatic access (optional)
 
@@ -192,7 +174,10 @@ Most users only need to share a potion link with their AI assistant. If you're b
 
 - **Main manifest**: `https://uipotion.com/uipotion-manifest.json` — service metadata, categories, link to potions index
 - **Potions index**: `https://uipotion.com/potions-index.json` — catalog of all potions (`id`, `name`, `category`, `tags`, `excerpt`, `webUrl`, `agentGuideUrl`, `markdownUrl`, dates)
-- **Individual guide**: `https://uipotion.com/potions/[category]/[id].json` — full implementation spec for one component
+- **Base schema**: `https://uipotion.com/schema/potion.base.schema.json` — shared contract for every potion guide
+- **Category schema**: `https://uipotion.com/schema/categories/[category].schema.json` — category-specific contract referenced by each guide
+- **Schema validator**: `https://uipotion.com/validator` — browser-based validation for potion JSON
+- **Individual guide**: `https://uipotion.com/potions/[category]/[id].json` — full implementation specification for one potion
 - **Markdown source**: `https://uipotion.com/potions/[category]/[id].md` — human-readable source for text/markdown-friendly agents
 - **LLM discovery file**: `https://uipotion.com/llms.txt` — curated entrypoint for LLM/agent discovery
 
@@ -207,48 +192,9 @@ Give your assistant the guide URL and say e.g. "Implement this dashboard for my 
 
 ## License
 
-MIT License
+UI Potion specifications, documentation, website content, and source code are available under the MIT License. See [LICENSE](LICENSE) for the full license text and scope.
 
-**Copyright (c) 2026 Julian Ćwirko**
-
-This license applies to the **UI Potion specifications, documentation, website content, and source code**. It does NOT apply to any code generated by AI agents based on these specifications.
-
-The copyright covers:
-- UI Potion specifications (JSON and Markdown files)
-- UI Potion website content and design
-- UI Potion documentation
-- UI Potion source code (Harold templates, scripts, etc.)
-
-The copyright does NOT cover:
-- Any code generated by AI agents based on these specifications
-- Implementations created by users or AI agents using these specifications
-- Derivative works created by AI agents
-
-**Julian Ćwirko and UI Potion make NO copyright claims over AI-generated code.** The copyright and ownership of AI-generated code is determined by applicable law and the terms of service of the AI provider used.
-
----
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
----
-
-**IMPORTANT DISCLAIMER:** UI Potion provides specifications and guidelines for UI components. We do NOT provide or generate code. Any code generated by AI agents or assistants based on our specifications is the sole responsibility of the AI agent, the developer who requested the generation, and the developer who deploys the code. Julian Ćwirko and UI Potion are NOT liable for any damages, security vulnerabilities, bugs, harmful code, copyright infringement, or any other issues arising from AI-generated code based on these specifications.
+UI Potion provides specifications and guidelines, not generated implementation code. Review, test, secure, and validate all AI-generated code before deployment. See [Legal information](https://uipotion.com/legal) for the complete disclaimer and privacy policy.
 
 ## Links
 

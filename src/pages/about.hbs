@@ -13,7 +13,7 @@
       <h1 class="about-hero-title">About UI Potion</h1>
       
       <p class="about-hero-description">
-        Learn how UI Potion works and how to use it with AI coding assistants to build production-ready UI components.
+        Learn how UI Potion works and how to use it with AI coding assistants to build UI implementations that fit an existing project.
       </p>
     </div>
   </header>
@@ -24,7 +24,7 @@
       <article class="about-article">
         <section class="about-section">
           <h2>The Problem</h2>
-          <p>Traditional UI component libraries have a fundamental problem: <strong>maintenance burden</strong>. Every framework update, every new pattern, every bug fix requires constant work. And developers still need to adapt the code to their specific project setup.</p>
+          <p>Traditional UI component libraries have a fundamental problem: <strong>maintenance burden</strong>. Framework updates, new patterns, and bug fixes can require library upgrades or migrations. And developers still need to adapt the code to their specific project setup.</p>
         </section>
         
         <section class="about-section">
@@ -32,7 +32,7 @@
           <p>UI Potion takes a different approach: <strong>we don't provide code, we provide specifications</strong>.</p>
           <p>Each "potion" is a comprehensive guide written specifically for AI coding assistants. It includes:</p>
           <ul>
-            <li>Detailed component specifications (dimensions, behavior, states)</li>
+            <li>Detailed UI specifications (structure, behavior, states, and dimensions where relevant)</li>
             <li>Responsive breakpoints and mobile patterns</li>
             <li>Accessibility requirements (ARIA, keyboard navigation)</li>
             <li>Framework-specific implementation patterns (React, Vue, Angular, etc.)</li>
@@ -51,7 +51,7 @@
             <li><strong>Copy the potion URL</strong> or JSON link</li>
             <li><strong>Tell your AI assistant</strong>: "Implement the dashboard layout from this UI Potion guide" + paste link</li>
             <li><strong>Specify your stack</strong>: "Use React with Tailwind CSS" (or whatever you're using)</li>
-            <li><strong>AI generates the code</strong> adapted to your specific framework and styling preferences</li>
+            <li><strong>The agent creates an implementation candidate</strong> adapted to the detected framework, styling system, and project conventions</li>
           </ol>
           
           <h3>For AI Agents</h3>
@@ -83,16 +83,16 @@
               <li>Understands the component structure and specifications</li>
               <li>Adapts the patterns to React (useState, useEffect, etc.)</li>
               <li>Uses Tailwind utility classes for styling</li>
-              <li>Generates complete, working code with proper accessibility</li>
+              <li>Creates a project-aligned implementation candidate that follows the accessibility requirements</li>
             </ol>
             
-            <p><strong>Result:</strong> Production-ready dashboard layout in minutes, perfectly adapted to your stack.</p>
+            <p><strong>Result:</strong> A project-aligned dashboard implementation to review, test, and refine before deployment.</p>
           </div>
         </section>
         
         <section class="about-section">
           <h2>Framework & Styling Agnostic</h2>
-          <p>UI Potion doesn't care what tools you use. Our guides work with:</p>
+          <p>UI Potion keeps its core guidance stack-neutral. Agents adapt it to the tools already present in the project, including:</p>
           
           <div class="two-column">
             <div>
@@ -125,54 +125,51 @@
           <h2>Benefits</h2>
           <div class="benefits-list">
             <div class="benefit">
-              <h4>Zero Maintenance</h4>
-              <p>Specifications don't break when frameworks update</p>
+              <h4>No Library Upgrade Cycle</h4>
+              <p>Nothing from UI Potion is installed as a runtime package</p>
             </div>
             <div class="benefit">
-              <h4>Always Current</h4>
-              <p>AI generates code using latest framework patterns</p>
+              <h4>Project-Compatible</h4>
+              <p>Agents adapt guidance to the framework versions and conventions detected in the project</p>
             </div>
             <div class="benefit">
               <h4>Truly Flexible</h4>
-              <p>Not locked into specific framework versions or styling libraries</p>
+              <p>No UI Potion runtime dependency tied to a framework version or styling library</p>
             </div>
             <div class="benefit">
-              <h4>Production Quality</h4>
-              <p>Includes accessibility, responsive design, and best practices</p>
+              <h4>Implementation Coverage</h4>
+              <p>Includes accessibility, responsive behavior, edge cases, and testing guidance where relevant</p>
             </div>
             <div class="benefit">
               <h4>Learning Resource</h4>
-              <p>Understand the "why" behind component patterns</p>
+              <p>Understand the "why" behind UI patterns</p>
             </div>
           </div>
         </section>
         
         <section class="about-section">
           <h2>JSON Structure</h2>
-          <p>Each potion guide is available as a JSON file for programmatic access. Example structure:</p>
+          <p>Each potion is available as JSON for programmatic access. The abbreviated example below shows the shared
+            discovery fields; category schemas add required implementation structures. Use a same-category guide as the
+            complete template.</p>
           <pre><code>{
-  "id": "dashboard-layout",
-  "name": "Dashboard Layout with Collapsible Sidebar",
+  "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
+  "id": "dashboard",
+  "version": "1.0.0",
+  "name": "Dashboard Layout",
+  "category": "layouts",
+  "tags": ["layouts", "dashboard"],
+  "description": "Responsive dashboard specification",
   "aiAgentInstructions": {
-    "summary": "...",
-    "keyFeatures": [...],
-    "implementationSteps": [...]
+    "summary": "Implementation goal",
+    "keyFeatures": ["Collapsible navigation"],
+    "implementationSteps": ["Detect the project stack before implementation"]
   },
-  "components": {
-    "Sidebar": { "dimensions": {...}, "states": [...] },
-    "Header": { "dimensions": {...}, "elements": {...} }
-  },
-  "frameworkPatterns": {
-    "react": {...},
-    "vue": {...},
-    "angular": {...}
-  },
-  "stylingApproaches": {
-    "tailwindCSS": {...},
-    "cssModules": {...}
-  },
-  "accessibility": {...},
-  "testingChecklist": [...]
+  "meta": {
+    "created": "YYYY-MM-DD",
+    "updated": "YYYY-MM-DD",
+    "webUrl": "https://uipotion.com/potions/layouts/dashboard"
+  }
 }</code></pre>
         </section>
     
