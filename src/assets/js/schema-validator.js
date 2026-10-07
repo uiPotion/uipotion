@@ -466,7 +466,7 @@
   
   function waitForAjv() {
     // Check for Ajv in various possible global locations
-    // cdnjs ajv2020.min.js exposes it as window.ajv2020
+    // The vendored ajv2020.min.js (assets/js/vendor) exposes it as window.ajv2020
     const AjvConstructor = window.ajv2020 || window.Ajv || window.ajv || (typeof Ajv !== 'undefined' ? Ajv : null);
     
     if (AjvConstructor) {
@@ -482,7 +482,7 @@
     } else {
       // Check if we've waited too long
       if (Date.now() - waitStartTime > maxWaitTime) {
-        console.error('Ajv failed to load after 10 seconds. Please check the CDN link.');
+        console.error('Ajv failed to load after 10 seconds. Please check the vendored Ajv script in assets/js/vendor.');
         const errorDiv = document.createElement('div');
         errorDiv.style.cssText = 'padding: 20px; background: #dc2626; color: white; margin: 20px; border-radius: 8px;';
         errorDiv.innerHTML = '<strong>Error:</strong> Failed to load Ajv library. Please refresh the page or check your internet connection.';

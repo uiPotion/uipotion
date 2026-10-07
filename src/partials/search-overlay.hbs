@@ -1,7 +1,7 @@
-<div class="search-overlay" data-js-search-overlay>
+<dialog class="search-overlay" data-js-search-overlay aria-label="Search potions">
   <div class="search-overlay-contents">
-    <button class="search-overlay-close-btn" data-js-search-close aria-label="Close search">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button type="button" class="search-overlay-close-btn" data-js-search-close aria-label="Close search">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
@@ -10,6 +10,11 @@
       <input
         class="search-overlay-input"
         type="text"
+        role="combobox"
+        aria-label="Search potions"
+        aria-autocomplete="list"
+        aria-expanded="false"
+        aria-controls="search-overlay-results"
         placeholder="Search potions..."
         autocomplete="off"
         autocorrect="off"
@@ -17,9 +22,10 @@
         spellcheck="false"
         autofocus
         data-js-search-input
-        aria-label="Search potions"
       />
     </div>
-    <div class="search-overlay-results" data-js-search-results role="list" aria-live="polite" aria-label="Search results"></div>
+    <div class="search-overlay-message" data-js-search-message hidden></div>
+    <div class="search-overlay-results" id="search-overlay-results" role="listbox" aria-label="Search results" data-js-search-results hidden></div>
+    <div class="sr-only" role="status" data-js-search-status></div>
   </div>
-</div>
+</dialog>

@@ -51,14 +51,8 @@
   <meta property="og:see_also" content="https://uipotion.com/{{agentManifest}}">
   {{/if}}
   
-  <!-- Performance: DNS Prefetch & Preconnect -->
-  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  
-  <!-- Fonts with display=swap for better performance -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Fonts: self-hosted Inter; @font-face rules live in styles/_basic.scss -->
+  <link rel="preload" href="/assets/fonts/inter/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   
   <!-- Stylesheet -->
   <link rel="stylesheet" href="/styles/main.css">
