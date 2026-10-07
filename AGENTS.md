@@ -46,8 +46,11 @@ tags:
   - components
   - tag
 agentManifest: 'potions/components/component-name.json'
+path: 'potions/components/component-name'
 ---
 ```
+
+- `path` is the potion page path, `potions/[category]/[slug]`, with no leading slash or extension. The potion layout builds the canonical URL, the social preview URLs, and the Markdown links from it, so a missing `path` points them at the homepage.
 
 - `category` is title case in Markdown front matter: `Layouts`, `Components`, `Features`, `Patterns`, or `Tooling`.
 - The first Markdown tag must be the lowercase category.

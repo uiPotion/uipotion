@@ -84,10 +84,12 @@ requests" currentPath="contribute" }}
           <h3>Step 2: Create Markdown File</h3>
           <p>Create <code>src/potions/[category]/your-potion.md</code></p>
           <p>Required front matter: <code>layout</code>, <code>title</code>, <code>publicationDate</code>,
-            <code>excerpt</code>, <code>category</code>, <code>tags</code>, <code>agentManifest</code>. The
-            <code>agentManifest</code> must point to your JSON file (e.g.
-            <code>potions/components/your-potion.json</code>). Then write comprehensive specifications in the body; see
-            existing potions (e.g. <code>navbar.md</code>, <code>dashboard.md</code>) for format.</p>
+            <code>excerpt</code>, <code>category</code>, <code>tags</code>, <code>agentManifest</code>, and
+            <code>path</code>. The <code>agentManifest</code> must point to your JSON file (e.g.
+            <code>potions/components/your-potion.json</code>). The <code>path</code> is the page path without a leading
+            slash or extension (e.g. <code>potions/components/your-potion</code>); the page's canonical URL and Markdown
+            links are built from it. Then write comprehensive specifications in the body; see existing potions (e.g.
+            <code>navbar.md</code>, <code>dashboard.md</code>) for format.</p>
           <div class="example-box">
             <p><strong>Example front matter:</strong></p>
             <pre><code>---
@@ -101,6 +103,7 @@ tags:
   - tag1
   - tag2
 agentManifest: 'potions/components/your-potion.json'
+path: 'potions/components/your-potion'
 ---</code></pre>
           </div>
           <p>Also add <code>promptSubject</code>, a short lowercase noun phrase such as <code>'modal dialogs'</code> or
@@ -228,13 +231,15 @@ Make sure the JSON follows the schema exactly and includes all required fields.<
             <p><strong>Example prompt for AI:</strong></p>
             <pre><code>Create a Markdown file for a UI Potion based on this JSON file.
 The Markdown should:
-- Include YAML front matter with layout, title, publicationDate, excerpt, category, tags, and agentManifest
+- Include YAML front matter with layout, title, publicationDate, excerpt, category, tags, agentManifest, path, and promptSubject
 - Be human-readable and comprehensive
 - Include detailed specifications, dimensions, states, accessibility requirements
 - Be framework-agnostic in descriptions
 - Follow the format of existing potions like navbar.md or dashboard.md
 
-The agentManifest should point to: potions/components/your-potion-name.json</code></pre>
+The agentManifest should point to: potions/components/your-potion-name.json
+The path should be: potions/components/your-potion-name
+The promptSubject is a short lowercase noun phrase for the prompts on the potion page, such as 'a navigation bar'</code></pre>
           </div>
 
           <p>Treat the generated files as a draft: review them against a same-category potion, validate them, and refine them before submitting.</p>

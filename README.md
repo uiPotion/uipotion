@@ -13,13 +13,15 @@ Think of it as "recipes for AI" - detailed guides that your AI assistant reads a
 
 ## Why UI Potion?
 
-### The Problem with Traditional Component Libraries
+### What You Get
 
-- **Maintenance burden**: Framework updates can require library upgrades or migrations
-- **Stack constraints**: Libraries support a defined set of frameworks and versions
-- **Adaptation needed**: Code still needs to be modified for your project
-- **Version conflicts**: Library version vs your project version
-- **Bundle bloat**: Shipping code you might not use
+UI Potion is a set of UI behavior guides your coding agent can apply to your existing project. Each guide spells out how the UI should behave, including details that are easy to miss in a short prompt. For example:
+
+- A chat message that fails to send stays in the input with a retry, so nobody has to retype it ([AI Agent Chat Layout](https://uipotion.com/potions/layouts/ai-agent-chat))
+- Closing a dialog returns focus to the control that opened it ([Modal Dialog](https://uipotion.com/potions/components/dialog))
+- Stopping a streamed AI response keeps the text that already arrived ([AI Response Rendering](https://uipotion.com/potions/patterns/ai-response-rendering))
+
+Your agent keeps your framework, components, and styling. The guide gives it the behavior to build and a checklist to verify it against.
 
 ### The UI Potion Approach
 
@@ -42,6 +44,8 @@ You don't need to install anything or fetch anything in your code. Use your AI c
 4. **Paste it into your coding agent** and add details about the task. With just the link, say what you want, e.g.:
    *"Implement this dashboard layout for my app. I use React and Tailwind. Guide: https://uipotion.com/potions/layouts/dashboard.json"*
 5. **Review the generated code** and ask for tweaks (layout, styling, behavior) until it fits your project
+
+Already have the UI? Use **Copy check prompt** on the potion page instead. The agent compares your existing implementation with the guide, lists the gaps by severity, and changes nothing until you ask.
 
 Your assistant uses the guide at that URL to generate code for your stack. You never fetch potions in your own code; you just share the link and iterate in the chat.
 
@@ -146,7 +150,7 @@ We welcome contributions! UI Potion grows with community input.
 
 ### Human Documentation (Markdown)
 
-- ✅ Clear prose descriptions (no ASCII art in website potion markdown)
+- ✅ Clear prose descriptions (no ASCII art, text diagrams, emojis, or Markdown tables in potion Markdown)
 - ✅ Structure and hierarchy
 - ✅ Exact dimensions and measurements where relevant
 - ✅ State descriptions and behavior
@@ -210,7 +214,6 @@ UI Potion provides specifications and guidelines, not generated implementation c
 ## Support & Contact
 
 - **Issues**: [GitHub Issues](https://github.com/uiPotion/uipotion/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/uiPotion/uipotion/discussions)
 - **X**: [@uipotion](https://x.com/uipotion) · [@thejulianio](https://x.com/thejulianio)
 
 ## Acknowledgments
