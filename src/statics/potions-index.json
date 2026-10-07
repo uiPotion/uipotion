@@ -252,11 +252,11 @@
         "accessibility",
         "forms"
       ],
-      "excerpt": "Complete authentication forms (login and registration) with real-time validation, error handling, password strength, and accessibility.",
+      "excerpt": "Complete authentication forms (login and registration) with real-time validation, error handling, password requirements, and accessibility. Follows current NIST password guidance, never reveals whether an email has an account, and works with password managers and passkeys.",
       "webUrl": "https://uipotion.com/potions/features/form-login-register",
       "agentGuideUrl": "https://uipotion.com/potions/features/form-login-register.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24",
+      "updated": "2026-10-07",
       "markdownUrl": "https://uipotion.com/potions/features/form-login-register.md"
     },
     {
@@ -300,7 +300,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.json",
       "created": "2026-02-01",
-      "updated": "2026-07-26",
+      "updated": "2026-10-07",
       "markdownUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.md"
     },
     {
@@ -528,5 +528,5 @@
     }
   ],
   "totalCount": 24,
-  "lastUpdated": "2026-07-26"
+  "lastUpdated": "2026-10-07"
 }

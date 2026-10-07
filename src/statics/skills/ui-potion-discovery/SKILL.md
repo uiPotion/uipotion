@@ -4,8 +4,8 @@ description: Identify the best UI Potion guide for a requested component, layout
 license: MIT
 metadata:
   author: ui-potion
-  version: "1.0"
-compatibility: Requires network access to fetch https://uipotion.com indexes when local files are unavailable.
+  version: "1.1"
+compatibility: Requires network access to fetch https://uipotion.com/potions-index.json, except when working inside the UI Potion repository.
 ---
 
 # UI Potion Discovery
@@ -23,11 +23,10 @@ Help agents find the most relevant UI Potion guides for a user request.
 - Optional category preference (layouts, components, features, patterns, tooling)
 
 ## Steps
-1. Prefer the local index if available: `src/statics/potions-index.json`
-2. Otherwise load `https://uipotion.com/potions-index.json`
-3. Filter by category and tags that match the intent
-4. Rank by tag overlap and relevance to the request
-5. Return the top 1-3 matches with both URLs
+1. Load the potions index. Inside the UI Potion repository itself, use the local file at `src/statics/potions-index.json`; in any other project, load `https://uipotion.com/potions-index.json`.
+2. Filter by category and tags that match the intent
+3. Rank by tag overlap and relevance to the request
+4. Return the top 1-3 matches with both URLs
 
 ## Output format
 - Name

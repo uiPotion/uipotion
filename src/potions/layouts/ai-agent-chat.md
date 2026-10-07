@@ -247,7 +247,8 @@ The input area contains Quick Action Chips (optional, above input), the Text Inp
 
 **Behavior:**
 - Auto-focus on input when chat opens
-- Enter key sends message (Shift+Enter for new line)
+- Enter key sends message (Shift+Enter for new line), but never while an input method editor (IME) is composing text, so people typing Japanese, Chinese, or Korean can confirm characters with Enter
+- Choose the default Enter behavior with a heuristic. When the primary input is touch (for example the `(hover: none) and (pointer: coarse)` media query), assume an on-screen keyboard, which has no Shift+Enter, so Enter inserts a new line and the send button sends; otherwise Enter sends. Media queries describe pointing devices, not keyboards, so a tablet with an attached keyboard may still get the new-line default, while touchscreen laptops usually report a fine pointer and keep Enter to send. Don't use touch support alone. If the product already has an Enter-to-send setting, it overrides the heuristic. Shift+Enter always inserts a new line, and the send button always sends
 - Input expands as user types multiple lines
 - Smooth height transition (150ms)
 - Send button enabled only when input not empty
@@ -376,6 +377,7 @@ This chat layout should meet WCAG 2.1 Level AA standards. Key requirements:
 **Implementation:**
 - Enter to send message (from input)
 - Shift+Enter for new line in input
+- While an IME is composing text, Enter confirms the composition and doesn't send: check the keydown event's `isComposing`, and also `keyCode === 229`, because Safari reports the confirming Enter that way
 - Escape to close sidebar or dropdowns
 - Arrow keys to navigate message history (optional)
 - Ctrl/Cmd + C to copy selected message text
@@ -920,7 +922,7 @@ For real-time message streaming:
 - Auto-expand textarea as user types
 - Max height: 200-256px (6-8 rows)
 - Show scrollbar when max height reached
-- Enter sends, Shift+Enter adds new line
+- Enter sends, Shift+Enter adds new line (no sending while an IME is composing; Enter defaults to a new line when the primary input is touch)
 
 ### Mobile Considerations
 - Ensure input stays above virtual keyboard
@@ -1002,6 +1004,11 @@ When implementing this chat layout, test:
 - Send button sends message
 - Enter key sends message
 - Shift+Enter adds new line
+- Pressing Enter to confirm an IME candidate (Japanese, Chinese, Korean) doesn't send the message, including in Safari
+- With a phone's on-screen keyboard, Enter adds a new line and the send button sends
+- On a touchscreen laptop with a fine primary pointer, Enter sends and Shift+Enter adds a new line
+- On a tablet with an attached keyboard, Shift+Enter adds a new line and the send button sends, whichever Enter default the heuristic picked
+- If the product has an Enter-to-send setting, it overrides the heuristic on every device
 - Input clears after sending
 - Auto-scroll works on new messages
 - Manual scroll pauses auto-scroll
@@ -1065,7 +1072,7 @@ Create a responsive AI agent chat layout with the following specifications:
    - Auto-expanding textarea (1-8 rows)
    - Send button (active when input not empty)
    - Optional quick action chips above input
-   - Enter to send, Shift+Enter for new line
+   - Enter to send, Shift+Enter for new line; no sending during IME composition
    - Optional file attachment button
 
 4. Additional Features:

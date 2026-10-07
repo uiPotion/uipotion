@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/features.schema.json",
   "id": "form-login-register",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Login & Registration Forms with Validation",
   "category": "features",
   "tags": [
@@ -14,7 +14,7 @@
     "accessibility",
     "forms"
   ],
-  "description": "Complete authentication forms (login and registration) with real-time validation, error handling, password strength, and accessibility. Demonstrates best practices for form validation UX, field states, and user feedback.",
+  "description": "Complete authentication forms (login and registration) with real-time validation, error handling, password requirements, and accessibility. Follows current NIST password guidance (SP 800-63B-4), never reveals whether an email has an account, works with password managers, and offers passkeys as an option.",
   "tokens": {
     "layout": {
       "formMaxWidthPx": 420,
@@ -36,16 +36,19 @@
     }
   },
   "aiAgentInstructions": {
-    "summary": "Implement login and registration forms with comprehensive validation, error handling, and accessibility. Apply Form Validation Pattern principles for validation timing. Use Text Input Component pattern for input fields. Adapt to the user's framework and styling system.",
+    "summary": "Implement login and registration forms with comprehensive validation, error handling, and accessibility. Apply Form Validation Pattern principles for validation timing. Use Text Input Component pattern for input fields. Adapt to the user's framework and styling system. Password rules, rate limits, and passkey support come from the project's authentication service when it has one; otherwise use the NIST SP 800-63B-4 defaults in this guide. Public error messages always follow this guide's account-privacy rules: map the service's error codes to them.",
     "keyFeatures": [
-      "Login form: email + password with 'Remember me' and 'Forgot password' options",
-      "Registration form: name, email, password, password confirmation with password strength indicator",
+      "Login form: email + password with 'Remember me' and 'Forgot password' options. Sign-in checks only that a password is present, never its length or character types, so accounts with older passwords can still sign in",
+      "Registration form: name, email, password, password confirmation with a password requirements indicator",
       "Real-time validation following Form Validation Pattern (on-blur for most, real-time for password confirmation)",
       "Clear, actionable error messages positioned inline below fields",
       "Success states with checkmarks for validated fields",
       "Loading states for submit buttons with spinner",
       "Password visibility toggle (eye icon)",
-      "Password strength meter for registration (weak/medium/strong)",
+      "Password feedback for registration and password reset: a requirements indicator (too short, too common, meets requirements), or the project's own pattern-aware strength estimator if it has one. Never rate a password strong from its length or character types",
+      "Messages never reveal whether an email has an account: one generic sign-in failure message, the same next step after every registration, and the same confirmation after every reset request",
+      "Works with password managers: correct autocomplete values, and paste and autofill always allowed (WCAG 3.3.8)",
+      "Optional passkey sign-in alongside the password form",
       "Form switching: Toggle between login and registration",
       "Full keyboard accessibility with proper ARIA attributes",
       "CRITICAL: TIP: Consider using Text Input Component pattern for consistent input styling and behavior (optional)",
@@ -56,20 +59,24 @@
     "implementationSteps": [
       "0. CRITICAL: Detect framework and styling system BEFORE writing code. Use ONLY the detected system.",
       "0d. TIP: Check for existing form libraries (react-hook-form, formik, vee-validate, @angular/forms). If found, use library's validation and state management. If not found, implement vanilla form state management.",
+      "0e. Check how the project handles authentication: its own backend, or a provider or library (for example Auth0, Clerk, Supabase Auth, Firebase Auth, Amazon Cognito, or Auth.js). If it defines password rules, rate limits, or passkey support, follow them and use its components or SDK. Map its error codes to this guide's public messages, and never show provider messages that reveal whether an account exists (such as 'user not found' or 'email already in use'). If the service's UI or API can't avoid revealing that, tell the user about the conflict instead of shipping it silently. Otherwise this guide fills the gaps; it doesn't override the service's rules",
       "1. TIP: Review Form Validation Pattern for validation timing best practices (optional reference)",
       "2. TIP: Review Text Input Component for input field patterns (optional reference)",
       "3. Create form state management: loginForm and registerForm with field values, errors, touched states",
-      "4. Implement login form: email (validate on blur), password (validate on blur), remember me checkbox",
-      "5. Implement registration form: name, email, password (with strength), password confirmation (real-time)",
+      "4. Implement login form: email (format check on blur), password (presence check only: no length or character-type rules at sign-in, so accounts with older passwords can still sign in), remember me checkbox",
+      "5. Implement registration form: name, email, password (with requirements indicator), password confirmation (real-time)",
       "6. Add validation timing: on-blur for email/name/password, real-time for password confirmation",
-      "7. Implement password strength calculator (weak: <8 chars, medium: 8+ with letters+numbers, strong: 8+ with special chars)",
+      "7. Implement password feedback for registration and password reset. If the project has a pattern-aware strength estimator, show its rating. Otherwise show a requirements indicator, not a strength rating: too short, too common (matches the client's short common-password list), or meets requirements. Length alone doesn't make a password strong ('aaaaaaaaaaaaaaaaaaaa' is long but trivial to guess), so never label one strong from its length or character types. Without rules from the auth service, use the NIST SP 800-63B-4 defaults: at least 15 characters when the password is the only sign-in factor (at least 8 when a second factor is always required), accept at least 64 characters, and accept spaces, all printable characters, and Unicode. Count length in Unicode code points, not UTF-16 units. The authoritative breached-password check runs on the server",
       "8. Add password visibility toggles with eye icons",
-      "9. Implement submit handlers with loading states and error handling",
+      "9. Implement submit handlers with loading states and error handling. Rejected credentials show one generic message ('Email or password is incorrect') that doesn't say which field was wrong. Network and service failures show a different message that doesn't blame the password ('Unable to sign in right now. Try again shortly'), the same for every account",
+      "9a. Never reveal whether an email has an account. Registration shows the same next step for every valid submission (for example 'Check your email to continue'), and the backend emails the existing account owner instead of the form saying the email is taken. This relies on email verification; if the product signs new users in immediately, raise the tradeoff with the user. A password reset request always confirms with 'If an account exists for this email, we've sent a reset link'",
+      "9b. Rate limits and lockouts: show one generic message with a retry hint (for example 'Too many attempts. Wait a few minutes and try again'), worded the same whether or not the account exists",
       "10. Add form switching toggle (Login ↔ Register)",
       "11. Style form cards with proper spacing, shadows, and responsive behavior",
       "12. Add ARIA attributes: aria-invalid, aria-describedby, aria-live for errors",
+      "12a. Make the forms work with password managers: autocomplete='username' on the email field that identifies the account (also when it holds an email address), 'current-password' on sign-in, 'new-password' on registration and reset, and 'one-time-code' on verification-code fields. Never block paste or autofill (WCAG 3.3.8 Accessible Authentication)",
       "13. Implement keyboard navigation and focus management",
-      "14. Add 'Forgot password' and 'Sign in with Google' options (UI only, backend integration not included)",
+      "14. Add 'Forgot password', optional social sign-in such as 'Sign in with Google', and an optional 'Sign in with a passkey' option (UI only, backend integration not included). For passkey autofill, append 'webauthn' to the identifier field's autocomplete value (autocomplete='username webauthn'), and fall back to the password form if the passkey prompt is cancelled or fails",
       "15. Test with keyboard and screen readers"
     ]
   },
@@ -83,12 +90,12 @@
       "If validation fails: errors displayed, focus moves to first invalid field",
       "If validation passes: button shows loading state, form submits",
       "On success: navigate to dashboard or show success message",
-      "On server error: show error message, re-enable form",
+      "On rejected credentials: show 'Email or password is incorrect'. On a network or service failure: show 'Unable to sign in right now. Try again shortly' instead, so an outage doesn't send people to reset their password. Re-enable the form either way",
       "Alternatively: User clicks 'Create account' to switch to registration form",
       "Registration form: User fills name, email, password, password confirmation",
-      "Password strength updates in real-time as user types",
+      "Password requirements indicator updates in real time as user types",
       "Password confirmation validates in real-time",
-      "Submit registration with same validation and error handling flow"
+      "Submit registration with same validation and error handling flow; every valid registration shows the same next step, whether or not the email already has an account"
     ],
     "screens": [
       {
@@ -103,7 +110,8 @@
           ],
           "extras": [
             "rememberMe",
-            "forgotPassword"
+            "forgotPassword",
+            "passkeySignIn (optional)"
           ],
           "cta": "Sign In",
           "switchPrompt": "Don't have an account? Create one"
@@ -120,11 +128,12 @@
           },
           "password": {
             "required": true,
-            "minLength": 8,
             "timing": "on-blur",
+            "note": "Presence check only. Never enforce length or character-type rules at sign-in: accounts created under older rules must still be able to sign in, and the rules belong to registration and reset.",
             "messages": {
               "required": "Password is required",
-              "minLength": "Password must be at least 8 characters"
+              "credentialsRejected": "Email or password is incorrect",
+              "serviceUnavailable": "Unable to sign in right now. Try again shortly"
             }
           }
         },
@@ -169,6 +178,15 @@
             "event": "forgotPasswordClick",
             "result": "navigateToPasswordReset",
             "sideEffects": []
+          },
+          {
+            "event": "passkeySignInClick",
+            "when": "passkeys are supported by the browser and enabled by the auth service",
+            "result": "startPasskeySignIn",
+            "sideEffects": [
+              "showBrowserPasskeyPrompt"
+            ],
+            "accessibilityNotes": "If the prompt is cancelled or fails, return focus to the passkey button, show a short generic message, and keep the password form available as a fallback"
           },
           {
             "event": "switchToRegister",
@@ -225,7 +243,7 @@
             "passwordConfirm"
           ],
           "extras": [
-            "passwordStrength",
+            "passwordRequirementsIndicator",
             "termsCheckbox"
           ],
           "cta": "Create Account",
@@ -245,22 +263,26 @@
             "required": true,
             "format": "Valid email format",
             "timing": "on-blur",
-            "asyncCheck": "Email availability (optional)",
+            "accountExistence": "Never reveal whether an email already has an account: no availability check while typing, and no 'already registered' error. Every valid submission shows the same next step, and the backend emails the existing account owner instead. This needs an email-verification step: if the product signs new users in immediately, registration can't hide whether an email exists, so raise that tradeoff with the user.",
             "messages": {
               "required": "Email is required",
-              "invalid": "Please enter a valid email address",
-              "taken": "This email is already registered"
+              "invalid": "Please enter a valid email address"
             }
           },
           "password": {
             "required": true,
-            "minLength": 8,
-            "strength": "Weak/Medium/Strong indicator",
-            "timing": "on-blur (validation), real-time (strength)",
+            "minLength": 15,
+            "minLengthNote": "NIST SP 800-63B-4 default when the password is the only sign-in factor. Use 8 when a second factor is always required, or the auth service's own rule when it has one. Count Unicode code points, not UTF-16 units.",
+            "maxLength": "Accept at least 64 characters; don't truncate silently",
+            "allowedCharacters": "Spaces, all printable characters, and Unicode. No composition rules (no required digits, symbols, or mixed case).",
+            "blocklist": "Reject common and known-breached passwords; the authoritative check runs on the server",
+            "indicator": "Too short, too common, or meets requirements. Show a strength rating only from a pattern-aware estimator the project already has, never from length or character types",
+            "timing": "on-blur (validation), real-time (indicator)",
             "messages": {
               "required": "Password is required",
-              "minLength": "Password must be at least 8 characters",
-              "weak": "Password is weak (add numbers or special characters)"
+              "minLength": "Use at least 15 characters",
+              "common": "This password is too common. Choose a different one",
+              "breached": "This password has appeared in a data breach. Choose a different one"
             }
           },
           "passwordConfirm": {
@@ -296,15 +318,14 @@
             "result": "validateEmail",
             "sideEffects": [
               "setTouchedEmail",
-              "checkEmailAvailability",
               "showErrorIfInvalid"
             ]
           },
           {
             "event": "passwordInput",
-            "result": "calculatePasswordStrength",
+            "result": "checkPasswordRequirements",
             "sideEffects": [
-              "updateStrengthMeter"
+              "updateRequirementsIndicator"
             ]
           },
           {
@@ -362,15 +383,15 @@
             "description": "Password confirmation",
             "default": ""
           },
-          "passwordStrength": {
+          "passwordRequirementState": {
             "type": "enum",
-            "description": "Calculated password strength",
+            "description": "Requirement status shown under the password field. A pattern-aware strength estimator the project already has may add its own rating; never derive 'strong' from length or character types",
             "default": "none",
             "allowedValues": [
               "none",
-              "weak",
-              "medium",
-              "strong"
+              "too-short",
+              "too-common",
+              "meets-requirements"
             ]
           },
           "agreeToTerms": {
@@ -402,9 +423,9 @@
       "field-focused",
       "field-blurred-valid",
       "field-blurred-invalid",
-      "password-strength-weak",
-      "password-strength-medium",
-      "password-strength-strong",
+      "password-too-short",
+      "password-too-common",
+      "password-meets-requirements",
       "form-submitting",
       "form-success",
       "form-error"
@@ -413,7 +434,12 @@
       "User switches forms mid-validation (reset state)",
       "User submits with Enter key from any field (trigger validation)",
       "Server returns generic error (display in form-level error message)",
-      "Email already registered (show specific error, suggest password reset)",
+      "Email already has an account: the form shows the same next step as any other valid registration, and the backend emails the account owner a sign-in or reset link. The screen never confirms that the account exists",
+      "Existing account with a password shorter than the current minimum: sign-in still works because sign-in checks presence only; ask for a new password after sign-in only if the auth service requires it",
+      "Password filled by a password manager or pasted: accept it; never block paste or autofill",
+      "Password with spaces or Unicode characters: accept it as typed and don't trim it silently",
+      "Too many attempts: show the generic rate-limit message, worded the same whether or not the account exists",
+      "Passkey prompt cancelled or failed: keep the password form available and return focus to the passkey button",
       "Very long email or name (truncate or wrap, test with max-length)",
       "Password contains special characters (ensure proper escaping)",
       "User rapidly types in password confirmation (debounce validation)",
@@ -456,25 +482,30 @@
     "dataContract": {
       "loginPayload": {
         "email": "string (validated email format)",
-        "password": "string (min 8 chars)",
+        "password": "string (required; no length or character rules at sign-in)",
         "rememberMe": "boolean"
       },
       "registerPayload": {
         "name": "string (min 2 chars)",
         "email": "string (validated email format)",
-        "password": "string (min 8 chars, strength checked)",
+        "password": "string (default min 15 chars when the password is the only factor, at least 64 accepted, no composition rules, checked against breached passwords on the server)",
         "agreeToTerms": "boolean (required true)"
       },
       "apiResponse": {
-        "success": {
+        "signInSuccess": {
           "status": "success",
           "token": "string (JWT or session token)",
           "user": "object (user details)"
         },
+        "registrationAccepted": {
+          "status": "pending-verification",
+          "message": "string (the same 'Check your email to continue' message for new and existing emails)",
+          "note": "No session token or user object. The response must look the same whether or not the email already has an account; the account is created or the owner is notified by email. Products that sign new users in immediately can't hide account existence at registration, so raise that tradeoff with the user"
+        },
         "error": {
           "status": "error",
           "message": "string (error message)",
-          "field": "string (optional field-specific error)"
+          "field": "string (optional field-specific error for registration fields; sign-in errors stay generic and never indicate whether an account exists)"
         }
       }
     },
@@ -483,7 +514,7 @@
       "form_register_viewed",
       "form_switched",
       "field_validation_error",
-      "password_strength_calculated",
+      "password_requirements_checked",
       "form_submitted",
       "form_submission_success",
       "form_submission_error",
@@ -505,6 +536,7 @@
         "3.3.2": "Labels and required indicators provided",
         "3.3.3": "Error messages provide guidance on fixing",
         "3.3.4": "User can review before final submission",
+        "3.3.8": "Accessible Authentication (Minimum): no cognitive test without an alternative. Allow paste and password managers, and offer passkeys or email links where the auth service supports them",
         "4.1.2": "Inputs have accessible names, roles, and states",
         "4.1.3": "Error messages announced via aria-live"
       }
@@ -523,7 +555,7 @@
           "aria-describedby": "Points to hint and/or error element IDs",
           "aria-invalid": "true when error, false when valid",
           "aria-required": "true for required fields",
-          "autocomplete": "email, name, current-password, new-password"
+          "autocomplete": "username (the email field that identifies the account, also when it holds an email address), name, current-password (sign-in), new-password (registration and reset), one-time-code (verification codes). For passkey autofill, append webauthn: 'username webauthn'"
         },
         "errorMessages": {
           "id": "Unique ID for aria-describedby reference",
@@ -545,7 +577,7 @@
       "fieldLabels": "Announced when field receives focus",
       "requiredIndicators": "Conveyed via aria-required, not just asterisk",
       "errors": "Announced via aria-live when they appear",
-      "passwordStrength": "Announced as user types password",
+      "passwordRequirements": "Requirement status announced when it changes, not on every keystroke",
       "loadingState": "Announced when form submits",
       "successMessage": "Announced via role=status or aria-live"
     },
@@ -630,9 +662,10 @@
     "Login form displays with email and password fields",
     "Registration form displays with name, email, password, confirm password",
     "Email validation triggers on blur, shows specific error",
-    "Password validation triggers on blur, shows specific error",
+    "Registration password validation triggers on blur, shows specific error",
+    "Sign-in accepts any non-empty password; no length error at sign-in",
     "Password confirmation validates in real-time as user types",
-    "Password strength meter updates as user types password",
+    "Password requirements indicator updates as user types",
     "Success checkmarks appear on valid fields",
     "Error messages appear below invalid fields",
     "Submit button enables before validation",
@@ -645,6 +678,15 @@
     "Remember me checkbox works (login)",
     "Terms checkbox required (registration)",
     "Forgot password link navigates correctly",
+    "Password feedback never asks for numbers or symbols. Without a pattern-aware estimator it never shows 'strong'; with one, 'aaaaaaaaaaaaaaaaaaaa' and 'abcdabcdabcdabcdabcd' don't rate strong",
+    "Passwords of 64+ characters, spaces, and Unicode are accepted",
+    "Registering an email that already has an account shows the same next step as a new email",
+    "A failed sign-in doesn't say whether the email or the password was wrong",
+    "A network or service failure shows 'Unable to sign in right now', not 'Email or password is incorrect'",
+    "A password reset request shows the same confirmation whether or not the account exists",
+    "Rate-limit message is the same whether or not the account exists",
+    "A password manager can save and autofill credentials; paste works in every password field",
+    "Passkey sign-in, if enabled, falls back to the password form when cancelled or failed",
     "Tab key moves through fields in logical order",
     "Shift+Tab moves backward correctly",
     "Enter key submits form from any field",
@@ -656,7 +698,7 @@
     "Screen reader announces form title",
     "Screen reader announces field labels",
     "Screen reader announces errors when they appear",
-    "Screen reader announces password strength",
+    "Screen reader announces password requirement status when it changes",
     "Screen reader announces loading state",
     "Focus ring visible on all interactive elements",
     "Error messages clear, specific, actionable",
@@ -667,7 +709,7 @@
   ],
   "meta": {
     "created": "2026-01-24",
-    "updated": "2026-01-24",
+    "updated": "2026-10-07",
     "webUrl": "https://uipotion.com/potions/features/form-login-register.html",
     "relatedPotions": [
       {

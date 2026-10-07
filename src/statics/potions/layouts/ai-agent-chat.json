@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
   "id": "ai-agent-chat",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "AI Agent Chat Layout",
   "category": "layouts",
   "tags": [
@@ -113,7 +113,7 @@
       "7. Add sidebar with conversation list (if enabled), with overlay behavior on mobile. When sidebar is open on desktop, apply margin-inline-start (or left margin) to the main chat container equal to sidebar width so the sidebar never overlaps the main content. Ensure users can always close the sidebar when it is open at every breakpoint (visible close control or header control that toggles).",
       "8. Implement state management for messages, input value, typing state, and sidebar visibility",
       "9. Add auto-scroll behavior with user scroll detection (pause auto-scroll when user scrolls up)",
-      "10. Implement keyboard navigation (Enter to send, Shift+Enter for new line, Escape to close sidebar)",
+      "10. Implement keyboard navigation (Enter to send, Shift+Enter for new line, Escape to close sidebar). Never send while an input method editor (IME) is composing text: ignore Enter when the keydown event has isComposing set or keyCode 229, which is how Safari reports the Enter that confirms a composition. Choose the default Enter behavior with a heuristic: when the primary input is touch (for example the (hover: none) and (pointer: coarse) media query), assume an on-screen keyboard, which has no Shift+Enter, so Enter inserts a new line and the send button sends; otherwise Enter sends. Media queries describe pointing devices, not keyboards: a tablet with an attached keyboard may still get the new-line default, while touchscreen laptops usually report a fine pointer and keep Enter to send. Don't use touch support alone. If the product already has an Enter-to-send setting, it overrides the heuristic. Shift+Enter always inserts a new line, and the send button always sends",
       "11. Add ARIA live regions for new messages and typing indicator announcements",
       "12. Implement responsive breakpoints (mobile, tablet, desktop) with appropriate layout changes",
       "13. Add smooth animations for message entrance, sidebar slide, and input height changes",
@@ -394,7 +394,7 @@
       },
       "behavior": {
         "autoFocus": "Focus input when chat opens",
-        "enterToSend": "Enter sends, Shift+Enter for new line",
+        "enterToSend": "Enter sends, Shift+Enter for new line. Enter never sends while an IME is composing text (isComposing or keyCode 229). When the primary input is touch (heuristic: (hover: none) and (pointer: coarse)), Enter defaults to inserting a new line and the send button sends. The heuristic can't detect attached keyboards, so they may inherit the new-line default; an existing Enter-to-send setting overrides it",
         "autoExpand": "Input expands as user types",
         "heightTransition": "150ms ease-in-out",
         "enableSend": "Only when input not empty",
@@ -703,8 +703,9 @@
     },
     "keyboardNavigation": {
       "tabOrder": "Header actions → Message list (optional) → Input area → Send button",
-      "enterKey": "Send message from input",
+      "enterKey": "Send message from input, except while an IME is composing text (isComposing or keyCode 229); then Enter confirms the composition",
       "shiftEnter": "New line in input",
+      "onScreenKeyboards": "Default when the primary input is touch: Enter inserts a new line and the send button sends. This is a primary-input heuristic, not touch support alone, and it can't detect attached keyboards, so a tablet with a keyboard may keep this default. An existing Enter-to-send setting overrides it",
       "escapeKey": "Close sidebar or dropdowns",
       "focusManagement": {
         "afterSend": "Focus remains in input",
@@ -983,7 +984,7 @@
     },
     "inputHandling": {
       "autoExpand": "Increase textarea rows up to max (8)",
-      "enterBehavior": "Send message (Enter) or new line (Shift+Enter)",
+      "enterBehavior": "Send message (Enter) or new line (Shift+Enter). Ignore Enter while an IME is composing text (isComposing or keyCode 229). When the primary input is touch (a heuristic that can't detect attached keyboards), Enter defaults to inserting a new line; an existing Enter-to-send setting overrides it",
       "heightTransition": "150ms ease-in-out"
     },
     "messageStreaming": {
@@ -1015,6 +1016,11 @@
     "User scroll detection pauses auto-scroll",
     "Send button sends message",
     "Enter key sends, Shift+Enter adds new line",
+    "Pressing Enter to confirm an IME candidate (Japanese, Chinese, Korean) doesn't send the message, including in Safari",
+    "With a phone's on-screen keyboard, Enter adds a new line and the send button sends",
+    "On a touchscreen laptop with a fine primary pointer, Enter sends and Shift+Enter adds a new line",
+    "On a tablet with an attached keyboard, Shift+Enter adds a new line and the send button sends, whichever Enter default the heuristic picked",
+    "If the product has an Enter-to-send setting, it overrides the heuristic on every device",
     "Input expands as user types",
     "Typing indicator animates",
     "Sidebar opens/closes smoothly",
@@ -1084,7 +1090,7 @@
   },
   "meta": {
     "created": "2026-02-01",
-    "updated": "2026-07-26",
+    "updated": "2026-10-07",
     "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
     "relatedPotions": [
       {
