@@ -19,6 +19,7 @@ tags:
   - forms
 agentManifest: 'potions/components/button.json'
 path: 'potions/components/button'
+promptSubject: 'buttons'
 ---
 
 # Button

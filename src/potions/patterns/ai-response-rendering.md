@@ -16,6 +16,13 @@ tags:
   - a11y
 agentManifest: 'potions/patterns/ai-response-rendering.json'
 path: 'potions/patterns/ai-response-rendering'
+promptSubject: 'AI response rendering'
+useWhen: 'you show an AI assistant reply as it streams in, with Markdown, code, tool calls, or citations.'
+specifies:
+  - 'Stopping a response keeps the text that already arrived, and a dropped connection shows an error and a retry under it.'
+  - 'The view follows new text only while the reader is at the bottom. Once they scroll up, it stays put and offers a jump to the latest content.'
+  - 'Screen readers hear status changes, such as started, complete, stopped, or failed, from one polite live region instead of every token.'
+example: 'A reply is streaming and the reader clicks Stop. The text so far stays, the cursor disappears, and screen readers hear that the response stopped.'
 ---
 
 # AI Response Rendering Pattern - Streaming, Tool Calls, and Optional Reasoning

@@ -16,6 +16,7 @@ tags:
   - scrollable
 agentManifest: 'potions/components/tabs.json'
 path: 'potions/components/tabs'
+promptSubject: 'tabs'
 ---
 
 # Tabs Component

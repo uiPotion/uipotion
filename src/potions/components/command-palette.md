@@ -16,6 +16,7 @@ tags:
   - aria
 agentManifest: 'potions/components/command-palette.json'
 path: 'potions/components/command-palette'
+promptSubject: 'a command palette'
 ---
 
 # Command Palette

@@ -1027,7 +1027,8 @@ body::-webkit-scrollbar-thumb:hover {
     }
   }
 
-  /* Inline Code */
+  /* Inline Code (long URLs wrap instead of running off narrow screens;
+     code blocks don't wrap, so this doesn't affect them) */
   code {
     background: #0a0a0a;
     color: #60a5fa;
@@ -1036,6 +1037,7 @@ body::-webkit-scrollbar-thumb:hover {
     font-size: 0.875rem;
     font-family: 'Monaco', 'Courier New', monospace;
     border: 1px solid #262626;
+    overflow-wrap: anywhere;
   }
 
   pre code {
@@ -1867,7 +1869,58 @@ html {
   max-width: 800px;
 }
 
-/* AI Agent Guide card - URL + Copy + Download */
+/* "Use this when" summary under the potion excerpt */
+.potion-fit {
+  max-width: 800px;
+  margin: 0 0 32px;
+  color: #cbd5e1;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Sits closer to the excerpt it continues */
+.potion-hero-description + .potion-fit {
+  margin-top: -16px;
+}
+
+.potion-fit-when {
+  margin: 0 0 16px;
+
+  strong {
+    color: #ffffff;
+    font-weight: 600;
+  }
+}
+
+.potion-fit-label {
+  margin: 0 0 8px;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.potion-fit-list {
+  margin: 0;
+  padding-left: 20px;
+
+  li {
+    margin-bottom: 6px;
+  }
+
+  li::marker {
+    color: #60a5fa;
+  }
+}
+
+.potion-fit-example {
+  margin: 16px 0 0;
+
+  strong {
+    color: #ffffff;
+    font-weight: 600;
+  }
+}
+
+/* Use-with-agent card - copyable prompts, guide link, downloads */
 .potion-resources-bar {
   background: #171717;
   border: 1px solid #262626;
@@ -1883,49 +1936,41 @@ html {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin: 0;
   color: #60a5fa;
   font-weight: 600;
   font-size: 0.875rem;
+  line-height: 1.4;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 
   &-icon {
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
   }
 }
 
-.potion-resources-bar-url-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+/* pre keeps the prompt's line breaks through HTML minification; pre-line
+   collapses any template indentation in front of each line */
+.potion-prompt {
+  margin: 0;
+  padding: 16px;
   background: #0a0a0a;
   border: 1px solid #262626;
   border-radius: 8px;
-  padding: 12px 16px;
-}
-
-.potion-resources-bar-path {
-  flex: 1;
-  min-width: 0;
+  color: #e5e5e5;
   font-family: 'Monaco', 'Courier New', monospace;
   font-size: 0.875rem;
-  color: #e5e5e5;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 
-.potion-resources-bar-ext {
-  color: #60a5fa;
-  font-weight: 500;
-}
-
-.potion-resources-bar-copy-btns {
+.potion-resources-bar-actions {
   display: flex;
-  gap: 8px;
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .potion-resources-bar-copy {
@@ -1934,6 +1979,7 @@ html {
   gap: 6px;
   padding: 8px 12px;
   border-radius: 6px;
+  font-family: inherit;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -1945,6 +1991,7 @@ html {
   svg {
     width: 16px;
     height: 16px;
+    flex-shrink: 0;
   }
 
   .check-icon {
@@ -1953,6 +2000,11 @@ html {
 
   &:hover {
     background: #404040;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
   }
 
   &.copied {
@@ -1969,6 +2021,19 @@ html {
   }
 }
 
+.potion-resources-bar-copy--primary {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  background: #4f46e5;
+  color: #fff;
+
+  &:hover {
+    background: #4338ca;
+  }
+}
+
 .potion-resources-bar-hint {
   color: #94a3b8;
   font-size: 0.875rem;
@@ -1976,22 +2041,59 @@ html {
   margin: 0;
 }
 
-.potion-resources-bar-downloads {
+/* Spaced with margins: some engines ignore display: flex on details */
+.potion-check {
+  border-top: 1px solid #262626;
+  padding-top: 16px;
+
+  summary {
+    cursor: pointer;
+    color: #cbd5e1;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border-radius: 4px;
+
+    &:hover {
+      color: #ffffff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #60a5fa;
+      outline-offset: 2px;
+    }
+  }
+
+  &[open] summary,
+  .potion-resources-bar-hint,
+  .potion-prompt {
+    margin-bottom: 12px;
+  }
+}
+
+.potion-resources-bar-files {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  align-items: center;
+  gap: 8px 12px;
+  border-top: 1px solid #262626;
+  padding-top: 16px;
+}
+
+.potion-resources-bar-files-label {
+  color: #94a3b8;
+  font-size: 0.875rem;
 }
 
 .potion-resources-bar-download {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  background: #4f46e5;
-  color: #fff;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: #262626;
+  color: #e5e5e5;
   text-decoration: none;
   transition: all 0.2s;
 
@@ -2000,7 +2102,12 @@ html {
   }
 
   &:hover {
-    background: #4338ca;
+    background: #404040;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
   }
 }
 
@@ -2218,7 +2325,8 @@ html {
     }
   }
 
-  /* Inline Code */
+  /* Inline Code (long URLs wrap instead of running off narrow screens;
+     code blocks don't wrap, so this doesn't affect them) */
   code {
     background: #0a0a0a;
     color: #60a5fa;
@@ -2227,6 +2335,7 @@ html {
     font-size: 0.875rem;
     font-family: 'Monaco', 'Courier New', monospace;
     border: 1px solid #262626;
+    overflow-wrap: anywhere;
   }
 
   pre code {
@@ -2440,26 +2549,18 @@ html {
     padding: 20px 16px;
   }
 
-  .potion-resources-bar-url-row {
-    flex-direction: column;
-    align-items: stretch;
+  .potion-prompt {
+    padding: 12px;
+    font-size: 0.8125rem;
   }
 
-  .potion-resources-bar-path {
-    word-break: break-all;
-    white-space: normal;
-  }
-
-  .potion-resources-bar-copy-btns {
-    justify-content: flex-start;
-  }
-
-  .potion-resources-bar-downloads {
-    flex-direction: column;
-  }
-
-  .potion-resources-bar-download {
+  .potion-resources-bar-copy--primary {
+    width: 100%;
     justify-content: center;
+  }
+
+  .potion-resources-bar-files-label {
+    width: 100%;
   }
 
   .potion-ai-card-body {

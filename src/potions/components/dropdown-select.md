@@ -17,6 +17,7 @@ tags:
   - keyboard-navigation
 agentManifest: 'potions/components/dropdown-select.json'
 path: 'potions/components/dropdown-select'
+promptSubject: 'select dropdowns'
 ---
 
 # Dropdown/Select Component

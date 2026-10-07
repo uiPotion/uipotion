@@ -18,6 +18,7 @@ tags:
   - validation
 agentManifest: 'potions/components/file-upload.json'
 path: 'potions/components/file-upload'
+promptSubject: 'file upload'
 ---
 
 # File Upload Component

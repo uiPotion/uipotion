@@ -38,8 +38,8 @@ You don't need to install anything or fetch anything in your code. Use your AI c
 
 1. **Browse potions** at [uipotion.com](https://uipotion.com)
 2. **Pick what you need** (e.g. dashboard layout, pricing table)
-3. **Copy the potion link** (the page URL or the JSON guide URL)
-4. **Paste the link in your AI chat** and say what you want, e.g.:  
+3. **Copy the prompt** from the potion page, or use **Copy guide link** to copy the JSON guide URL
+4. **Paste it into your coding agent** and add details about the task. With just the link, say what you want, e.g.:
    *"Implement this dashboard layout for my app. I use React and Tailwind. Guide: https://uipotion.com/potions/layouts/dashboard.json"*
 5. **Review the generated code** and ask for tweaks (layout, styling, behavior) until it fits your project
 

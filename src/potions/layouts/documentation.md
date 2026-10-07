@@ -15,6 +15,7 @@ tags:
   - a11y
 agentManifest: 'potions/layouts/documentation.json'
 path: 'potions/layouts/documentation'
+promptSubject: 'a documentation site layout'
 ---
 
 # Documentation Website Layout

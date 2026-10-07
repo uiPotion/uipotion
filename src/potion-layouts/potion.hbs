@@ -20,10 +20,26 @@
       {{#if excerpt}}
       <p class="potion-hero-description">{{excerpt}}</p>
       {{/if}}
-      
-      {{#if agentManifest}}
-      {{> potion-resources-bar path=path agentManifest=agentManifest}}
+
+      {{#if useWhen}}
+      <div class="potion-fit">
+        <p class="potion-fit-when"><strong>Use this when</strong> {{useWhen}}</p>
+        {{#if specifies}}
+        <p class="potion-fit-label" id="potion-fit-label">Behaviors this guide specifies include:</p>
+        <ul class="potion-fit-list" aria-labelledby="potion-fit-label">
+          {{#each specifies}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+        {{/if}}
+        {{#if example}}
+        <p class="potion-fit-example"><strong>Example:</strong> {{example}}</p>
+        {{/if}}
+      </div>
       {{/if}}
+
+      {{!-- One line on purpose: Handlebars indents every line of a partial that stands on its own line, including the prompt text --}}
+      {{#if agentManifest}}{{> potion-resources-bar path=path agentManifest=agentManifest promptSubject=promptSubject promptReuse=promptReuse}}{{/if}}
       
       <!-- Meta Info -->
       <div class="potion-meta-bar" role="group" aria-label="Potion metadata">

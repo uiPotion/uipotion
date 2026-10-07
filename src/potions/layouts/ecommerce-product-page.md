@@ -16,6 +16,7 @@ tags:
   - responsive
 agentManifest: 'potions/layouts/ecommerce-product-page.json'
 path: 'potions/layouts/ecommerce-product-page'
+promptSubject: 'an ecommerce product page'
 ---
 
 # Ecommerce Product Page

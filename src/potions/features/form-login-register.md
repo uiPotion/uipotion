@@ -15,6 +15,7 @@ tags:
   - forms
 agentManifest: 'potions/features/form-login-register.json'
 path: 'potions/features/form-login-register'
+promptSubject: 'login and registration forms'
 ---
 
 # Login & Registration Forms with Validation

@@ -16,6 +16,7 @@ tags:
   - a11y
 agentManifest: 'potions/components/navbar.json'
 path: 'potions/components/navbar'
+promptSubject: 'a responsive navigation bar'
 ---
 
 # Navigation Bar (Responsive) with Mobile Menu

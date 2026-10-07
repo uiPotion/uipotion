@@ -23,14 +23,20 @@
     <div class="about-main-container">
       <article class="about-article">
         <section class="about-section">
-          <h2>The Problem</h2>
-          <p>Traditional UI component libraries have a fundamental problem: <strong>maintenance burden</strong>. Framework updates, new patterns, and bug fixes can require library upgrades or migrations. And developers still need to adapt the code to their specific project setup.</p>
+          <h2>What You Get</h2>
+          <p>UI Potion is a set of <strong>UI behavior guides your coding agent can apply to your existing project</strong>. Each guide spells out how the UI should behave, including details that are easy to miss in a short prompt. For example:</p>
+          <ul>
+            <li>A chat message that fails to send stays in the input with a retry, so nobody has to retype it (<a href="/potions/layouts/ai-agent-chat">AI Agent Chat Layout</a>).</li>
+            <li>Closing a dialog returns focus to the control that opened it (<a href="/potions/components/dialog">Modal Dialog</a>).</li>
+            <li>Stopping a streamed AI response keeps the text that already arrived (<a href="/potions/patterns/ai-response-rendering">AI Response Rendering</a>).</li>
+          </ul>
+          <p>Your agent keeps your framework, components, and styling. The guide gives it the behavior to build and a checklist to verify it against.</p>
         </section>
-        
+
         <section class="about-section">
           <h2>Our Approach</h2>
-          <p>UI Potion takes a different approach: <strong>we don't provide code, we provide specifications</strong>.</p>
-          <p>Each "potion" is a comprehensive guide written specifically for AI coding assistants. It includes:</p>
+          <p>UI Potion provides <strong>specifications, not code</strong>.</p>
+          <p>Each "potion" is a guide written for AI coding assistants, which adapt it to the stack already in your project. It includes:</p>
           <ul>
             <li>Detailed UI specifications (structure, behavior, states, and dimensions where relevant)</li>
             <li>Responsive breakpoints and mobile patterns</li>
@@ -48,11 +54,11 @@
           <h3>For Developers</h3>
           <ol>
             <li><strong>Browse potions</strong> on this website to find what you need (e.g., dashboard layout, pricing table, dialog)</li>
-            <li><strong>Copy the potion URL</strong> or JSON link</li>
-            <li><strong>Tell your AI assistant</strong>: "Implement the dashboard layout from this UI Potion guide" + paste link</li>
-            <li><strong>Specify your stack</strong>: "Use React with Tailwind CSS" (or whatever you're using)</li>
-            <li><strong>The agent creates an implementation candidate</strong> adapted to the detected framework, styling system, and project conventions</li>
+            <li><strong>Copy the prompt</strong> from the potion page. It points your agent to the guide and asks it to reuse your existing components, implement only what the task needs, and check its changes with your existing tests</li>
+            <li><strong>Paste it into your coding agent</strong> and add any details about the task, such as the screen it's for</li>
+            <li><strong>The agent creates an implementation candidate</strong> adapted to the detected framework, styling system, and project conventions. Review, test, and refine it before you ship it</li>
           </ol>
+          <p>Already have the UI? Use <strong>Copy check prompt</strong> on the potion page instead. The agent compares your existing implementation with the guide, lists the gaps by severity, and changes nothing until you ask.</p>
           
           <h3>For AI Agents</h3>
           <p>AI agents can discover potions automatically:</p>
@@ -125,16 +131,12 @@
           <h2>Benefits</h2>
           <div class="benefits-list">
             <div class="benefit">
-              <h4>No Library Upgrade Cycle</h4>
-              <p>Nothing from UI Potion is installed as a runtime package</p>
+              <h4>No Runtime Package</h4>
+              <p>Nothing from UI Potion is installed in your app. The code your agent writes is part of your project, and you maintain it like the rest</p>
             </div>
             <div class="benefit">
               <h4>Project-Compatible</h4>
               <p>Agents adapt guidance to the framework versions and conventions detected in the project</p>
-            </div>
-            <div class="benefit">
-              <h4>Truly Flexible</h4>
-              <p>No UI Potion runtime dependency tied to a framework version or styling library</p>
             </div>
             <div class="benefit">
               <h4>Implementation Coverage</h4>

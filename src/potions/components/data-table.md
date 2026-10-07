@@ -19,6 +19,7 @@ tags:
   - dashboard
 agentManifest: 'potions/components/data-table.json'
 path: 'potions/components/data-table'
+promptSubject: 'data tables'
 ---
 
 # Data Table (Sortable, Paginated, Filterable)

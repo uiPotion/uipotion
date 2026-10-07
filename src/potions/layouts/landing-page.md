@@ -16,6 +16,7 @@ tags:
   - conversion
 agentManifest: 'potions/layouts/landing-page.json'
 path: 'potions/layouts/landing-page'
+promptSubject: 'a marketing landing page'
 ---
 
 # Landing Page Layout (Marketing)

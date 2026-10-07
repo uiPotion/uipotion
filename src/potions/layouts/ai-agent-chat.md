@@ -15,6 +15,7 @@ tags:
   - a11y
 agentManifest: 'potions/layouts/ai-agent-chat.json'
 path: 'potions/layouts/ai-agent-chat'
+promptSubject: 'an AI chat interface'
 ---
 
 # AI Agent Chat Layout

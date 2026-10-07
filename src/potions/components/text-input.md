@@ -16,6 +16,7 @@ tags:
   - form-control
 agentManifest: 'potions/components/text-input.json'
 path: 'potions/components/text-input'
+promptSubject: 'text inputs'
 ---
 
 # Text Input Field

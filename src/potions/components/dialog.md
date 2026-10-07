@@ -15,6 +15,13 @@ tags:
   - aria
 agentManifest: 'potions/components/dialog.json'
 path: 'potions/components/dialog'
+promptSubject: 'modal dialogs'
+useWhen: 'you need someone to confirm a choice or finish a short task, such as a delete confirmation or a small form, without leaving the page.'
+specifies:
+  - 'Focus moves into the dialog when it opens and returns to the element that opened it, however it closes.'
+  - 'Escape closes it, and so can a backdrop click, unless the dialog is marked non-dismissible.'
+  - 'If the primary action fails, the dialog stays open and its buttons work again, so the user can retry.'
+example: 'Someone clicks Delete project, then changes their mind and presses Escape. The dialog closes, and focus is back on Delete project.'
 ---
 
 # Modal Dialog (Accessible) with Focus Trap and Actions

@@ -15,6 +15,7 @@ tags:
   - a11y
 agentManifest: 'potions/components/sidebar-navigation.json'
 path: 'potions/components/sidebar-navigation'
+promptSubject: 'sidebar navigation'
 ---
 
 # Sidebar Navigation

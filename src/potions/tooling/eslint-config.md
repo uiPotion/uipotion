@@ -16,6 +16,8 @@ tags:
   - formatting
 agentManifest: 'potions/tooling/eslint-config.json'
 path: 'potions/tooling/eslint-config'
+promptSubject: 'linting with ESLint'
+promptReuse: 'Build on our existing lint and formatting setup if there is one, change only what this task needs, and don''t remove or replace config files without asking.'
 ---
 
 # ESLint Config Generator for UI Projects

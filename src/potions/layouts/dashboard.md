@@ -12,6 +12,7 @@ tags:
   - admin
 agentManifest: 'potions/layouts/dashboard.json'
 path: 'potions/layouts/dashboard'
+promptSubject: 'a dashboard layout'
 ---
 
 # Dashboard Layout

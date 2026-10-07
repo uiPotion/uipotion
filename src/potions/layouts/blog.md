@@ -16,6 +16,7 @@ tags:
   - newsletter
 agentManifest: 'potions/layouts/blog.json'
 path: 'potions/layouts/blog'
+promptSubject: 'a blog layout'
 ---
 
 # Blog Layout (List and Post)

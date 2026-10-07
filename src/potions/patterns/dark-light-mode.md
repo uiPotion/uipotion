@@ -15,6 +15,7 @@ tags:
   - responsive
 agentManifest: 'potions/patterns/dark-light-mode.json'
 path: 'potions/patterns/dark-light-mode'
+promptSubject: 'dark and light mode'
 ---
 
 # Dark/Light Mode Pattern - Theme Switching and Color Schemes

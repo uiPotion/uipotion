@@ -16,6 +16,7 @@ tags:
   - a11y
 agentManifest: 'potions/patterns/ai-action-review.json'
 path: 'potions/patterns/ai-action-review'
+promptSubject: 'review and approval of AI agent actions'
 ---
 
 # AI Action Review Pattern

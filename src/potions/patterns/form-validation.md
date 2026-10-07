@@ -15,6 +15,7 @@ tags:
   - user-experience
 agentManifest: 'potions/patterns/form-validation.json'
 path: 'potions/patterns/form-validation'
+promptSubject: 'form validation'
 ---
 
 # Form Validation Pattern - UX and Timing Strategies

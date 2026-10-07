@@ -52,6 +52,12 @@ agentManifest: 'potions/components/component-name.json'
 - `category` is title case in Markdown front matter: `Layouts`, `Components`, `Features`, `Patterns`, or `Tooling`.
 - The first Markdown tag must be the lowercase category.
 - Do not add any other category name as a tag, or the potion can appear in multiple catalog sections.
+- Potion page fields, rendered by `src/potion-layouts/potion.hbs`:
+  - `promptSubject`: a short lowercase noun phrase, such as `'modal dialogs'` or `'a dashboard layout'`. It completes the copyable prompts ("implementing modal dialogs in this project" and "Compare how this project implements modal dialogs with..."). Add it to every potion; without it, the prompts fall back to generic wording.
+  - `promptReuse` (optional): replaces the build prompt's reuse sentence ("Reuse our existing components and styling, implement only what this task needs, and keep existing APIs.") when it doesn't fit, as for tooling potions. The prompt adds "Don't add new dependencies without asking." after it.
+  - `useWhen` (optional): one sentence that completes "Use this when", starting in lowercase.
+  - `specifies` (optional, with `useWhen`): three behaviors the guide currently specifies, one sentence each. List only behavior the guide's content covers.
+  - `example` (optional, with `useWhen`): one short scenario that shows the listed behaviors, using only behavior the guide covers.
 - Keep titles concise: prefer 2-6 words and target 60 characters or less. Put detailed qualifiers in the excerpt, body, and JSON fields.
 - Do not use ASCII art, text-based diagrams, emojis, or Markdown tables in potion Markdown. Use clear prose and bullets instead.
 - Do not make Markdown potions framework-specific. Describe behavior, structure, states, accessibility, responsive behavior, animation, and testing in stack-neutral terms.
@@ -76,6 +82,7 @@ agentManifest: 'potions/components/component-name.json'
   - Matching `potions-index.json` entry `updated`.
   - `potions-index.json` top-level `lastUpdated`.
   - `uipotion-manifest.json` `meta.updated`.
+- A change that touches only potion page fields (`promptSubject`, `promptReuse`, `useWhen`, `specifies`, `example`) isn't a content change. Don't bump `meta.updated`, the index dates, or the manifest date for it. The index `updated` date drives the sitemap and tells apps such as Potion Kit that a guide changed.
 - Use `YYYY-MM-DD` dates.
 
 ## Links And URLs

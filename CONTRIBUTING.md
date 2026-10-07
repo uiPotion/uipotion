@@ -84,6 +84,8 @@ agentManifest: 'potions/components/your-potion.json'
 ---
 ```
 
+Also add `promptSubject`, a short lowercase noun phrase such as `'modal dialogs'` or `'a dashboard layout'`. The potion page uses it in the prompts visitors copy. If the prompt's default reuse sentence doesn't fit your potion, as with tooling, add `promptReuse` with a replacement sentence. Optionally, add `useWhen` (one sentence that completes "Use this when"), `specifies` (three behaviors your guide specifies), and `example` (one short scenario that shows them) to show a short summary under the excerpt.
+
 Then write comprehensive specifications in the body (see existing potions for format).
 
 ### Step 3: Validate

@@ -103,6 +103,12 @@ tags:
 agentManifest: 'potions/components/your-potion.json'
 ---</code></pre>
           </div>
+          <p>Also add <code>promptSubject</code>, a short lowercase noun phrase such as <code>'modal dialogs'</code> or
+            <code>'a dashboard layout'</code>. The potion page uses it in the prompts visitors copy. If the prompt's
+            default reuse sentence doesn't fit your potion, as with tooling, add <code>promptReuse</code> with a
+            replacement sentence. Optionally, add <code>useWhen</code> (one sentence that completes "Use this when"),
+            <code>specifies</code> (three behaviors your guide specifies), and <code>example</code> (one short scenario
+            that shows them) to show a short summary under the excerpt.</p>
 
           <h3>Step 3: Validate</h3>
           <p>Visit the <a href="/validator">Schema Validator</a> or run <code>npm run validate</code>
