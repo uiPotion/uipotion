@@ -179,4 +179,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-**Thank you for contributing to UI Potion!** 🧪✨
+**Thank you for contributing to UI Potion!**

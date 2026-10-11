@@ -87,6 +87,11 @@
   };
 
   const renderError = function () {
+    // Already shown (typing runs the search again): keep it, so the Try again button
+    // isn't replaced under a click or keyboard focus, and the error isn't announced again
+    if (messageArea.querySelector('.search-error')) {
+      return;
+    }
     const box = renderMessage(
       'search-error',
       [

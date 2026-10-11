@@ -25,12 +25,12 @@ Your agent keeps your framework, components, and styling. The guide gives it the
 
 ### The UI Potion Approach
 
-- ✅ **No UI Potion runtime dependency**: Nothing from UI Potion is installed or executed in your application
-- ✅ **Framework agnostic**: Core guidance is stack-neutral and can be adapted to React, Vue, Angular, Svelte, or other frameworks
-- ✅ **Styling agnostic**: Agents should reuse the styling system and design tokens already present in the project
-- ✅ **Project-aware**: Your coding assistant adapts the specification to the versions, tokens, and conventions already in your project
-- ✅ **Version-compatible guidance**: Agents should use patterns compatible with the framework versions detected in your project
-- ✅ **Independently useful**: Each potion stands on its own; related potions are optional suggestions
+- **No UI Potion runtime dependency**: Nothing from UI Potion is installed or executed in your application
+- **Framework agnostic**: Core guidance is stack-neutral and can be adapted to React, Vue, Angular, Svelte, or other frameworks
+- **Styling agnostic**: Agents should reuse the styling system and design tokens already present in the project
+- **Project-aware**: Your coding assistant adapts the specification to the versions, tokens, and conventions already in your project
+- **Version-compatible guidance**: Agents should use patterns compatible with the framework versions detected in your project
+- **Independently useful**: Each potion stands on its own; related potions are optional suggestions
 
 ## How It Works
 
@@ -150,27 +150,27 @@ We welcome contributions! UI Potion grows with community input.
 
 ### Human Documentation (Markdown)
 
-- ✅ Clear prose descriptions (no ASCII art, text diagrams, emojis, or Markdown tables in potion Markdown)
-- ✅ Structure and hierarchy
-- ✅ Exact dimensions and measurements where relevant
-- ✅ State descriptions and behavior
-- ✅ Interaction patterns
-- ✅ Responsive behavior at relevant breakpoints
-- ✅ Accessibility requirements
-- ✅ Animation specifications where relevant
-- ✅ Testing checklist
-- ✅ Framework-agnostic examples
+- Clear prose descriptions (no ASCII art, text diagrams, emojis, or Markdown tables in potion Markdown)
+- Structure and hierarchy
+- Exact dimensions and measurements where relevant
+- State descriptions and behavior
+- Interaction patterns
+- Responsive behavior at relevant breakpoints
+- Accessibility requirements
+- Animation specifications where relevant
+- Testing checklist
+- Framework-agnostic examples
 
 ### AI Guide (JSON)
 
-- ✅ Structured, parseable data
-- ✅ Complete specifications that minimize ambiguity
-- ✅ Framework-specific patterns where they help agents adapt the specification
-- ✅ Styling approach examples where useful
-- ✅ State management guidance where relevant
-- ✅ Accessibility implementation details
-- ✅ Animation timing values where relevant
-- ✅ Testing verification steps
+- Structured, parseable data
+- Complete specifications that minimize ambiguity
+- Framework-specific patterns where they help agents adapt the specification
+- Styling approach examples where useful
+- State management guidance where relevant
+- Accessibility implementation details
+- Animation timing values where relevant
+- Testing verification steps
 
 ## Programmatic access (optional)
 
@@ -224,6 +224,6 @@ UI Potion provides specifications and guidelines, not generated implementation c
 
 ---
 
-**Built with ❤️ for AI-powered development**
+**Built for AI-powered development**
 
 *Making UI implementation faster, easier, and more flexible for everyone.*

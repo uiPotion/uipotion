@@ -1,0 +1,88 @@
+{{!--
+  Homepage hero demo: three behaviors the guides specify, played in a small app window by
+  /assets/js/hero-demo.js. This markup is the finished first frame (the first scene's outcome),
+  so the demo shows something without JavaScript and nothing shifts when the script starts.
+  The app window is aria-hidden and has nothing focusable; the tabs, Pause button, captions,
+  and links are real. Captions are the About page outcomes.
+--}}
+<figure class="hero-demo" data-scene="0" data-cursor="off">
+  <div class="hero-demo-head">
+    <span class="hero-demo-label">Behaviors the guides specify</span>
+    <button type="button" class="hero-demo-toggle demo-needs-js" aria-label="Pause the demo"><span class="demo-toggle-icon"><svg class="demo-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg></span><span class="demo-toggle-text">Pause</span></button>
+  </div>
+  <div class="demo-window" aria-hidden="true">
+    <div class="demo-titlebar"><span class="demo-app-mark">A</span><span class="demo-title">Acme · Assistant</span></div>
+    <div class="demo-viewport">
+      <div class="demo-scene is-stopped" data-scene="0" data-title="Acme · Assistant">
+        <div class="demo-thread">
+          <div class="demo-bubble">Summarize this week’s release notes.</div>
+          <div class="demo-reply">
+            <span class="demo-avatar">A</span>
+            <div class="demo-reply-body">
+              <div class="demo-reply-text"><span class="demo-stream">This week's release adds offline drafts, faster search, and a new export menu. Search now returns results in under 200 ms, and drafts sync as soon</span><span class="demo-caret"></span></div>
+              <div class="demo-stopped"><span class="demo-chip">Stopped</span><span class="demo-text-btn">Continue</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-composer">
+          <span class="demo-icon-btn"><svg class="demo-i" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></span>
+          <span class="demo-field is-empty"></span>
+          <span class="demo-send"><span class="demo-send-stop"><svg class="demo-i" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2" class="demo-fill"/></svg></span><span class="demo-send-up"><svg class="demo-i" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span></span>
+        </div>
+      </div>
+      <div class="demo-scene" data-scene="1" data-title="Acme · Assistant">
+        <div class="demo-thread">
+          <div class="demo-reply">
+            <span class="demo-avatar">A</span>
+            <div class="demo-reply-body"><div class="demo-reply-text">The migration plan is ready. Want me to add anything?</div></div>
+          </div>
+          <div class="demo-bubble demo-outgoing">
+            <span class="demo-out-text"></span>
+            <span class="demo-out-state">
+              <span class="demo-out-sending"><span class="demo-spinner"></span>Sending…</span>
+              <span class="demo-out-failed"><svg class="demo-i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>Not sent<span class="demo-retry"><svg class="demo-i" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4v4.5H9"/></svg>Retry</span></span>
+              <span class="demo-out-sent"><svg class="demo-i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Sent</span>
+            </span>
+          </div>
+        </div>
+        <div class="demo-composer">
+          <span class="demo-icon-btn"><svg class="demo-i" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></span>
+          <span class="demo-field demo-typed is-empty"></span>
+          <span class="demo-send"><span class="demo-send-up"><svg class="demo-i" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span></span>
+        </div>
+      </div>
+      <div class="demo-scene" data-scene="2" data-title="Acme · Settings">
+        <div class="demo-settings">
+          <span class="demo-settings-title">Project settings</span>
+          <span class="demo-settings-tabs"><span class="is-current">General</span><span>Members</span><span>Billing</span></span>
+          <div class="demo-setting-row"><span class="demo-setting-label">Project name</span><span class="demo-setting-field">Acme Web</span></div>
+          <div class="demo-danger-zone">
+            <div><span class="demo-dz-title">Delete this project</span><span class="demo-dz-text">Removes Acme Web and all of its data.</span></div>
+            <span class="demo-btn demo-btn-danger-outline demo-trigger">Delete project</span>
+          </div>
+        </div>
+        <div class="demo-backdrop"></div>
+        <div class="demo-dialog">
+          <span class="demo-dialog-icon"><svg class="demo-i" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.01"/></svg></span>
+          <span class="demo-dialog-title">Delete project?</span>
+          <span class="demo-dialog-text">Acme Web and its data will be gone for good.</span>
+          <span class="demo-dialog-actions"><span class="demo-btn demo-cancel">Cancel</span><span class="demo-btn demo-btn-danger">Delete</span></span>
+        </div>
+      </div>
+      <div class="demo-inspect"><span class="demo-inspect-label"></span></div>
+      <span class="demo-keys"></span>
+      <span class="demo-ripple"></span>
+      <span class="demo-cursor"><span class="demo-cursor-y"><svg width="20" height="26" viewBox="0 0 20 26"><path d="M2 2v19.5l5-4.8 3.4 7.6 3.3-1.4-3.3-7.4H17z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></span></span>
+    </div>
+  </div>
+  <div class="demo-tabs demo-needs-js">
+    <button type="button" class="demo-tab" data-index="0" aria-pressed="true"><span class="demo-track"><span class="demo-fillbar"></span></span>Streaming reply</button>
+    <button type="button" class="demo-tab" data-index="1" aria-pressed="false"><span class="demo-track"><span class="demo-fillbar"></span></span>Failed send</button>
+    <button type="button" class="demo-tab" data-index="2" aria-pressed="false"><span class="demo-track"><span class="demo-fillbar"></span></span>Dialog focus</button>
+  </div>
+  <div class="demo-captions">
+    <p class="demo-caption" data-scene="0"><span class="demo-caption-text is-marked">Stopping a streamed AI response keeps the text that already arrived.</span> <a class="demo-caption-link" href="/potions/patterns/ai-response-rendering">AI Response Rendering</a></p>
+    <p class="demo-caption" data-scene="1" hidden><span class="demo-caption-text">A chat message that fails to send stays in the input with a retry, so nobody has to retype it.</span> <a class="demo-caption-link" href="/potions/layouts/ai-agent-chat">AI Agent Chat Layout</a></p>
+    <p class="demo-caption" data-scene="2" hidden><span class="demo-caption-text">Closing a dialog returns focus to the control that opened it.</span> <a class="demo-caption-link" href="/potions/components/dialog">Modal Dialog</a></p>
+  </div>
+</figure>

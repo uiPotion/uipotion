@@ -13,7 +13,7 @@
 - Discovery files live at `src/statics/uipotion-manifest.json`, `src/statics/potions-index.json`, and `src/statics/llms.txt`.
 - JSON schemas live in `src/statics/schema/`.
 - Handlebars pages live in `src/pages/`; partials live in `src/partials/`; potion layouts live in `src/potion-layouts/`.
-- SCSS entrypoint is `src/styles/main.scss`, which uses `basic`, `page`, and `uipotion`.
+- SCSS entrypoint is `src/styles/main.scss`, which uses `basic` and `uipotion`.
 - Build output in `build/` is generated. Do not edit it by hand.
 - Generated Markdown copies under `src/statics/potions/**/*.md` are gitignored and removed after production builds. Edit the source files in `src/potions/` instead.
 

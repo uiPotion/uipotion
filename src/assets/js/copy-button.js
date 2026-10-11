@@ -57,6 +57,20 @@
       const originalLabel = copyText.textContent;
       let resetTimer = null;
 
+      // Keep one width: the label shares a grid cell with hidden copies of every label
+      // the button can show, so "Copied!" or "Copy failed" never moves the buttons next to it
+      const labelBox = document.createElement('span');
+      labelBox.className = 'copy-label';
+      copyText.before(labelBox);
+      labelBox.appendChild(copyText);
+      [originalLabel, 'Copied!', 'Copy failed'].forEach(function(label) {
+        const sizer = document.createElement('span');
+        sizer.className = 'copy-label-sizer';
+        sizer.setAttribute('aria-hidden', 'true');
+        sizer.textContent = label;
+        labelBox.appendChild(sizer);
+      });
+
       function reset() {
         copyIcon.style.display = 'block';
         checkIcon.style.display = 'none';
