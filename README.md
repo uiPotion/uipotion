@@ -125,7 +125,8 @@ npm start
 # Build for production (runs validation automatically)
 npm run build
 
-# Validate all potions against their schemas (optional; also runs on build)
+# Validate all potions: the JSON schemas, the potions index, and the AGENTS.md
+# authoring rules, including each guide's Markdown (also runs on build)
 npm run validate
 
 # Generate sitemap.xml, _redirects, and temporary Markdown publishing copies
@@ -180,7 +181,7 @@ Most users only need to share a potion link with their AI assistant. If you're b
 - **Potions index**: `https://uipotion.com/potions-index.json` — catalog of all potions (`id`, `name`, `category`, `tags`, `excerpt`, `webUrl`, `agentGuideUrl`, `markdownUrl`, dates)
 - **Base schema**: `https://uipotion.com/schema/potion.base.schema.json` — shared contract for every potion guide
 - **Category schema**: `https://uipotion.com/schema/categories/[category].schema.json` — category-specific contract referenced by each guide
-- **Schema validator**: `https://uipotion.com/validator` — browser-based validation for potion JSON
+- **Schema validator**: `https://uipotion.com/validator` — checks one potion JSON against its category schema in the browser (`npm run validate` also checks the Markdown and the index)
 - **Individual guide**: `https://uipotion.com/potions/[category]/[id].json` — full implementation specification for one potion
 - **Markdown source**: `https://uipotion.com/potions/[category]/[id].md` — human-readable source for text/markdown-friendly agents
 - **LLM discovery file**: `https://uipotion.com/llms.txt` — curated entrypoint for LLM/agent discovery

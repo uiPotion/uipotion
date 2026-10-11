@@ -42,8 +42,8 @@ requests" currentPath="contribute" }}
             <li><strong>Fork this repository</strong> at <a href="https://github.com/uiPotion/uipotion" target="_blank"
                 rel="noopener">github.com/uiPotion/uipotion</a></li>
             <li><strong>Create your potion</strong> (Markdown + JSON + index entry) — see Creating a Potion below</li>
-            <li><strong>Validate</strong> using the <a href="/validator">Schema Validator</a> or
-              <code>npm run validate</code></li>
+            <li><strong>Validate</strong> with <code>npm run validate</code>, which checks the JSON, the Markdown, and the
+              index entry. The <a href="/validator">Schema Validator</a> checks only the JSON, in your browser.</li>
             <li><strong>Run <code>npm run build</code></strong> to validate and generate the production site</li>
             <li><strong>Submit a pull request</strong> with your new potion</li>
           </ol>
@@ -114,8 +114,10 @@ path: 'potions/components/your-potion'
             that shows them) to show a short summary under the excerpt.</p>
 
           <h3>Step 3: Validate</h3>
-          <p>Visit the <a href="/validator">Schema Validator</a> or run <code>npm run validate</code>
-            to validate your JSON. Fix any errors before continuing.</p>
+          <p>Check your JSON in the <a href="/validator">Schema Validator</a>, which compares it with its category
+            schema. Fix any errors before continuing. The full check, <code>npm run validate</code>, also covers your
+            Markdown and the index entry from Step 4, so run it after that step (<code>npm run build</code> runs it
+            too).</p>
 
           <h3>Step 4: Update Potions Index and Dates</h3>
           <p>Add the matching entry to <code>src/statics/potions-index.json</code>, including <code>id</code>,
@@ -125,8 +127,9 @@ path: 'potions/components/your-potion'
             index dates synchronized with the guide metadata, and update the manifest <code>meta.updated</code>.</p>
 
           <h3>Step 5: Build and Verify</h3>
-          <p>Run <code>npm run build</code>. The build validates every potion, checks index consistency, regenerates
-            static discovery files, builds the Harold site, and cleans temporary Markdown publishing copies.</p>
+          <p>Run <code>npm run build</code>. The build validates every potion (its JSON, its Markdown, and the index),
+            regenerates static discovery files, builds the Harold site, and cleans temporary Markdown publishing
+            copies.</p>
         </section>
 
         <section class="about-section">
@@ -247,18 +250,18 @@ The promptSubject is a short lowercase noun phrase for the prompts on the potion
 
         <section class="about-section">
           <h2>Validate Your Potion</h2>
-          <p>Before submitting a pull request, always validate your potion JSON against the appropriate schema. You can
-            use either the web-based validator or the CLI script:</p>
+          <p>Before submitting a pull request, always validate your potion. There are two validators, and they check
+            different things:</p>
 
           <h3>Web-Based Validator</h3>
           <div class="validator-cta">
             <a href="/validator" class="button primary">Open Schema Validator</a>
-            <p>Select the correct category schema and paste your JSON to check for errors.</p>
+            <p>Select the category and paste your potion JSON. It checks that one JSON against its category schema, in
+              your browser. It doesn't see your Markdown or the index.</p>
           </div>
 
           <h3>CLI Validation Script</h3>
-          <p>For contributors working locally, you can also use the Node.js CLI validation script that validates all
-            potions at once:</p>
+          <p>The Node.js CLI validation script checks every potion at once, and checks more than the web validator:</p>
           <div class="example-box">
             <pre><code># Validate all potions
 npm run validate
@@ -270,8 +273,10 @@ node validate-potions.js</code></pre>
           <ul>
             <li>Automatically finds all potion JSON files</li>
             <li>Selects the category schema from the potion directory</li>
-            <li>Validates each potion against its category schema</li>
+            <li>Validates each potion against its category schema, including formats such as dates</li>
             <li>Checks guide identity and metadata against <code>potions-index.json</code></li>
+            <li>Checks the authoring rules in <code>AGENTS.md</code>: the Markdown front matter, tags, names, and
+              content rules, the guide URLs, related potions, and dates</li>
             <li>Shows detailed error messages for any issues</li>
             <li>Runs automatically before <code>npm run build</code></li>
             <li>Exits with error code if validation fails (useful for CI/CD)</li>
@@ -280,7 +285,7 @@ node validate-potions.js</code></pre>
           <p>Both validators will:</p>
           <ul>
             <li>Check that all required fields are present</li>
-            <li>Verify data types and formats</li>
+            <li>Verify data types (only the CLI script checks formats such as dates)</li>
             <li>Validate schema references</li>
             <li>Show detailed error messages if something is wrong</li>
           </ul>

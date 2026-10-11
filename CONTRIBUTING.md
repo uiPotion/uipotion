@@ -10,7 +10,7 @@ Thank you for your interest in contributing to UI Potion! This guide will help y
 
 1. Fork this repository at https://github.com/uiPotion/uipotion
 2. Create your potion (Markdown + JSON + index entry) — see Creating a Potion below
-3. Validate using the [Schema Validator](https://uipotion.com/validator) or `npm run validate`
+3. Validate with `npm run validate`, which checks the JSON, the Markdown, and the index entry. The [Schema Validator](https://uipotion.com/validator) checks only the JSON, in your browser.
 4. Run `npm run build` to validate and generate the production site
 5. Submit a pull request
 
@@ -93,7 +93,7 @@ Then write comprehensive specifications in the body (see existing potions for fo
 
 ### Step 3: Validate
 
-Visit https://uipotion.com/validator and validate your JSON file.
+Check your JSON in the [Schema Validator](https://uipotion.com/validator), which compares it with its category schema. Fix any errors before continuing. The full check, `npm run validate`, also covers your Markdown and the index entry from Step 4, so run it after that step (`npm run build` runs it too).
 
 ### Step 4: Update Potions Index and Dates
 
@@ -124,7 +124,7 @@ Run the full production check:
 npm run build
 ```
 
-The build validates every potion, checks index metadata consistency, regenerates the sitemap and redirects, creates the Harold site, and cleans temporary Markdown publishing copies.
+The build validates every potion (its JSON, its Markdown, and the index), regenerates the sitemap and redirects, creates the Harold site, and cleans temporary Markdown publishing copies.
 
 ## Testing Locally
 
@@ -144,7 +144,7 @@ Visit http://localhost:3000 to preview your changes.
 ## Pull Request Guidelines
 
 **Before submitting:**
-- JSON validates with no errors (web validator or `npm run validate`)
+- `npm run validate` passes with no errors (the web validator checks only the JSON)
 - Markdown has correct front matter
 - Ran `npm run build`
 - Updated `potions-index.json`

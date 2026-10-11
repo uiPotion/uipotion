@@ -18,7 +18,8 @@
 - Generated Markdown copies under `src/statics/potions/**/*.md` are gitignored and removed after production builds. Edit the source files in `src/potions/` instead.
 
 ## Commands
-- `npm run validate`: validate all potion JSON files against category schemas.
+- `npm run validate`: validate every potion: its JSON against the category schema, the potions index against the guides, and the authoring rules in this file (Markdown front matter and content, URLs, related potions, dates). Breaks that existed when a rule was added are listed in `KNOWN_RULE_BREAKS` in `validate-potions.js`; delete a line there once its potion's fix removes the break.
+- The browser validator at `/validator` checks one pasted JSON against its category schema only.
 - `npm run static`: regenerate `src/statics/sitemap.xml`, `src/statics/_redirects`, and temporary Markdown copies for static publishing.
 - `npm run build`: preferred full check; runs validate, static generation, Harold build, and postbuild cleanup.
 - `npm run start`: build, serve `build/` on `localhost:3000`, and watch source files.
