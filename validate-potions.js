@@ -19,13 +19,12 @@ const SCHEMAS_DIR = 'src/statics/schema';
 const POTIONS_INDEX_FILE = 'src/statics/potions-index.json';
 const MANIFEST_FILE = 'src/statics/uipotion-manifest.json';
 const SITE_URL = 'https://uipotion.com';
-const CATEGORIES = ['components', 'features', 'layouts', 'patterns', 'tooling'];
 
 // Authoring rules from AGENTS.md that these potions broke when the checks were added (2026-10-11).
 // Each line is one finding exactly as the validator prints it, so a potion with a known break
 // still fails on any new break, including another break of the same rule. The lines print as
 // warnings until each potion's pass fixes them and deletes them here. A line that no longer
-// matches a finding fails validation, so this list only shrinks.
+// matches a finding fails validation. Never add a line: fix a new break instead.
 const KNOWN_RULE_BREAKS = [
   'components/data-table [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
   'components/data-table [urls]: meta.webUrl is "https://uipotion.com/potions/components/data-table.html", expected https://uipotion.com/potions/components/data-table',
@@ -68,14 +67,10 @@ const KNOWN_RULE_BREAKS = [
   'tooling/eslint-config [urls]: meta.webUrl is "https://uipotion.com/potions/tooling/eslint-config.html", expected https://uipotion.com/potions/tooling/eslint-config'
 ];
 
-// Schema file mapping
-const SCHEMA_FILES = {
-  components: path.join(SCHEMAS_DIR, 'categories', 'components.schema.json'),
-  layouts: path.join(SCHEMAS_DIR, 'categories', 'layouts.schema.json'),
-  features: path.join(SCHEMAS_DIR, 'categories', 'features.schema.json'),
-  patterns: path.join(SCHEMAS_DIR, 'categories', 'patterns.schema.json'),
-  tooling: path.join(SCHEMAS_DIR, 'categories', 'tooling.schema.json')
-};
+// Each category folder has its schema at categories/[category].schema.json
+function categorySchemaFile(category) {
+  return path.join(SCHEMAS_DIR, 'categories', `${category}.schema.json`);
+}
 
 // Required schemas for resolution
 const REQUIRED_SCHEMAS = [
@@ -287,13 +282,44 @@ function formatError(error) {
 }
 
 /**
+ * The category folders in the guide and Markdown directories
+ */
+function findCategoryFolders() {
+  return [POTIONS_DIR, MARKDOWN_DIR].flatMap(dir => {
+    if (!fs.existsSync(dir)) return [];
+    return fs.readdirSync(dir, { withFileTypes: true })
+      .filter(entry => entry.isDirectory())
+      .map(entry => ({ dir: path.join(dir, entry.name), category: entry.name }));
+  });
+}
+
+/**
+ * Every file under dir, as paths relative to it
+ */
+function listFiles(dir) {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    if (entry.isDirectory()) return listFiles(path.join(dir, entry.name)).map(file => path.join(entry.name, file));
+    return entry.isFile() ? [entry.name] : [];
+  });
+}
+
+/**
+ * The categories: the folder names that have a category schema. checkAuthoringRules reports
+ * the folders that have none.
+ */
+function findCategories() {
+  const names = new Set(findCategoryFolders().map(folder => folder.category));
+  return [...names].filter(category => fs.existsSync(categorySchemaFile(category))).sort();
+}
+
+/**
  * Find all potion JSON files
  */
 function findPotions() {
   const potions = [];
-  const categories = ['components', 'features', 'layouts', 'patterns', 'tooling'];
 
-  categories.forEach(category => {
+  findCategories().forEach(category => {
     const categoryDir = path.join(POTIONS_DIR, category);
     if (!fs.existsSync(categoryDir)) return;
 
@@ -369,8 +395,8 @@ function validatePotion(potion) {
   }
 
   // Check if category schema exists
-  const categorySchemaPath = SCHEMA_FILES[detectedCategory];
-  if (!categorySchemaPath) {
+  const categorySchemaPath = categorySchemaFile(detectedCategory);
+  if (!fs.existsSync(categorySchemaPath)) {
     return {
       valid: false,
       errors: [{
@@ -625,10 +651,10 @@ function readJsonFile(file) {
 }
 
 /**
- * Check the authoring rules in AGENTS.md: front matter, tags, titles and names, the potion page
- * fields, no emoji, text diagrams, or Markdown tables, no template placeholders, the guide URLs,
- * related potions, and the dates. Each finding names the exact break, so a known break can't
- * hide a new one.
+ * Check the authoring rules in AGENTS.md: each potion's Markdown and JSON in a category folder
+ * with a schema, front matter, tags, titles and names, the potion page fields, no emoji, text
+ * diagrams, or Markdown tables, no template placeholders, the guide URLs, related potions, and
+ * the dates. Each finding names the exact break, so a known break can't hide a new one.
  */
 async function checkAuthoringRules(potions) {
   const findings = []; // { key, rule, message }
@@ -636,6 +662,7 @@ async function checkAuthoringRules(potions) {
   const shown = value => (value === undefined ? 'missing' : JSON.stringify(value));
   const isText = value => typeof value === 'string' && value.trim() !== '';
   const parseMarkdown = await loadBuildMarkdownParser();
+  const categories = findCategories();
 
   // A missing or malformed index is reported by checkIndexConsistency; here it only skips the
   // comparisons that need it. Nothing else reads the manifest, so its problems are reported here.
@@ -703,7 +730,7 @@ async function checkAuthoringRules(potions) {
     // The first tag is the category; another category's name as a tag would list the potion twice
     const tags = Array.isArray(fm.tags) ? fm.tags : [];
     if (tags[0] !== category) add(key, 'first-tag', `the first tag is ${shown(tags[0])}, expected "${category}"`);
-    const otherCategories = tags.filter(tag => CATEGORIES.includes(tag) && tag !== category);
+    const otherCategories = tags.filter(tag => categories.includes(tag) && tag !== category);
     if (otherCategories.length) add(key, 'category-tag', `tags include other categories: ${otherCategories.join(', ')}`);
 
     // Titles: at most 60 characters, and the same name in the Markdown, the JSON, and the index
@@ -761,6 +788,32 @@ async function checkAuthoringRules(potions) {
     });
 
     if (meta.created && meta.updated && meta.updated < meta.created) add(key, 'dates', `meta.updated ${meta.updated} is before meta.created ${meta.created}`);
+  });
+
+  // Potion files sit directly in a category folder that has a schema, and each Markdown potion
+  // has its JSON guide (a guide without Markdown is reported above). Harold builds every Markdown
+  // file under src/potions and publishes every file under src/statics/potions, so a potion file
+  // anywhere else would go live unchecked.
+  findCategoryFolders().forEach(({ dir, category }) => {
+    if (!categories.includes(category)) add(dir, 'category-folder', `no category schema at ${categorySchemaFile(category)}`);
+  });
+  [[POTIONS_DIR, /\.json$/i, '.json'], [MARKDOWN_DIR, /\.(md|markdown)$/i, '.md']].forEach(([dir, pattern, extension]) => {
+    listFiles(dir).filter(file => pattern.test(file)).forEach(file => {
+      if (file.split(path.sep).length !== 2 || path.extname(file) !== extension) {
+        add(path.join(dir, file), 'file-location', `expected ${path.join(dir, '[category]', `[slug]${extension}`)}`);
+      }
+    });
+  });
+  categories.forEach(category => {
+    const markdownDir = path.join(MARKDOWN_DIR, category);
+    if (!fs.existsSync(markdownDir)) return;
+    fs.readdirSync(markdownDir, { withFileTypes: true })
+      .filter(entry => entry.isFile() && entry.name.endsWith('.md'))
+      .forEach(entry => {
+        const slug = entry.name.replace(/\.md$/, '');
+        const key = `${category}/${slug}`;
+        if (!guideKeys.has(key)) add(key, 'json-missing', `no JSON guide at ${path.join(POTIONS_DIR, category, `${slug}.json`)}`);
+      });
   });
 
   // The index's lastUpdated and the manifest's meta.updated are real dates (the sitemap uses them

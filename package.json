@@ -8,7 +8,8 @@
     "build": "npm run validate && npm run static && harold-scripts build",
     "postbuild": "node scripts/cleanup-potion-markdown.js",
     "static": "node generate-static.js",
-    "validate": "node validate-potions.js"
+    "validate": "node validate-potions.js",
+    "test": "node --test test/validate-potions.test.js"
   },
   "repository": {
     "type": "git",

@@ -271,8 +271,8 @@ node validate-potions.js</code></pre>
           </div>
           <p>The CLI script:</p>
           <ul>
-            <li>Automatically finds all potion JSON files</li>
-            <li>Selects the category schema from the potion directory</li>
+            <li>Finds every potion in the category folders, and checks that each has both its Markdown and its JSON</li>
+            <li>Selects the category schema from the potion directory, and fails on a folder without one</li>
             <li>Validates each potion against its category schema, including formats such as dates</li>
             <li>Checks guide identity and metadata against <code>potions-index.json</code></li>
             <li>Checks the authoring rules in <code>AGENTS.md</code>: the Markdown front matter, tags, names, and

@@ -129,6 +129,9 @@ npm run build
 # authoring rules, including each guide's Markdown (also runs on build)
 npm run validate
 
+# Test the validator itself, after changing validate-potions.js
+npm test
+
 # Generate sitemap.xml, _redirects, and temporary Markdown publishing copies
 npm run static
 
