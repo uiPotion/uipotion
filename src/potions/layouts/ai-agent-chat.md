@@ -18,8 +18,6 @@ path: 'potions/layouts/ai-agent-chat'
 promptSubject: 'an AI chat interface'
 ---
 
-# AI Agent Chat Layout
-
 A responsive AI agent chat interface layout with message history, input area, typing indicators, and conversation management. Perfect for AI assistants, chatbots, and conversational interfaces.
 
 ## Structure Specification

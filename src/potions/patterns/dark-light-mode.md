@@ -18,8 +18,6 @@ path: 'potions/patterns/dark-light-mode'
 promptSubject: 'dark and light mode'
 ---
 
-# Dark/Light Mode Pattern - Theme Switching and Color Schemes
-
 A framework-agnostic pattern for implementing dark and light theme switching. Covers preference detection (system vs user override), persistence, semantic color tokens, preventing flash of unstyled content, accessibility, and handling of images and media. Works with any frontend framework and styling system.
 
 ## The Problem

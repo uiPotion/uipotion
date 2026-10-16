@@ -1,6 +1,7 @@
 {
   "name": "uipotion",
   "version": "1.0.0",
+  "private": true,
   "description": "AI-agent-optimized UI specifications for any framework",
   "main": "index.js",
   "scripts": {

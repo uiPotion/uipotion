@@ -19,8 +19,6 @@ path: 'potions/components/command-palette'
 promptSubject: 'a command palette'
 ---
 
-# Command Palette
-
 An accessible command palette component for keyboard-first navigation and action execution, with fuzzy search, grouped results, recent commands, and role-aware command visibility.
 
 ## Overview

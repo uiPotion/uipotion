@@ -19,8 +19,6 @@ path: 'potions/components/tabs'
 promptSubject: 'tabs'
 ---
 
-# Tabs Component
-
 An accessible tabs component for horizontal and vertical layouts with fixed or scrollable tab lists, keyboard navigation, optional manual activation, responsive behavior, and robust overflow handling for many tabs.
 
 ## Overview

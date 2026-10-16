@@ -22,8 +22,6 @@ path: 'potions/components/button'
 promptSubject: 'buttons'
 ---
 
-# Button
-
 A foundational, accessible Button component with semantic variants (primary, secondary, ghost, destructive, link), sizes (sm, md, lg), icon-only support, loading and disabled states, and optional link or toggle behavior. Designed to integrate into existing design systems via tokens and adapter rules.
 
 ## Overview

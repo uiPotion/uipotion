@@ -18,8 +18,6 @@ path: 'potions/layouts/documentation'
 promptSubject: 'a documentation site layout'
 ---
 
-# Documentation Website Layout
-
 A three-column documentation reading layout with hierarchical sidebar navigation, a focused prose content area, and a scroll-spy table of contents. Designed for developer documentation sites, knowledge bases, and technical reference pages. Inspired by Next.js docs, Nextra, Docusaurus, and Mintlify.
 
 ## Structure Specification

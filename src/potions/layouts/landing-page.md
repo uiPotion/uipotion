@@ -19,8 +19,6 @@ path: 'potions/layouts/landing-page'
 promptSubject: 'a marketing landing page'
 ---
 
-# Landing Page Layout (Marketing)
-
 A conversion-optimized marketing landing page layout with hero section, feature highlights, social proof, and strategic CTAs. Perfect for product launches, SaaS marketing, and lead generation campaigns.
 
 ## Structure Specification

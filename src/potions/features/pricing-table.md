@@ -18,8 +18,6 @@ path: 'potions/features/pricing-table'
 promptSubject: 'a pricing table'
 ---
 
-# 3-Tier SaaS Pricing Table
-
 A responsive 3-tier pricing table component with monthly/yearly billing toggle, highlighted "Most Popular" plan, and feature comparison. Perfect for SaaS marketing pages, product pages, and subscription-based services.
 
 ## Overview

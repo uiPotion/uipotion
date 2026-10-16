@@ -64,6 +64,7 @@ path: 'potions/components/component-name'
   - `example` (optional, with `useWhen`): one short scenario that shows the listed behaviors, using only behavior the guide covers.
 - Keep titles concise: prefer 2-6 words and target 60 characters or less. Put detailed qualifiers in the excerpt, body, and JSON fields.
 - Do not use ASCII art, text-based diagrams, emojis, or Markdown tables in potion Markdown. Use clear prose and bullets instead.
+- No `#` heading in the body: the page shows `title` as its only `h1`, so sections start at `##`.
 - Do not make Markdown potions framework-specific. Describe behavior, structure, states, accessibility, responsive behavior, animation, and testing in stack-neutral terms.
 - Use same-category existing potions as templates before inventing a new structure.
 
@@ -99,7 +100,7 @@ path: 'potions/components/component-name'
 - Potions index URL: `/potions-index.json`.
 
 ## Harold And Templates
-- Pages in `src/pages/*.hbs` should include `{{> head}}` at the top and `{{> footer}}` at the bottom.
+- Pages in `src/pages/*.hbs` should include `{{> head}}` at the top and `{{> footer}}` at the bottom, with the page content, hero included, in one `<main>`.
 - Do not put DOCTYPE, `<html>`, `<head>`, or opening `<body>` tags in page files; `src/partials/head.hbs` owns that wrapper.
 - Use semantic HTML and pass page metadata through the `head` partial.
 - Useful helpers include `formatDate`, `responsiveImg`, and `postsList`.

@@ -18,8 +18,6 @@ path: 'potions/components/sidebar-navigation'
 promptSubject: 'sidebar navigation'
 ---
 
-# Sidebar Navigation
-
 A responsive sidebar navigation component with collapsible icon-only mode, multi-level nested groups, badge support, inline search, and mobile overlay. The primary navigation pattern for SaaS dashboards, admin panels, and application shells.
 
 ## Structure Specification

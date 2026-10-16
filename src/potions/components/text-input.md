@@ -19,8 +19,6 @@ path: 'potions/components/text-input'
 promptSubject: 'text inputs'
 ---
 
-# Text Input Field
-
 An accessible text input component with label, hint text, error display, success indicator, and comprehensive state management. Foundation for all form inputs with full keyboard and screen reader support.
 
 ## Overview

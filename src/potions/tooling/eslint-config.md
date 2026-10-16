@@ -20,8 +20,6 @@ promptSubject: 'linting with ESLint'
 promptReuse: 'Build on our existing lint and formatting setup if there is one, change only what this task needs, and don''t remove or replace config files without asking.'
 ---
 
-# ESLint Config Generator for UI Projects
-
 A comprehensive ESLint configuration generator for modern UI projects. Supports React, Vue, Angular, and Svelte with accessibility linting, TypeScript support, and Prettier integration.
 
 ## Config Format Selection

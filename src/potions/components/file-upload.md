@@ -21,8 +21,6 @@ path: 'potions/components/file-upload'
 promptSubject: 'file upload'
 ---
 
-# File Upload Component
-
 A fully accessible file upload component with drag-and-drop, browse button fallback, validation (type/size/count), per-file progress, retry/cancel, and robust keyboard and screen reader support. Supports single or multiple files, optional previews, and async upload integration.
 
 ## Overview

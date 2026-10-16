@@ -478,6 +478,20 @@ describe('validate-potions.js', { concurrency: CONCURRENCY }, () => {
     assertErrors(await f.run(), ['components/button [markdown-table]: 1 Markdown table(s)']);
   });
 
+  it('fails on level-1 headings in the Markdown body, in either syntax', async t => {
+    const f = fixture(t);
+    f.edit(markdown(BUTTON), text => text.replace(/\n---\n/, '\n---\n\n# Button\n') + '\nAnother title\n=============\n');
+    assertErrors(await f.run(), [
+      'components/button [markdown-h1]: 2 level-1 heading(s) in the Markdown: "Button", "Another title" (the page shows the title as its h1, so headings start at ##)'
+    ]);
+  });
+
+  it('accepts # lines in code blocks and deeper headings', async t => {
+    const f = fixture(t);
+    f.edit(markdown(BUTTON), text => `${text}\n## Install\n\n\`\`\`sh\n# install the package\nnpm install\n\`\`\`\n\n    # indented code\n`);
+    assertPasses(await f.run());
+  });
+
   it('fails on template placeholders, listed one by one', async t => {
     const f = fixture(t);
     f.editJson(guide(BUTTON), data => { data.description += ' {{USER_FRAMEWORK}}'; });

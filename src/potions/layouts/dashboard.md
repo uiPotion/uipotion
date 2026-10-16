@@ -15,8 +15,6 @@ path: 'potions/layouts/dashboard'
 promptSubject: 'a dashboard layout'
 ---
 
-# Dashboard Layout
-
 A responsive admin dashboard layout with collapsible sidebar navigation and a fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.
 
 ## Structure Specification

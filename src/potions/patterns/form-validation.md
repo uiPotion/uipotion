@@ -18,8 +18,6 @@ path: 'potions/patterns/form-validation'
 promptSubject: 'form validation'
 ---
 
-# Form Validation Pattern - UX and Timing Strategies
-
 A comprehensive UX pattern for form validation covering timing strategies (when to show errors), error display patterns, async validation, accessibility, and integration with form libraries. Teaches principles that work with any framework or validation library.
 
 ## The Problem

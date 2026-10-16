@@ -20,8 +20,6 @@ path: 'potions/components/toast-notifications'
 promptSubject: 'toast notifications'
 ---
 
-# Toast Notifications (Accessible) with Queue System
-
 A non-blocking toast notification system for providing user feedback after actions. Features success, error, warning, and info variants with queue management, auto-dismiss timers, manual dismiss controls, keyboard navigation, and full screen reader support.
 
 ## Structure Specification

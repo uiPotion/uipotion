@@ -19,8 +19,6 @@ path: 'potions/patterns/ai-action-review'
 promptSubject: 'review and approval of AI agent actions'
 ---
 
-# AI Action Review Pattern
-
 A framework-agnostic pattern for reviewing AI-proposed actions before they execute. It covers plan previews, affected data, risk labels, scoped permissions, approve/reject/edit controls, undo and rollback affordances, progress states, and audit trails for agentic products.
 
 This pattern complements the [AI Agent Chat Layout](/potions/layouts/ai-agent-chat) and [AI Response Rendering Pattern](/potions/patterns/ai-response-rendering). Those potions define the conversation shell and assistant response body. This pattern defines the control surface that appears when an AI assistant wants to do something with consequences.

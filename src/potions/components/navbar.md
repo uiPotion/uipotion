@@ -19,8 +19,6 @@ path: 'potions/components/navbar'
 promptSubject: 'a responsive navigation bar'
 ---
 
-# Navigation Bar (Responsive) with Mobile Menu
-
 A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, optional transparent-to-solid transition, and first-class dropdown support. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.
 
 ## Structure Specification

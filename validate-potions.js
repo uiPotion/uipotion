@@ -653,8 +653,9 @@ function readJsonFile(file) {
 /**
  * Check the authoring rules in AGENTS.md: each potion's Markdown and JSON in a category folder
  * with a schema, front matter, tags, titles and names, the potion page fields, no emoji, text
- * diagrams, or Markdown tables, no template placeholders, the guide URLs, related potions, and
- * the dates. Each finding names the exact break, so a known break can't hide a new one.
+ * diagrams, Markdown tables, or level-1 headings, no template placeholders, the guide URLs,
+ * related potions, and the dates. Each finding names the exact break, so a known break can't
+ * hide a new one.
  */
 async function checkAuthoringRules(potions) {
   const findings = []; // { key, rule, message }
@@ -757,8 +758,18 @@ async function checkAuthoringRules(potions) {
     if (emoji.length) add(key, 'emoji', `${emoji.length} emoji in the Markdown: ${emoji.join(' ')}`);
     const boxDrawing = body.match(/[─-╿]/g) || [];
     if (boxDrawing.length) add(key, 'text-diagram', `${boxDrawing.length} box-drawing characters (text diagrams) in the Markdown`);
-    const tableRows = linesOutsideCode(parseMarkdown(body), body).filter(line => /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line));
+    const tree = parseMarkdown(body);
+    const tableRows = linesOutsideCode(tree, body).filter(line => /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line));
     if (tableRows.length) add(key, 'markdown-table', `${tableRows.length} Markdown table(s)`);
+
+    // No level-1 heading in the body: the potion page shows the title as its only h1
+    const h1s = [];
+    const textOf = node => node.value || (node.children || []).map(textOf).join('');
+    (function walk(node) {
+      if (node.type === 'heading' && node.depth === 1) h1s.push(JSON.stringify(textOf(node)));
+      else (node.children || []).forEach(walk);
+    })(tree);
+    if (h1s.length) add(key, 'markdown-h1', `${h1s.length} level-1 heading(s) in the Markdown: ${h1s.join(', ')} (the page shows the title as its h1, so headings start at ##)`);
 
     // Template placeholders that nothing fills in, listed one by one
     [['JSON', jsonText], ['Markdown', markdown]].forEach(([where, text]) => {

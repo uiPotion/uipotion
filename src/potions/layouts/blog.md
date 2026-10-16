@@ -19,8 +19,6 @@ path: 'potions/layouts/blog'
 promptSubject: 'a blog layout'
 ---
 
-# Blog Layout (List and Post)
-
 A comprehensive blog layout covering both the list frontpage and the single post page. Includes all UI sections typically needed in blogs: navbar, hero, post list, post card, article header, article content, sidebar, newsletter signup, footer, pagination, comments, share buttons, and related posts.
 
 ## Structure Specification

@@ -1,54 +1,56 @@
 {{> head title="UI Potion - UI Behavior Guides for Coding Agents" description="UI behavior guides your coding agent can apply to your existing project. Each guide spells out how a piece of UI should behave; your agent builds it with your framework, components, and styling." currentPath="" }}
 
-<div class="hero">
-  <div class="container">
-    <h1>UI behavior guides for your coding agent</h1>
-    <p class="tagline">Each guide spells out how a piece of UI should behave, down to the details a short prompt misses. Your agent builds it into your project with your own components and styling.</p>
-    <div class="hero-actions">
-      <a href="#potions" class="button primary">Browse Potions</a>
-      <a href="/about" class="button">How It Works</a>
-    </div>
-    {{> hero-demo}}
-  </div>
-</div>
-
-<section id="potions" class="potions-section">
-  <div class="container">
-    <h2>Available Potions</h2>
-    <p class="section-intro">Each potion is a detailed specification that AI agents can adapt into layouts, components, features, patterns, or tooling for an existing project.</p>
-
-    {{postsList
-      perPageLimit=6
-      currentPage=1
-      className="potions-grid"
-      dateFormat='dd mmmm yyyy'
-      noDate=true
-    }}
-
-    <div class="view-all-potions">
-      <a href="/potions" class="button primary">View All Potions</a>
-    </div>
-  </div>
-</section>
-
-<section class="how-to-use">
-  <div class="container">
-    <h2>How to Use</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-number">Copy prompt</div>
-        <h3>Build it into your project</h3>
-        <p>Open a potion, copy its prompt, and paste it into your coding agent, such as Claude Code, Codex, or Cursor. The agent builds the behavior with your components and styling.</p>
+<main>
+  <div class="hero">
+    <div class="container">
+      <h1>UI behavior guides for your coding agent</h1>
+      <p class="tagline">Each guide spells out how a piece of UI should behave, down to the details a short prompt misses. Your agent builds it into your project with your own components and styling.</p>
+      <div class="hero-actions">
+        <a href="#potions" class="button primary">Browse Potions</a>
+        <a href="/about" class="button">How It Works</a>
       </div>
-      <div class="step">
-        <div class="step-number">Check prompt</div>
-        <h3>Check what you already have</h3>
-        <p>Use a potion's check prompt to compare your existing UI with the guide. The agent lists the gaps by severity and changes nothing until you ask.</p>
+      {{> hero-demo}}
+    </div>
+  </div>
+
+  <section id="potions" class="potions-section">
+    <div class="container">
+      <h2>Available Potions</h2>
+      <p class="section-intro">Each potion is a detailed specification that AI agents can adapt into layouts, components, features, patterns, or tooling for an existing project.</p>
+
+      {{postsList
+        perPageLimit=6
+        currentPage=1
+        className="potions-grid"
+        dateFormat='dd mmmm yyyy'
+        noDate=true
+      }}
+
+      <div class="view-all-potions">
+        <a href="/potions" class="button primary">View All Potions</a>
       </div>
     </div>
-    <p class="how-to-use-alt">Or use <a href="/potion-kit">Potion Kit</a>: a CLI that lets you scaffold and chat-build Harold + UI Potion sites; the model uses only real potion specs from the catalog.</p>
-  </div>
-</section>
+  </section>
+
+  <section class="how-to-use">
+    <div class="container">
+      <h2>How to Use</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">Copy prompt</div>
+          <h3>Build it into your project</h3>
+          <p>Open a potion, copy its prompt, and paste it into your coding agent, such as Claude Code, Codex, or Cursor. The agent builds the behavior with your components and styling.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">Check prompt</div>
+          <h3>Check what you already have</h3>
+          <p>Use a potion's check prompt to compare your existing UI with the guide. The agent lists the gaps by severity and changes nothing until you ask.</p>
+        </div>
+      </div>
+      <p class="how-to-use-alt">Or use <a href="/potion-kit">Potion Kit</a>: a CLI that lets you scaffold and chat-build Harold + UI Potion sites; the model uses only real potion specs from the catalog.</p>
+    </div>
+  </section>
+</main>
 
 <script src="/assets/js/hero-demo.js"></script>
 

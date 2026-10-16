@@ -19,8 +19,6 @@ path: 'potions/layouts/ecommerce-product-page'
 promptSubject: 'an ecommerce product page'
 ---
 
-# Ecommerce Product Page
-
 A modern ecommerce product detail page layout built for high-intent shoppers. The layout prioritizes product inspection, variant clarity, availability confidence, shipping and return transparency, and fast purchase actions on both desktop and mobile.
 
 ## Structure Specification

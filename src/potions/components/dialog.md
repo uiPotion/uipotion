@@ -24,8 +24,6 @@ specifies:
 example: 'Someone clicks Delete project, then changes their mind and presses Escape. The dialog closes, and focus is back on Delete project.'
 ---
 
-# Modal Dialog (Accessible) with Focus Trap and Actions
-
 An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.
 
 ## Structure Specification

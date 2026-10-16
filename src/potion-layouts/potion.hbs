@@ -1,10 +1,10 @@
 {{> head title=title description=excerpt agentManifest=agentManifest currentPath=path tags=tags publicationDate=publicationDate }}
 
-<div class="potion-page">
+<main class="potion-page">
   <!-- Hero Header with AI Link -->
-  <header class="potion-hero" role="banner">
+  <header class="potion-hero">
     <div class="potion-hero-container">
-      <nav class="potion-breadcrumb" aria-label="Breadcrumb navigation">
+      <nav class="potion-breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
         <span aria-hidden="true">/</span>
         <a href="/potions">All Potions</a>
@@ -56,14 +56,14 @@
   </header>
   
   <!-- Main Content -->
-  <main class="potion-main" id="potion-main-content" role="main">
+  <div class="potion-main" id="potion-main-content">
     <div class="potion-main-container">
       <article class="potion-article">
         {{{content}}}
       </article>
     </div>
-  </main>
-</div>
+  </div>
+</main>
 
 <!-- Scroll to Top Button -->
 <button class="potion-scroll-top" id="potionScrollTop" aria-label="Scroll to top of page">

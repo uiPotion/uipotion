@@ -25,8 +25,6 @@ specifies:
 example: 'A reply is streaming and the reader clicks Stop. The text so far stays, the cursor disappears, and screen readers hear that the response stopped.'
 ---
 
-# AI Response Rendering Pattern - Streaming, Tool Calls, and Optional Reasoning
-
 A framework-agnostic pattern for rendering the contents of a single AI assistant reply: streaming tokens, incremental Markdown, code blocks with copy controls, tool-call cards with lifecycle states, citations and source pills, artifact handoffs, message-level controls, and recovery from mid-stream failures. Includes an optional reasoning-status surface for products whose model provider explicitly exposes a reasoning channel.
 
 This pattern is the companion to the [AI Agent Chat Layout](/potions/layouts/ai-agent-chat). The chat layout defines the room (sidebar, header, message list, input). This pattern defines what goes inside one assistant message bubble in that room. The two are designed to work together: the layout streams chunks into the bubble; this pattern decides how those chunks become visible UI.

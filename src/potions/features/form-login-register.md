@@ -18,8 +18,6 @@ path: 'potions/features/form-login-register'
 promptSubject: 'login and registration forms'
 ---
 
-# Login & Registration Forms with Validation
-
 Complete authentication forms (login and registration) with real-time validation, error handling, a password requirements indicator, and full accessibility. Demonstrates best practices for form validation UX, field states, and user feedback, and follows current account-security guidance: NIST SP 800-63B-4 password rules, messages that never reveal whether an email has an account, password manager support, and optional passkeys.
 
 ## Overview

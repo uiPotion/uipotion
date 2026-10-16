@@ -732,7 +732,10 @@ body::-webkit-scrollbar-thumb:hover {
       gap: 24px;
     }
 
-    h4 {
+    /* h3 under the section's h2, in the text font at h4 size */
+    h3 {
+      font-family: var(--font-text);
+      font-size: 1.25rem;
       color: var(--text);
       margin-top: 0;
       margin-bottom: 16px;
@@ -766,7 +769,10 @@ body::-webkit-scrollbar-thumb:hover {
       border-color: var(--border-strong);
     }
 
-    h4 {
+    /* h3 under the section's h2, in the text font at h4 size */
+    h3 {
+      font-family: var(--font-text);
+      font-size: 1.25rem;
       font-weight: 600;
       margin: 0 0 12px 0;
       color: var(--text);
@@ -1815,8 +1821,8 @@ html {
   border-radius: 4px;
   padding: 48px;
 
-  /* Typography */
-  h1, h2, h3, h4, h5, h6 {
+  /* Typography. The page's h1 is the hero title, so the article's headings start at h2. */
+  h2, h3, h4, h5, h6 {
     color: var(--text);
     font-weight: 600;
     margin-top: 48px;
@@ -1824,10 +1830,8 @@ html {
     line-height: 1.3;
   }
 
-  h1 {
-    font-size: 2.5rem;
-    border-bottom: 1px solid var(--border-strong);
-    padding-bottom: 16px;
+  /* Whatever comes first, a paragraph or a heading, starts at the top of the card */
+  > :first-child {
     margin-top: 0;
   }
 
@@ -2134,10 +2138,6 @@ html {
 
   .potion-article {
     padding: 24px 20px;
-
-    h1 {
-      font-size: 2rem;
-    }
 
     h2 {
       font-size: 1.5rem;

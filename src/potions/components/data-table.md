@@ -22,8 +22,6 @@ path: 'potions/components/data-table'
 promptSubject: 'data tables'
 ---
 
-# Data Table (Sortable, Paginated, Filterable)
-
 ## Overview
 
 A comprehensive data table component designed for displaying and managing tabular data in admin panels, dashboards, and data-driven applications. The component provides essential features for data manipulation including column sorting (ascending/descending), client-side pagination with configurable page sizes, row selection (single and multi-select), and responsive behavior that adapts to mobile screens by displaying data in a card-based layout.

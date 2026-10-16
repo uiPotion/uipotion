@@ -1,7 +1,7 @@
 {{> head title="Contribute to UI Potion" description="Learn how to contribute your own potions to UI Potion through pull
 requests" currentPath="contribute" }}
 
-<div class="about-page">
+<main class="about-page">
   <!-- Hero Header -->
   <header class="about-hero">
     <div class="about-hero-container">
@@ -21,7 +21,7 @@ requests" currentPath="contribute" }}
   </header>
 
   <!-- Main Content -->
-  <main class="about-main">
+  <div class="about-main">
     <div class="about-main-container">
       <article class="about-article">
         <section class="about-section">
@@ -89,7 +89,8 @@ requests" currentPath="contribute" }}
             <code>potions/components/your-potion.json</code>). The <code>path</code> is the page path without a leading
             slash or extension (e.g. <code>potions/components/your-potion</code>); the page's canonical URL and Markdown
             links are built from it. Then write comprehensive specifications in the body; see existing potions (e.g.
-            <code>navbar.md</code>, <code>dashboard.md</code>) for format.</p>
+            <code>navbar.md</code>, <code>dashboard.md</code>) for format. Don't start it with a <code>#</code> title:
+            the page shows <code>title</code> as its heading, so sections start at <code>##</code>.</p>
           <div class="example-box">
             <p><strong>Example front matter:</strong></p>
             <pre><code>---
@@ -404,7 +405,7 @@ npm start</code></pre>
         </section>
       </article>
     </div>
-  </main>
-</div>
+  </div>
+</main>
 
 {{> footer}}

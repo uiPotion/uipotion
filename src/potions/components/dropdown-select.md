@@ -20,8 +20,6 @@ path: 'potions/components/dropdown-select'
 promptSubject: 'select dropdowns'
 ---
 
-# Dropdown/Select Component
-
 An accessible dropdown/select component with search/filter capability, multi-select support, keyboard navigation, and full ARIA combobox/listbox pattern. Supports grouped options, loading states, and error handling.
 
 ## Overview
