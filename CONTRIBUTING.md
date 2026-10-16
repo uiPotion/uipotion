@@ -36,7 +36,7 @@ Choose the appropriate category:
 
 Create `src/statics/potions/[category]/your-potion.json`
 
-Use the **category schema** in `src/statics/schema/categories/` and an existing potion as template (e.g., `navbar.json` for components, `dashboard.json` for layouts).
+Use the **category schema** in `src/statics/schema/categories/` and an existing potion as template (e.g., `dialog.json` for components, `dashboard.json` for layouts). Write it the way the Dialog guide is written: it follows the [Guide Rules](AGENTS.md#guide-rules), which not every older guide follows yet.
 
 Every guide begins with the required base fields below. This excerpt is not a complete category guide; each category schema adds required structures of its own. Start from an existing potion in the same category and validate the result.
 
@@ -89,7 +89,7 @@ path: 'potions/components/your-potion'
 
 Also add `promptSubject`, a short lowercase noun phrase such as `'modal dialogs'` or `'a dashboard layout'`. The potion page uses it in the prompts visitors copy. If the prompt's default reuse sentence doesn't fit your potion, as with tooling, add `promptReuse` with a replacement sentence. Optionally, add `useWhen` (one sentence that completes "Use this when"), `specifies` (three behaviors your guide specifies), and `example` (one short scenario that shows them) to show a short summary under the excerpt.
 
-Then write comprehensive specifications in the body (see existing potions for format). Don't start it with a `#` title: the page shows `title` as its heading, so sections start at `##`.
+Then write comprehensive specifications in the body (see the Dialog potion, `dialog.md`, for format). Don't start it with a `#` title: the page shows `title` as its heading, so sections start at `##`.
 
 ### Step 3: Validate
 
@@ -161,9 +161,10 @@ We'll review your potion for schema compliance and best practices, suggest impro
 
 ## Content Guidelines
 
-- **Be comprehensive** — Include all necessary details for AI to implement
+- **Be comprehensive** — Include all necessary details for AI to implement, and say each rule once
 - **Be framework-agnostic** — Avoid framework-specific code in descriptions
-- **Include accessibility where relevant** — WCAG compliance, ARIA, keyboard navigation
+- **Include accessibility where relevant** — WCAG 2.2 AA, ARIA, keyboard navigation
+- **Follow the Guide Rules** — In [AGENTS.md](AGENTS.md#guide-rules); the Dialog guide follows all of them
 - **Include responsive specs where relevant** — Mobile, tablet, desktop breakpoints
 - **Include testing checklist** — What to verify after implementation
 

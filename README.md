@@ -152,6 +152,8 @@ We welcome contributions! UI Potion grows with community input.
 
 ## What Makes a Good Potion?
 
+The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. The Dialog guide follows all of them; the others get them as they're revised.
+
 ### Human Documentation (Markdown)
 
 - Clear prose descriptions (no ASCII art, text diagrams, emojis, or Markdown tables in potion Markdown)
@@ -169,7 +171,7 @@ We welcome contributions! UI Potion grows with community input.
 
 - Structured, parseable data
 - Complete specifications that minimize ambiguity
-- Framework-specific patterns where they help agents adapt the specification
+- Framework examples only where they help agents adapt the specification, labeled with the version they're for
 - Styling approach examples where useful
 - State management guidance where relevant
 - Accessibility implementation details

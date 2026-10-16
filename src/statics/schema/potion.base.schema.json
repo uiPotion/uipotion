@@ -90,7 +90,7 @@
           }
         }
       },
-      "description": "Human-readable instructions for AI agents. Should include styling enforcement rules (e.g., 'Styling MUST match the project's existing conventions. Do NOT introduce new styling systems.') and a step to detect project styling conventions before coding."
+      "description": "Human-readable instructions for AI agents, in plain words. Should include the styling rule (e.g., 'Match the project's existing styling and tokens, and add no new styling system.') and a step to detect the project's conventions before coding."
     },
     "frameworkPatterns": {
       "type": "object",
@@ -111,7 +111,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["framework", "stylingSystem", "designTokens"],
-      "description": "Guidance for AI agents to detect the project's framework, styling system, and design tokens before implementation. Agents MUST follow these detection steps before writing any code.",
+      "description": "Guidance for AI agents to detect the project's framework, styling system, and design tokens before implementation. Agents follow these detection steps before writing any code.",
       "properties": {
         "framework": {
           "type": "object",
@@ -219,7 +219,7 @@
             "type": "string",
             "minLength": 1
           },
-          "description": "List of requirements that the generated code MUST satisfy (e.g., 'Use Tailwind utility classes only', 'Use project token classes')."
+          "description": "List of requirements that the generated code must satisfy (e.g., 'Use Tailwind utility classes only', 'Use project token classes')."
         },
         "mustNot": {
           "type": "array",
@@ -227,7 +227,7 @@
             "type": "string",
             "minLength": 1
           },
-          "description": "List of forbidden patterns that the generated code MUST NOT include (e.g., 'No <style> blocks', 'No inline style attributes', 'No hardcoded hex/rgb colors')."
+          "description": "List of forbidden patterns that the generated code must not include (e.g., 'No <style> blocks', 'No inline style attributes', 'No hardcoded hex/rgb colors')."
         }
       },
       "description": "Explicit constraints on code output that agents must self-check before finalizing implementation."

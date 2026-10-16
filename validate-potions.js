@@ -28,8 +28,6 @@ const SITE_URL = 'https://uipotion.com';
 const KNOWN_RULE_BREAKS = [
   'components/data-table [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
   'components/data-table [urls]: meta.webUrl is "https://uipotion.com/potions/components/data-table.html", expected https://uipotion.com/potions/components/data-table',
-  'components/dialog [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'components/dialog [placeholder]: placeholders left in the Markdown: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
   'components/dropdown-select [title-length]: the title has 74 characters (at most 60)',
   'components/dropdown-select [name-mismatch]: Markdown title "Dropdown/Select Component - Accessible Select with Search and Multi-Select", JSON name "Dropdown/Select Component (Accessible) with Search and Multi-Select", index name "Dropdown/Select Component (Accessible) with Search and Multi-Select"',
   'components/dropdown-select [text-diagram]: 78 box-drawing characters (text diagrams) in the Markdown',

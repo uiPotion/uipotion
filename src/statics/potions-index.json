@@ -36,7 +36,7 @@
       "webUrl": "https://uipotion.com/potions/components/dialog",
       "agentGuideUrl": "https://uipotion.com/potions/components/dialog.json",
       "created": "2026-01-11",
-      "updated": "2026-01-11",
+      "updated": "2026-10-16",
       "markdownUrl": "https://uipotion.com/potions/components/dialog.md"
     },
     {
@@ -528,5 +528,5 @@
     }
   ],
   "totalCount": 24,
-  "lastUpdated": "2026-10-07"
+  "lastUpdated": "2026-10-16"
 }

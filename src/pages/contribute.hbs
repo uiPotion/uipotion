@@ -74,8 +74,10 @@ requests" currentPath="contribute" }}
           <h3>Step 1: Create JSON File</h3>
           <p>Create <code>src/statics/potions/[category]/your-potion.json</code></p>
           <p>Use the <strong>category schema</strong> in <code>src/statics/schema/categories/</code> and an existing
-            potion as template (e.g., <code>navbar.json</code> for components, <code>dashboard.json</code> for layouts).
-            Every guide requires the base fields <code>$schema</code>, <code>id</code>, <code>version</code>,
+            potion as template (e.g., <code>dialog.json</code> for components, <code>dashboard.json</code> for layouts).
+            Write it the way the Dialog guide is written: it follows the
+            <a href="https://github.com/uiPotion/uipotion/blob/main/AGENTS.md#guide-rules" target="_blank" rel="noopener noreferrer">Guide Rules</a>,
+            which not every older guide follows yet. Every guide requires the base fields <code>$schema</code>, <code>id</code>, <code>version</code>,
             <code>name</code>, <code>category</code>, <code>tags</code>, <code>description</code>,
             <code>aiAgentInstructions</code>, and <code>meta</code>. Each category schema adds required structures of
             its own, so start from an existing potion in the same category rather than treating this list as a complete template.
@@ -88,8 +90,8 @@ requests" currentPath="contribute" }}
             <code>path</code>. The <code>agentManifest</code> must point to your JSON file (e.g.
             <code>potions/components/your-potion.json</code>). The <code>path</code> is the page path without a leading
             slash or extension (e.g. <code>potions/components/your-potion</code>); the page's canonical URL and Markdown
-            links are built from it. Then write comprehensive specifications in the body; see existing potions (e.g.
-            <code>navbar.md</code>, <code>dashboard.md</code>) for format. Don't start it with a <code>#</code> title:
+            links are built from it. Then write comprehensive specifications in the body; see the Dialog potion
+            (<code>dialog.md</code>) for format. Don't start it with a <code>#</code> title:
             the page shows <code>title</code> as its heading, so sections start at <code>##</code>.</p>
           <div class="example-box">
             <p><strong>Example front matter:</strong></p>
@@ -226,7 +228,9 @@ The component should:
 - Be responsive with a mobile hamburger menu
 - Support sticky scroll behavior
 
-Make sure the JSON follows the schema exactly and includes all required fields.</code></pre>
+Make sure the JSON follows the schema exactly and includes all required fields.
+Write it like https://uipotion.com/potions/components/dialog.json, which follows the
+Guide Rules in https://github.com/uiPotion/uipotion/blob/main/AGENTS.md.</code></pre>
           </div>
 
           <h3>Generating the Markdown File</h3>
@@ -239,7 +243,8 @@ The Markdown should:
 - Be human-readable and comprehensive
 - Include detailed specifications, dimensions, states, accessibility requirements
 - Be framework-agnostic in descriptions
-- Follow the format of existing potions like navbar.md or dashboard.md
+- Follow the format of dialog.md: no # title in the body (sections start at ##), and no ASCII art,
+  text diagrams, emojis, or tables
 
 The agentManifest should point to: potions/components/your-potion-name.json
 The path should be: potions/components/your-potion-name
@@ -332,25 +337,30 @@ npm start</code></pre>
 
         <section class="about-section">
           <h2>Best Practices</h2>
+          <p>The <a href="https://github.com/uiPotion/uipotion/blob/main/AGENTS.md#guide-rules" target="_blank"
+              rel="noopener noreferrer">Guide Rules</a> list these in full, and the Dialog guide follows all of them.</p>
 
           <h3>Writing AI Agent Instructions</h3>
           <ul>
-            <li>Be specific about styling enforcement (e.g., "MUST use Tailwind if detected")</li>
-            <li>Include detection steps for framework and styling system</li>
-            <li>Provide clear implementation steps</li>
+            <li>Tell agents plainly to use the project's styling system and tokens, without "CRITICAL" or all-caps rules</li>
+            <li>Tell them to build on suitable existing components, implement only what the task needs, keep existing
+              APIs, and add no dependency without asking</li>
+            <li>Use the Dialog guide's <code>projectDetection</code> for the detection steps</li>
+            <li>Provide clear implementation steps, and say each rule once</li>
             <li>Include output constraints (what to avoid)</li>
           </ul>
 
           <h3>Framework Patterns</h3>
           <ul>
-            <li>Provide examples for React, Vue, Angular, and Svelte when possible</li>
-            <li>Use framework-agnostic descriptions when patterns are similar</li>
-            <li>Include state management patterns (useState, refs, etc.)</li>
+            <li>Prefer platform features, such as <code>&lt;dialog&gt;</code>, <code>inert</code>, and <code>popover</code>, and
+              stack-neutral examples</li>
+            <li>Add framework examples only where they help, and label the framework version they're for</li>
+            <li>Describe the state the behavior needs in stack-neutral terms</li>
           </ul>
 
           <h3>Accessibility</h3>
           <ul>
-            <li>For user-facing UI, specify the applicable WCAG target and requirements</li>
+            <li>For user-facing UI, target WCAG 2.2 AA and name the criteria that matter</li>
             <li>Include keyboard navigation requirements</li>
             <li>Document ARIA attributes needed</li>
             <li>Provide screen reader considerations</li>
@@ -367,9 +377,10 @@ npm start</code></pre>
         <section class="about-section">
           <h2>Content Guidelines</h2>
           <ul>
-            <li><strong>Be comprehensive</strong> — Include all necessary details for AI to implement</li>
+            <li><strong>Be comprehensive</strong> — Include all necessary details for AI to implement, and say each rule once</li>
             <li><strong>Be framework-agnostic</strong> — Avoid framework-specific code in descriptions</li>
-            <li><strong>Include accessibility where relevant</strong> — WCAG compliance, ARIA, keyboard navigation</li>
+            <li><strong>Include accessibility where relevant</strong> — WCAG 2.2 AA, ARIA, keyboard navigation</li>
+            <li><strong>Follow the Guide Rules</strong> — In <code>AGENTS.md</code>; the Dialog guide follows all of them</li>
             <li><strong>Include responsive specs where relevant</strong> — Mobile, tablet, desktop breakpoints</li>
             <li><strong>Include testing checklist</strong> — What to verify after implementation</li>
           </ul>

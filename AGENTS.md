@@ -75,9 +75,25 @@ path: 'potions/components/component-name'
 - `version` is SemVer.
 - `category` is lowercase.
 - Include enough detail for an AI agent to implement without guessing: structure, components, responsive breakpoints, state, accessibility, animations, framework patterns, styling approaches, edge cases, and testing.
-- When a guide includes implementation guidance, require agents to detect the user's framework, styling system, existing tokens, and component conventions before writing code.
+- When a guide includes implementation guidance, require agents to detect the user's framework, styling system, existing tokens, and component conventions before writing code, with the Dialog guide's `projectDetection` wording.
 - JSON may include code-like examples in `frameworkPatterns` or `stylingApproaches`, but the potion remains a specification, not a shipped component package.
 - Optional `meta.relatedPotions` entries must use `required: false` unless there is a truly exceptional reason.
+
+## Guide Rules
+Rules for guide content, in both formats. The Dialog guide follows all of them; bring other guides in line when you edit them.
+- State each rule once, mark options and suggested sizes as such, and end with a short acceptance checklist.
+- Tell agents to implement only what the task needs, keep existing APIs, build on a suitable existing component, and add no dependency without asking.
+- The project's conventions win for styling and visual defaults; conflicts with accessibility or correctness go to the user.
+- Write plainly: no "CRITICAL", no all-caps rules, no personal style rules such as one hook per concern, and no `aiImplementationPrompt`.
+- Target WCAG 2.2 AA, prefer platform features (`<dialog>`, `inert`, `popover`), and label framework examples with their version.
+- Layers, bottom to top: page, sticky bars, dropdowns and popovers, toasts, modals (which make the rest inert). The project's scale wins; the top layer needs no z-index.
+- Hide closed menus, drawers, and sidebars with `hidden` or `inert`, not only `aria-hidden`.
+- Field errors use `aria-describedby`; results use one polite status region that exists before it changes; `role="alert"` is only for urgent errors, never with `aria-live="polite"`.
+- Fixed bars get matching `scroll-padding` (WCAG 2.4.11), and site headers start with a skip link.
+- Example colors meet 4.5:1 for text and 3:1 for UI parts and icons (1.4.11); remind agents to check the project's colors.
+- Accessible names include the visible text (2.5.3), disclosures have no `aria-haspopup`, required fields say so in text, and links in running text are underlined.
+- Saved UI state uses the app's own storage prefix and applies before the first paint.
+- Don't teach `:focus` outline fallbacks, `transform3d`, focus-trap libraries, or Angular `[label]='Text'` bindings.
 
 ## Index And Dates
 - When adding a potion, add an entry to `src/statics/potions-index.json` with `id`, `name`, `category`, `tags`, `excerpt`, `webUrl`, `agentGuideUrl`, `markdownUrl`, `created`, and `updated`.

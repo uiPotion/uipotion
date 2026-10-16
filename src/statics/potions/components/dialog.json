@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/components.schema.json",
   "id": "dialog",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Modal Dialog (Accessible) with Focus Trap and Actions",
   "category": "components",
   "tags": [
@@ -13,14 +13,20 @@
     "wcag",
     "aria"
   ],
-  "description": "An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.",
+  "description": "An accessible modal dialog for confirmations and short tasks, built on the project's dialog component or native <dialog>: focus moves in and comes back, Escape and backdrop rules, a busy state that survives a failed action, a page that stays still behind it, and a full-screen layout on phones.",
   "tokens": {
+    "note": "Suggested defaults. The project's design tokens and existing dialogs win.",
     "layout": {
-      "zIndex": {
-        "overlayBackdrop": 40,
-        "dialog": 50,
-        "tooltips": 60
-      }
+      "maxWidthPx": 640,
+      "gutterPx": 16,
+      "paddingPx": {
+        "mobile": 16,
+        "desktop": 24
+      },
+      "mobileBreakpointPx": 768,
+      "shortViewportMaxHeightPx": 480,
+      "minTargetPx": 24,
+      "layering": "Native <dialog> opened with showModal() is drawn in the top layer and needs no z-index. Without it, the backdrop and the dialog sit above every other layer the project defines: page content, sticky bars, dropdowns and popovers, and toasts."
     },
     "motion": {
       "openDurationMs": 180,
@@ -29,34 +35,25 @@
     }
   },
   "aiAgentInstructions": {
-    "summary": "Implement a reusable modal dialog with overlay backdrop, focus trap, and keyboard accessibility. Adapt to the user's framework and styling system. Ensure WCAG AA compliance, including Escape handling, focus restoration, and ARIA attributes.",
+    "summary": "Add a modal dialog for confirmations and short tasks without leaving the page. Build on the project's dialog component when it has a suitable one; otherwise use native <dialog> opened with showModal(). Implement only what the task needs, keep existing APIs, and match the project's styling and tokens. The project's conventions win for styling and visual defaults; if one conflicts with an accessibility or correctness requirement in this guide, ask the user instead of choosing silently. Target WCAG 2.2 AA.",
     "keyFeatures": [
-      "Accessible semantics: role='dialog' or role='alertdialog', aria-modal, aria-labelledby, aria-describedby",
-      "Focus trap while open; restore focus to trigger on close",
-      "Dismiss rules: Escape closes when dismissible; optional backdrop click close",
-      "Body scroll lock while open; preserve scroll position",
-      "Responsive sizing: centered dialog on desktop; optional fullscreen on mobile",
-      "Animations with prefers-reduced-motion support",
-      "Action footer: primary/secondary buttons; loading/disabled states",
-      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems.",
-      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements. Define classes like .dialog, .dialog--open, .backdrop, etc. and apply them via className/class attributes.",
-      "CRITICAL: When detecting React, extract logic from useEffect hooks into separate custom hooks that do ONE thing each. For example: useFocusTrap(), useBodyScrollLock(), useDialogState(). This improves code organization, testability, and reusability."
+      "Built on the project's dialog component, or native <dialog> opened with showModal(), which draws it in the top layer and makes the rest of the page inert",
+      "Named by its visible title; a short plain-text message can describe it",
+      "Focus moves in on open (to Cancel in confirmations) and returns on close, or to a sensible place nearby when the trigger is gone",
+      "Closes with Escape, a visible Cancel or Close button, and optionally a backdrop click that ignores text selections dragged out of the dialog",
+      "A busy primary action keeps focus and has a time limit, and a failure keeps the dialog open with the error inside it",
+      "The page behind it doesn't scroll or shift",
+      "Centered up to 640 px wide; full screen or near-full width on phones, sized with dvh",
+      "Optional short motion, and no movement under reduced motion"
     ],
     "implementationSteps": [
-      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine: (a) package.json for framework (React, Vue, Angular, Svelte) and styling dependencies (tailwindcss, styled-components, emotion, sass, etc.), (b) existing component files to see how they import styles (CSS Modules, Tailwind classes, styled-components, etc.), (c) config files (tailwind.config.js, vite.config.js, webpack.config.js, etc.), (d) existing style files and their structure. If the project uses Tailwind, use Tailwind. If SCSS/CSS, use SCSS/CSS. If styled-components, use styled-components. If nothing is configured, use the most suitable CSS approach (vanilla CSS or CSS Modules).",
-      "0a. Detect framework patterns: Check how existing components are structured (hooks in React, composition API in Vue, etc.), how state is managed, and what patterns are used.",
-      "0b. Detect styling conventions: Identify class naming (BEM, camelCase, kebab-case), how styles are imported, whether there's a design system or token system, and what utility functions exist (cn, clsx, classnames, etc.).",
-      "0c. If detection is uncertain, ask the user about their styling approach and framework before proceeding.",
-      "1. Build component anatomy: Trigger, Backdrop, Dialog, Header, Body, Footer",
-      "2. Implement open/close state and controlled/uncontrolled usage",
-      "3. Add focus trap (manual or library) and focus restoration to trigger",
-      "4. Add Escape and backdrop click handlers based on dismissible config",
-      "5. Add scroll locking and cleanup on close/unmount",
-      "6. Apply ARIA: aria-modal, aria-labelledby, aria-describedby; set role based on variant",
-      "7. Add animations + prefers-reduced-motion behavior",
-      "8. Provide confirm/alert variants and responsive fullscreen option",
-      "9. Use ONLY the detected styling system. Do NOT add <style> blocks, inline styles, or new CSS files unless that's the project's convention. Match existing component styling patterns exactly.",
-      "10. Provide test checklist for keyboard + screen reader flows"
+      "1. Detect the framework and its version, the styling system, the tokens, and the existing components (projectDetection). If the project already has a dialog or modal component, configure or extend it to meet this guide instead of building another one, and keep its API.",
+      "2. Choose what the task needs: the variant (dialog or alertdialog), whether Escape closes it, whether a backdrop click closes it, and whether it goes full screen on phones. Leave out the rest.",
+      "3. Without a suitable component, use native <dialog> and open it with showModal(), as in frameworkPatterns.nativeDialog. Don't use the open attribute or show() for a modal: they give a non-modal dialog without a backdrop or an inert page.",
+      "4. Wire opening, focus, and every way of closing as in componentSpec.interactions.",
+      "5. Add the primary action's busy, success, and failure states (componentSpec.interactions and edgeCases.busyClose).",
+      "6. Lock page scrolling (implementationDetails.pageScrollLock), add the layouts in componentSpec.responsiveBehavior, then the optional motion in animations.",
+      "7. Check the result against testingChecklist with a keyboard, a screen reader, and a touch device, and run the project's existing tests and checks."
     ]
   },
   "componentSpec": {
@@ -64,32 +61,41 @@
     "anatomy": {
       "slots": [
         "trigger",
-        "backdrop",
         "dialog",
+        "backdrop",
         "title",
         "description",
         "body",
-        "footer",
+        "statusMessage",
+        "actions",
         "closeButton"
       ],
-      "hierarchy": "Trigger → Backdrop → Dialog( Header(Title, Close), Body, Footer(Actions) )"
+      "hierarchy": "The trigger opens the dialog. The dialog holds the title, an optional close button, an optional short description, the body, the status message, and the actions. The backdrop covers the page; native <dialog> draws it as ::backdrop.",
+      "slotNotes": {
+        "title": "A visible heading that names the dialog through aria-labelledby.",
+        "description": "Optional: one short plain-text message, as in a confirmation, referenced by aria-describedby. Leave it out when the body holds a form or longer content, which a screen reader would read in full on open.",
+        "body": "The content. It scrolls inside the dialog when it is long.",
+        "statusMessage": "An element with role=\"status\", present from the moment the dialog opens, for busy and error text.",
+        "actions": "Cancel and the primary action, named for what it does (\"Delete project\", not \"OK\").",
+        "closeButton": "Optional icon button with an accessible name such as \"Close\". Every dialog has a visible Cancel or Close button, because touch and screen reader users may have no Escape key."
+      }
     },
     "stateModel": {
       "open": {
         "type": "boolean",
-        "description": "Whether the dialog is open.",
+        "description": "Whether the dialog is shown as a modal.",
         "default": false,
         "persistence": "component state only"
       },
       "loading": {
         "type": "boolean",
-        "description": "Whether primary action is processing; disables actions and optionally shows spinner.",
+        "description": "Whether the primary action is running; see the primaryActionClick interaction.",
         "default": false,
         "persistence": "component state only"
       },
       "variant": {
         "type": "enum",
-        "description": "Dialog semantics variant; alertdialog is used for urgent confirmations.",
+        "description": "dialog for most uses; alertdialog for an urgent decision, such as confirming a deletion.",
         "default": "dialog",
         "allowedValues": [
           "dialog",
@@ -99,81 +105,73 @@
       },
       "dismissible": {
         "type": "boolean",
-        "description": "If true, Escape and (optionally) backdrop click can close the dialog.",
+        "description": "Whether Escape, or the back gesture on Android, closes the dialog.",
         "default": true,
         "persistence": "props/config"
       },
       "closeOnBackdropClick": {
         "type": "boolean",
-        "description": "If true and dismissible=true, clicking backdrop closes the dialog.",
+        "description": "Whether a click on the backdrop closes a dismissible dialog. Turn it off for alert dialogs and for forms with typed input.",
         "default": true,
         "persistence": "props/config"
       },
       "fullscreenOnMobile": {
         "type": "boolean",
-        "description": "If true, dialog becomes fullscreen on small screens.",
+        "description": "Whether the dialog fills the screen below the mobile breakpoint.",
         "default": true,
         "persistence": "props/config"
       }
     },
     "interactions": [
       {
-        "event": "triggerClick",
+        "event": "triggerActivate",
         "result": "openDialog",
         "sideEffects": [
-          "captureTriggerElementForFocusRestore",
-          "lockBodyScroll",
+          "rememberTrigger",
+          "lockPageScroll",
           "moveFocusToInitialElement"
-        ]
+        ],
+        "accessibilityNotes": "Initial focus goes to the least destructive action (usually Cancel) in confirmations and alert dialogs, to the first field in a form, and to the title or the top of the content (tabindex=\"-1\") when the content is long or should be read first; otherwise to the first focusable element. With native <dialog>, put autofocus on that element."
       },
       {
         "event": "escapeKey",
-        "when": "open && dismissible",
+        "when": "open && dismissible && !loading",
         "result": "closeDialog",
-        "sideEffects": [
-          "restoreFocusToTrigger",
-          "unlockBodyScroll"
-        ],
-        "preventDefault": true,
         "stopPropagation": true,
-        "accessibilityNotes": "Escape should close and return focus to the element that opened the dialog."
+        "accessibilityNotes": "Escape, and the back gesture on Android, sends a close request: native <dialog> fires cancel, then close. When the dialog isn't dismissible or is busy, call preventDefault() on cancel. Browsers may still close it on a repeated request without other user interaction, so treat every close as the safe choice, Cancel, never as a confirmation."
       },
       {
         "event": "backdropClick",
-        "when": "open && dismissible && closeOnBackdropClick",
+        "when": "open && dismissible && closeOnBackdropClick && !loading",
         "result": "closeDialog",
-        "sideEffects": [
-          "restoreFocusToTrigger",
-          "unlockBodyScroll"
-        ],
-        "stopPropagation": true
+        "accessibilityNotes": "Count a click only when the press also started on the backdrop: a text selection dragged from inside the dialog onto the backdrop ends in a click on the dialog, and must not close it. With native <dialog>, give the dialog no padding of its own, so only a backdrop click targets the <dialog> element. Where supported, closedby=\"any\" does this natively; keep the script for other browsers."
       },
       {
-        "event": "closeButtonClick",
+        "event": "cancelOrCloseClick",
         "when": "open",
         "result": "closeDialog",
         "sideEffects": [
-          "restoreFocusToTrigger",
-          "unlockBodyScroll"
-        ]
+          "abortPrimaryActionIfRunning"
+        ],
+        "accessibilityNotes": "While the primary action runs, Cancel and Close abort it if it can be aborted; otherwise they do nothing until it finishes."
       },
       {
         "event": "primaryActionClick",
         "when": "open && !loading",
-        "result": "invokePrimaryAction",
+        "result": "runPrimaryAction",
         "sideEffects": [
           "setLoadingTrue",
-          "disableActions"
-        ]
+          "setActionsAriaDisabled",
+          "showBusyStatus"
+        ],
+        "accessibilityNotes": "Focus stays on the button: use aria-disabled=\"true\" and ignore activation instead of the disabled attribute, which drops focus to the page. Give the request a time limit (edgeCases.stuckOperation). A form dialog validates first; on errors it stays open and moves focus to the first invalid field."
       },
       {
         "event": "primaryActionResolved",
         "when": "open",
         "result": "closeDialog",
         "sideEffects": [
-          "setLoadingFalse",
-          "restoreFocusToTrigger",
-          "unlockBodyScroll"
+          "setLoadingFalse"
         ]
       },
       {
@@ -182,187 +180,231 @@
         "result": "keepDialogOpen",
         "sideEffects": [
           "setLoadingFalse",
-          "announceErrorOptional"
-        ]
+          "showErrorInStatusMessage",
+          "removeAriaDisabled"
+        ],
+        "accessibilityNotes": "The status message shows the error, so it's announced, and focus stays on the primary action, so the user can retry or cancel. Running out of time is a failure too, with a message that says so."
+      },
+      {
+        "event": "dialogClosed",
+        "result": "returnFocus",
+        "sideEffects": [
+          "unlockPageScroll",
+          "focusTriggerOrFallback"
+        ],
+        "accessibilityNotes": "Every way of closing ends here. Focus returns to the trigger; native <dialog> does this itself. If the trigger is gone (Delete removed its row), move focus to a sensible place nearby, such as the next item, the list, or its heading (tabindex=\"-1\"), never to the page body. If the list updates only after the dialog has closed, move focus when it updates."
       }
     ],
     "responsiveBehavior": {
       "mobile": {
         "maxWidthPx": 767,
-        "behavior": "If fullscreenOnMobile=true, dialog uses fullscreen layout; otherwise uses near-full width with margins.",
+        "behavior": "With fullscreenOnMobile, the dialog fills the screen: 100vw wide (100% would leave a reserved scrollbar gutter uncovered), 100dvh tall (100vh as the fallback), no margins or rounded corners, and padding that includes the safe-area insets. Otherwise it's near-full width with 16 px gutters and at most calc(100dvh - 64px) tall.",
         "padding": "16px"
       },
-      "desktop": {
-        "minWidthPx": 1024,
-        "maxDialogWidthPx": 640,
-        "bodyMaxHeight": "calc(100vh - 200px)",
-        "bodyOverflow": "auto"
-      }
+      "tabletAndDesktop": {
+        "minWidthPx": 768,
+        "behavior": "Centered, at most 640 px wide and calc(100dvh - 64px) tall. The title row and the actions stay visible while the body scrolls.",
+        "padding": "24px"
+      },
+      "shortViewport": {
+        "maxHeightPx": 480,
+        "behavior": "On landscape phones and at high zoom, the whole content scrolls, actions included, instead of keeping the title row and actions in place."
+      },
+      "reflow": "At 320 px wide, which is 400% zoom on a 1280 px screen, nothing scrolls sideways.",
+      "nativeDefaults": "The browser stylesheet gives dialog:modal default margins and maximum sizes; override them for the full-screen layout."
     },
     "variants": {
-      "confirm": "Shows primary and secondary buttons. Backdrop click allowed if dismissible.",
-      "alert": "Uses role='alertdialog'. Prefer closeOnBackdropClick=false to avoid accidental dismissal."
+      "confirm": "A question, a short explanation, Cancel, and the confirming action named for what it does. Initial focus on Cancel.",
+      "alert": "role=\"alertdialog\" for an urgent decision, such as deleting something. The short message is its description, and a backdrop click doesn't close it.",
+      "form": "Fields in the body and a submit action. A backdrop click doesn't close it, so a stray click can't lose typed input, and validation follows the project's form rules. Optional: ask before discarding typed input.",
+      "progress": "Shows an operation in progress. Its Cancel aborts the operation; if the operation can't be cancelled, an error with Retry and Close appears after a timeout, so nobody is stuck.",
+      "fullscreen": "Full screen at every width, for long forms or content that needs the space."
     }
   },
   "animations": {
+    "note": "Optional.",
     "open": {
       "durationMs": 180,
       "easing": "cubic-bezier(0.2, 0, 0, 1)",
       "backdrop": {
-        "opacity": "0 → 1"
+        "opacity": "0 to 1"
       },
       "dialog": {
-        "opacity": "0 → 1",
-        "transform": "translateY(8px) scale(0.98) → translateY(0) scale(1)"
+        "opacity": "0 to 1",
+        "transform": "translateY(8px) scale(0.98) to none"
       }
     },
     "close": {
       "durationMs": 140,
       "easing": "cubic-bezier(0.2, 0, 0, 1)",
       "backdrop": {
-        "opacity": "1 → 0"
+        "opacity": "1 to 0"
       },
       "dialog": {
-        "opacity": "1 → 0",
-        "transform": "translateY(0) scale(1) → translateY(8px) scale(0.98)"
+        "opacity": "1 to 0",
+        "transform": "none to translateY(8px) scale(0.98)"
       }
-    }
+    },
+    "reducedMotion": "Under prefers-reduced-motion: reduce, nothing moves: a short fade, or no animation.",
+    "nativeDialog": "Animate the open with @starting-style. Animating the close also needs transition-behavior: allow-discrete on display and overlay; where a browser can't do that, the dialog closes at once, which is fine. Focus returns and the page unlocks at once, not after the animation."
   },
   "accessibility": {
     "wcagCompliance": {
       "level": "AA",
+      "version": "2.2",
       "requirements": {
-        "2.1.1": "All dialog controls operable via keyboard; focus is trapped within dialog while open.",
-        "2.1.2": "No keyboard trap beyond intended focus trap; Escape exits when dismissible.",
-        "2.4.3": "Logical focus order; initial focus placed inside dialog; focus returns to trigger on close.",
-        "2.4.7": "Visible focus indicators for all interactive elements.",
-        "4.1.2": "Correct ARIA roles, names, and relationships."
+        "1.3.1": "The title is a heading, and it names the dialog (aria-labelledby).",
+        "1.4.10": "At 320 px wide the dialog fits without horizontal scrolling.",
+        "1.4.11": "Focus indicators and control boundaries have at least 3:1 contrast.",
+        "2.1.1": "Every control works from the keyboard. A scrolling body without focusable content is focusable itself (tabindex=\"0\") and named.",
+        "2.1.2": "The dialog can always be left: Escape when it's dismissible, and its Cancel or Close button (componentSpec.anatomy.slotNotes.closeButton).",
+        "2.4.3": "Focus moves into the dialog on open and returns on close (componentSpec.interactions).",
+        "2.4.7": "Every control shows a visible focus indicator.",
+        "2.5.8": "The close button and the actions are at least 24 by 24 CSS px.",
+        "4.1.2": "role dialog or alertdialog, modal, and named by its title.",
+        "4.1.3": "Busy and error messages are announced through the status message without moving focus."
       }
     },
     "keyboardNavigation": {
-      "escapeKey": "Closes dialog when dismissible=true; always restore focus to trigger.",
-      "tabKey": "Trapped within dialog. Tabbing cycles through focusable elements; Shift+Tab cycles backwards.",
-      "initialFocus": "Prefer first focusable element in body, else close button, else primary action button."
+      "tab": "Tab and Shift+Tab move through the dialog's controls. With native <dialog>, focus can also reach the browser's own controls, but never the page behind.",
+      "escape": "See the escapeKey interaction.",
+      "enter": "In a form dialog, Enter submits the form as usual.",
+      "initialFocus": "See the triggerActivate interaction.",
+      "focusReturn": "See the dialogClosed interaction."
     },
     "ariaAttributes": {
       "required": {
         "dialog": {
-          "role": "dialog or alertdialog (variant-dependent)",
-          "aria-modal": "true",
-          "aria-labelledby": "id of title element",
-          "aria-describedby": "id of description/body element (when present)"
+          "aria-labelledby": "The id of the visible title",
+          "role": "alertdialog for the alert variant; native <dialog> is already a dialog",
+          "aria-modal": "true, but only on a dialog that isn't native <dialog> opened with showModal()"
         },
         "closeButton": {
-          "aria-label": "Close dialog"
-        },
-        "trigger": {
-          "aria-haspopup": "dialog",
-          "aria-expanded": "true/false"
+          "name": "An accessible name such as \"Close\", from visually hidden text or aria-label"
         }
       },
       "optional": {
-        "statusRegion": {
+        "dialog": {
+          "aria-describedby": "The id of a short plain-text message; see componentSpec.anatomy.slotNotes.description"
+        },
+        "trigger": {
+          "aria-haspopup": "\"dialog\", if screen readers should say the button opens a dialog. Never \"true\", which announces a menu.",
+          "aria-expanded": "Rarely useful for a modal; the WAI-ARIA APG modal dialog example uses neither attribute."
+        },
+        "statusMessage": {
           "role": "status",
-          "aria-live": "polite",
-          "usage": "Optional: announce loading or error messages."
+          "usage": "Present from the moment the dialog opens; holds the busy and error text."
         }
       }
-    },
-    "implementationChecklist": [
-      "Trap focus inside dialog when open",
-      "Restore focus to trigger on close (all close paths)",
-      "Escape closes dialog only if dismissible=true",
-      "Backdrop click closes only if closeOnBackdropClick=true",
-      "role and aria-* attributes present and correctly wired",
-      "Body scroll lock applied and cleaned up",
-      "prefers-reduced-motion reduces or removes transforms"
-    ]
+    }
   },
   "projectDetection": {
     "framework": {
-      "description": "Detect the project's framework by examining package.json, existing component files, and project structure. Common frameworks: React, Vue, Angular, Svelte.",
+      "description": "Find the framework, its version, and how existing components are written before writing code.",
       "detectionSteps": [
-        "Check package.json for framework dependencies (react, vue, @angular/core, svelte)",
-        "Examine existing component files for framework-specific patterns (JSX for React, .vue files for Vue, etc.)",
-        "Check build configuration (vite.config.js, webpack.config.js, angular.json, etc.)",
-        "Look for framework-specific directories (src/components, src/app, etc.)"
+        "Read the project's dependencies (package.json or its equivalent) for the framework and its version, and use the syntax that version supports.",
+        "Open two or three existing components to see their file structure, state handling, and naming.",
+        "Look for an existing component that already does this job, in the project or in a design system or UI library it uses, and build on it."
       ]
     },
     "stylingSystem": {
-      "description": "Detect the project's styling approach by examining dependencies, config files, and existing component styles. Use the detected system exclusively.",
+      "description": "Use the styling system the project already uses, and only that one.",
       "detectionSteps": [
-        "Check package.json for styling dependencies: tailwindcss, styled-components, emotion, sass, less, css-modules, etc.",
-        "Look for config files: tailwind.config.js, postcss.config.js, sass config, etc.",
-        "Examine existing component files to see how styles are imported and used",
-        "Check for style files: .css, .scss, .module.css, styled-components patterns, etc.",
-        "Identify class naming conventions and utility functions (cn, clsx, classnames, etc.)",
-        "If no styling system is detected, use vanilla CSS or CSS Modules as the most suitable approach"
+        "Check the dependencies and config for the styling setup: Tailwind (version 4 keeps its theme in CSS with @theme, version 3 in tailwind.config.*), CSS Modules, Sass, CSS-in-JS, or plain CSS.",
+        "See how existing components apply styles and compose class names, for example with cn or clsx.",
+        "Check for design documentation: DESIGN.md, a design system package, or Storybook stories for existing components."
       ],
       "adaptationRules": [
-        "If Tailwind is detected: Use Tailwind utility classes, respect existing config, use existing design tokens, follow project's class composition patterns",
-        "If SCSS/CSS is detected: Use SCSS/CSS files matching project structure, follow existing naming conventions (BEM, camelCase, etc.), import styles as the project does",
-        "If styled-components is detected: Use styled-components syntax matching project patterns, follow existing component structure",
-        "If CSS Modules is detected: Use .module.css files, follow existing module naming patterns",
-        "If no styling system: Use vanilla CSS with semantic class names, or CSS Modules if it seems appropriate for the project size"
+        "Write styles the way existing components do, and add no new styling library or system.",
+        "With plain CSS, use classes in the project's stylesheets instead of inline styles, except for values computed at runtime.",
+        "If the setup is unclear or mixed, ask before choosing."
       ]
     },
     "designTokens": {
-      "description": "Identify existing design tokens, color systems, spacing scales, and typography from the project. Use these instead of inventing new values.",
+      "description": "Use the project's tokens for color, spacing, radius, type, shadows, motion, and layering.",
       "detectionSteps": [
-        "Check for design token files (tokens.json, theme.js, design-tokens.css, etc.)",
-        "Examine Tailwind config for theme values if using Tailwind",
-        "Look at existing components for color, spacing, and typography patterns",
-        "Check CSS variables (--color-*, --spacing-*, etc.) in global styles",
-        "If tokens exist, use them. If not, use values that match existing component styles"
+        "Find the tokens: CSS custom properties, a Tailwind theme (@theme or config), a theme object, or a tokens file.",
+        "Use them instead of this guide's example values; where there are none, match the closest existing components.",
+        "Check that the colors you use meet the contrast minimums: 4.5:1 for text, and 3:1 for focus indicators, icons, and control boundaries."
       ]
     }
   },
+  "frameworkPatterns": {
+    "nativeDialog": {
+      "description": "A delete confirmation in plain HTML and JavaScript; adapt it to the project's framework and its version. It covers the parts that are easy to get wrong: the backdrop check, the cancel event, the busy state and its time limit, results that arrive after the dialog closed, and focus when the trigger is gone. deleteProject() and notify() stand for the app's own request and its toast or page message.",
+      "html": "<button type=\"button\" id=\"delete-trigger\">Delete project</button>\n\n<dialog id=\"confirm-delete\" role=\"alertdialog\" aria-labelledby=\"confirm-title\" aria-describedby=\"confirm-message\">\n  <div class=\"dialog-inner\">\n    <h2 id=\"confirm-title\">Delete project?</h2>\n    <div class=\"dialog-body\">\n      <p id=\"confirm-message\">This deletes the project and its files for everyone on the team.</p>\n    </div>\n    <p class=\"dialog-status\" role=\"status\"></p>\n    <div class=\"dialog-actions\">\n      <button type=\"button\" data-action=\"cancel\" autofocus>Cancel</button>\n      <button type=\"button\" data-action=\"confirm\">Delete project</button>\n    </div>\n  </div>\n</dialog>",
+      "script": "// Opens a modal <dialog> with this guide's closing and focus rules.\n// fallbackFocus: where focus goes if the trigger is gone when the dialog closes.\nfunction openDialog(dialog, trigger, { dismissible = true, closeOnBackdropClick = true, fallbackFocus } = {}) {\n  let pressStartedOnBackdrop = false;\n\n  // <dialog> has no padding, so only the backdrop makes it the event target. A text selection\n  // dragged from inside also ends in a click on <dialog>, so the press must start there too.\n  const onPointerDown = (event) => {\n    pressStartedOnBackdrop = event.target === dialog;\n  };\n  const onClick = (event) => {\n    const fromBackdrop = pressStartedOnBackdrop && event.target === dialog;\n    pressStartedOnBackdrop = false;\n    if (fromBackdrop && dismissible && closeOnBackdropClick && dialog.dataset.busy !== 'true') {\n      dialog.close('cancel');\n    }\n  };\n  // Escape, or the back gesture on Android. A repeated request may still close the dialog, so\n  // a close without returnValue 'confirm' always counts as Cancel.\n  const onCancel = (event) => {\n    if (!dismissible || dialog.dataset.busy === 'true') event.preventDefault();\n  };\n  const onClose = () => {\n    dialog.removeEventListener('pointerdown', onPointerDown);\n    dialog.removeEventListener('click', onClick);\n    dialog.removeEventListener('cancel', onCancel);\n    (trigger.isConnected ? trigger : fallbackFocus)?.focus();\n  };\n\n  dialog.returnValue = '';\n  dialog.addEventListener('pointerdown', onPointerDown);\n  dialog.addEventListener('click', onClick);\n  dialog.addEventListener('cancel', onCancel);\n  dialog.addEventListener('close', onClose, { once: true });\n  dialog.showModal();\n}\n\n// The delete confirmation: an alert dialog that a backdrop click doesn't close.\n// deleteProject() and notify() stand for the app's request and its toast or page message.\nconst trigger = document.getElementById('delete-trigger');\nconst dialog = document.getElementById('confirm-delete');\nconst status = dialog.querySelector('[role=\"status\"]');\nconst actions = dialog.querySelectorAll('.dialog-actions button');\nconst heading = document.getElementById('projects-heading'); // the list's heading, tabindex=\"-1\"\n\ntrigger.addEventListener('click', () => {\n  // Opened again while the request still runs: keep its busy message\n  if (dialog.dataset.busy !== 'true') status.textContent = '';\n  openDialog(dialog, trigger, { closeOnBackdropClick: false, fallbackFocus: heading });\n});\n\ndialog.querySelector('[data-action=\"cancel\"]').addEventListener('click', () => {\n  if (dialog.dataset.busy !== 'true') dialog.close('cancel');\n});\n\n// The browser can close the dialog while the request runs (a repeated Escape or back gesture),\n// so a result that arrives after that goes to the page, and lost focus goes to the heading\nfunction report(message) {\n  if (dialog.open) {\n    status.textContent = message;\n    return;\n  }\n  notify(message);\n  if (!trigger.isConnected && document.activeElement === document.body) heading.focus();\n}\n\ndialog.querySelector('[data-action=\"confirm\"]').addEventListener('click', async () => {\n  if (dialog.dataset.busy === 'true') return;\n  // Busy: the buttons keep focus (aria-disabled, not disabled), and the status message says why\n  dialog.dataset.busy = 'true';\n  actions.forEach((button) => button.setAttribute('aria-disabled', 'true'));\n  status.textContent = 'Deleting…';\n  // A time limit, so a request that hangs can't trap anyone\n  const signal = AbortSignal.timeout(30_000);\n  try {\n    await deleteProject({ signal }); // on success it also removes the project's row, trigger included\n    if (dialog.open) dialog.close('confirm');\n    else report('Project deleted.');\n  } catch {\n    // Ask the signal, not the error: WebKit rejects fetch with an AbortError, not the TimeoutError\n    report(signal.reason?.name === 'TimeoutError'\n      ? 'Deleting is taking too long. Check your connection and try again.'\n      : \"The project wasn't deleted. Check your connection and try again.\");\n  } finally {\n    dialog.dataset.busy = 'false';\n    actions.forEach((button) => button.removeAttribute('aria-disabled'));\n  }\n});"
+    }
+  },
+  "stylingApproaches": {
+    "plainCss": {
+      "description": "Plain CSS for the parts the browser doesn't provide. Use the project's styling system and tokens instead of these values.",
+      "css": "dialog {\n  padding: 0; /* .dialog-inner has the padding, so only the backdrop targets <dialog> itself */\n  border: none;\n  border-radius: 12px;\n  width: min(640px, 100% - 32px);\n  max-height: calc(100dvh - 64px);\n}\n\ndialog::backdrop {\n  background: rgb(0 0 0 / 0.5);\n}\n\n.dialog-inner {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n  box-sizing: border-box;\n  max-height: inherit;\n  padding: 24px;\n}\n\n.dialog-body {\n  overflow: auto;\n  overscroll-behavior: contain;\n}\n\n.dialog-actions {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-end;\n  gap: 12px;\n}\n\n.dialog-actions [aria-disabled='true'] {\n  cursor: not-allowed;\n  opacity: 0.6;\n}\n\n/* The page doesn't scroll behind a modal, and keeps the scrollbar's space so nothing shifts */\nhtml {\n  scrollbar-gutter: stable;\n}\n\nhtml:has(dialog:modal) {\n  overflow: hidden;\n}\n\n/* Short viewports (landscape phones, high zoom): everything scrolls, the actions included */\n@media (max-height: 480px) {\n  .dialog-inner {\n    overflow: auto;\n    overscroll-behavior: contain;\n  }\n\n  .dialog-body {\n    overflow: visible;\n  }\n}\n\n/* Phones: full screen, clear of the browser's toolbars and the screen's rounded corners */\n@media (max-width: 767px) {\n  dialog.fullscreen-mobile {\n    width: 100vw; /* 100% would leave the reserved scrollbar gutter uncovered */\n    max-width: none;\n    height: 100vh;\n    height: 100dvh;\n    max-height: none;\n    margin: 0;\n    border-radius: 0;\n  }\n\n  dialog.fullscreen-mobile .dialog-inner {\n    height: 100%;\n    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))\n      max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));\n  }\n}"
+    }
+  },
+  "implementationDetails": {
+    "pageScrollLock": "Native <dialog> and inert stop clicks and focus behind the dialog, but not scrolling. Set overflow: hidden on the root element while a modal is open (html:has(dialog:modal)), keep the scrollbar's space (scrollbar-gutter: stable on the root, or padding equal to the scrollbar's width while locked), and give the dialog's scrolling body overscroll-behavior: contain. iOS Safari can still scroll the page under a touch; where it does, fix the body in place while the dialog is open (position: fixed, with top set to minus the scroll position) and restore the scroll position on close.",
+    "formDialogs": "<form method=\"dialog\"> closes the dialog on submit and sets returnValue to the submit button's value, which is enough for confirmations without async work. A form that saves data handles submit itself, as the primary action does.",
+    "withoutNativeDialog": "Only when neither the project nor native <dialog> fits, for example an overlay system the project must keep: render the dialog at the end of body with role=\"dialog\" (or \"alertdialog\") and aria-modal=\"true\"; make every sibling of its container inert while it's open, which keeps focus in the dialog without a focus-trap library; move focus in and return it as in componentSpec.interactions; close on Escape with a keydown listener on the dialog; give the backdrop element the same press-and-click check; and put the backdrop and the dialog at the top of the project's layering scale. Don't hide the page with aria-hidden instead of inert."
+  },
+  "edgeCases": {
+    "busyClose": "While the primary action runs, Escape and backdrop clicks do nothing. Cancel and Close abort it only when aborting really stops the work, such as an upload or a search; a request that changes data can still finish on the server, so for that they wait. If the browser closes the dialog anyway, for example after a repeated Escape or back gesture, show the result in the page, for example in a toast, and if focus was lost with the trigger, move it as in the dialogClosed interaction. Opened again before the result arrives, the dialog shows the busy state again.",
+    "stuckOperation": "Give the request a time limit the project picks, for example 30 seconds (AbortSignal.timeout() with fetch). When it runs out, show an error that says so and make the actions work again, so the person can retry or cancel. Tell a timeout from other failures by the signal's reason (signal.reason.name is \"TimeoutError\"), not by the error: WebKit rejects fetch with an AbortError.",
+    "stackedDialogs": "Avoid a dialog on top of a dialog; replace the content instead. When it can't be avoided, showModal() stacks it: Escape closes the top one, and focus returns into the one below. Without native <dialog>, make the lower dialog inert too.",
+    "toasts": "A toast below an open modal can't be reached. Show the result of the dialog's action after it closes, or inside the dialog while it stays open.",
+    "longContent": "The body scrolls inside the dialog (overflow: auto, overscroll-behavior: contain) while the title row and actions stay visible. If it holds no focusable element, make it focusable (tabindex=\"0\") and name it, so keyboard users can scroll it.",
+    "rapidToggle": "Ignore the trigger while the dialog opens or closes, so a double click never opens two.",
+    "navigation": "If the route changes while the dialog is open, close it without returning focus to a trigger on the old page.",
+    "serverRendering": "Render the dialog closed, and call showModal() only in the browser, after mount."
+  },
   "outputConstraints": {
     "must": [
-      "Detect and use ONLY the project's existing framework (React, Vue, Angular, Svelte) - match existing component patterns",
-      "Detect and use ONLY the project's existing styling system (Tailwind, SCSS, CSS, styled-components, etc.) - match existing styling patterns",
-      "Use project's existing design tokens, color system, and spacing scales if available",
-      "Use project's class composition utility (cn, clsx, classnames, etc.) if it exists",
-      "Follow project's naming conventions (BEM, camelCase, kebab-case, etc.)",
-      "Match the structure and patterns of existing components in the project"
+      "Build on the project's dialog component when it has a suitable one, and keep its API",
+      "Use the project's framework version, styling system, and tokens, the way existing components do",
+      "Implement only the options and variants the task needs",
+      "Give every dialog a visible Cancel or Close button",
+      "Return focus on every way of closing, including when the trigger is gone"
     ],
     "mustNot": [
-      "Do NOT introduce new styling systems (if project uses Tailwind, don't add SCSS; if SCSS, don't add Tailwind)",
-      "Do NOT add <style> blocks unless that's the project's convention (e.g., Vue SFC <style> blocks)",
-      "Do NOT use inline style attributes unless necessary for dynamic values (use CSS variables if supported)",
-      "Do NOT create new CSS/SCSS files unless that's how the project structures styles",
-      "Do NOT hardcode colors/values - use project's design tokens or match existing component values",
-      "Do NOT import new UI libraries or styling dependencies",
-      "Do NOT use string concatenation for class names - use project's composition utility",
-      "CRITICAL: When vanilla CSS is detected, NEVER use inline style attributes on HTML elements. ALWAYS create CSS classes in a stylesheet and apply them via className/class. Example: Create .dialog { max-width: 640px; } in CSS, then use <div class='dialog'> not <div style='max-width: 640px'>",
-      "CRITICAL: When React is detected, NEVER put multiple concerns in a single useEffect. ALWAYS extract logic into separate custom hooks. Example: Instead of useEffect(() => { /* focus trap + scroll lock + escape handler */ }), create useFocusTrap(), useBodyScrollLock(), useEscapeHandler() hooks and use them separately"
+      "Add a dependency, such as a focus-trap, scroll-lock, or UI library, without asking",
+      "Show a modal with the open attribute or show(); use showModal()",
+      "Hide the page with aria-hidden instead of a native modal or inert",
+      "Close on a click that started inside the dialog",
+      "Put the disabled attribute on the focused action while it's busy",
+      "Use inline styles for static values in a plain-CSS project, or hardcode colors the project has tokens for"
     ]
   },
   "testingChecklist": [
-    "Dialog opens from trigger and focus moves inside dialog",
-    "Tab and Shift+Tab cycle within dialog only",
-    "Escape closes when dismissible=true and restores focus to trigger",
-    "Backdrop click closes only when enabled; does not close when disabled",
-    "Close button always closes and restores focus",
-    "role='dialog'/'alertdialog' correctly applied based on variant",
-    "aria-labelledby and aria-describedby point to existing elements",
-    "Body scroll is locked while open and restored on close",
-    "On mobile, fullscreen variant renders correctly when enabled",
-    "prefers-reduced-motion removes heavy transforms/animations",
-    "Styling uses only the detected project styling system (matches existing components)",
-    "All styling matches project conventions and existing patterns"
+    "Opened from the keyboard, focus lands as the initial-focus rule says, and a screen reader announces the dialog's role and title, plus its short description if it has one",
+    "Tab and Shift+Tab never reach the page behind it, and the page can't be clicked or scrolled, including by touch on iOS Safari",
+    "Opening it doesn't shift the page's layout",
+    "Escape closes a dismissible dialog, and focus returns to the trigger; a dialog that isn't dismissible stays open on the first Escape, and any close counts as Cancel",
+    "A backdrop click closes the dialog only when that's turned on, and dragging a text selection from inside onto the backdrop never closes it",
+    "Every dialog has a visible Cancel or Close button with an accessible name, at least 24 by 24 px",
+    "While the primary action runs, focus stays on its button and the status message announces progress; a failure keeps the dialog open with the error announced and the buttons working; a success closes it",
+    "A request that never settles ends at its time limit with an error and working buttons, and a result that arrives after the dialog closed shows in the page without leaving focus on the page body",
+    "When the action removed the trigger, focus lands in a sensible place nearby, not on the page body",
+    "At 320 px wide and at 400% zoom nothing scrolls sideways and the actions stay reachable; on phones, the full-screen dialog isn't hidden behind the browser's toolbars",
+    "With reduced motion, nothing moves",
+    "Styles come from the project's styling system and tokens, like its other components"
   ],
-  "aiImplementationPrompt": "Implement an accessible Modal Dialog component with overlay backdrop, focus trap, focus restoration to trigger, Escape/backdrop dismissal (configurable), and scroll lock. Support role='dialog' and role='alertdialog' variants, with aria-modal, aria-labelledby, aria-describedby, and aria-expanded on the trigger. Provide header (title + close), body, footer (primary/secondary actions) and loading state for primary action. Add open/close animations with prefers-reduced-motion support. Adapt to {{USER_FRAMEWORK}} and {{USER_STYLING_LIBRARY}}. CRITICAL: If vanilla CSS is detected, create CSS classes in a stylesheet, never use inline styles. If React is detected, extract useEffect logic into separate custom hooks (one concern per hook).",
   "meta": {
     "created": "2026-01-11",
-    "updated": "2026-01-11",
+    "updated": "2026-10-16",
     "webUrl": "https://uipotion.com/potions/components/dialog",
     "relatedPotions": [
       {
         "id": "button",
         "category": "components",
         "relationship": "used-in",
-        "description": "Optional: For footer actions (primary, secondary, destructive).",
+        "description": "Optional: for the dialog's actions.",
+        "required": false
+      },
+      {
+        "id": "toast-notifications",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: toasts sit below an open modal, so show an action result after the dialog closes, or inside it while it stays open.",
         "required": false
       }
     ],
