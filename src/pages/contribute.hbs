@@ -7,7 +7,7 @@ requests" currentPath="contribute" }}
     <div class="about-hero-container">
       <div class="about-breadcrumb">
         <a href="/">Home</a>
-        <span>/</span>
+        <span aria-hidden="true">/</span>
         <span>Contribute</span>
       </div>
 
@@ -74,8 +74,8 @@ requests" currentPath="contribute" }}
           <h3>Step 1: Create JSON File</h3>
           <p>Create <code>src/statics/potions/[category]/your-potion.json</code></p>
           <p>Use the <strong>category schema</strong> in <code>src/statics/schema/categories/</code> and an existing
-            potion as template (e.g., <code>dialog.json</code> for components, <code>dashboard.json</code> for layouts).
-            Write it the way the Dialog guide is written: it follows the
+            potion as template (e.g., <code>dialog.json</code> for components, <code>ai-agent-chat.json</code> for layouts,
+            <code>ai-action-review.json</code> for patterns). Write it the way those guides are written: they follow the
             <a href="https://github.com/uiPotion/uipotion/blob/main/AGENTS.md#guide-rules" target="_blank" rel="noopener noreferrer">Guide Rules</a>,
             which not every older guide follows yet. Every guide requires the base fields <code>$schema</code>, <code>id</code>, <code>version</code>,
             <code>name</code>, <code>category</code>, <code>tags</code>, <code>description</code>,
@@ -338,7 +338,7 @@ npm start</code></pre>
         <section class="about-section">
           <h2>Best Practices</h2>
           <p>The <a href="https://github.com/uiPotion/uipotion/blob/main/AGENTS.md#guide-rules" target="_blank"
-              rel="noopener noreferrer">Guide Rules</a> list these in full, and the Dialog guide follows all of them.</p>
+              rel="noopener noreferrer">Guide Rules</a> list these in full, and the Dialog guide and the three AI guides follow all of them.</p>
 
           <h3>Writing AI Agent Instructions</h3>
           <ul>
@@ -380,7 +380,7 @@ npm start</code></pre>
             <li><strong>Be comprehensive</strong> — Include all necessary details for AI to implement, and say each rule once</li>
             <li><strong>Be framework-agnostic</strong> — Avoid framework-specific code in descriptions</li>
             <li><strong>Include accessibility where relevant</strong> — WCAG 2.2 AA, ARIA, keyboard navigation</li>
-            <li><strong>Follow the Guide Rules</strong> — In <code>AGENTS.md</code>; the Dialog guide follows all of them</li>
+            <li><strong>Follow the Guide Rules</strong> — In <code>AGENTS.md</code>; the Dialog guide and the three AI guides follow all of them</li>
             <li><strong>Include responsive specs where relevant</strong> — Mobile, tablet, desktop breakpoints</li>
             <li><strong>Include testing checklist</strong> — What to verify after implementation</li>
           </ul>

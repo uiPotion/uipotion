@@ -20,23 +20,23 @@
     },
     {
       "id": "dialog",
-      "name": "Modal Dialog (Accessible) with Focus Trap and Actions",
+      "name": "Modal Dialog",
       "category": "components",
       "tags": [
         "components",
         "modal",
         "dialog",
         "overlay",
-        "focus-trap",
+        "focus-management",
         "a11y",
         "wcag",
         "aria"
       ],
-      "excerpt": "An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.",
+      "excerpt": "An accessible modal dialog for confirmations and short tasks, built on the project's dialog component or the native dialog element: focus that moves in and comes back, Escape and backdrop rules, a busy state that survives a failed action, and a full-screen layout on phones.",
       "webUrl": "https://uipotion.com/potions/components/dialog",
       "agentGuideUrl": "https://uipotion.com/potions/components/dialog.json",
       "created": "2026-01-11",
-      "updated": "2026-10-16",
+      "updated": "2026-10-17",
       "markdownUrl": "https://uipotion.com/potions/components/dialog.md"
     },
     {
@@ -296,11 +296,11 @@
         "responsive",
         "a11y"
       ],
-      "excerpt": "A responsive AI agent chat interface layout with message history, input area, typing indicators, and conversation management. Perfect for AI assistants, chatbots, and conversational interfaces.",
+      "excerpt": "A chat layout for an AI assistant: a conversation list, a transcript that stays put while you read, and a composer whose Send button turns into Stop. A message that fails to send stays in the input with a retry.",
       "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.json",
       "created": "2026-02-01",
-      "updated": "2026-10-07",
+      "updated": "2026-10-17",
       "markdownUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.md"
     },
     {
@@ -484,7 +484,7 @@
     },
     {
       "id": "ai-response-rendering",
-      "name": "AI Response Rendering Pattern - Streaming, Tool Calls, and Reasoning",
+      "name": "AI Response Rendering Pattern",
       "category": "patterns",
       "tags": [
         "patterns",
@@ -497,11 +497,11 @@
         "artifacts",
         "a11y"
       ],
-      "excerpt": "A framework-agnostic pattern for rendering an AI assistant reply: streaming tokens, incremental Markdown, code blocks, tool-call cards, collapsible reasoning, citations, artifacts, and recovery from mid-stream errors. Companion to the AI Agent Chat Layout.",
+      "excerpt": "How to render an AI assistant's reply as it streams: Markdown, code, tool-call cards, citations, artifacts, and optional reasoning, with a Stop that keeps partial text, errors shown in place, and model output treated as untrusted. Companion to the AI Agent Chat Layout.",
       "webUrl": "https://uipotion.com/potions/patterns/ai-response-rendering",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.json",
       "created": "2026-04-18",
-      "updated": "2026-07-26",
+      "updated": "2026-10-17",
       "markdownUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.md"
     },
     {
@@ -519,14 +519,14 @@
         "audit-log",
         "a11y"
       ],
-      "excerpt": "A framework-agnostic pattern for reviewing AI-proposed actions before execution: plan preview, risk labels, scoped permissions, approve/reject/edit controls, undo, progress, and audit trail.",
+      "excerpt": "A framework-agnostic pattern for reviewing AI-proposed actions before they run: plan preview, risk labels, scoped permissions, approve, reject, and edit controls, undo, progress, and an audit trail.",
       "webUrl": "https://uipotion.com/potions/patterns/ai-action-review",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-action-review.json",
       "created": "2026-05-23",
-      "updated": "2026-07-26",
+      "updated": "2026-10-17",
       "markdownUrl": "https://uipotion.com/potions/patterns/ai-action-review.md"
     }
   ],
   "totalCount": 24,
-  "lastUpdated": "2026-10-16"
+  "lastUpdated": "2026-10-17"
 }

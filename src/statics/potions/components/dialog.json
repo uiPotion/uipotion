@@ -1,14 +1,14 @@
 {
   "$schema": "https://uipotion.com/schema/categories/components.schema.json",
   "id": "dialog",
-  "version": "1.1.0",
-  "name": "Modal Dialog (Accessible) with Focus Trap and Actions",
+  "version": "1.1.1",
+  "name": "Modal Dialog",
   "category": "components",
   "tags": [
     "modal",
     "dialog",
     "overlay",
-    "focus-trap",
+    "focus-management",
     "a11y",
     "wcag",
     "aria"
@@ -390,7 +390,7 @@
   ],
   "meta": {
     "created": "2026-01-11",
-    "updated": "2026-10-16",
+    "updated": "2026-10-17",
     "webUrl": "https://uipotion.com/potions/components/dialog",
     "relatedPotions": [
       {

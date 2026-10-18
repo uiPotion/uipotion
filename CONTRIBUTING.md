@@ -36,7 +36,7 @@ Choose the appropriate category:
 
 Create `src/statics/potions/[category]/your-potion.json`
 
-Use the **category schema** in `src/statics/schema/categories/` and an existing potion as template (e.g., `dialog.json` for components, `dashboard.json` for layouts). Write it the way the Dialog guide is written: it follows the [Guide Rules](AGENTS.md#guide-rules), which not every older guide follows yet.
+Use the **category schema** in `src/statics/schema/categories/` and an existing potion as template (e.g., `dialog.json` for components, `ai-agent-chat.json` for layouts, `ai-action-review.json` for patterns). Write it the way those guides are written: they follow the [Guide Rules](AGENTS.md#guide-rules), which not every older guide follows yet.
 
 Every guide begins with the required base fields below. This excerpt is not a complete category guide; each category schema adds required structures of its own. Start from an existing potion in the same category and validate the result.
 
@@ -164,7 +164,7 @@ We'll review your potion for schema compliance and best practices, suggest impro
 - **Be comprehensive** — Include all necessary details for AI to implement, and say each rule once
 - **Be framework-agnostic** — Avoid framework-specific code in descriptions
 - **Include accessibility where relevant** — WCAG 2.2 AA, ARIA, keyboard navigation
-- **Follow the Guide Rules** — In [AGENTS.md](AGENTS.md#guide-rules); the Dialog guide follows all of them
+- **Follow the Guide Rules** — In [AGENTS.md](AGENTS.md#guide-rules); the Dialog guide and the three AI guides follow all of them
 - **Include responsive specs where relevant** — Mobile, tablet, desktop breakpoints
 - **Include testing checklist** — What to verify after implementation
 

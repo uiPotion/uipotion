@@ -1,6 +1,6 @@
 # UI Potion
 
-> AI-agent-optimized UI specifications for any framework
+> UI behavior guides your coding agent can apply to your existing project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Built with Harold](https://img.shields.io/badge/Built%20with-Harold-deeppink)](https://haroldjs.com)
@@ -152,7 +152,7 @@ We welcome contributions! UI Potion grows with community input.
 
 ## What Makes a Good Potion?
 
-The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. The Dialog guide follows all of them; the others get them as they're revised.
+The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. The Dialog guide and the three AI guides follow all of them; the others get them as they're revised.
 
 ### Human Documentation (Markdown)
 

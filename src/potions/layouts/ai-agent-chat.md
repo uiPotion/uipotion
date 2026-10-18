@@ -2,7 +2,7 @@
 layout: 'potion'
 title: 'AI Agent Chat Layout'
 publicationDate: '2026-02-01'
-excerpt: 'A responsive AI agent chat interface layout with message history, input area, typing indicators, and conversation management. Perfect for AI assistants, chatbots, and conversational interfaces.'
+excerpt: 'A chat layout for an AI assistant: a conversation list, a transcript that stays put while you read, and a composer whose Send button turns into Stop. A message that fails to send stays in the input with a retry.'
 category: 'Layouts'
 tags:
   - layouts
@@ -16,1150 +16,285 @@ tags:
 agentManifest: 'potions/layouts/ai-agent-chat.json'
 path: 'potions/layouts/ai-agent-chat'
 promptSubject: 'an AI chat interface'
+useWhen: 'you build or extend a chat interface where people talk to an AI assistant.'
+specifies:
+  - 'A message that fails to send stays in the input with a retry, so nobody has to retype it.'
+  - 'Enter sends and Shift+Enter adds a line, but never while someone is composing text with an input method editor.'
+  - 'While a reply streams, the Send button becomes Stop, and the view follows new text only while the reader is at the bottom.'
+example: 'Someone sends a question on a train and the connection drops. The message shows Not sent with Retry, their text is still in the input, and one tap on Retry sends it.'
 ---
 
-A responsive AI agent chat interface layout with message history, input area, typing indicators, and conversation management. Perfect for AI assistants, chatbots, and conversational interfaces.
+People talk to an AI assistant through parts every chat shares: a list of conversations, the transcript, and a box to type in. This guide covers that shell. It builds on the chat components your project already has, and targets WCAG 2.2 AA. What goes inside an assistant's reply, such as streaming text, Markdown, and tool calls, is covered by the [AI Response Rendering Pattern](/potions/patterns/ai-response-rendering), and approving the assistant's actions by the [AI Action Review Pattern](/potions/patterns/ai-action-review). This guide works with or without them.
 
-## Structure Specification
+## Start from what the project has
 
-### Layout Hierarchy
+1. If the project has chat, message, or composer components, in its design system or a library it already uses, configure or extend them to meet this guide. Keep their APIs.
+2. Otherwise use plain HTML: a `<form>` with a labelled `<textarea>` and one submit button, a list for the transcript, and a `<nav>` for the conversation list.
+3. Choose what the task needs: the conversation list, attachments, quick actions, and the optional capabilities at the end. Leave out the rest.
 
-The layout consists of an optional Sidebar (conversation list and agent selector) and a Main Chat Area. The Main Chat Area contains a fixed Header (agent info and actions), a scrollable Message List (conversation history), and a fixed Input Area (message composition with send button and quick actions).
+Add no dependency, such as a chat UI kit or an autosize library, without asking. The project's conventions win for styling and visual defaults. If one conflicts with an accessibility or correctness requirement here, ask instead of choosing.
 
-## Detailed Component Specifications
+## Layout
 
-### 1. Sidebar Component (Optional)
+- The page is a full-height grid, `100dvh` tall with `100vh` as the fallback: the conversation list's column, when it's docked, and the chat column.
+- The chat column has three rows: the header, the transcript, and the composer. In the chat column only the transcript scrolls (`overflow-y: auto`, `overscroll-behavior: contain`); a docked conversation list scrolls inside its own column.
+- Grid and flex items default to `min-height: auto`, so give the page grid's columns `min-height: 0`. Without it, a long conversation list or conversation stretches the page and pushes the composer off screen.
+- The header and the composer stay visible because they're outside the transcript's scrolling area, not because of `position: fixed`. So they never cover the focused element (WCAG 2.4.11), and the composer stays above mobile browser toolbars.
+- A docked conversation list takes its own column and never covers the chat.
+- The transcript is centered and at most 768 px wide. Sizes in this guide are suggested defaults; the project's design wins.
+- At 320 px wide nothing scrolls sideways, apart from code blocks, which scroll inside themselves.
 
-**Dimensions:**
-- Desktop: 280-320px width
-- Mobile: Full screen overlay or hidden
-- Collapsed state: 0px (completely hidden)
+## The composer
 
-**States:**
-- `expanded` (default on desktop)
-- `hidden` (mobile default)
-- `overlay` (mobile when open)
+- A labelled `<textarea>` and one submit button. The label can be visually hidden. If a placeholder shows a prompt such as "Message Acme Assistant", the label uses the same words, so voice control users can say what they see.
+- Text is at least 16 px, so iOS Safari doesn't zoom the page when the field gets focus.
+- It grows with its content up to about 8 lines, then scrolls inside: `field-sizing: content` where the browser supports it, otherwise set the height from `scrollHeight` on input.
+- Problems with the draft, such as a message that's too long or a rejected file, show as text under the composer, linked to the textarea with `aria-describedby`.
 
-**Elements:**
+### Enter
 
-#### Conversation List
-- Scrollable list of past conversations
-- Each item: Title, timestamp, last message preview
-- Height: 64-72px per conversation item
-- Active conversation: Highlighted background or left border indicator
-- New conversation button: Fixed at top or bottom
+Enter sends and Shift+Enter adds a line. Enter that confirms an input method editor (IME) composition never sends, so people typing Japanese, Chinese, or Korean can confirm characters: check `isComposing`, and `keyCode` 229, which is how Safari reports that Enter.
 
-#### Agent Selector
-- Dropdown or list of available AI agents
-- Shows agent name, avatar, and status
-- Status indicators: Online, offline, busy
+When the primary input is touch (`(hover: none) and (pointer: coarse)`), assume an on-screen keyboard, which has no Shift+Enter, so Enter adds a line and the button sends. That's a heuristic: a tablet with a keyboard may get the new-line default, and touchscreen laptops usually keep Enter to send. An existing Enter-to-send setting overrides it, and the button always sends.
 
-**Behavior:**
-- Mobile: Overlay with backdrop, dismissible
-- Backdrop click closes sidebar (prevent event bubbling)
-- Smooth transition animation (250ms ease-out)
-- Persist open/closed state in localStorage (optional)
+The snippets in this guide are plain JavaScript; adapt them to the project's framework and its version. `form`, `textarea`, `button`, `transcript`, and `jumpButton` stand for the composer's and the transcript's elements, and `conversation` for the app's state.
 
-**Closing the sidebar:** When the sidebar is open, users must always have a visible way to close it at every viewport size. Provide at least one: a dedicated close control in the sidebar (e.g. in the header), or a header control that both opens and closes the sidebar. Do not hide or remove the close option on desktop. The close action should be keyboard-accessible and have an accessible name for screen readers.
+```js
+// Enter sends, and Shift+Enter adds a line. enterSends is the product's Enter-to-send
+// setting, or undefined to use the touch heuristic.
+const touchPrimary = matchMedia('(hover: none) and (pointer: coarse)');
 
-**Layout space (critical):** When the sidebar is visible on desktop, the main chat area must have left margin (or margin-inline-start) equal to the sidebar width (280-320px) so the sidebar never overlaps the main content. Do not rely on z-index alone; reserve layout space. When the sidebar is closed or in overlay mode (mobile/tablet), use zero margin. Sidebar visibility must be tied to open/closed state on all breakpoints.
-
-### 2. Header Component
-
-**Dimensions:**
-- Height: 56-64px (fixed)
-- Width: 100% of chat area
-- Position: Fixed or sticky at top
-
-**Layout:**
-
-The header contains a Menu Toggle button (visible when sidebar is collapsible), Agent Info section (avatar, name, status), and Header Actions (settings, clear chat, etc.) on the right.
-
-**Elements:**
-
-#### Menu Toggle Button (Optional)
-- Size: 40px x 40px
-- Icon: Hamburger or sidebar toggle icon
-- Visibility: Hidden when sidebar is always visible
-- Position: Left-most
-
-#### Agent Info Section
-- Avatar: 36-40px circle
-- Agent Name: 16-18px, medium weight
-- Status Indicator: 8-10px colored dot (green for online, gray for offline)
-- Status Text: 12-14px, muted color (optional)
-
-#### Header Actions
-- Settings/Options button: 40px icon button
-- Clear conversation button: 40px icon button (with confirmation)
-- Additional actions as needed
-
-**Behavior:**
-- Shadow or border-bottom for depth
-- Remains fixed at top during scroll
-- Dropdowns close on outside click or escape key
-- Accessible via keyboard
-
-### 3. Message List Component
-
-**Dimensions:**
-- Padding: 16-24px horizontal, 16-24px vertical
-- Padding-bottom: At least 24-32px so the last message or welcome content does not sit directly under the input area
-- Max-width: 768-900px (centered for readability)
-- Spacing between messages: 16-24px
-
-**Layout:**
-- Vertical stack of messages
-- User messages: Right-aligned or right side
-- Agent messages: Left-aligned or left side
-- Timestamps: Below each message or grouped by date
-
-**Elements:**
-
-#### Message Bubble
-- Border radius: 16-20px (user: 16-20px, 16-20px, 4-8px, 16-20px; agent: 16-20px, 16-20px, 16-20px, 4-8px)
-- Max-width: 75-85% of container
-- Padding: 12-16px
-- Font size: 14-16px
-- Line height: 1.5-1.6
-
-**User Message Styling:**
-- Background: Primary brand color or dark neutral
-- Text: White or high contrast
-- Alignment: Flex-end (right side)
-
-**Agent Message Styling:**
-- Background: Light gray or subtle color
-- Text: Dark text on light background
-- Alignment: Flex-start (left side)
-- May include agent avatar
-
-#### Message Content
-- Text content with proper formatting
-- Code blocks: Monospace font, darker background, rounded corners
-- Links: Underlined or colored text
-- Lists: Proper indentation and bullets
-
-#### Timestamp
-- Font size: 11-12px
-- Color: Muted gray
-- Format: Relative time ("2 min ago") or absolute time
-- Position: Below message or in tooltip
-
-#### Date Dividers
-- Show date between messages from different days
-- Centered text: 12-14px, uppercase, letter-spacing
-- Optional horizontal lines on sides
-
-**Behavior:**
-- Auto-scroll to bottom on new messages
-- Smooth scroll animation when scrolling to specific message
-- Infinite scroll or pagination for loading older messages
-- Message selection and actions (copy, delete)
-- Empty state: Welcome message or prompt suggestions
-
-### 4. Typing Indicator Component
-
-**Dimensions:**
-- Height: 32-40px
-- Width: auto (fits content)
-- Margin: 8-12px from last message
-
-**Elements:**
-
-#### Animated Dots
-- Three dots in a row
-- Size: 8-10px each
-- Animation: Sequential bounce or fade (1.4s cycle)
-- Color: Muted text color
-
-#### Typing Text (Optional)
-- "Agent is typing..." or similar
-- Font size: 12-14px
-- Color: Muted gray
-- Position: Below or beside dots
-
-**Behavior:**
-- Appears when agent is generating response
-- Disappears when message arrives
-- Smooth fade in/out animation (200ms)
-- Cancel animation if typing stops abruptly
-
-### 5. Input Area Component
-
-**Dimensions:**
-- Min-height: 56-72px
-- Max-height: 200-256px (for multiline expansion)
-- Padding: 12-16px on all sides (minimum 16px recommended)
-- Position: Fixed at bottom
-
-**Spacing (critical):** Provide clear white space on all sides so the input is not flush with the viewport. Bottom padding must include env(safe-area-inset-bottom) on mobile (e.g. calc(16px + env(safe-area-inset-bottom))). Use at least 12px gap between the text input and the send button. Ensure the message list above has sufficient padding-bottom so content does not appear to sit under the input area.
-
-**Layout:**
-
-The input area contains Quick Action Chips (optional, above input), the Text Input field (expandable textarea), Attachment Button (left of input), and Send Button (right of input).
-
-**Elements:**
-
-#### Quick Action Chips (Optional)
-- Position: Above text input, horizontal scroll
-- Chip height: 32-36px
-- Padding: 8-16px horizontal
-- Border radius: 16-18px (pill shape)
-- Background: Light or transparent with border
-- Text: 13-14px
-- Behavior: Click to insert text into input
-- Examples: "Summarize this", "Explain like I'm 5", "Make it shorter"
-
-#### Text Input Field
-- Type: Auto-expanding textarea
-- Min rows: 1
-- Max rows: 6-8
-- Font size: 14-16px
-- Line height: 1.5
-- Placeholder: "Type a message..." or similar
-- Padding: 12-16px
-- Border radius: 20-24px
-- Border: 1-2px solid or none (flat design)
-
-**Input States:**
-- Default: Subtle border or background
-- Focus: Highlighted border, no outline or custom outline
-- Disabled: Reduced opacity, no interactions
-- Error: Red border or background (if validation fails)
-
-#### Attachment Button (Optional)
-- Size: 40px icon button
-- Icon: Paperclip or plus
-- Position: Left side of input
-- Behavior: Opens file picker or attachment menu
-- Supports: Images, documents, audio
-
-#### Send Button
-- Size: 40-44px circular button
-- Icon: Send arrow or paper plane
-- Position: Right side of input
-- States:
-  - Default: Muted color or disabled when input empty
-  - Active: Primary brand color when input has text
-  - Loading: Spinner or disabled state while sending
-
-**Behavior:**
-- Auto-focus on input when chat opens
-- Enter key sends message (Shift+Enter for new line), but never while an input method editor (IME) is composing text, so people typing Japanese, Chinese, or Korean can confirm characters with Enter
-- Choose the default Enter behavior with a heuristic. When the primary input is touch (for example the `(hover: none) and (pointer: coarse)` media query), assume an on-screen keyboard, which has no Shift+Enter, so Enter inserts a new line and the send button sends; otherwise Enter sends. Media queries describe pointing devices, not keyboards, so a tablet with an attached keyboard may still get the new-line default, while touchscreen laptops usually report a fine pointer and keep Enter to send. Don't use touch support alone. If the product already has an Enter-to-send setting, it overrides the heuristic. Shift+Enter always inserts a new line, and the send button always sends
-- Input expands as user types multiple lines
-- Smooth height transition (150ms)
-- Send button enabled only when input not empty
-- Clear input after sending
-- Maintain input value if sending fails (show error)
-
-### 6. Welcome Screen / Empty State
-
-**Dimensions:**
-- Full height of message list area
-- Centered content
-- Max-width: 600px
-
-**Elements:**
-
-#### Welcome Message
-- Large icon or illustration (optional)
-- Heading: "How can I help you today?" or similar
-- Font size: 24-32px
-- Subtext: Brief description of agent capabilities
-
-#### Suggested Prompts
-- Grid or list of suggested starting prompts
-- 3-6 suggestions
-- Styled as clickable cards or buttons
-- Examples: "Help me write...", "Explain...", "Summarize..."
-
-**Behavior:**
-- Displayed when no messages in conversation
-- Dismissed after first message sent
-- Can be recalled via button in header
-
-## Responsive Breakpoints
-
-### Desktop (>= 1024px)
-- Sidebar: Visible by default (if enabled)
-- Message max-width: 768-900px (centered)
-- Input area: Full width with comfortable padding
-- Quick actions: Visible above input
-
-### Tablet (768px - 1023px)
-- Sidebar: Collapsible, overlay mode when open
-- Message max-width: 100% with 16-24px margins
-- Input area: Full width, reduced padding
-- Quick actions: Horizontal scroll or hidden
-
-### Mobile (< 768px)
-- Sidebar: Hidden by default, fullscreen overlay when open
-- Message max-width: 100% with 12-16px margins
-- Input area: Full width, minimal padding (12px)
-- Quick actions: Horizontal scroll, compact
-- Header: Simplified (avatar and name only)
-- Touch-friendly tap targets (min 44px)
-
-### Window Resize Handling
-- Debounce: 200ms
-- Behavior: Re-evaluate breakpoint on resize
-- Close mobile sidebar if switching to desktop
-
-## Interaction Patterns
-
-### Sending a Message
-1. User types message in input field
-2. Send button becomes active
-3. User clicks send or presses Enter
-4. Message appears in message list immediately (optimistic UI)
-5. Typing indicator appears
-6. Agent response appears when ready
-7. Auto-scroll to show new message
-
-### Receiving a Response
-1. Typing indicator animates
-2. Response streams in (optional: word-by-word or chunk-by-chunk)
-3. Message bubble grows to accommodate content
-4. Code blocks and formatting render
-5. Auto-scroll follows streaming content
-6. Typing indicator disappears
-
-### Sidebar Toggle (if applicable)
-1. User clicks menu toggle button
-2. Sidebar slides in from left (mobile) or expands (desktop)
-3. Backdrop appears on mobile
-4. User can select different conversation
-5. Current conversation switches with smooth transition
-
-### Message Actions
-1. Long press or right-click on message
-2. Context menu appears with options:
-   - Copy text
-   - Delete message (if allowed)
-   - Retry (for failed messages)
-   - Quote/reply
-3. Action executes on selection
-
-### File Attachment (if enabled)
-1. User clicks attachment button
-2. File picker opens
-3. User selects file(s)
-4. File preview appears above input
-5. User types optional message
-6. Send button submits message with attachment
-
-## Accessibility Requirements
-
-### WCAG 2.1 Compliance (Level AA Target)
-
-This chat layout should meet WCAG 2.1 Level AA standards. Key requirements:
-
-- 1.1.1 Non-text Content: All icons have text or aria-label
-- 1.3.1 Info and Relationships: Semantic HTML structure with proper roles
-- 1.4.3 Contrast Minimum: 4.5:1 for normal text, 3:1 for large text
-- 2.1.1 Keyboard: All interactive elements keyboard accessible
-- 2.1.2 No Keyboard Trap: Focus doesn't get trapped
-- 2.4.2 Page Titled: Descriptive page title
-- 2.4.3 Focus Order: Logical tab order throughout
-- 2.4.4 Link Purpose: Clear button labels
-- 2.4.7 Focus Visible: Clear focus indicators on all interactive elements
-- 4.1.2 Name, Role, Value: All elements have accessible names and roles
-- 4.1.3 Status Messages: Use aria-live for new messages and typing indicator
-
-### Keyboard Navigation
-
-**Tab Order:**
-- Header actions → Message list (if navigating history) → Input area → Send button
-
-**Implementation:**
-- Enter to send message (from input)
-- Shift+Enter for new line in input
-- While an IME is composing text, Enter confirms the composition and doesn't send: check the keydown event's `isComposing`, and also `keyCode === 229`, because Safari reports the confirming Enter that way
-- Escape to close sidebar or dropdowns
-- Arrow keys to navigate message history (optional)
-- Ctrl/Cmd + C to copy selected message text
-
-**Focus Management:**
-- Focus remains in input after sending message
-- Focus moves to new message when it arrives (optional, use carefully)
-- Focus trap in sidebar when open on mobile
-- Focus restored to toggle button when sidebar closes
-
-### ARIA Attributes
-
-**Required ARIA Attributes:**
-
-1. Message List Container:
-   ```html
-   <div role="log" aria-live="polite" aria-label="Chat messages">
-   ```
-
-2. User Message:
-   ```html
-   <div class="message user-message" aria-label="You said: [message content]">
-   ```
-
-3. Agent Message:
-   ```html
-   <div class="message agent-message" aria-label="Agent said: [message content]">
-   ```
-
-4. Typing Indicator:
-   ```html
-   <div class="typing-indicator" aria-live="polite" aria-label="Agent is typing">
-     <span class="sr-only">Agent is typing</span>
-     <span class="dots" aria-hidden="true">...</span>
-   </div>
-   ```
-
-5. Input Field:
-   ```html
-   <textarea aria-label="Message input" placeholder="Type a message..." rows="1"></textarea>
-   ```
-
-6. Send Button:
-   ```html
-   <button aria-label="Send message" disabled="true/false">
-     <span class="sr-only">Send</span>
-   </button>
-   ```
-
-7. Sidebar:
-   ```html
-   <aside role="complementary" aria-label="Conversation list" aria-hidden="false/true">
-   ```
-
-**Dynamic ARIA Updates:**
-- Announce new messages with aria-live region
-- Update aria-hidden when sidebar opens/closes
-- Update disabled state on send button
-- Announce when agent starts/stops typing
-
-### Screen Reader Support
-
-**Announcements:**
-- New messages: "Agent said: [content]" or "You said: [content]"
-- Typing status: "Agent is typing" when indicator appears
-- Send confirmation: "Message sent" (optional, brief)
-- Error states: "Failed to send message" with retry option
-
-**Labels:**
-- All icon buttons must have aria-label
-- Message bubbles should have descriptive aria-label
-- Input field must have accessible name
-
-**Screen Reader Only Text:**
-```css
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
+textarea.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter' || event.shiftKey) return;
+  // Enter that confirms an IME composition; Safari reports it as keyCode 229
+  if (event.isComposing || event.keyCode === 229) return;
+  // On-screen keyboards have no Shift+Enter, so there Enter adds a line by default
+  if (!(enterSends ?? !touchPrimary.matches)) return;
+  event.preventDefault();
+  // While a reply streams, Enter keeps the draft: the button is Stop
+  if (!conversation.replyInProgress) form.requestSubmit();
+});
 ```
 
-### Color Contrast
+### Send and Stop
 
-**Requirements:**
-- WCAG AA: 4.5:1 for normal text, 3:1 for large text (18pt+ or 14pt+ bold)
-- WCAG AAA (Recommended): 7:1 for important text
+One button sends, and turns into Stop while a reply streams. Stop stops the reply and keeps its text. The textarea stays editable, so the next message can be drafted, but Enter doesn't send until the reply ends or is stopped.
 
-**Verification:**
-- User message text on bubble background
-- Agent message text on bubble background
-- Input text on input background
-- Button text on button background
-- Timestamp text on background
-- Placeholder text (must meet contrast requirements)
+The button never gets the `disabled` attribute, which would drop focus to the page when its state changes. With nothing to send, it has `aria-disabled="true"` and does nothing. Its name follows its state: "Send message" or "Stop response". In Stop mode it has `formnovalidate`, so a `required` field or other form validation never blocks Stop. It's at least 24 by 24 px; 40 to 44 px is comfortable.
 
-### Focus Visible Styles
-
-**Implementation:**
-```css
-input:focus-visible,
-textarea:focus-visible,
-button:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-}
-```
-
-### Accessibility Implementation Checklist
-
-When implementing this chat layout, ensure:
-
-- All buttons have aria-label or visible text
-- All icons have aria-label or sr-only text
-- Message list has role="log" and aria-live="polite"
-- Typing indicator announces to screen readers
-- Input field has accessible name
-- Send button has disabled state communicated
-- Color contrast verified with contrast checker tool
-- Keyboard navigation works throughout
-- Focus visible on all interactive elements
-- Focus managed properly in sidebar
-- Screen reader tested with NVDA, VoiceOver, or JAWS
-- Touch targets minimum 44px on mobile
-
-## Design System Specifications
-
-**Important**: The design specifications below are tool-agnostic and should be implemented using your project's chosen styling approach (Tailwind, CSS Modules, styled-components, Chakra UI, Material-UI, SCSS, etc.).
-
-### Color Guidelines
-
-#### User Message Bubble
-- Background (Light): Primary brand color (e.g., #3b82f6, #10b981) or dark neutral (#1f2937)
-- Background (Dark): Primary color or lighter shade (#60a5fa, #34d399)
-- Text: White (#ffffff) or very light (#f3f4f6)
-- Links: Light blue or underlined white
-- Code blocks: Darker background within bubble (#1f2937), light text
-
-#### Agent Message Bubble
-- Background (Light): Light gray (#f3f4f6, #e5e7eb) or white with border
-- Background (Dark): Dark gray (#374151, #4b5563)
-- Text: Dark gray (#1f2937, #111827) for light, light gray (#e5e7eb) for dark
-- Links: Primary brand color
-- Code blocks: Dark background (#1f2937), light text, rounded corners
-
-#### Input Area
-- Background (Light): White (#ffffff) or very light gray (#f9fafb)
-- Background (Dark): Dark gray (#1f2937, #374151)
-- Border: 1px solid light gray (#e5e7eb) or transparent
-- Focus Border: Primary brand color
-- Text: Match body text color
-- Placeholder: Muted gray (#9ca3af)
-
-#### Send Button
-- Default: Muted gray or disabled state
-- Active: Primary brand color
-- Icon: White or contrast color
-- Disabled: Light gray (#d1d5db)
-
-#### Header
-- Background (Light): White (#ffffff) or very light gray (#f9fafb)
-- Background (Dark): Dark gray (#1f2937)
-- Border: 1px solid light gray (#e5e7eb) or subtle shadow
-- Text: Dark gray (#1f2937) for light, light gray (#e5e7eb) for dark
-
-#### Sidebar
-- Background (Light): White (#ffffff) or light gray (#f9fafb)
-- Background (Dark): Dark gray (#1f2937)
-- Active Conversation: Primary color at 10% opacity or left border
-- Text: Match body text color
-
-### Typography
-
-- Font Family: Use project's font stack (system-ui, -apple-system, sans-serif or custom)
-- Message Text: 14-16px, regular weight (400), line-height 1.5-1.6
-- Code Blocks: Monospace font (Consolas, Monaco, 'Courier New'), 13-14px
-- Timestamps: 11-12px, regular weight, muted color
-- Agent Name (Header): 16-18px, medium weight (500-600)
-- Status Text: 12-14px, regular weight
-- Input Text: 14-16px, regular weight
-- Quick Actions: 13-14px, regular weight
-- Welcome Heading: 24-32px, bold (700)
-
-### Spacing System
-
-- Message List Padding: 16-24px horizontal, 16-24px vertical
-- Message Bubble Padding: 12-16px
-- Message Gap: 16-24px between messages
-- Input Area Padding: 12-16px
-- Header Padding: 12-16px horizontal, 12-16px vertical
-- Sidebar Item Padding: 12-16px
-- Quick Action Gap: 8-12px between chips
-
-### Shadows & Elevation
-
-- Header Shadow: 0 1px 3px rgba(0, 0, 0, 0.1)
-- Input Area Shadow (if floating): 0 -2px 10px rgba(0, 0, 0, 0.05)
-- Message Bubbles: No shadow or very subtle (0 1px 2px rgba(0, 0, 0, 0.05))
-- Sidebar Shadow (when overlay): 4px 0 15px rgba(0, 0, 0, 0.1)
-
-### Border Radius
-
-- Message Bubbles: 16-20px (asymmetric for speech bubble effect)
-- Input Field: 20-24px (pill shape if single line)
-- Send Button: 50% (circle) or 8-12px
-- Quick Action Chips: 16-18px (pill shape)
-- Avatars: 50% (circle)
-- Header Buttons: 6-8px
-
-### Visual Hierarchy Principles
-
-1. Messages should be clearly distinguishable (user vs agent)
-2. Input area should be prominent and always accessible
-3. Header should provide context without dominating
-4. Timestamps should be subtle but readable
-5. Active conversation should be clearly highlighted
-6. Quick actions should be discoverable but not distracting
-7. Code blocks should stand out within messages
-
-## State Management Considerations
-
-### For AI Agents to Implement
-
-**State to Track:**
-1. `messages: array` - List of all messages in conversation
-   - Structure: `{ id, role: 'user'|'agent', content, timestamp, status: 'sent'|'delivering'|'error' }`
-2. `inputValue: string` - Current text in input field
-3. `isTyping: boolean` - Whether agent is generating response
-4. `sidebarOpen: boolean` - Whether sidebar is visible (mobile)
-5. `conversations: array` - List of available conversations (if sidebar enabled)
-6. `activeConversationId: string` - Currently selected conversation
-7. `isSending: boolean` - Whether message is being sent
-8. `hasMoreMessages: boolean` - For pagination/infinite scroll
-
-**State Persistence:**
-- `sidebarOpen` → localStorage (optional)
-- `activeConversationId` → localStorage or URL param
-- Message history → Server/database (not localStorage for privacy)
-- Draft message (inputValue) → localStorage (optional, auto-save)
-
-### SSR/Hydration Considerations
-- localStorage access: Only in onMounted/useEffect
-- Default state: Empty messages, closed sidebar
-- Prevent hydration mismatches by initializing state after mount
-- Loading states for initial message fetch
-
-## Critical Implementation Guidelines
-
-### Vanilla CSS Detection
-**CRITICAL**: When detecting vanilla CSS in the project, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements.
-
-- Define classes like `.message`, `.message--user`, `.message--agent`, `.input-area`, etc.
-- Apply classes via className/class attributes: `<div class="message message--user">`
-- Do NOT use: `<div style="background: blue">`
-
-### React Hook Patterns
-**CRITICAL**: When detecting React, extract logic from useEffect hooks into separate custom hooks that do ONE thing each.
-
-- `useChatMessages()` - Manages message list state and operations
-- `useAutoScroll(messageListRef, messages)` - Handles auto-scrolling behavior
-- `useTypingIndicator(isTyping)` - Manages typing animation state
-- `useConversation()` - Manages conversation switching
-- Each hook should have a single responsibility
-
-### Message Streaming (Optional)
-For real-time message streaming:
-- Update message content as chunks arrive
-- Use requestAnimationFrame for smooth DOM updates
-- Throttle rapid updates to prevent layout thrashing
-- Show streaming cursor or typing indicator during stream
-
-### Performance Considerations
-- Virtualize long message lists (react-window, @tanstack/virtual)
-- Debounce input changes if doing heavy processing
-- Lazy load images and attachments
-- Optimize re-renders with proper React keys or Vue memoization
-
-## Code Implementation Patterns
-
-### React Example Pattern
-```jsx
-// Suggested component structure
-<ChatLayout>
-  {hasSidebar && (
-    <Sidebar
-      conversations={conversations}
-      activeId={activeConversationId}
-      isOpen={sidebarOpen}
-      onSelect={handleConversationSelect}
-    />
-  )}
-  <ChatContainer>
-    <Header
-      agent={currentAgent}
-      onMenuToggle={handleSidebarToggle}
-      actions={headerActions}
-    />
-    <MessageList
-      messages={messages}
-      isTyping={isTyping}
-      onMessageAction={handleMessageAction}
-    />
-    <InputArea
-      value={inputValue}
-      onChange={setInputValue}
-      onSend={handleSend}
-      quickActions={quickActions}
-      disabled={isSending}
-    />
-  </ChatContainer>
-</ChatLayout>
-```
-
-### Vue Example Pattern
-```vue
-<!-- Suggested component structure -->
-<template>
-  <ChatLayout>
-    <Sidebar
-      v-if="hasSidebar"
-      :conversations="conversations"
-      :active-id="activeConversationId"
-      :is-open="sidebarOpen"
-      @select="handleConversationSelect"
-    />
-    <ChatContainer>
-      <Header
-        :agent="currentAgent"
-        @menu-toggle="handleSidebarToggle"
-        :actions="headerActions"
-      />
-      <MessageList
-        :messages="messages"
-        :is-typing="isTyping"
-        @message-action="handleMessageAction"
-      />
-      <InputArea
-        v-model="inputValue"
-        @send="handleSend"
-        :quick-actions="quickActions"
-        :disabled="isSending"
-      />
-    </ChatContainer>
-  </ChatLayout>
-</template>
-```
-
-### Angular Example Pattern
-```html
-<!-- Suggested template structure -->
-<app-chat-layout>
-  <app-sidebar *ngIf="hasSidebar"
-    [conversations]="conversations"
-    [activeId]="activeConversationId"
-    [isOpen]="sidebarOpen"
-    (select)="handleConversationSelect($event)"
-  />
-  <div class="chat-container">
-    <app-header
-      [agent]="currentAgent"
-      (menuToggle)="handleSidebarToggle()"
-      [actions]="headerActions"
-    />
-    <app-message-list
-      [messages]="messages"
-      [isTyping]="isTyping"
-      (messageAction)="handleMessageAction($event)"
-    />
-    <app-input-area
-      [(value)]="inputValue"
-      (send)="handleSend()"
-      [quickActions]="quickActions"
-      [disabled]="isSending"
-    />
-  </div>
-</app-chat-layout>
-```
-
-### CSS/Styling Approaches
-
-#### Tailwind CSS Pattern
-```html
-<!-- Message List -->
-<div class="flex-1 overflow-y-auto p-4 space-y-4">
-  <div class="flex flex-col max-w-3xl mx-auto space-y-4">
-    <!-- User Message -->
-    <div class="flex justify-end">
-      <div class="bg-blue-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%]">
-        <p>Hello, AI assistant!</p>
-      </div>
-    </div>
-    <!-- Agent Message -->
-    <div class="flex justify-start">
-      <div class="bg-gray-100 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
-        <p>Hello! How can I help you today?</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Input Area -->
-<div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
-  <div class="flex items-end gap-2 max-w-3xl mx-auto">
-    <textarea 
-      class="flex-1 resize-none rounded-2xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
-      rows="1"
-      placeholder="Type a message..."
-    ></textarea>
-    <button class="w-11 h-11 rounded-full bg-blue-600 text-white flex items-center justify-center">
-      Send
-    </button>
-  </div>
-</div>
-```
-
-#### Vanilla CSS Pattern
-```css
-/* CRITICAL: Always create CSS classes, never use inline styles */
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+```js
+// One submit button that sends, or stops the reply while one streams. It never gets the
+// disabled attribute, which would drop focus to the page: with nothing to send it's
+// aria-disabled, and the submit handler ignores it. Call this when a reply starts and ends.
+function updateComposerButton() {
+  const stop = conversation.replyInProgress;
+  button.dataset.mode = stop ? 'stop' : 'send';
+  button.setAttribute('aria-label', stop ? 'Stop response' : 'Send message');
+  button.formNoValidate = stop; // form validation, such as a required field, never blocks Stop
+  const nothingToSend = !stop && textarea.value.trim() === '';
+  button.setAttribute('aria-disabled', String(nothingToSend));
 }
 
-.message-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px 24px;
-}
-
-.message {
-  display: flex;
-  margin-bottom: 16px;
-}
-
-.message--user {
-  justify-content: flex-end;
-}
-
-.message--agent {
-  justify-content: flex-start;
-}
-
-.message__bubble {
-  max-width: 85%;
-  padding: 12px 16px;
-  border-radius: 16px;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.message--user .message__bubble {
-  background: #3b82f6;
-  color: white;
-  border-radius: 16px 16px 4px 16px;
-}
-
-.message--agent .message__bubble {
-  background: #f3f4f6;
-  color: #1f2937;
-  border-radius: 16px 16px 16px 4px;
-}
-
-.input-area {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 12px 16px;
-  background: white;
-  border-top: 1px solid #e5e7eb;
-}
+textarea.addEventListener('input', updateComposerButton);
 ```
 
-## Animation Specifications
+### Sending, and failed sends
 
-### Message Entrance Animation
-- Duration: 300ms
-- Easing: ease-out
-- Transform: translateY(10px) to translateY(0)
-- Opacity: 0 to 1
-- Stagger: 50-100ms between messages on initial load
+When the person sends, the message appears in the transcript as sending, and the draft stays in the composer until the server accepts the message. It leaves only if the composer still holds the sent text, so anything typed meanwhile stays. The button is ignored while a message is being sent, so a double press sends once.
 
-### Typing Indicator Animation
-- Duration: 1.4s (continuous loop)
-- Animation: Sequential dot bounce or fade
-- Dot 1: 0ms delay
-- Dot 2: 200ms delay
-- Dot 3: 400ms delay
+If sending fails, the message shows "Not sent" with a Retry button, the draft is still in the composer, and the status region says "Message not sent". Retry sends the message again with the same id, so the server can drop a copy it already has, as when a dropped connection hid that the first attempt arrived. Sending a changed draft instead replaces the failed message.
 
-### Input Area Height Transition
-- Duration: 150ms
-- Easing: ease-in-out
-- Property: height
-
-### Sidebar Slide Animation
-- Duration: 250ms
-- Easing: ease-out
-- Transform: translateX(-100%) to translateX(0) for open
-
-### Send Button Press
-- Duration: 100ms
-- Transform: scale(0.95) on press, scale(1) on release
-
-### New Message Auto-Scroll
-- Duration: 300ms
-- Easing: ease-out
-- Behavior: Smooth scroll to bottom
-
-## Z-Index Layer System
-
-- Base content: 0
-- Message bubbles: 1
-- Input area: 10
-- Header: 20
-- Sidebar (desktop): 30
-- Dropdowns/Popovers: 40
-- Mobile sidebar overlay: 50
-- Backdrop: 60
-- Modals/Dialogs: 70
-
-## Implementation Details
-
-### Auto-Scroll Behavior
-- Scroll to bottom on new message arrival
-- Don't scroll if user has manually scrolled up (check scroll position)
-- Resume auto-scroll when user scrolls back to bottom
-- Smooth scroll animation
-
-### Message Alignment
-- User messages: Right-aligned (flex-end) or left with offset
-- Agent messages: Left-aligned (flex-start) or right with offset
-- Consider RTL language support (flip alignment)
-
-### Input Multi-line Handling
-- Auto-expand textarea as user types
-- Max height: 200-256px (6-8 rows)
-- Show scrollbar when max height reached
-- Enter sends, Shift+Enter adds new line (no sending while an IME is composing; Enter defaults to a new line when the primary input is touch)
-
-### Mobile Considerations
-- Ensure input stays above virtual keyboard
-- Use visual viewport API if needed
-- Prevent body scroll when keyboard opens (optional)
-- Full-screen message list on mobile
-
-### Edge Cases
-
-#### Very Long Messages
-- Message bubble expands vertically
-- Code blocks scroll horizontally if too wide
-- Consider max-height with "Read more" for extremely long messages
-
-#### Rapid Message Sending
-- Queue messages if sending too quickly
-- Show loading state per message
-- Prevent duplicate sends
-
-#### Empty Input
-- Disable send button when input is empty or only whitespace
-- Visual indication of disabled state
-
-#### Failed Message Send
-- Show error state on message bubble
-- Provide retry button
-- Keep message text in input as fallback
-
-#### Slow Connection
-- Show loading indicator on send button
-- Optimistic UI: Show message immediately, update status on confirmation
-- Timeout handling with retry option
-
-## Common Variations
-
-### Without Sidebar
-- Full-width chat interface
-- Header contains conversation switcher dropdown
-- Simpler layout, good for embedded chat widgets
-
-### Compact Mode
-- Reduced padding and spacing
-- Smaller avatars and bubbles
-- Good for sidebar chat widgets
-
-### Embedded/Widget Mode
-- Floating button to open chat
-- Modal overlay when open
-- Smaller dimensions (400-500px width)
-- Can be positioned bottom-right or bottom-left
-
-### Multi-Agent Mode
-- Agent switcher in header
-- Different avatars/colors per agent
-- Agent name displayed on each message
-
-### Rich Content Support
-- Image previews in messages
-- File download links
-- Interactive cards/components in agent responses
-- Button actions within messages
-
-## Testing Checklist
-
-When implementing this chat layout, test:
-
-### Visual
-- Message bubbles display correctly (user vs agent styling)
-- Input area stays fixed at bottom
-- Header remains fixed at top
-- Messages scroll smoothly in list
-- Timestamps display correctly
-- Quick action chips render properly
-- Typing indicator animates smoothly
-- Sidebar opens/closes smoothly (if applicable)
-- Responsive at all breakpoints (mobile, tablet, desktop)
-
-### Functional
-- Send button sends message
-- Enter key sends message
-- Shift+Enter adds new line
-- Pressing Enter to confirm an IME candidate (Japanese, Chinese, Korean) doesn't send the message, including in Safari
-- With a phone's on-screen keyboard, Enter adds a new line and the send button sends
-- On a touchscreen laptop with a fine primary pointer, Enter sends and Shift+Enter adds a new line
-- On a tablet with an attached keyboard, Shift+Enter adds a new line and the send button sends, whichever Enter default the heuristic picked
-- If the product has an Enter-to-send setting, it overrides the heuristic on every device
-- Input clears after sending
-- Auto-scroll works on new messages
-- Manual scroll pauses auto-scroll
-- Sidebar toggle works (if applicable)
-- Conversation switching works (if applicable)
-- File attachment works (if enabled)
-- Quick actions insert text into input
-
-### Accessibility
-- Keyboard navigation works (Tab, Enter, Escape)
-- Focus indicators visible on all interactive elements
-- Screen reader announces new messages
-- Typing indicator announced to screen readers
-- Input field has accessible name
-- Send button has accessible name
-- Color contrast verified (4.5:1 minimum)
-- Touch targets minimum 44px on mobile
-
-### Responsive
-- Layout adapts correctly at all breakpoints
-- Text is readable on all screen sizes
-- Input area accessible on mobile (above keyboard)
-- Sidebar becomes overlay on mobile (if applicable)
-- No horizontal scroll
-
-### Performance
-- Smooth scrolling with many messages
-- No layout shift when sending messages
-- Typing animation doesn't cause jank
-- Auto-resize input performs well
-
-### Edge Cases
-- Empty input handling
-- Very long message handling
-- Rapid send handling
-- Failed send handling
-- Slow connection handling
-- Message overflow/scrolling
-
-## AI Agent Implementation Prompt Template
-
-Use this template when asking an AI agent to implement this chat layout:
-
-```
-Create a responsive AI agent chat layout with the following specifications:
-
-1. Layout Structure:
-   - Optional sidebar for conversation list (280-320px on desktop, overlay on mobile)
-   - Fixed header with agent info (56-64px height)
-   - Scrollable message list (centered, max-width 768-900px)
-   - Fixed input area at bottom with auto-expanding textarea
-
-2. Message Display:
-   - User messages: Right-aligned, primary color background, white text
-   - Agent messages: Left-aligned, light gray background, dark text
-   - Message bubbles with asymmetric border-radius for speech bubble effect
-   - Timestamps below messages
-   - Support for code blocks, links, and formatting
-
-3. Input Area:
-   - Auto-expanding textarea (1-8 rows)
-   - Send button (active when input not empty)
-   - Optional quick action chips above input
-   - Enter to send, Shift+Enter for new line; no sending during IME composition
-   - Optional file attachment button
-
-4. Additional Features:
-   - Typing indicator with animated dots
-   - Welcome screen when no messages
-   - Empty state with suggested prompts
-   - Smooth animations for all interactions
-
-5. Use [Framework: React/Vue/Angular/Svelte] with [Styling: Tailwind/Chakra/CSS Modules]
-
-6. Include:
-   - Smooth animations (300ms ease-out)
-   - Keyboard accessibility (Tab, Enter, Escape)
-   - ARIA labels and live regions for screen readers
-   - Auto-scroll to new messages
-   - Responsive breakpoints (mobile, tablet, desktop)
-   - Color contrast compliance (WCAG AA)
-
-Reference: UI Potion AI Agent Chat Layout
+```js
+// The draft leaves the composer only once the server has accepted the message, so a failed
+// send loses nothing. showMessage() adds the message to the transcript with a new id;
+// sendMessage() sends it with that id, which Retry reuses, so the server can drop a copy it
+// already has. announce() writes to the conversation's status region.
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (conversation.replyInProgress) return conversation.stop(); // the button is Stop
+  const text = textarea.value;
+  if (!text.trim() || form.dataset.sending === 'true') return;
+  form.dataset.sending = 'true';
+  const message = showMessage(text, 'sending');
+  try {
+    await sendMessage(message); // resolves once the server has accepted the message
+    message.setStatus('sent');
+    if (textarea.value === text) textarea.value = ''; // keep a draft typed meanwhile
+  } catch {
+    message.setStatus('failed'); // "Not sent" with Retry; the draft is still in the composer
+    announce('Message not sent.');
+  }
+  form.dataset.sending = 'false';
+  updateComposerButton();
+});
 ```
 
-## Additional Resources
+Sending doesn't move focus: after Enter it stays in the textarea, and after a press of the button it stays on the button. Don't focus the composer when the page loads on touch devices, where that opens the on-screen keyboard; focus it when the person starts a new conversation or picks a suggested prompt.
 
-### Message Data Structure
-```javascript
-const message = {
-  id: 'msg_123',
-  role: 'user', // 'user' | 'agent'
-  content: 'Hello, how are you?',
-  timestamp: '2026-02-01T10:30:00Z',
-  status: 'sent', // 'sent' | 'delivering' | 'error'
-  attachments: [], // optional
-  metadata: {} // optional
-};
+Optional parts of the composer:
+
+- **Attachments**: a button that opens the file picker. Attached files show as chips with a remove button named for the file ("Remove report.csv"). Type and size checks in the browser are a convenience; the server checks them again. Show file names as text.
+- **Quick actions and suggested prompts**: buttons that fill the composer and move focus to it, so the person can edit before sending. Suggested prompts in an empty conversation may send at once when they need no editing.
+- **Escape**: Escape in the composer can stop a streaming reply, unless the chat sits in a dialog or panel that Escape closes.
+
+## The transcript
+
+- Messages appear oldest first, in a list or a series of articles. The transcript isn't a live region.
+- Each message starts with a visually hidden heading that names the speaker, such as "You said:" or "Acme Assistant said:", one level below the conversation's heading. Screen reader users move between messages with the heading key. Don't put `aria-label` on a message: it would replace the content.
+- The person's messages sit on the end side (right in left-to-right languages) and the assistant's on the start side. Logical properties, such as `margin-inline-start`, mirror the layout for right-to-left languages, and `dir="auto"` on the person's messages shows mixed-direction text correctly.
+- The person's messages are plain text with their line breaks (`white-space: pre-wrap`). Assistant messages go through the project's renderer. Links in messages are underlined.
+- Long text wraps (`overflow-wrap: anywhere`). A code block scrolls inside itself; one that scrolls and has nothing focusable gets `tabindex="0"` and a name.
+- Avatars are optional and decorative (`alt=""`), since the heading names the speaker. Timestamps are optional, in a `<time datetime>` element.
+- The person's messages can have Edit, which lets them change the message and send it again (see branching), and Copy. Every icon button has a name and is at least 24 by 24 px.
+
+### Waiting for a reply
+
+From the moment the message is accepted until the reply's first content appears, show a waiting indicator, such as three dots. The dots are decorative (`aria-hidden="true"`) and static under reduced motion. Hide the indicator as soon as content appears, or when the reply's streaming cursor appears, if the project follows the AI Response Rendering Pattern.
+
+### Announcements
+
+One element with `role="status"` per conversation, visually hidden and present before anything changes, announces one short sentence at a time:
+
+- "Acme Assistant is responding", once, when a reply starts
+- "Response complete", "Response stopped", or the failure, when it ends
+- "Message not sent", when a send fails
+
+It never reads the streamed text, or the person's own message. After "Response complete", screen reader users find the reply by its heading.
+
+A modal over the chat, such as the conversation overlay, makes this region inert, which hides it from screen readers. Anything that must be heard while a modal is open goes through a status region inside it.
+
+### Following new content
+
+The transcript follows new content only while the reader is at the bottom, within about 48 px. Only scrolling up stops following; content that grows below the view never does. It follows instantly, never with smooth scrolling. While the reader is scrolled up, a Jump to latest button shows. It scrolls to the bottom, follows again, and puts focus in the composer, since it hides itself. Sending a message also scrolls to the bottom and follows again.
+
+```js
+// The transcript follows new content only while the reader is at the bottom.
+let pinned = true;
+let lastTop = 0;
+
+transcript.addEventListener('scroll', () => {
+  const nearBottom = transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 48;
+  // Only scrolling up unpins, so content that grows below the view never does
+  pinned = transcript.scrollTop < lastTop ? nearBottom : pinned || nearBottom;
+  lastTop = transcript.scrollTop;
+  jumpButton.hidden = pinned;
+});
+
+// Call after each update, and with true when the person sends a message
+function followIfPinned(pin = false) {
+  if (pin) pinned = true;
+  if (pinned) transcript.scrollTop = transcript.scrollHeight; // instant, never smooth
+}
+
+jumpButton.addEventListener('click', () => {
+  textarea.focus(); // the button is about to hide, so focus goes to the composer
+  followIfPinned(true);
+});
 ```
 
-### Conversation Data Structure
-```javascript
-const conversation = {
-  id: 'conv_456',
-  title: 'Project Discussion',
-  lastMessage: 'Let me review that...',
-  timestamp: '2026-02-01T10:30:00Z',
-  unreadCount: 0,
-  agentId: 'agent_1'
-};
-```
+A conversation opens at its latest message, and loading older messages at the top keeps what's on screen where it is.
 
-### Quick Actions Example
-```javascript
-const quickActions = [
-  { id: 'summarize', label: 'Summarize this', prompt: 'Please summarize the above conversation.' },
-  { id: 'explain', label: 'Explain like I am 5', prompt: 'Explain this like I am 5 years old.' },
-  { id: 'shorter', label: 'Make it shorter', prompt: 'Please make your response shorter and more concise.' },
-  { id: 'code', label: 'Show me code', prompt: 'Can you provide code examples for this?' }
-];
-```
+## The conversation list
 
----
+The list is navigation: a `<nav>` labelled "Conversations", with a link for each conversation, since each has its own URL. The open one has `aria-current="page"`. A New chat button at the top starts a conversation and puts focus in the composer.
 
-## See Also
+- **From 1024 px wide**, the list is docked: its own grid column, open by default. A toggle in the header opens and closes it, with `aria-expanded` and `aria-controls`. When closed, the column is hidden (the `hidden` attribute or `display: none`), not only moved off screen.
+- **Below 1024 px**, it opens as a modal: native `<dialog>` opened with `showModal()`, or the Dialog guide's model. It has a visible Close button, closes on Escape, on a backdrop click, and when a conversation is chosen, and returns focus to the toggle.
+- The list scrolls inside its column while docked (`overflow-y: auto`), and inside the dialog below 1024 px, so a long list never stretches the page.
+- If the docked list comes before the chat in the page, the page starts with a skip link to the chat (WCAG 2.4.1).
+- When the window crosses 1024 px, react to a `matchMedia` change, not to resize events. If the overlay is open when the window gets wider, close it and move focus to the same item in the docked list.
+- In a single-page app, opening a conversation moves focus to its heading (`tabindex="-1"`) and updates `document.title`. A reply that's still running keeps going on the server, and shows when the person returns, never in the conversation they switched to. Drafts are kept per conversation.
 
-This AI agent chat layout commonly uses these components:
+Optional: groups such as Today and Previous 7 days, under headings; rename, pin, and delete in a More actions menu per item, with delete asking first or offering undo; and a filter field whose number of matches is announced politely.
 
-- **[AI Response Rendering Pattern](/potions/patterns/ai-response-rendering)** - The companion pattern that defines what goes inside an assistant message bubble: streaming cursor, incremental Markdown, tool-call cards, collapsible reasoning, citations, artifact cards, and per-message controls. This layout owns the chat shell; that pattern owns the bubble interior. Designed to compose; hide this layout's typing indicator as soon as the pattern's streaming cursor appears
-- **[AI Action Review Pattern](/potions/patterns/ai-action-review)** - The companion pattern for consequential agent actions proposed in the conversation: plan preview, risk labels, approve/reject/edit controls, undo, and audit trail. This layout hosts the review surface (inline card in the message list, side panel, drawer, or modal); consequential tool calls rendered inside assistant messages should hand off to that pattern before execution
-- **[Command Palette](/potions/components/command-palette)** - Add quick prompt, tool, and conversation-switch actions with keyboard-first access
-- **[Text Input Component](/potions/components/text-input)** - For the message input field
-- **[Button](/potions/components/button)** - For send button, toolbar actions, and dialog action footers
-- **[Dialog Component](/potions/components/dialog)** - For confirmation dialogs (clear chat, delete message)
-- **[Toast Notifications](/potions/components/toast-notifications)** - For success/error feedback
-- **[Dropdown/Select Component](/potions/components/dropdown-select)** - For agent selector or conversation actions
-- **[Navbar Component](/potions/components/navbar)** - For the header navigation patterns
+## The header
 
-These are examples of components that pair well with AI chat interfaces. The layout works with any content you choose.
+- The conversation's title, as the page's main heading or a visually hidden heading such as "Chat", and in `document.title`.
+- The list toggle, New chat, and other actions, such as an assistant or model picker and a More actions menu. Clearing a conversation asks first or offers undo.
+- On phones: the toggle, the title, and New chat; the rest goes in the More actions menu.
 
----
+## Saved state
 
-## Summary for AI Agents
+- Messages and conversations live on the server, not in the browser's storage, and the open conversation is in the URL.
+- Whether the docked list is open can be saved under the app's own storage prefix, for example `acme.chat.sidebar`, where `acme` stands for that prefix. Apply it before the first paint, with a cookie the server reads or a small inline script, so the layout doesn't jump.
+- Drafts can be saved per conversation, in `sessionStorage` or where the app keeps drafts, and cleared once the message is sent.
+- With server rendering, render the conversation on the server, so it shows before scripts run.
 
-This AI agent chat layout is a conversational interface optimized for human-AI interaction. Key implementation points:
+## Phones
 
-1. **Layout**: Flexbox or grid with fixed header, scrollable message list, fixed input area
-2. **Messages**: Clear visual distinction between user (right/primary color) and agent (left/gray)
-3. **Input**: Auto-expanding textarea with send button and optional quick actions
-4. **Accessibility**: ARIA live regions for new messages, keyboard navigation, focus management
-5. **Responsive**: Sidebar becomes overlay on mobile, full-width chat, touch-friendly targets
-6. **Animations**: Smooth entrance for messages, typing indicator, input height transitions
-7. **Framework-agnostic**: Adapt patterns to any framework's component model
+- Pad the header's top and the composer's bottom with `env(safe-area-inset-top)` and `env(safe-area-inset-bottom)`, and add `viewport-fit=cover` to the viewport meta tag.
+- Add `interactive-widget=resizes-content` to the same tag, so browsers that support it, such as Chrome on Android, shrink the layout when the on-screen keyboard opens and the composer stays above it. iOS Safari keeps the layout size and scrolls the focused field into view.
+- Targets are at least 24 by 24 px; 44 px is comfortable for touch.
 
-Generate clean, semantic HTML with proper component separation. Use framework-specific state management patterns and CSS methodology as specified by the user. Ensure all interactive elements are accessible and the chat interface works smoothly across all devices.
+## Motion
+
+Motion is optional. New messages fade in over 200 ms with `cubic-bezier(0.2, 0, 0, 1)`, only when they arrive while the page is open, never for the history on load. The docked list slides in over 250 ms. Following new content never animates. Under `prefers-reduced-motion: reduce`, nothing slides or fades, and the waiting dots are static.
+
+## Colors
+
+Suggested defaults for projects without a design. The project's tokens win; check its colors meet the same contrast, including in dark mode.
+
+- The person's messages: white text on `#2563eb` (5.2:1), or on `#1d4ed8` in dark mode (6.7:1). Links in them are underlined in the text color.
+- The assistant's text: `#111827` on white (17.7:1), or `#f3f4f6` on `#111827` in dark mode (16.1:1). Assistant messages can do without a bubble.
+- Muted text, such as timestamps, statuses, and the placeholder: `#6b7280` (4.8:1), or `#9ca3af` in dark mode (7.0:1).
+- Links: `#1d4ed8` (6.7:1), or `#93c5fd` in dark mode (9.8:1), always underlined.
+- The composer's edge: `#6b7280` (4.8:1, and 3.7:1 on the dark page). Focus indicators: `#2563eb`, or `#60a5fa` in dark mode.
+- Errors: `#b91c1c` (6.5:1), or `#fca5a5` in dark mode (9.4:1).
+
+Bubble tails and shadows are optional decoration; the side and the speaker heading tell messages apart.
+
+## Optional capabilities
+
+Add these only when the product needs them.
+
+- **Branching** helps when people edit an earlier question and expect the original answer kept. Editing creates a new version of the message, which shows "2 of 3" with Previous and Next version buttons; the transcript below follows the chosen version. Announce the change.
+- **Pinning** helps when people return to a few conversations often. Pinned conversations sit in their own group at the top of the list.
+- **History search** helps when people ask where an earlier conversation went. A search over all conversations, with results that link to the conversation and its matching message. Announce the number of results.
+- **Keyboard shortcuts** help people who chat all day, for example a shortcut for New chat and one to the composer. Avoid keys the browser and screen readers use, list the shortcuts in the interface, and let people turn off single-key shortcuts (WCAG 2.1.4).
+- **Embedded chat**: a launcher button opens the chat in a modal dialog (see the Dialog guide) or a side panel. A panel moves focus in when it opens, closes with Escape, returns focus to the launcher, and leaves the page usable.
+
+## Working with the other AI guides
+
+- With the AI Response Rendering Pattern, this layout owns the shell, the Send and Stop button, Edit on the person's messages, following new content, and the conversation's status region. The pattern owns the inside of each assistant message, including Copy, Regenerate, and feedback, and announces through this layout's status region.
+- With the AI Action Review Pattern, this layout places the review: a card in the transcript for low-risk actions, or a side panel, drawer, or dialog for the rest.
+
+## Edge cases
+
+- **A reply that doesn't start**: give the request a time limit, for example 30 seconds, and show the failure with Retry when it runs out. Tell a timeout from other failures by the signal's reason, as the Dialog guide does.
+- **Offline**: a send while offline fails like any other, with Not sent and Retry. Optionally, retry once the browser is back online, and say so.
+- **Long drafts**: if the product limits message length, show the count near the limit and explain an over-limit draft under the composer. Never cut the draft.
+- **Reloads**: after a reload during a reply, show what the server saved, and continue the stream if the backend supports it.
+- **Long conversations**: virtualize the transcript only when conversations get long (several hundred messages), and keep the newest messages and any focused element rendered.
+
+## Acceptance checklist
+
+- [ ] Enter sends and Shift+Enter adds a line; Enter that confirms an IME composition (Japanese, Chinese, Korean) doesn't send, including in Safari
+- [ ] With a phone's on-screen keyboard, Enter adds a line and the button sends; an Enter-to-send setting overrides that on every device
+- [ ] While a reply streams, the button is Stop and keeps focus, form validation never blocks it, Stop keeps the reply's text, and Enter in the composer keeps the draft without sending
+- [ ] With nothing to send, the button is aria-disabled, stays focusable, and does nothing
+- [ ] A message that fails to send shows Not sent with Retry, the draft is still in the composer, and a screen reader hears that it wasn't sent
+- [ ] A draft typed while a message is being sent stays in the composer, and a double press sends once
+- [ ] The transcript follows new content only at the bottom; scrolled up, it stays put, and Jump to latest scrolls down and puts focus in the composer
+- [ ] A screen reader can move between messages by heading, hears that a reply started and ended, and never hears the streamed text
+- [ ] The header and the composer never cover the focused element, and on phones the composer stays above the browser's toolbars and the on-screen keyboard
+- [ ] With a long conversation list and a long conversation, each scrolls on its own, and the composer stays on screen
+- [ ] Below 1024 px the conversation list opens as a modal with a Close button, Escape closes it, and focus returns to the toggle; a closed list can't be reached with Tab
+- [ ] The open conversation has aria-current and is named in the page title, and a skip link moves past a long conversation list
+- [ ] At 320 px wide and at 400% zoom nothing scrolls sideways, and right-to-left languages mirror the layout
+- [ ] With reduced motion, nothing slides or fades, and following new content never animates
+- [ ] Styles come from the project's styling system and tokens, and text, the composer's edge, and focus indicators meet the contrast minimums
+
+## See also
+
+- **[AI Response Rendering Pattern](/potions/patterns/ai-response-rendering)**: what goes inside an assistant message.
+- **[AI Action Review Pattern](/potions/patterns/ai-action-review)**: approving the actions the assistant proposes.
+- **[Modal Dialog](/potions/components/dialog)**: for the conversation overlay and for confirmations.
+- **[Sidebar Navigation](/potions/components/sidebar-navigation)**: when the conversation list sits next to the app's own navigation.
+- **[Command Palette](/potions/components/command-palette)**: quick prompts, commands, and switching conversations from the keyboard.
+- **[Text Input](/potions/components/text-input)**: label, hint, and error conventions for the composer.
+- **[Toast Notifications](/potions/components/toast-notifications)**: feedback outside the conversation, such as a deleted conversation with Undo.
+- **[Dropdown/Select](/potions/components/dropdown-select)**: an assistant or model picker.
+- **[Navigation Bar](/potions/components/navbar)**: when the chat sits under the site's own header.
+- **[Button](/potions/components/button)**: the composer's button and the header's actions.
+
+These are suggestions; the layout works with any components you choose.

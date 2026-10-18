@@ -2,7 +2,7 @@
 layout: 'potion'
 title: 'AI Action Review Pattern'
 publicationDate: '2026-05-23'
-excerpt: 'A framework-agnostic pattern for reviewing AI-proposed actions before execution: plan preview, risk labels, scoped permissions, approve/reject/edit controls, undo, progress, and audit trail.'
+excerpt: 'A framework-agnostic pattern for reviewing AI-proposed actions before they run: plan preview, risk labels, scoped permissions, approve, reject, and edit controls, undo, progress, and an audit trail.'
 category: 'Patterns'
 tags:
   - patterns
@@ -17,329 +17,215 @@ tags:
 agentManifest: 'potions/patterns/ai-action-review.json'
 path: 'potions/patterns/ai-action-review'
 promptSubject: 'review and approval of AI agent actions'
+useWhen: 'an AI agent proposes actions with consequences, such as sending email, changing records, or making payments, and people approve them first.'
+specifies:
+  - 'Nothing with consequences runs until someone approves it, and blocked actions can''t be approved at all.'
+  - 'Approval gets stronger with risk: one click for a low-risk draft, a typed confirmation for an action that can''t be undone.'
+  - 'When some actions fail, the ones that succeeded stay visible, with Retry for the failures and Undo where it''s possible.'
+example: 'The assistant proposes emailing 3 customers and updating 43 records. The person approves the emails but not the records, and the review then shows each action''s result.'
 ---
 
-A framework-agnostic pattern for reviewing AI-proposed actions before they execute. It covers plan previews, affected data, risk labels, scoped permissions, approve/reject/edit controls, undo and rollback affordances, progress states, and audit trails for agentic products.
+When an AI assistant wants to do something with consequences, such as sending an email, changing records, or paying an invoice, people need to see what it will do and decide before it happens. This guide defines that review: what to show, how approval scales with risk, and what happens during and after the run. It targets WCAG 2.2 AA. It works on its own, and with the [AI Agent Chat Layout](/potions/layouts/ai-agent-chat) and the [AI Response Rendering Pattern](/potions/patterns/ai-response-rendering), which define the conversation and the assistant's messages.
 
-This pattern complements the [AI Agent Chat Layout](/potions/layouts/ai-agent-chat) and [AI Response Rendering Pattern](/potions/patterns/ai-response-rendering). Those potions define the conversation shell and assistant response body. This pattern defines the control surface that appears when an AI assistant wants to do something with consequences.
+## Start from what the project has
 
-## Scope and Boundary
+1. Build on the project's dialog, drawer, button, checkbox, disclosure, and table components, and its permission and audit services. Keep their APIs.
+2. Choose what the task needs: the review surfaces, partial approval, editing, pause, undo, and the audit trail. Leave out the rest.
 
-This pattern covers:
+Add no dependency, such as a focus-trap library or a form library, without asking. The project's conventions win for styling and visual defaults. If one conflicts with an accessibility, security, or correctness requirement here, ask instead of choosing.
 
-- Reviewing a proposed action, batch of actions, or agent plan before execution
-- Showing what will happen, why, which data is affected, and what the user can change
-- Risk labels for reversible, sensitive, external-facing, destructive, or high-impact actions
-- Approve, reject, edit, approve selected, pause, stop, undo, and retry controls
-- Permission requests scoped to the current task
-- Execution progress and post-action audit trails
-- Accessibility for review flows, status updates, and confirmation surfaces
+The guide covers reviewing one action, a batch, or a plan before it runs; risk labels; approve, reject, edit, pause, stop, retry, and undo; task-scoped permission requests; progress; and the audit trail. It doesn't cover back-end authorization, policy engines, model safety, legal approval workflows, or background agents that run without anyone watching.
 
-This pattern does NOT cover:
+## The action model
 
-- The chat shell or message list
-- General assistant message rendering
-- Back-end authorization, policy engines, model safety, or security scanning
-- Domain-specific legal approval workflows
-- Fully autonomous background agent governance
+Turn the agent's proposal into typed action items, never generated prose alone. Each has a stable id (never key rows by index), a title, a plain-language summary of its consequence, an action type, a risk level, its reversibility, the objects it affects, the permissions it needs, its inputs and destination, what led to it, its state, an idempotency key once it's approved, and audit details.
 
-## The Problem
+Action types: message (send, post, publish, notify), record-update, file-operation, schedule, code-change, payment-or-order, external-api, and system-setting. An unknown type still renders as a reviewable item, clearly labelled, and is never approved automatically.
 
-AI agents can now draft emails, update records, run tools, create files, schedule meetings, and call APIs. If those actions execute without a clear review step, users can lose control over:
+## Risk levels
 
-- What the agent plans to do
-- Which records, people, files, or systems will be affected
-- Whether an action is reversible
-- What data or permission scope the agent is using
-- How to correct a plan before execution
-- How to stop or undo execution once it starts
-- What happened afterward for accountability
+Risk shows as text and an icon, never color alone. It sets how much review an action gets.
 
-Naive confirmation dialogs are not enough. They often hide details behind vague language, treat every action as equally risky, and give users only "OK" or "Cancel" even when the right move is to edit, approve only part of the plan, or ask the agent to try again.
+- **low**: reversible, local, expected, limited in scope
+- **medium**: changes shared data, several targets, or saved state
+- **high**: external, sensitive, costly, changes permissions, destructive, or hard to undo
+- **blocked**: invalid, missing a permission, failing a policy check, unsupported, or missing a prerequisite
 
-## The Solution
+Reversibility is reversible, partially reversible, irreversible, or unknown. Treat unknown as higher risk.
 
-Treat AI action review as a structured state machine over a proposed plan.
+## The review
 
-1. Convert the agent proposal into one or more typed action items
-2. Summarize the goal in plain language before showing details
-3. Show affected objects, permissions, data sources, destination, timing, and reversibility
-4. Label risk using human-readable categories and non-color indicators
-5. Let users approve, reject, edit, approve selected, or request a revised plan
-6. Require stronger confirmation for high-impact or irreversible actions
-7. Execute with visible progress, pause/stop controls, and partial failure handling
-8. Preserve an audit trail with action id, actor, timestamp, tool, inputs, outputs, and outcome
-9. Offer undo or rollback when the action is reversible
-10. Announce state changes through live regions without moving focus unexpectedly
+- **Header**: the goal in plain language ("Update 12 overdue invoices"), the status, the highest risk among the selected actions, and the main controls.
+- **Plan summary**, before any details: what will happen, why the agent suggests it, what data or tool results it's based on, whether it can be undone, and how many steps or how long. When the proposal follows content from outside the product, such as an email, a web page, or a shared file, say so and link to it: instructions inside such content may not come from the user.
+- **Action list**: each action's title and summary, what it affects (records, files, recipients, settings), where it goes, the permission it uses, its risk and reversibility, a preview or diff where there is one, and a checkbox when partial approval is supported.
+- **Details**, behind disclosures: input parameters, the tool and integration, the raw payload, policy checks, the evidence behind the proposal, and audit details.
 
-The review surface can appear inline in a chat, in a side panel, in a drawer, or in a modal dialog depending on urgency and available space.
-
-## Action Model
-
-Each action item should have a stable id, a human-readable label, a lifecycle state, and enough metadata for review.
-
-### Required Fields
-
-- id
-- title
-- summary
-- actionType
-- riskLevel
-- reversibility
-- affectedObjects
-- permissions
-- inputs
-- destination
-- state
-- auditMetadata
-
-### Action Types
-
-- message - send, post, publish, or notify
-- record-update - create, edit, archive, or delete a record
-- file-operation - create, edit, move, share, or delete a file
-- schedule - create, update, cancel, or invite
-- code-change - edit, generate, run, or deploy code
-- payment-or-order - purchase, refund, bill, or change subscription
-- external-api - call a third-party service or internal integration
-- system-setting - change configuration, permission, role, or automation
-
-Unknown action types must still render as reviewable items. Label them clearly and avoid automatic approval.
-
-## Risk Levels
-
-Risk labels help users calibrate attention. They must be visible as text and icon, not only color.
-
-- low - reversible, local, expected, limited scope
-- medium - affects shared data, has multiple targets, or changes a saved state
-- high - external-facing, sensitive, costly, permission-changing, or difficult to reverse
-- blocked - violates policy, lacks permission, has invalid parameters, or needs a missing prerequisite
-
-Use risk labels to change the review depth, not to shame the user. A high-risk action should show more detail, clearer consequences, and a stronger confirmation step.
-
-## Review Surface
-
-### Header
-
-- Plain-language goal: "Update 12 overdue invoices"
-- Status: proposed, reviewing, approved, executing, completed, failed, reverted
-- Risk summary: highest risk level across selected actions
-- Primary controls: approve, reject, edit, or approve selected
-
-### Plan Summary
-
-- What will happen
-- Why the agent suggests it
-- What data, context, or tool result influenced the proposal
-- Whether the action is reversible
-- Estimated time or number of steps
-
-### Action List
-
-Each action item shows:
-
-- Title and concise summary
-- Affected objects such as records, files, recipients, customers, or settings
-- Destination or external system, if any
-- Permission scope requested or already available
-- Risk label and reversibility
-- Preview, diff, or before/after comparison where applicable
-- Checkbox or segmented approval when partial approval is supported
-
-### Details Disclosure
-
-Use progressive disclosure for dense information:
-
-- Input parameters
-- Tool name and integration
-- Raw payload
-- Policy check result
-- Source citations or evidence
-- Audit metadata
-
-Details should be available but not dominate the primary review task.
+The review can be a card in an assistant's message (for low-risk actions), a side panel (for plans of several actions), a drawer or sheet (on phones and tablets), a dialog (for urgent, high-risk, or irreversible confirmations), or full screen (for long plans and dense diffs).
 
 ## Controls
 
-### Primary Controls
+- **Approve** runs the selected eligible actions. Name it for the action and its scope, such as "Send to 3 recipients" or "Update 43 records", as a dialog names its primary action.
+- **Approve selected** runs only the checked actions, and never the others.
+- **Reject** declines the plan. **Edit** opens the parameters, the message text, the selected objects, or the constraints, validated with the project's form rules. **Ask for revision** sends a correction back to the assistant.
+- **Pause** and **Stop** are reachable as soon as actions run. Stop starts no new action; one already sent may still finish, and its result shows.
+- **Retry** runs failed or skipped actions again, **Undo** reverts completed ones when there's a rollback path, and **View log** opens the audit trail.
 
-- Approve - executes all selected eligible actions
-- Approve selected - executes only checked items
-- Reject - declines the proposed plan
-- Edit - opens editable parameters, message copy, selected objects, or constraints
-- Ask for revision - sends a corrective instruction back to the assistant
+## Confirmation rules
 
-### Execution Controls
+- **Low risk**: one Approve button, when the affected objects and reversibility are visible.
+- **Medium risk**: show the affected objects and reversibility before approval, and allow editing where parameters matter.
+- **High risk**: an explicit step that states the consequences, never just "Are you sure?", with focus on the least destructive action.
+- **Irreversible**: a typed confirmation that accepts paste, or a separate step that names the consequence. Don't use hold-to-confirm: holding is hard for many people with motor impairments, and has no standard keyboard or screen reader behavior.
+- **Blocked**: approval isn't available, and the review says what must change before it can be.
 
-- Pause - pauses queued or multi-step execution when supported
-- Stop - cancels remaining actions immediately when possible
-- Retry - retries a failed action or failed subset
-- Undo - reverses completed actions when the system has a rollback path
-- View log - opens the audit trail
+The snippets in this guide are plain HTML and JavaScript; adapt them to the project's framework and its version.
 
-### Confirmation Rules
+```html
+<label for="confirm-phrase">To confirm, type <strong>delete 43 records</strong></label>
+<input id="confirm-phrase" autocomplete="off" spellcheck="false">
+<button type="button" id="confirm-action" aria-disabled="true">Delete 43 records</button>
+```
 
-- Low-risk actions can use a single approve button
-- Medium-risk actions should show affected objects and reversibility before approval
-- High-risk actions should require an explicit confirmation step with consequences
-- Irreversible actions should require a typed confirmation, a least-destructive focus default, or an equivalent strong safeguard
-- Blocked actions cannot be approved until the issue is resolved
+```js
+// Paste works: the point is a deliberate step, not a typing test. The button stays
+// focusable (aria-disabled, not disabled) and ignores activation until the phrase
+// matches. approve() stands for the app's approval request.
+const input = document.getElementById('confirm-phrase');
+const button = document.getElementById('confirm-action');
+const phrase = 'delete 43 records';
 
-## Lifecycle
+input.addEventListener('input', () => {
+  const matches = input.value.trim().toLowerCase() === phrase;
+  button.setAttribute('aria-disabled', String(!matches));
+});
 
-The review flow moves through these states:
+button.addEventListener('click', () => {
+  if (button.getAttribute('aria-disabled') !== 'true') approve();
+});
+```
 
-- proposed - action plan is available but not reviewed
-- reviewing - user is inspecting, selecting, or editing
-- needs-changes - user asked for a revision or edited inputs
-- approved - action is approved but not yet running
-- executing - one or more actions are in progress
-- paused - execution is intentionally paused
-- completed - all approved actions finished successfully
-- partially-completed - some actions succeeded and some failed or were skipped
-- failed - no approved action completed
-- cancelled - user stopped execution before completion
-- reverted - completed action was undone or rolled back
+## The run's lifecycle
 
-State transitions must preserve the reviewed plan and partial outcomes. Do not replace the review with a generic error.
+The review moves through these states: proposed, reviewing, needs-changes (after an edit or a request for revision, until the agent sends a revised plan), approved (and not yet started), executing, paused, completed, partially-completed, failed, cancelled, and reverted. Each action has its own state: proposed, selected, blocked, approved, executing, completed, failed, skipped, cancelled, or reverted.
+
+- Only eligible proposed actions can be selected; blocked ones stay visible but can't be.
+- An action that depends on another shows that, and is skipped if the other fails.
+- Selections survive opening and closing details.
+- A state change never replaces the reviewed plan or its partial results.
+
+## Failures, retries, and undo
+
+- After a failure, every action stays visible with its own state, and completed, failed, skipped, cancelled, and reverted actions look different.
+- Retry runs only failed or skipped actions, and only when it's safe. It never reruns a completed action unless the person chooses to.
+- Each approved action gets an idempotency key, and every retry sends the same key, so the server runs the action at most once.
+- Give each request a time limit. Only an answer from the app decides the outcome: no answer, after a timeout or a dropped connection, or an error from a gateway (502 to 504) instead of the app, leaves it unknown, since the action may have run. Say that instead of "Failed", and retry only with the same key, or after checking the status.
+- An answer that only accepts the action, such as 202 Accepted or a pending status in the app's answer, isn't the end. The action stays executing, with its Pause and Stop, and the review tracks it until the app reports how it ended.
+- Before Undo, show what it will revert. If the rollback fails, keep that state and show how to escalate.
+
+```js
+// One idempotency key per approved action, reused on every retry, so the server can tell a
+// retry from a new request and never runs the action twice. runAction() stands for the app's
+// request: it sends the key, for example in an Idempotency-Key header, and resolves with the
+// server's response.
+async function execute(action) {
+  action.idempotencyKey ??= crypto.randomUUID();
+  let response;
+  try {
+    response = await runAction(action, { idempotencyKey: action.idempotencyKey, signal: AbortSignal.timeout(30_000) });
+  } catch {
+    // No answer, after a timeout or a dropped connection: the action may still have run
+    action.state = 'failed';
+    action.failure = 'outcome-unknown';
+    return;
+  }
+  // 202 Accepted: the app has the action but hasn't finished it, so track it until it reports
+  if (response.status === 202) action.state = 'executing';
+  else if (response.ok) action.state = 'completed';
+  else {
+    action.state = 'failed';
+    // A gateway's error (502 to 504) doesn't say whether the app ran the action
+    action.failure = response.status >= 502 && response.status <= 504 ? 'outcome-unknown' : 'error';
+  }
+}
+```
+
+## Permissions and the audit trail
+
+- Show the permission scope in plain language, and why this action needs it. Prefer one-time or task-scoped access to broad, lasting grants, and offer a manual path when permission is denied and the workflow allows it.
+- The server checks the permission and the approval again: hiding or disabling a control is a convenience, not security.
+- Record audit events for proposals, approvals, rejections, edits, runs, failures, cancellations, retries, and rollbacks. Each records the action and review ids, the actor and the approver, the time, the tool or integration, the permission scope, an input summary or hash, an output reference, the state changes, the failure reason, and the rollback result.
+- Show a short activity log by default, with technical details behind disclosures.
 
 ## Accessibility
 
-- Use semantic buttons, checkboxes, disclosures, and lists
-- Keep focus inside a modal review surface when modal, and return focus to the invoking control when it closes
-- Move focus to the review heading when a new review surface opens
-- Put the least destructive action first in focus order for high-risk confirmations
-- Announce lifecycle changes with `aria-live="polite"` or `role="status"`
-- Use `role="alert"` only for urgent failures that require immediate attention
-- Associate each checkbox with the action title and consequence summary
-- Do not rely on color alone for risk labels
-- Make all details disclosures keyboard reachable
-- Ensure target sizes meet at least 24 by 24 CSS pixels with adequate spacing
+- Use headings for the review title, the plan summary, the action list, and the audit trail. Each selectable action's name contains its title and consequence, and `aria-describedby` connects it to its consequence, permission, and reversibility.
+- A modal review follows the Dialog guide: native `<dialog>` opened with `showModal()`, or the rest of the page inert. Focus goes to the heading or the first safe control, and returns to the invoking control on close. Escape closes it as Cancel and never approves; in a high-risk confirmation step, Escape cancels the step and returns to the review.
+- An inline, side-panel, or drawer review moves focus to its heading when it opens. Progress updates never move focus.
+- A validation failure moves focus to the first invalid field, and a permission failure to the explanation or the scoped request. After Undo, focus stays near the affected action.
+- Lifecycle updates, such as executing, completed, failed, cancelled, and reverted, are announced through one polite status region: the conversation's, when the review sits in a chat, otherwise its own. A modal review makes everything outside it inert, which hides the conversation's region, so while it's open it announces through a status region inside the dialog. Use `role="alert"` only for urgent failures, and never stream progress logs into a live region.
+- Space toggles selections and disclosures, Enter activates buttons, and nothing runs when an action is selected or a parameter edited.
+- Controls are at least 24 by 24 px, or have enough space around them.
 
-## Responsive Behavior
+## Layouts
 
-- Desktop: use a side panel or inline split view with plan summary, action list, and details
-- Tablet: stack summary above action list and collapse dense metadata into disclosures
-- Mobile: use a full-height sheet or full-screen view with sticky action controls
-- Long action lists should support filtering by risk, state, or selected status
-- Sticky controls must not cover focused elements, errors, or status messages
+- **From 1024 px**: a side panel, a split view, or full screen for dense plans; the summary and the action list can sit beside the details.
+- **768 to 1023 px**: the summary above the action list, with dense details behind disclosures.
+- **Below 768 px**: a full-height sheet or full screen, with sticky main controls and safe-area padding. Set `scroll-padding-bottom` to the controls' height, so they never cover the focused field, an error, or a status message.
+- Long action lists can be filtered by risk, state, or selection.
 
-## Error and Partial Failure
+## Motion
 
-Execution can fail after approval. Preserve context and show exactly what happened.
+Motion is optional. State changes use a short background or border transition (150 ms), and surfaces follow the project's drawer, sheet, or dialog motion. Progress shows state without constant motion. Under `prefers-reduced-motion: reduce`, progress and state changes don't animate, and the status text stays.
 
-- Tool failure - show the failed action, reason, retry option, and whether later actions were skipped
-- Permission failure - show the missing scope and a scoped permission request
-- Validation failure - keep user edits and focus the invalid field
-- Network failure - preserve completed actions and retry only unfinished actions when possible
-- Partial completion - distinguish completed, skipped, failed, cancelled, and reverted items
-- Rollback failure - show completed rollback steps, failed rollback steps, and support escalation
+## Working with the other AI guides
 
-## Do
-
-- Show the proposed action before execution
-- Use plain-language summaries before technical payloads
-- Show affected objects, destination, permissions, and reversibility
-- Use risk labels with text and icon, not color alone
-- Let users edit or approve only part of a plan when the workflow supports it
-- Require stronger confirmation for high-risk or irreversible actions
-- Keep pause, stop, and cancel controls reachable during execution
-- Preserve partial results and errors in place
-- Provide undo or rollback when possible
-- Record an audit trail for approved, rejected, failed, cancelled, and reverted actions
-- Detect the user's framework, styling system, design tokens, component conventions, and existing AI/action infrastructure before writing code
-
-## Don't
-
-- Execute consequential actions directly from an assistant message without review
-- Hide affected objects or destination behind generic text
-- Treat all actions as equally risky
-- Use color-only risk indicators
-- Approve blocked, invalid, or missing-permission actions
-- Collapse irreversible consequences behind a vague confirmation
-- Replace partial execution with a generic failure message
-- Move keyboard focus unexpectedly during progress updates
-- Auto-grant broad permissions when a task-scoped grant is enough
-- Introduce a new modal, drawer, toast, or button system when the project already has one
+- The AI Agent Chat Layout owns the shell, where review cards sit in the conversation, and the conversation's status region. Low-risk reviews render as cards in the transcript; high-risk or dense plans move to a side panel, drawer, or dialog.
+- The AI Response Rendering Pattern owns tool-call cards and their states (pending, running, success, error, cancelled). A tool call with consequences stays pending while this pattern reviews it, and the reply waits in its awaiting-review state. Approval moves the action to approved, and the card turns running only when the action starts running, cancelled on rejection, and error when running it fails.
+- This pattern owns the review, the action model, the risk and confirmation rules, the run, partial failures, the audit trail, and permission requests.
+- Only tool calls the product classifies as without consequences skip review: already authorized, read-only, sending no sensitive data out of the product, and costing nothing meaningful. Reads that send sensitive query data to external services, call metered APIs, or need new permissions are reviewed like any other action.
 
 ## Examples
 
-### Email Send Review
+- **Sending an email**: the recipients, subject, body, attachments, the context it came from, and when it sends, with external recipients flagged. People can edit the text, remove recipients, save it as a draft, approve, or ask for a softer tone.
+- **A bulk record update**: 43 proposed customer updates grouped by risk, with a sample diff and selectable rows. People approve the low-risk changes and reject one high-risk change.
+- **Scheduling**: attendees, time zone, conflicts, conferencing, external guests, the agenda, and whether personal calendar access is used. People can change the time or the attendees before approving.
+- **Sharing a file**: the file, its current access, the proposed recipients, the access level, any expiry, inherited permissions, and whether the share can be revoked. A public link needs explicit confirmation.
+- **A code change**: the touched files, the diff, the commands the agent wants to run, the permission to run them, the test plan, and how to roll back. Commands run only after approval.
+- **A payment or an order**: the amount, account, recipient, invoice, due date, fees, and whether it can be cancelled, with high-risk confirmation and audit logging.
+- **A permission request**: the exact missing scope, why this action needs it, for how long, and a manual alternative when there is one.
+- **A partial failure**: five actions were approved. Three completed, one failed validation, and one was skipped because it depended on the failed one. The review stays visible, with Retry for the failure and Undo for the completed actions.
+- **No answer**: the request to send an invoice times out, or its connection drops. The action says it's unknown whether the invoice was sent, and Retry reuses its idempotency key, so the server sends it at most once.
 
-An assistant drafts a customer email. The review surface shows recipients, subject, message preview, attachments, source context, and whether the email will send immediately or save as draft. The user can edit copy, remove recipients, approve, or ask for a softer tone.
+## Acceptance checklist
 
-### Bulk Record Update
+- [ ] Proposed actions show before anything runs, each with what it affects, where it goes, the permission it uses, its risk in text and an icon, and whether it can be undone
+- [ ] Low, medium, high, and blocked actions get the review the confirmation rules give them, and blocked actions can't be approved
+- [ ] Approve is named for the action and its scope, and Approve selected runs only the selected actions
+- [ ] An irreversible action's typed confirmation accepts a pasted phrase, and its button stays focusable and does nothing until the phrase matches
+- [ ] Reject, Edit, and Ask for revision work, and edited values are validated with the project's form rules
+- [ ] Pause and Stop are reachable as soon as actions run, and Stop starts nothing new
+- [ ] After a partial failure, every action shows its own state (completed, failed, skipped, cancelled, or reverted), and Retry runs only failed or skipped actions
+- [ ] An action whose request gets no answer, after a timeout or a dropped connection, says its outcome is unknown, and retrying it reuses its idempotency key, so it never runs twice
+- [ ] An action the app accepts but hasn't finished (202 Accepted) stays executing, with Pause and Stop, until the app reports how it ended
+- [ ] Undo says what it will revert, and its result is recorded
+- [ ] The audit trail records the action, actor, approver, time, tool, permission scope, inputs, outputs, outcome, and rollback
+- [ ] A modal review works like the Dialog guide: focus moves in, the page behind is inert, Escape cancels without approving, and focus returns to the control that opened it
+- [ ] An inline or side-panel review moves focus to its heading when it opens, and progress updates never move focus
+- [ ] Screen readers hear lifecycle changes once each, without the progress log
+- [ ] Sticky controls on phones never cover the focused field, an error, or a status message
+- [ ] With reduced motion, progress and state changes don't animate, and the status text stays
+- [ ] Styles come from the project's styling system and tokens, and risk labels, text, and controls meet the contrast minimums
 
-An assistant proposes updating 43 customer records. The review surface groups actions by risk, shows a sample diff, lets the user approve selected rows, and requires confirmation because shared records will change.
+## See also
 
-### Calendar Scheduling
+- **[AI Agent Chat Layout](/potions/layouts/ai-agent-chat)**: places review cards in the conversation.
+- **[AI Response Rendering Pattern](/potions/patterns/ai-response-rendering)**: renders the tool-call cards that hand off to the review.
+- **[Modal Dialog](/potions/components/dialog)**: for urgent or blocking confirmations.
+- **[Toast Notifications](/potions/components/toast-notifications)**: completion, retry, and undo feedback after the review has closed.
+- **[Command Palette](/potions/components/command-palette)**: commands with consequences can go through the same review.
+- **[Data Table](/potions/components/data-table)**: bulk actions and selectable affected objects.
+- **[Form Validation Pattern](/potions/patterns/form-validation)**: editable action parameters.
+- **[Dark/Light Mode Pattern](/potions/patterns/dark-light-mode)**: risk labels and status colors that stay readable in both themes.
+- **[Button](/potions/components/button)**: approve, reject, destructive, busy, and icon-only buttons.
 
-An assistant proposes a meeting. The review surface shows attendees, time zone, conflicts, conferencing details, notes, and external guests. External guests and personal calendar access are labelled as higher risk.
-
-### File Share
-
-An assistant proposes sharing a document. The review surface shows the file, recipients, access level, expiration, inherited permissions, and whether the share can be revoked.
-
-### Code Change
-
-An assistant proposes a code edit. The review surface shows a diff, touched files, commands to run, permission to execute commands, and rollback instructions.
-
-## Anti-Patterns
-
-1. One-button autonomy - the assistant says "I handled it" without showing what changed.
-2. Vague confirmation - "Are you sure?" without affected objects, destination, or reversibility.
-3. Hidden recipients - messages, invitations, or shares execute without showing who will receive them.
-4. All-or-nothing batch approval - one risky item forces users to reject an otherwise good batch.
-5. Permission sprawl - asking for broad, persistent access for a narrow task.
-6. Non-recoverable progress - execution starts and the user cannot pause, stop, or inspect what is happening.
-7. Audit trail as an afterthought - logs omit inputs, actor, tool, timestamps, or partial failures.
-8. Color-only risk - red or yellow labels without text, icon, or accessible name.
-
-## Testing Checklist
-
-- [ ] Proposed actions appear before execution
-- [ ] Risk labels include text and are not color-only
-- [ ] Affected objects, permissions, destination, and reversibility are visible
-- [ ] Low, medium, high, and blocked actions render distinct review behavior
-- [ ] Approve, reject, edit, ask for revision, and approve selected work as expected
-- [ ] High-risk or irreversible actions require stronger confirmation
-- [ ] Blocked actions cannot be approved
-- [ ] Pause, stop, cancel, retry, undo, and view log controls are reachable when applicable
-- [ ] Partial completion preserves completed, failed, skipped, cancelled, and reverted states
-- [ ] Audit trail records actor, timestamp, action id, tool, inputs, outputs, and outcome
-- [ ] Modal review traps focus and returns focus on close
-- [ ] Inline or side-panel review moves focus predictably to the heading
-- [ ] Screen readers announce lifecycle changes without repeated noise
-- [ ] Keyboard users can select individual actions and expand details
-- [ ] Mobile sticky controls do not obscure focused content or status messages
-- [ ] Reduced motion disables nonessential progress and state-change animation
-
-## Composing with the AI Potions
-
-This pattern is the control surface of the AI potion suite. When used together with the [AI Agent Chat Layout](/potions/layouts/ai-agent-chat) and the [AI Response Rendering Pattern](/potions/patterns/ai-response-rendering), keep the ownership boundaries clear instead of duplicating behavior:
-
-- The chat layout owns the shell (sidebar, header, message list, input placement) and where inline review cards sit in the conversation
-- The response rendering pattern owns tool-call cards and their lifecycle states (pending, running, success, error, cancelled)
-- This pattern owns the review surface, the action model, risk and confirmation rules, execution controls, partial failure handling, and the audit trail
-- A consequential tool call holds in its pending state and the message enters the rendering pattern's awaiting-review lifecycle state (status line on the held card, running animation and cursor suppressed) while this pattern presents the proposed action; approval moves it to approved, the card turns running only when execution begins, rejection turns it cancelled, and execution failure turns it error
-- Low-risk reviews render as inline cards in the message list; high-risk or dense plans escalate to a side panel, drawer, or modal
-- Only tool calls the product classifies as non-consequential skip review and run immediately: already authorized, read-only, no sensitive data leaving the product, and no meaningful cost
-- When composed with the response rendering pattern, review lifecycle announcements route through its single conversation-level live region; this pattern's own status region applies only when the review surface runs standalone
-
-Each potion remains independently useful. These rules apply only when they are used together.
-
-## See Also
-
-This pattern complements these potions:
-
-- **[AI Agent Chat Layout](/potions/layouts/ai-agent-chat)** - hosts review cards, drawers, or side panels inside conversational products
-- **[AI Response Rendering Pattern](/potions/patterns/ai-response-rendering)** - renders tool calls and assistant messages that can hand off to review
-- **[Dialog Component](/potions/components/dialog)** - works well for urgent or blocking confirmations
-- **[Toast Notifications](/potions/components/toast-notifications)** - useful for completion, undo, and rollback feedback
-- **[Command Palette](/potions/components/command-palette)** - can route command execution through the same review step
-- **[Data Table](/potions/components/data-table)** - commonly pairs with bulk action review
-- **[Form Validation Pattern](/potions/patterns/form-validation)** - applies to editable action parameters
-- **[Dark/Light Mode Pattern](/potions/patterns/dark-light-mode)** - keeps risk labels and status colors readable in both modes
-- **[Button Component](/potions/components/button)** - provides clear action, destructive, loading, and icon-button behavior
-
-These are suggestions. The AI Action Review Pattern remains independently useful in any agentic workflow.
+These are suggestions; the pattern works in any agent workflow.

@@ -56,8 +56,6 @@ const KNOWN_RULE_BREAKS = [
   'layouts/ecommerce-product-page [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
   'layouts/landing-page [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
   'layouts/landing-page [urls]: meta.webUrl is "https://uipotion.com/potions/layouts/landing-page.html", expected https://uipotion.com/potions/layouts/landing-page',
-  'patterns/ai-response-rendering [title-length]: the title has 77 characters (at most 60)',
-  'patterns/ai-response-rendering [name-mismatch]: Markdown title "AI Response Rendering Pattern - Streaming, Tool Calls, and Optional Reasoning", JSON name "AI Response Rendering Pattern - Streaming, Tool Calls, and Optional Reasoning", index name "AI Response Rendering Pattern - Streaming, Tool Calls, and Reasoning"',
   'patterns/dark-light-mode [urls]: meta.webUrl is "https://uipotion.com/potions/patterns/dark-light-mode.html", expected https://uipotion.com/potions/patterns/dark-light-mode',
   'patterns/form-validation [first-tag]: the first tag is "validation", expected "patterns"',
   'patterns/form-validation [urls]: meta.webUrl is "https://uipotion.com/potions/patterns/form-validation.html", expected https://uipotion.com/potions/patterns/form-validation',

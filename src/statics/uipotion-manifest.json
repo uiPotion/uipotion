@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "name": "UI Potion",
-  "description": "AI-agent-optimized UI specifications for any framework",
+  "description": "UI behavior guides your coding agent can apply to your existing project",
   "baseUrl": "https://uipotion.com",
   "discovery": {
     "manifestUrl": "https://uipotion.com/uipotion-manifest.json",
@@ -48,7 +48,7 @@
   ],
   "meta": {
     "created": "2026-01-10",
-    "updated": "2026-10-16",
+    "updated": "2026-10-17",
     "license": "MIT",
     "legalUrl": "https://uipotion.com/legal",
     "copyrightScope": "Full disclaimer and terms: https://uipotion.com/legal",

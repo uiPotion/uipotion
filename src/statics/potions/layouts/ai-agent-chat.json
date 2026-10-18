@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
   "id": "ai-agent-chat",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "name": "AI Agent Chat Layout",
   "category": "layouts",
   "tags": [
@@ -14,153 +14,118 @@
     "responsive",
     "a11y"
   ],
-  "description": "A responsive AI agent chat interface layout with message history, input area, typing indicators, and conversation management. Perfect for AI assistants, chatbots, and conversational interfaces.",
+  "description": "A chat layout for an AI assistant: an optional conversation list, a transcript that follows new content only while the reader is at the bottom, and a composer whose Send button turns into Stop while a reply streams. A message that fails to send stays in the input with a retry, and screen readers hear one status region instead of every token.",
   "tokens": {
+    "note": "Suggested defaults. The project's design tokens and existing components win.",
     "layout": {
       "sidebarWidthPx": 280,
-      "headerHeightPx": 64,
-      "inputAreaMinHeightPx": 72,
-      "inputAreaMaxHeightPx": 256,
-      "messageMaxWidthPx": 768,
-      "zIndex": {
-        "base": 0,
-        "messageBubbles": 1,
-        "inputArea": 10,
-        "header": 20,
-        "sidebarDesktop": 30,
-        "dropdownsPopovers": 40,
-        "mobileSidebarOverlay": 50,
-        "backdrop": 60,
-        "modals": 70
-      }
+      "sidebarDocksFromPx": 1024,
+      "headerHeightPx": 56,
+      "transcriptMaxWidthPx": 768,
+      "composerMaxLines": 8,
+      "textSizePx": 16,
+      "minTargetPx": 24,
+      "touchTargetPx": 44,
+      "pinnedWithinPx": 48,
+      "layering": "The header and the composer are rows outside the scrolling transcript, so they need no z-index. Menus and popovers sit above the page, and toasts above those. Below 1024 px the conversation list is a modal: native <dialog> opened with showModal() is drawn in the top layer and makes the rest of the page inert."
     },
     "motion": {
-      "messageEntranceDurationMs": 300,
-      "sidebarSlideDurationMs": 250,
-      "inputHeightTransitionMs": 150,
-      "sendButtonPressMs": 100,
-      "autoScrollDurationMs": 300,
-      "typingIndicatorCycleMs": 1400,
-      "defaultEasing": "ease-out",
-      "inputEasing": "ease-in-out"
-    },
-    "breakpoints": {
-      "tabletMinPx": 768,
-      "desktopMinPx": 1024
-    }
-  },
-  "layoutPresets": {
-    "default": {
-      "sidebarWidthPx": 280,
-      "messageMaxWidthPx": 768
-    },
-    "wide": {
-      "sidebarWidthPx": 320,
-      "messageMaxWidthPx": 900
-    },
-    "compact": {
-      "sidebarWidthPx": 0,
-      "messageMaxWidthPx": 768
+      "messageEnterMs": 200,
+      "sidebarSlideMs": 250,
+      "easing": "cubic-bezier(0.2, 0, 0, 1)"
     }
   },
   "layoutModel": {
-    "type": "stack",
-    "scrollRegion": "custom",
+    "type": "grid",
+    "scrollRegion": "contentArea",
     "positioningContract": {
-      "header": "fixed-top",
-      "inputArea": "fixed-bottom",
-      "messageList": "scrollable-middle",
-      "sidebar": "optional-fixed-left"
+      "page": "A full-height grid, 100dvh tall with 100vh as the fallback: the conversation list column, when docked, and the chat column",
+      "header": "The chat column's first row, outside the scrolling area",
+      "transcript": "The chat column's scrolling area, between the header and the composer",
+      "composer": "The chat column's last row, outside the scrolling area",
+      "sidebar": "Its own grid column from 1024 px wide; a modal overlay below that"
     },
     "invariants": [
-      "Header and input area are always visible",
-      "Message list scrolls independently between header and input",
-      "Input area accounts for safe areas on mobile",
-      "No horizontal scroll in message content",
-      "When sidebar is visible on desktop, main chat container must have margin-inline-start (or left margin) equal to sidebar width so the sidebar never overlaps content; when closed or overlay, use zero margin"
+      "The header and the composer stay visible because they're outside the scrolling area, not because of position: fixed, so they never cover the focused element",
+      "In the chat column only the transcript scrolls, and a docked conversation list scrolls inside its own column, so neither stretches the page",
+      "Grid and flex items default to min-height: auto, so the page grid's columns get min-height: 0; without it, a long conversation list or conversation stretches the page and pushes the composer off screen",
+      "A docked conversation list takes its own column and never covers the chat",
+      "At 320 px wide nothing scrolls sideways, apart from code blocks, which scroll inside themselves"
     ]
   },
   "aiAgentInstructions": {
-    "summary": "Implement a responsive AI agent chat interface with message history, input area, typing indicators, and optional conversation sidebar. The layout is framework-agnostic and should adapt to the user's chosen stack (React, Vue, Angular, Svelte, etc.) and styling approach (Tailwind, CSS Modules, Chakra UI, Material-UI, etc.).",
+    "summary": "Build or extend the shell of an AI chat: an optional conversation list, a header, the transcript, and the composer. Build on the project's chat, message, and input components when it has suitable ones; otherwise use plain HTML. Implement only what the task needs, keep existing APIs, and add no dependency without asking. The project's conventions win for styling and visual defaults; if one conflicts with an accessibility or correctness requirement in this guide, ask the user instead of choosing silently. Target WCAG 2.2 AA. Assistant messages go through the project's own renderer; the AI Response Rendering Pattern covers streaming, Markdown, and tool calls inside them, and the AI Action Review Pattern covers approving the assistant's actions.",
     "keyFeatures": [
-      "Optional sidebar for conversation list (280-320px on desktop, overlay on mobile). When sidebar is visible on desktop, main chat container MUST have left margin equal to sidebar width so the sidebar never overlaps content.",
-      "Fixed header with agent info (56-64px height)",
-      "Scrollable message list with user/agent message distinction",
-      "Fixed input area with auto-expanding textarea",
-      "Typing indicator with animated dots",
-      "Quick action chips for common prompts",
-      "Message bubbles with asymmetric border-radius (speech bubble effect)",
-      "Support for code blocks, links, and rich formatting",
-      "Auto-scroll to new messages with user scroll detection",
-      "Full keyboard accessibility with ARIA live regions",
-      "Mobile-optimized with touch-friendly targets (44px min)",
-      "Smooth animations (300ms message entrance, 250ms sidebar slide)",
-      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems.",
-      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements. Define classes like .message, .message--user, .message--agent, .input-area, etc.",
-      "CRITICAL: When detecting React, extract logic from useEffect hooks into separate custom hooks that do ONE thing each. For example: useChatMessages(), useAutoScroll(), useTypingIndicator(), useConversation()."
+      "Built on the project's chat and input components, or on a plain form with a labelled textarea and one submit button",
+      "A full-height layout (dvh) whose header and composer sit outside the transcript's scrolling area, so they never cover the focused element or hide behind mobile toolbars, and a conversation list that scrolls on its own",
+      "Enter sends and Shift+Enter adds a line, never while an IME is composing; on touch-primary devices Enter adds a line by default",
+      "One button that turns into Stop while a reply streams and keeps focus; Enter keeps the draft until the reply ends",
+      "The draft stays in the composer until the server accepts the message, so a failed send shows Not sent with Retry and loses nothing",
+      "The transcript follows new content only while the reader is at the bottom; otherwise a Jump to latest button appears",
+      "A visually hidden heading starts each message, and one polite status region announces replies starting, ending, and failing, never the streamed text",
+      "A conversation list that is navigation: docked from 1024 px, a modal overlay below, and hidden when closed",
+      "Optional capabilities, each with when it helps: branching, pinning, history search, and keyboard shortcuts"
     ],
     "implementationSteps": [
-      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine: (a) package.json for framework (React, Vue, Angular, Svelte) and styling dependencies (tailwindcss, styled-components, emotion, sass, etc.), (b) existing component files to see how they import styles (CSS Modules, Tailwind classes, styled-components, etc.), (c) config files (tailwind.config.js, vite.config.js, webpack.config.js, etc.), (d) existing style files and their structure.",
-      "0a. Detect framework patterns: Check how existing components are structured (hooks in React, composition API in Vue, etc.), how state is managed, and what patterns are used.",
-      "0b. Detect styling conventions: Identify class naming (BEM, camelCase, kebab-case), how styles are imported, whether there's a design system or token system, and what utility functions exist (cn, clsx, classnames, etc.).",
-      "0c. If detection is uncertain, ask the user about their styling approach and framework before proceeding.",
-      "1. Create main layout container with optional sidebar and main chat area",
-      "2. Implement Header component with agent info (avatar, name, status) and actions",
-      "3. Create MessageList component with scrollable container and centered max-width content",
-      "4. Implement MessageBubble component with user/agent variants and asymmetric border-radius",
-      "5. Add InputArea component with auto-expanding textarea, send button, and optional quick actions",
-      "6. Implement TypingIndicator component with animated dots",
-      "7. Add sidebar with conversation list (if enabled), with overlay behavior on mobile. When sidebar is open on desktop, apply margin-inline-start (or left margin) to the main chat container equal to sidebar width so the sidebar never overlaps the main content. Ensure users can always close the sidebar when it is open at every breakpoint (visible close control or header control that toggles).",
-      "8. Implement state management for messages, input value, typing state, and sidebar visibility",
-      "9. Add auto-scroll behavior with user scroll detection (pause auto-scroll when user scrolls up)",
-      "10. Implement keyboard navigation (Enter to send, Shift+Enter for new line, Escape to close sidebar). Never send while an input method editor (IME) is composing text: ignore Enter when the keydown event has isComposing set or keyCode 229, which is how Safari reports the Enter that confirms a composition. Choose the default Enter behavior with a heuristic: when the primary input is touch (for example the (hover: none) and (pointer: coarse) media query), assume an on-screen keyboard, which has no Shift+Enter, so Enter inserts a new line and the send button sends; otherwise Enter sends. Media queries describe pointing devices, not keyboards: a tablet with an attached keyboard may still get the new-line default, while touchscreen laptops usually report a fine pointer and keep Enter to send. Don't use touch support alone. If the product already has an Enter-to-send setting, it overrides the heuristic. Shift+Enter always inserts a new line, and the send button always sends",
-      "11. Add ARIA live regions for new messages and typing indicator announcements",
-      "12. Implement responsive breakpoints (mobile, tablet, desktop) with appropriate layout changes",
-      "13. Add smooth animations for message entrance, sidebar slide, and input height changes",
-      "14. Use ONLY the detected styling system. Match existing component styling patterns exactly.",
-      "15. Input area: Provide clear white space on all sides (min 16px padding). Bottom padding must include env(safe-area-inset-bottom). Gap between text input and send button: 12px min. Message list: Use sufficient padding-bottom (24px+) so content does not sit under the input area."
+      "1. Detect the framework and its version, the styling system, the tokens, and the existing components (projectDetection). If the project already has chat, message, or composer components, configure or extend them to meet this guide instead of building others, and keep their APIs.",
+      "2. Choose what the task needs: the conversation list, attachments, quick actions, and the optional capabilities in commonVariations. Leave out the rest.",
+      "3. Lay out the page as layoutModel says: a full-height grid with the header and the composer outside the scrolling transcript.",
+      "4. Build the composer (components.Composer): the Enter rules, one Send and Stop button, and a draft that stays until the message is accepted (frameworkPatterns.composerEnterKey, sendStopButton, and sendMessage).",
+      "5. Render the transcript (components.Transcript and components.Message): each message starts with a visually hidden heading, the person's messages show their send status, and assistant messages go through the project's renderer.",
+      "6. Add the conversation's status region (accessibility.screenReader) and the scrolling rules (frameworkPatterns.pinnedToBottom).",
+      "7. If the task needs it, add the conversation list (components.Sidebar), with a skip link when it comes before the chat.",
+      "8. Save only the UI state the product needs, under the app's own storage prefix, and apply it before the first paint (stateManagement).",
+      "9. Check the result against testingChecklist with a keyboard, a screen reader, an input method editor, and a phone, and run the project's existing tests and checks."
     ]
   },
   "structure": {
     "hierarchy": {
       "ChatLayout": {
-        "description": "Root container, full viewport height, manages sidebar and main chat area layout",
+        "description": "The page grid: a skip link when the conversation list comes first, the conversation list, and the chat column",
         "children": {
+          "SkipLink": {
+            "description": "The first focusable element when the docked list comes before the chat; moves focus to the chat"
+          },
           "Sidebar": {
-            "description": "Optional conversation list sidebar (280-320px desktop, overlay mobile)",
+            "description": "Optional conversation list",
             "children": [
-              "ConversationList",
-              "AgentSelector",
-              "NewConversationButton"
+              "NewChatButton",
+              "Filter (optional)",
+              "ConversationLinks"
             ]
           },
-          "ChatContainer": {
-            "description": "Main chat area containing header, message list, and input area",
+          "ChatColumn": {
+            "description": "The main region: header, transcript, and composer",
             "children": {
               "Header": {
-                "description": "Fixed header with agent info and actions",
+                "description": "The conversation's title, the list toggle, and actions",
                 "children": [
-                  "MenuToggle",
-                  "AgentInfo",
+                  "ListToggle",
+                  "ConversationTitle",
                   "HeaderActions"
                 ]
               },
-              "MessageList": {
-                "description": "Scrollable message history with centered content",
+              "Transcript": {
+                "description": "The chat column's scrolling area",
                 "children": [
-                  "MessageBubble",
-                  "DateDivider",
-                  "TypingIndicator"
+                  "EmptyState",
+                  "Message",
+                  "WaitingIndicator",
+                  "JumpToLatest"
                 ]
               },
-              "InputArea": {
-                "description": "Fixed input area at bottom with message composition",
+              "Composer": {
+                "description": "A form with a textarea and one Send and Stop button",
                 "children": [
-                  "QuickActions",
-                  "TextInput",
-                  "AttachmentButton",
-                  "SendButton"
+                  "QuickActions (optional)",
+                  "AttachmentButton (optional)",
+                  "Textarea",
+                  "SendStopButton",
+                  "ComposerError"
                 ]
+              },
+              "StatusRegion": {
+                "description": "One polite status region for the conversation, visually hidden and present from the start"
               }
             }
           }
@@ -170,997 +135,593 @@
   },
   "components": {
     "Sidebar": {
-      "description": "Optional conversation list sidebar with collapsible behavior",
+      "description": "Optional conversation list. It's navigation: a nav element labelled \"Conversations\", with a link for each conversation, since each conversation has its own URL.",
       "dimensions": {
-        "desktopWidthPx": 280,
-        "wideModeWidthPx": 320,
-        "mobile": "full screen overlay or hidden",
-        "collapsedWidthPx": 0
+        "widthPx": 280,
+        "docksFromPx": 1024
       },
       "states": [
-        "expanded",
-        "hidden",
-        "overlay"
+        "docked-open",
+        "docked-closed",
+        "overlay-open",
+        "overlay-closed"
       ],
       "elements": {
-        "ConversationList": {
-          "itemHeightPx": 64,
-          "scrollable": true,
-          "itemStructure": [
-            "Title",
-            "Timestamp",
-            "LastMessagePreview"
-          ]
-        },
-        "AgentSelector": {
-          "type": "dropdown or list",
-          "shows": [
-            "AgentName",
-            "Avatar",
-            "Status"
-          ]
-        },
-        "NewConversationButton": {
-          "position": "top or bottom of sidebar",
-          "style": "primary button or floating action button"
-        }
+        "NewChatButton": "At the top of the list. It starts a new conversation and puts focus in the composer.",
+        "ConversationLinks": "A list of links, the open conversation marked with aria-current=\"page\". Optional groups, such as Today and Previous 7 days, get headings.",
+        "ItemActions": "Optional rename, pin, and delete, in a More actions menu button per item. Delete asks first (see the Dialog guide) or offers undo.",
+        "Filter": "Optional search field that filters the list; the number of matches is announced politely."
       },
       "behavior": {
-        "mobile": {
-          "overlay": "Overlay with backdrop, dismissible",
-          "backdropClick": "Close sidebar when backdrop clicked",
-          "preventBodyScroll": "Lock body scroll when sidebar open"
-        },
-        "animation": "250ms ease-out slide transition",
-        "persistence": "Store sidebar state in localStorage (optional)",
-        "closeability": "When the sidebar is open, the user must always have a visible way to close it at every breakpoint (including desktop). Provide at least one: a dedicated close control in the sidebar, or a header control that both opens and closes the sidebar. Do not hide or remove the close option on larger viewports. Ensure the close action is keyboard-accessible and has an accessible name (e.g. aria-label)."
-      },
-      "layoutSpace": "When sidebar is visible on desktop, the main chat container must have margin-inline-start (or left margin) equal to sidebar width so the sidebar never overlaps the main content. When sidebar is closed or in overlay mode (mobile/tablet), use zero margin. Sidebar visibility must be tied to open/closed state on all breakpoints (do not force sidebar visible on desktop regardless of state)."
+        "scroll": "The list scrolls inside its column (overflow-y: auto) while docked, and inside the dialog in the overlay, so a long list never stretches the page.",
+        "docked": "From 1024 px wide the list is a grid column, open by default. A toggle in the header opens and closes it: a button with aria-expanded and aria-controls. When closed, the column is hidden (the hidden attribute or display: none), not only moved off screen.",
+        "overlay": "Below 1024 px the list opens as a modal: native <dialog> opened with showModal(), or the Dialog guide's model. It has a visible Close button, closes on Escape, on a backdrop click, and when a conversation is chosen, and returns focus to the toggle.",
+        "skipLink": "When the docked list comes before the chat in the page, the page starts with a skip link to the chat (WCAG 2.4.1).",
+        "breakpointChange": "React to a matchMedia change, not to resize events. If the overlay is open when the window gets wider than 1024 px, close it and move focus to the same item in the docked list."
+      }
     },
     "Header": {
-      "description": "Fixed header bar with agent information and actions",
+      "description": "The chat column's first row.",
       "dimensions": {
-        "heightPx": 64,
-        "width": "100% of chat area",
-        "position": "fixed or sticky at top"
+        "heightPx": 56
       },
-      "layout": "[MenuToggle] [AgentInfo] [spacer] [HeaderActions]",
       "elements": {
-        "MenuToggle": {
-          "sizePx": 40,
-          "visibility": "When sidebar is collapsible",
-          "icon": "Hamburger or sidebar toggle icon"
-        },
-        "AgentInfo": {
-          "avatarSizePx": 36,
-          "nameFontSizePx": 16,
-          "statusIndicatorSizePx": 8,
-          "statusTextFontSizePx": 12
-        },
-        "HeaderActions": {
-          "buttonSizePx": 40,
-          "actions": [
-            "Settings",
-            "ClearChat",
-            "AdditionalActions"
-          ]
-        }
+        "ListToggle": "Shown when the conversation list can be opened or closed. Its name contains its visible text, if it has any, and it is at least 24 by 24 px.",
+        "ConversationTitle": "The conversation's title, as the page's main heading, or a visually hidden heading such as \"Chat\". document.title includes it.",
+        "HeaderActions": "Optional: New chat, an assistant or model picker, and a More actions menu. Clearing a conversation asks first or offers undo."
       },
       "behavior": {
-        "shadow": "Subtle shadow or border-bottom for depth",
-        "dropdowns": "Close on outside click or Escape key",
-        "keyboard": "Full keyboard navigation"
+        "phones": "The toggle, the title, and New chat; the other actions go in the More actions menu."
       }
     },
-    "MessageList": {
-      "description": "Scrollable container for conversation history",
+    "Transcript": {
+      "description": "The conversation, oldest first, in the chat column's scrolling area.",
       "dimensions": {
-        "padding": "16-24px",
-        "paddingBottomMinPx": 24,
         "maxWidthPx": 768,
+        "paddingPx": 16,
         "messageGapPx": 16
       },
-      "spacingRequirements": "Use sufficient padding-bottom (24-32px recommended) so that the last message or welcome content does not sit directly under the input area. This prevents overlap and gives clear visual separation.",
-      "layout": "Vertical stack of messages, centered with max-width",
       "behavior": {
-        "autoScroll": "Scroll to bottom on new messages",
-        "userScrollDetection": "Pause auto-scroll when user scrolls up",
-        "pagination": "Optional infinite scroll or pagination for loading history",
-        "emptyState": "Welcome screen or suggested prompts when no messages"
+        "structure": "A list or a series of articles, in reading order. It isn't a live region: replies are announced through the status region.",
+        "scrollContainer": "overflow-y: auto and overscroll-behavior: contain.",
+        "followingNewContent": "Follow new content only while the reader is at the bottom (within 48 px). Only scrolling up stops following; content that grows below the view never does. Follow instantly, never with smooth scrolling. While the reader is scrolled up, show JumpToLatest. Sending a message scrolls to the bottom and follows again (frameworkPatterns.pinnedToBottom).",
+        "opening": "A conversation opens at its latest message.",
+        "olderMessages": "Loading older messages at the top keeps what's on screen where it is."
       }
     },
-    "MessageBubble": {
-      "description": "Individual message display with user/agent styling",
+    "Message": {
+      "description": "One message, from the person or from the assistant.",
       "dimensions": {
-        "maxWidthPercent": 85,
+        "bubbleMaxWidthPercent": 85,
         "paddingPx": 12,
-        "borderRadiusPx": 16,
-        "asymmetricBorderRadius": {
-          "user": "16px 16px 4px 16px",
-          "agent": "16px 16px 16px 4px"
-        }
-      },
-      "variants": {
-        "user": {
-          "background": "Primary brand color or dark neutral",
-          "text": "White or high contrast",
-          "alignment": "flex-end (right side)"
-        },
-        "agent": {
-          "background": "Light gray or subtle color",
-          "text": "Dark text on light background",
-          "alignment": "flex-start (left side)"
-        }
+        "radiusPx": 16
       },
       "elements": {
-        "Content": {
-          "supports": [
-            "Plain text",
-            "Code blocks",
-            "Links",
-            "Lists",
-            "Rich formatting"
-          ]
-        },
-        "Timestamp": {
-          "fontSizePx": 11,
-          "color": "Muted gray",
-          "position": "Below message bubble"
-        },
-        "Avatar": {
-          "sizePx": 32,
-          "position": "Before agent messages",
-          "shape": "Circle"
-        }
+        "SpeakerHeading": "A visually hidden heading at the start of each message, such as \"You said:\" or \"Acme Assistant said:\", one level below the conversation's heading. Screen reader users move between messages with the heading key. Don't put aria-label on a message: it would replace the content.",
+        "Content": "The person's messages are plain text with their line breaks (white-space: pre-wrap) and dir=\"auto\". Assistant messages go through the project's renderer. Links in messages are underlined.",
+        "SendStatus": "The person's messages show sending, sent (or nothing), or failed: \"Not sent\" with a Retry button.",
+        "Actions": "Optional on the person's messages: Edit, which lets them change the message and send it again (see commonVariations.branching), and Copy. Every icon button has a name and is at least 24 by 24 px.",
+        "Avatar": "Optional and decorative (alt=\"\"), since the heading names the speaker.",
+        "Timestamp": "Optional, in a time element with a datetime attribute."
       },
       "behavior": {
-        "selection": "Allow text selection",
-        "actions": "Optional context menu (copy, delete, retry)"
+        "alignment": "The person's messages sit on the end side (right in left-to-right languages) and the assistant's on the start side. Logical properties, such as margin-inline-start, mirror the layout for right-to-left languages.",
+        "longContent": "Long text wraps (overflow-wrap: anywhere). A code block scrolls inside itself; one that scrolls and has nothing focusable gets tabindex=\"0\" and a name."
       }
     },
-    "TypingIndicator": {
-      "description": "Animated indicator showing agent is generating response",
-      "dimensions": {
-        "heightPx": 32,
-        "width": "Auto (fits content)"
-      },
+    "WaitingIndicator": {
+      "description": "Shown from the moment the message is accepted until the reply's first content appears (the queued state).",
       "elements": {
-        "AnimatedDots": {
-          "count": 3,
-          "sizePx": 8,
-          "animation": "Sequential bounce or fade (1.4s cycle)",
-          "delaysMs": [
-            0,
-            200,
-            400
-          ]
-        },
-        "Text": {
-          "content": "Agent is typing...",
-          "fontSizePx": 12,
-          "optional": true
-        }
+        "Dots": "Decorative (aria-hidden=\"true\"), and static under reduced motion. The status region announces the start once."
       },
       "behavior": {
-        "display": "Show when agent is generating response",
-        "hide": "Hide when message arrives",
-        "animation": "Smooth fade in/out (200ms)"
+        "hide": "As soon as content appears, or when the reply's streaming cursor appears, if the project follows the AI Response Rendering Pattern."
       }
     },
-    "InputArea": {
-      "description": "Fixed message composition area at bottom of screen",
+    "Composer": {
+      "description": "A form with a textarea and one submit button, in the last row of the chat column.",
       "dimensions": {
-        "minHeightPx": 72,
-        "maxHeightPx": 256,
+        "textSizePx": 16,
+        "maxLines": 8,
         "paddingPx": 12,
-        "paddingHorizontalMinPx": 16,
-        "paddingBottomMinPx": 16,
-        "includeSafeAreaBottom": true,
-        "gapBetweenInputAndSendButtonPx": 12
+        "buttonSizePx": 40,
+        "gapPx": 8
       },
-      "spacingRequirements": "Input area must have clear white space on all sides: minimum 12-16px padding. Bottom padding must include env(safe-area-inset-bottom) on mobile (e.g. calc(16px + env(safe-area-inset-bottom))). Gap between text input and send button: 12px minimum. Do not let the input sit flush with viewport edges.",
-      "layout": "[QuickActions (optional)] [TextInput] [AttachmentButton (optional)] [SendButton]",
+      "states": [
+        "empty",
+        "ready",
+        "sending",
+        "reply-in-progress",
+        "error"
+      ],
       "elements": {
-        "QuickActions": {
-          "position": "Above text input",
-          "layout": "Horizontal scrollable chips",
-          "chipHeightPx": 32,
-          "chipPaddingPx": "8-16 horizontal",
-          "borderRadiusPx": 16
-        },
-        "TextInput": {
-          "type": "Auto-expanding textarea",
-          "minRows": 1,
-          "maxRows": 8,
-          "fontSizePx": 14,
-          "borderRadiusPx": 20,
-          "placeholder": "Type a message..."
-        },
-        "AttachmentButton": {
-          "sizePx": 40,
-          "icon": "Paperclip or plus",
-          "optional": true
-        },
-        "SendButton": {
-          "sizePx": 40,
-          "shape": "Circle or rounded square",
-          "icon": "Send arrow or paper plane",
-          "states": [
-            "default (muted/disabled)",
-            "active (primary color)",
-            "loading (spinner)"
-          ]
-        }
+        "Textarea": "Labelled; the label can be visually hidden. If a placeholder shows a prompt such as \"Message Acme Assistant\", the label uses the same words, so voice control users can say what they see. Text is at least 16 px, so iOS Safari doesn't zoom the page on focus. It grows with its content up to about 8 lines, then scrolls inside: field-sizing: content where the browser supports it, otherwise set the height from scrollHeight on input.",
+        "SendStopButton": "One button: Send, or Stop while a reply streams. It never gets the disabled attribute, which would drop focus to the page when its state changes. With nothing to send it has aria-disabled=\"true\" and does nothing. Its name follows its state: \"Send message\" or \"Stop response\". In Stop mode it has formnovalidate, so a required field or other form validation never blocks Stop (frameworkPatterns.sendStopButton).",
+        "AttachmentButton": "Optional. Opens the file picker. Attached files show as chips with a remove button named for the file (\"Remove report.csv\").",
+        "QuickActions": "Optional buttons that fill the composer and move focus to it, so the person can edit before sending. Suggested prompts in an empty conversation may send at once when they need no editing.",
+        "ComposerError": "Text under the composer for problems with the draft, such as a message that's too long or a rejected file, linked to the textarea with aria-describedby."
       },
       "behavior": {
-        "autoFocus": "Focus input when chat opens",
-        "enterToSend": "Enter sends, Shift+Enter for new line. Enter never sends while an IME is composing text (isComposing or keyCode 229). When the primary input is touch (heuristic: (hover: none) and (pointer: coarse)), Enter defaults to inserting a new line and the send button sends. The heuristic can't detect attached keyboards, so they may inherit the new-line default; an existing Enter-to-send setting overrides it",
-        "autoExpand": "Input expands as user types",
-        "heightTransition": "150ms ease-in-out",
-        "enableSend": "Only when input not empty",
-        "clearOnSend": "Clear input after sending",
-        "errorHandling": "Maintain input if sending fails"
+        "enter": "Enter sends and Shift+Enter adds a line. Enter that confirms an input method editor (IME) composition never sends: check isComposing, and keyCode 229, which is how Safari reports that Enter. When the primary input is touch ((hover: none) and (pointer: coarse)), assume an on-screen keyboard, which has no Shift+Enter, so Enter adds a line and the button sends. This is a heuristic: a tablet with a keyboard may get the new-line default, and touchscreen laptops usually keep Enter to send. An existing Enter-to-send setting overrides it, and the button always sends (frameworkPatterns.composerEnterKey).",
+        "whileReplyStreams": "The button turns into Stop, which stops the reply and keeps its text. The textarea stays editable, so the next message can be drafted, but Enter doesn't send until the reply ends or is stopped.",
+        "sending": "The message appears in the transcript as sending, and the draft stays in the composer until the server accepts the message. It leaves only if the composer still holds the sent text, so anything typed meanwhile stays. The button is ignored while a message is being sent, so a double press sends once (frameworkPatterns.sendMessage).",
+        "failure": "The message shows \"Not sent\" with Retry, the draft is still in the composer, and the status region says \"Message not sent\". Retry sends the message again with the same id, so the server can drop a copy it already has, as when a dropped connection hid that the first attempt arrived. Sending a changed draft instead replaces the failed message.",
+        "focus": "Sending doesn't move focus: after Enter it stays in the textarea, and after a press of the button it stays on the button. Don't focus the composer when the page loads on touch devices, where that opens the on-screen keyboard; focus it when the person starts a new conversation or picks a suggested prompt.",
+        "escape": "Optional: Escape in the composer stops a streaming reply, unless the chat sits in a dialog or panel that Escape closes."
       }
     },
-    "WelcomeScreen": {
-      "description": "Empty state shown when no messages exist",
-      "dimensions": {
-        "height": "Full message list height",
-        "maxWidthPx": 600
-      },
+    "EmptyState": {
+      "description": "Shown in a conversation with no messages.",
       "elements": {
-        "Icon": {
-          "type": "Optional illustration or icon",
-          "sizePx": 64
-        },
-        "Heading": {
-          "text": "How can I help you today?",
-          "fontSizePx": 24
-        },
-        "Subtext": {
-          "description": "Brief agent capability description",
-          "fontSizePx": 14
-        },
-        "SuggestedPrompts": {
-          "count": "3-6 suggestions",
-          "style": "Clickable cards or buttons"
-        }
+        "Heading": "A short heading, such as \"How can I help?\"",
+        "SuggestedPrompts": "Optional, 3 to 6 buttons; see Composer.elements.QuickActions."
+      }
+    },
+    "JumpToLatest": {
+      "description": "A button at the bottom of the transcript, shown while the reader is scrolled up.",
+      "behavior": {
+        "activate": "Scrolls to the bottom, follows new content again, and puts focus in the composer, since the button hides itself."
       }
     }
   },
   "responsiveBreakpoints": {
     "desktop": {
       "minWidth": "1024px",
-      "sidebar": "Visible by default (if enabled)",
-      "messageMaxWidth": "768-900px (centered)",
-      "inputArea": "Full width with comfortable padding",
-      "quickActions": "Visible above input"
+      "sidebar": "Docked column, open by default, toggled from the header",
+      "transcript": "Centered, at most 768 px wide"
     },
     "tablet": {
       "minWidth": "768px",
       "maxWidth": "1023px",
-      "sidebar": "Collapsible, overlay mode when open",
-      "messageMaxWidth": "100% with 16-24px margins",
-      "inputArea": "Full width, reduced padding",
-      "quickActions": "Horizontal scroll or hidden"
+      "sidebar": "Modal overlay, closed by default",
+      "transcript": "Full width with 24 px side padding"
     },
     "mobile": {
       "maxWidth": "767px",
-      "sidebar": "Hidden by default, fullscreen overlay when open",
-      "messageMaxWidth": "100% with 12-16px margins",
-      "inputArea": "Full width, minimal padding (12px)",
-      "quickActions": "Horizontal scroll, compact",
-      "header": "Simplified (avatar and name only)",
-      "touchTargets": "Minimum 44px"
+      "sidebar": "Modal overlay at full height",
+      "header": "See components.Header.behavior.phones",
+      "transcript": "Full width with 16 px side padding",
+      "targets": "At least 24 by 24 px; 44 px is comfortable for touch"
     },
     "resizeHandling": {
-      "debounceMs": 200,
-      "behavior": "Re-evaluate breakpoint on resize, close mobile sidebar if switching to desktop"
+      "approach": "React to changes of matchMedia('(min-width: 1024px)'), not to resize events; see components.Sidebar.behavior.breakpointChange."
     }
   },
   "stateManagement": {
     "statesToTrack": {
       "messages": {
         "type": "array",
-        "description": "List of all messages in conversation. Structure: { id: string, role: 'user'|'agent', content: string, timestamp: ISO string, status: 'sent'|'delivering'|'error', attachments?: array }",
-        "persistence": "Server/database (not localStorage)"
+        "description": "The conversation's messages; see dataStructures.message.",
+        "persistence": "The server"
       },
-      "inputValue": {
+      "draft": {
         "type": "string",
-        "description": "Current text in input field",
+        "description": "The composer's text.",
         "default": "",
-        "persistence": "localStorage (optional, auto-save draft)"
+        "persistence": "Optional: per conversation, in sessionStorage or where the app keeps drafts, under the app's own prefix; cleared once the message is sent"
       },
-      "isTyping": {
+      "sending": {
         "type": "boolean",
-        "description": "Whether agent is generating response",
+        "description": "Whether a message is being sent; the button is ignored meanwhile.",
         "default": false,
+        "persistence": "component state only"
+      },
+      "replyState": {
+        "type": "enum",
+        "description": "The lifecycle of the current reply (the AI Response Rendering Pattern uses the same states). The button is Stop while the reply is queued, streaming, running a tool, or awaiting review.",
+        "default": "idle",
+        "allowedValues": [
+          "idle",
+          "queued",
+          "streaming",
+          "tool-running",
+          "awaiting-review",
+          "complete",
+          "cancelled",
+          "errored"
+        ],
+        "persistence": "component state only"
+      },
+      "pinnedToBottom": {
+        "type": "boolean",
+        "description": "Whether the transcript follows new content.",
+        "default": true,
         "persistence": "component state only"
       },
       "sidebarOpen": {
         "type": "boolean",
-        "description": "Whether sidebar is visible on mobile",
-        "default": false,
-        "persistence": "localStorage (optional)"
+        "description": "Whether the docked conversation list is open. The overlay always starts closed.",
+        "default": true,
+        "persistence": "Optional: a cookie the server reads, or storage under the app's own prefix (for example acme.chat.sidebar, where acme stands for the app's prefix), applied by a small inline script before the first paint, so the layout doesn't jump"
       },
       "conversations": {
         "type": "array",
-        "description": "List of available conversations",
-        "persistence": "Server/database"
+        "description": "The conversation list; see dataStructures.conversation.",
+        "persistence": "The server"
       },
       "activeConversationId": {
         "type": "string",
-        "description": "Currently selected conversation ID",
-        "persistence": "localStorage or URL param"
-      },
-      "isSending": {
-        "type": "boolean",
-        "description": "Whether message is being sent",
-        "default": false,
-        "persistence": "component state only"
-      },
-      "hasMoreMessages": {
-        "type": "boolean",
-        "description": "For pagination/infinite scroll",
-        "default": false,
-        "persistence": "component state only"
-      },
-      "userScrolled": {
-        "type": "boolean",
-        "description": "Whether user has manually scrolled up",
-        "default": false,
-        "persistence": "component state only"
+        "description": "The open conversation.",
+        "persistence": "router/URL: each conversation has its own URL"
       }
     },
     "ssrConsiderations": {
-      "localStorage": "Only access in onMounted/useEffect",
-      "defaultState": "Empty messages, closed sidebar",
-      "hydrationMismatch": "Initialize state after mount to prevent mismatches"
-    }
-  },
-  "persistence": {
-    "storage": "localStorage",
-    "keys": {
-      "sidebarOpen": "uipotion.ai-chat.sidebarOpen.v1",
-      "activeConversationId": "uipotion.ai-chat.activeConversation.v1",
-      "draftMessage": "uipotion.ai-chat.draftMessage.v1"
+      "transcript": "With server rendering, render the conversation on the server, so it shows before scripts run.",
+      "savedState": "Apply the saved state of the docked list before the first paint, with a cookie or a small inline script, as dark mode does for the theme."
     }
   },
   "navigationBehavior": {
-    "onConversationChange": {
-      "sidebar": "close on mobile",
-      "scroll": "scroll to bottom of new conversation"
-    },
-    "onRouteChange": {
-      "sidebar": "close",
-      "saveDraft": "save current input value"
-    }
+    "onConversationChange": "The overlay closes and the transcript opens at the latest message. In a single-page app, focus moves to the conversation's heading (tabindex=\"-1\") and document.title changes.",
+    "replyInProgress": "Switching conversations doesn't stop a reply on the server. It shows when the person returns, never in the conversation they switched to.",
+    "drafts": "Drafts are kept per conversation, so switching back restores one."
   },
   "internationalization": {
     "rtl": {
       "supported": true,
       "messageAlignment": {
-        "user": "start (left in RTL)",
-        "agent": "end (right in RTL)"
+        "user": "end: right in left-to-right languages, left in right-to-left ones",
+        "assistant": "start: left in left-to-right languages, right in right-to-left ones"
       },
-      "useLogicalProperties": true,
-      "notes": "Use logical CSS properties (inset-inline-start/end, margin-inline-start/end) for proper RTL support."
+      "notes": "Use logical properties (margin-inline-start, padding-inline, inset-inline-end) and dir on the root, so the layout mirrors without separate styles. dir=\"auto\" on the person's messages shows mixed-direction text correctly."
     }
   },
   "mobileSafeArea": {
     "applyTo": [
       "header",
-      "inputArea"
+      "composer",
+      "conversation overlay"
     ],
-    "topInset": "env(safe-area-inset-top)",
-    "bottomInset": "env(safe-area-inset-bottom)",
-    "notes": "On mobile devices with notches/home indicators, add safe-area padding to fixed header and input area."
-  },
-  "motionPreferences": {
-    "prefersReducedMotion": {
-      "behavior": "reduce",
-      "rules": [
-        "Disable message entrance animations",
-        "Keep typing indicator but simplify animation",
-        "Reduce transition durations to 0ms or 50ms",
-        "Keep essential state changes but make them instant"
-      ]
-    }
-  },
-  "frameworkPatterns": {
-    "react": {
-      "stateManagement": "useState for component state, custom hooks for chat logic, Context API or props for sharing",
-      "customHooks": [
-        "useChatMessages() - manages message list and operations",
-        "useAutoScroll(messageListRef, messages, isTyping) - handles auto-scrolling",
-        "useTypingIndicator(isTyping) - manages typing animation state",
-        "useConversation() - manages conversation switching",
-        "useLocalStorage(key, defaultValue) - SSR-safe localStorage"
-      ],
-      "componentStructure": "<ChatLayout><Sidebar /><ChatContainer><Header /><MessageList /><InputArea /></ChatContainer></ChatLayout>",
-      "keyLibraries": "Optional: react-textarea-autosize for input, react-virtualized for long message lists"
-    },
-    "vue": {
-      "stateManagement": "ref() or reactive() for state, watch() for localStorage, provide/inject for sharing",
-      "customHooks": "useChatMessages(), useAutoScroll(), useTypingIndicator() as composables",
-      "componentStructure": "<ChatLayout><Sidebar /><ChatContainer><Header /><MessageList /><InputArea /></ChatContainer></ChatLayout>",
-      "keyLibraries": "Optional: vue-textarea-autosize for input, vue-virtual-scroller for long lists"
-    },
-    "angular": {
-      "stateManagement": "Component properties, RxJS BehaviorSubject for shared state, services for persistence",
-      "services": [
-        "ChatService - manages messages and conversations",
-        "AutoScrollService - handles scroll behavior",
-        "TypingIndicatorService - manages typing state"
-      ],
-      "componentStructure": "<app-chat-layout><app-sidebar /><div class=\"chat-container\"><app-header /><app-message-list /><app-input-area /></div></app-chat-layout>"
-    },
-    "svelte": {
-      "stateManagement": "writable stores for state, onMount for localStorage",
-      "customHooks": "Create chat store, autoScroll store, typingIndicator store",
-      "componentStructure": "<ChatLayout><Sidebar /><ChatContainer><Header /><MessageList /><InputArea /></ChatContainer></ChatLayout>"
-    }
-  },
-  "stylingApproaches": {
-    "note": "These are implementation examples showing how to apply designSystem specifications. Always refer to designSystem for authoritative values.",
-    "tailwindCSS": {
-      "description": "Use utility classes with dynamic classes based on state. Use arbitrary values for exact pixel values.",
-      "messageBubbleExample": "class='max-w-[85%] px-4 py-3 rounded-2xl' :class=\"{'bg-blue-600 text-white rounded-tr-sm': isUser, 'bg-gray-100 text-gray-900 rounded-tl-sm': isAgent}\"",
-      "inputExample": "class='flex-1 resize-none rounded-2xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none'",
-      "key": "Use logical properties (start/end) for RTL support. Use arbitrary values for exact sizes.",
-      "note": "Map token values directly. Use max-w-3xl (768px) or max-w-[900px] for message list."
-    },
-    "cssModules": {
-      "description": "Scoped CSS classes with conditional class names. Apply token values directly in CSS.",
-      "approach": "Define .message, .messageUser, .messageAgent, .inputArea, .sendButton. Toggle via className logic.",
-      "example": ".message { max-width: 85%; border-radius: 16px; } .messageUser { background: #3b82f6; color: white; border-radius: 16px 16px 4px 16px; }",
-      "note": "Prefer logical properties (margin-inline-start) for RTL support."
-    },
-    "styledComponents": {
-      "description": "CSS-in-JS with props. Map token values to component props.",
-      "approach": "Pass isUser prop and adjust styles dynamically",
-      "example": "const MessageBubble = styled.div`max-width: 85%; padding: 12px 16px; border-radius: ${p => p.isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px'}; background: ${p => p.isUser ? '#3b82f6' : '#f3f4f6'};`",
-      "note": "Extract tokens into shared constants module."
-    },
-    "chakraUI": {
-      "components": "Use Box, Flex, VStack, HStack for layout. Avatar component for agent avatars.",
-      "approach": "Use Chakra components with responsive variants. Override styles using token values.",
-      "theme": "Extend Chakra theme with designSystem colors and tokens",
-      "transitions": "Use Chakra transition helpers, respect prefers-reduced-motion"
-    },
-    "materialUI": {
-      "components": "Use Paper for message bubbles, TextField for input, IconButton for actions",
-      "approach": "Override MUI components with token values for dimensions and colors",
-      "theme": "Override MUI theme to match designSystem + tokens"
-    },
-    "vanillaCSS": {
-      "description": "Standard CSS with class toggles. Apply token values directly. CRITICAL: ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes.",
-      "approach": "Define .message, .message--user, .message--agent, .input-area, .send-button. Toggle classes via JS.",
-      "example": ".message{max-width:85%;padding:12px 16px;border-radius:16px}.message--user{background:#3b82f6;color:#fff;border-radius:16px 16px 4px 16px}.message--agent{background:#f3f4f6;color:#1f2937;border-radius:16px 16px 16px 4px}",
-      "note": "Apply classes via className/class attribute: <div class='message message--user'> NOT <div style='background: #3b82f6'>"
-    },
-    "sass": {
-      "description": "SCSS with variables and mixins. Define token values as SCSS variables.",
-      "approach": "Create SCSS variables for tokens. Use mixins for message bubble styles.",
-      "example": "$message-max-width: 85%; $user-bg: #3b82f6; .message { max-width: $message-max-width; @include message-bubble($user-bg); }"
-    }
+    "notes": "Pad the header's top and the composer's bottom with env(safe-area-inset-top) and env(safe-area-inset-bottom), and add viewport-fit=cover to the viewport meta tag. Add interactive-widget=resizes-content to the same tag, so browsers that support it, such as Chrome on Android, shrink the layout when the on-screen keyboard opens and the composer stays above it. iOS Safari keeps the layout size and scrolls the focused field into view."
   },
   "animations": {
-    "messageEntrance": {
-      "durationMs": 300,
-      "easing": "ease-out",
-      "properties": {
-        "transform": "translateY(10px) to translateY(0)",
-        "opacity": "0 to 1"
-      },
-      "staggerMs": 50
-    },
-    "typingIndicator": {
-      "cycleMs": 1400,
-      "dotDelaysMs": [
-        0,
-        200,
-        400
-      ],
-      "animation": "Sequential bounce or fade"
-    },
-    "inputHeight": {
-      "durationMs": 150,
-      "easing": "ease-in-out",
-      "property": "height"
+    "note": "Optional.",
+    "messageEnter": {
+      "durationMs": 200,
+      "easing": "cubic-bezier(0.2, 0, 0, 1)",
+      "notes": "opacity 0 to 1 and translateY(4px) to none, only for messages that arrive while the page is open, never for the history on load"
     },
     "sidebarSlide": {
       "durationMs": 250,
-      "easing": "ease-out",
-      "transform": "translateX(-100%) to translateX(0)"
+      "easing": "cubic-bezier(0.2, 0, 0, 1)",
+      "notes": "The docked list slides in from the start side"
     },
-    "sendButtonPress": {
-      "durationMs": 100,
-      "transform": "scale(0.95) on press"
-    },
-    "autoScroll": {
-      "durationMs": 300,
-      "easing": "ease-out",
-      "behavior": "smooth"
-    }
+    "following": "Following new content never animates.",
+    "reducedMotion": "Under prefers-reduced-motion: reduce, nothing slides or fades, and the waiting dots are static."
   },
   "accessibility": {
     "wcagCompliance": {
       "level": "AA",
+      "version": "2.2",
       "requirements": {
-        "1.1.1": "Non-text Content - All icons have aria-label or sr-only text",
-        "1.3.1": "Info and Relationships - Semantic HTML structure with proper roles",
-        "1.4.3": "Contrast Minimum - 4.5:1 for normal text, 3:1 for large text",
-        "2.1.1": "Keyboard - All interactive elements keyboard accessible",
-        "2.1.2": "No Keyboard Trap - Focus doesn't get trapped",
-        "2.4.2": "Page Titled - Descriptive page title",
-        "2.4.3": "Focus Order - Logical tab order throughout",
-        "2.4.4": "Link Purpose - Clear button labels",
-        "2.4.7": "Focus Visible - Clear focus indicators",
-        "4.1.2": "Name, Role, Value - All elements have accessible names and roles",
-        "4.1.3": "Status Messages - Use aria-live for new messages and typing indicator"
+        "1.3.1": "Each message starts with a heading that names the speaker, the conversation list is a nav, and the composer has a label.",
+        "1.4.3": "Text, including placeholders and timestamps, has at least 4.5:1 contrast.",
+        "1.4.10": "At 320 px wide nothing scrolls sideways, apart from code blocks that scroll inside themselves.",
+        "1.4.11": "The composer's edge, icons, and focus indicators have at least 3:1 contrast.",
+        "1.4.12": "Bubbles and buttons use min-height and padding, not fixed heights, so larger text spacing doesn't cut them off.",
+        "2.1.1": "Everything works from the keyboard, including Jump to latest and every message action.",
+        "2.4.1": "When the conversation list comes before the chat, a skip link moves past it.",
+        "2.4.2": "document.title names the conversation.",
+        "2.4.3": "Sending doesn't move focus, and closing the overlay returns focus to the toggle.",
+        "2.4.7": "Every control shows a visible focus indicator (:focus-visible).",
+        "2.4.11": "The header and the composer are outside the scrolling area, so they never cover the focused element.",
+        "2.5.3": "Each control's name contains its visible text, and the composer's label contains its placeholder's words.",
+        "2.5.8": "Controls are at least 24 by 24 CSS px.",
+        "3.3.1": "A failed send and a draft that's too long are described in text.",
+        "4.1.2": "The button's name follows its state, and aria-disabled=\"true\" says when there is nothing to send.",
+        "4.1.3": "Replies starting, ending, and failing, and failed sends, are announced through one polite status region without moving focus."
       }
     },
     "keyboardNavigation": {
-      "tabOrder": "Header actions → Message list (optional) → Input area → Send button",
-      "enterKey": "Send message from input, except while an IME is composing text (isComposing or keyCode 229); then Enter confirms the composition",
-      "shiftEnter": "New line in input",
-      "onScreenKeyboards": "Default when the primary input is touch: Enter inserts a new line and the send button sends. This is a primary-input heuristic, not touch support alone, and it can't detect attached keyboards, so a tablet with a keyboard may keep this default. An existing Enter-to-send setting overrides it",
-      "escapeKey": "Close sidebar or dropdowns",
-      "focusManagement": {
-        "afterSend": "Focus remains in input",
-        "sidebar": "Trap focus when open on mobile",
-        "restoreFocus": "Restore focus to toggle button when sidebar closes"
-      }
+      "enter": "See components.Composer.behavior.enter.",
+      "escape": "Closes the conversation overlay and menus. Optional: see components.Composer.behavior.escape.",
+      "tabOrder": "The skip link, the docked conversation list, the header, the controls in the transcript, then the composer.",
+      "shortcuts": "Optional; see commonVariations.keyboardShortcuts."
     },
     "ariaAttributes": {
       "required": {
-        "messageList": {
-          "role": "log",
-          "ariaLive": "polite",
-          "ariaLabel": "Chat messages"
+        "conversationList": {
+          "element": "nav",
+          "aria-label": "Conversations"
         },
-        "userMessage": {
-          "ariaLabel": "You said: [content]"
+        "openConversationLink": {
+          "aria-current": "page"
         },
-        "agentMessage": {
-          "ariaLabel": "Agent said: [content]"
+        "listToggle": {
+          "aria-expanded": "true or false, for the docked list",
+          "aria-controls": "The list's id"
         },
-        "typingIndicator": {
-          "ariaLive": "polite",
-          "ariaLabel": "Agent is typing",
-          "srOnlyText": "Agent is typing"
+        "composerTextarea": {
+          "label": "A label element, or aria-label, that contains the placeholder's words",
+          "aria-describedby": "The composer's error text, while it shows"
         },
-        "inputField": {
-          "ariaLabel": "Message input",
-          "placeholder": "Type a message..."
+        "sendStopButton": {
+          "name": "\"Send message\" or \"Stop response\"",
+          "aria-disabled": "\"true\" while there is nothing to send"
         },
-        "sendButton": {
-          "ariaLabel": "Send message",
-          "disabled": "true/false"
-        },
-        "sidebar": {
-          "role": "complementary",
-          "ariaLabel": "Conversation list",
-          "ariaHidden": "false/true based on state"
+        "statusRegion": {
+          "role": "status",
+          "notes": "Visually hidden, present before anything changes, one per conversation"
         }
       },
-      "dynamicUpdates": [
-        "Announce new messages via aria-live",
-        "Update aria-hidden when sidebar opens/closes",
-        "Update disabled state on send button",
-        "Announce typing status changes"
-      ]
+      "optional": {
+        "listToggle": {
+          "aria-haspopup": "\"dialog\", when it opens the overlay; never \"true\", which announces a menu"
+        }
+      }
     },
     "screenReader": {
       "announcements": {
-        "newMessage": "Agent said: [content] or You said: [content]",
-        "typing": "Agent is typing",
-        "sendConfirmation": "Message sent (optional, brief)",
-        "error": "Failed to send message"
+        "replyStarted": "\"Acme Assistant is responding\", once",
+        "replyEnded": "\"Response complete\", \"Response stopped\", or the failure",
+        "sendFailed": "\"Message not sent\"",
+        "neverAnnounced": "The streamed text, and the person's own message"
       },
-      "labels": {
-        "iconButtons": "All icon buttons must have aria-label",
-        "messageBubbles": "Descriptive aria-label for each message"
-      }
+      "findingReplies": "After \"Response complete\", people find the reply by its heading.",
+      "modals": "A modal over the chat, such as the conversation overlay, makes the status region inert, which hides it from screen readers. Anything that must be heard while a modal is open goes through a status region inside it."
     },
     "focusManagement": {
-      "focusVisible": {
-        "required": true,
-        "css": "outline: 2px solid var(--primary-color); outline-offset: 2px",
-        "targets": [
-          "input",
-          "textarea",
-          "button"
-        ]
-      }
+      "onLoad": "Don't focus the composer when the page loads on touch devices.",
+      "afterNewChat": "Focus the composer.",
+      "afterJumpToLatest": "Focus the composer.",
+      "overlay": "Opening it moves focus into the list; closing it returns focus to the toggle."
     },
     "colorContrast": {
-      "requirement": "WCAG AA: 4.5:1 for normal text, 3:1 for large text",
-      "criticalAreas": [
-        "User message text on bubble background",
-        "Agent message text on bubble background",
-        "Input text on input background",
-        "Button text on button background",
-        "Timestamp text on background",
-        "Placeholder text"
-      ]
-    },
-    "implementationChecklist": [
-      "All buttons have aria-label or visible text",
-      "All icons have aria-label or sr-only text",
-      "Message list has role='log' and aria-live='polite'",
-      "Typing indicator announces to screen readers",
-      "Input field has accessible name",
-      "Send button has disabled state communicated",
-      "Color contrast verified (4.5:1 minimum)",
-      "Keyboard navigation works throughout",
-      "Focus visible on all interactive elements",
-      "Focus managed properly in sidebar",
-      "Screen reader tested with NVDA, VoiceOver, or JAWS",
-      "Touch targets minimum 44px on mobile"
-    ]
+      "requirement": "4.5:1 for text; 3:1 for the composer's edge, icons, and focus indicators",
+      "check": "Check the project's own colors, including on the person's bubbles and in dark mode."
+    }
   },
   "designSystem": {
-    "note": "Tool-agnostic design specifications. Implement using project's chosen styling approach.",
-    "colorGuidelines": {
-      "userMessage": {
-        "backgroundLight": "Primary brand color (e.g., #3b82f6, #10b981) or dark neutral (#1f2937)",
-        "backgroundDark": "Primary color or lighter shade (#60a5fa, #34d399)",
-        "text": "White (#ffffff) or very light (#f3f4f6)",
-        "links": "Light blue or underlined white",
-        "codeBlocks": "Darker background within bubble (#1f2937), light text"
+    "note": "Suggested defaults for projects without a design. The project's tokens and existing components win; check its colors meet the same contrast.",
+    "colors": {
+      "light": {
+        "page": "#ffffff",
+        "userBubble": "#2563eb with #ffffff text (5.2:1); links in it underlined in the text color",
+        "assistantText": "#111827 (17.7:1); assistant messages can do without a bubble",
+        "mutedText": "#6b7280 (4.8:1), for timestamps, statuses, and the placeholder",
+        "links": "#1d4ed8 (6.7:1), underlined",
+        "composerEdge": "#6b7280 (4.8:1)",
+        "focus": "#2563eb (5.2:1)",
+        "error": "#b91c1c (6.5:1)"
       },
-      "agentMessage": {
-        "backgroundLight": "Light gray (#f3f4f6, #e5e7eb) or white with border",
-        "backgroundDark": "Dark gray (#374151, #4b5563)",
-        "text": "Dark gray (#1f2937, #111827) for light, light gray (#e5e7eb) for dark",
-        "links": "Primary brand color",
-        "codeBlocks": "Dark background (#1f2937), light text, rounded corners"
-      },
-      "inputArea": {
-        "backgroundLight": "White (#ffffff) or very light gray (#f9fafb)",
-        "backgroundDark": "Dark gray (#1f2937, #374151)",
-        "border": "1px solid light gray (#e5e7eb) or transparent",
-        "focusBorder": "Primary brand color",
-        "text": "Match body text color",
-        "placeholder": "Muted gray (#9ca3af)"
-      },
-      "sendButton": {
-        "default": "Muted gray or disabled state",
-        "active": "Primary brand color",
-        "disabled": "Light gray (#d1d5db)"
-      },
-      "header": {
-        "backgroundLight": "White (#ffffff) or very light gray (#f9fafb)",
-        "backgroundDark": "Dark gray (#1f2937)",
-        "border": "1px solid light gray (#e5e7eb)",
-        "text": "Dark gray (#1f2937) for light, light gray (#e5e7eb) for dark"
-      },
-      "sidebar": {
-        "backgroundLight": "White (#ffffff) or light gray (#f9fafb)",
-        "backgroundDark": "Dark gray (#1f2937)",
-        "activeConversation": "Primary color at 10% opacity or left border"
+      "dark": {
+        "page": "#111827",
+        "userBubble": "#1d4ed8 with #ffffff text (6.7:1)",
+        "assistantText": "#f3f4f6 (16.1:1)",
+        "mutedText": "#9ca3af (7.0:1)",
+        "links": "#93c5fd (9.8:1), underlined",
+        "composerEdge": "#6b7280 (3.7:1)",
+        "focus": "#60a5fa (7.0:1)",
+        "error": "#fca5a5 (9.4:1)"
       }
     },
     "typography": {
-      "messageText": {
-        "fontSizePx": 14,
-        "fontWeight": 400,
-        "lineHeight": 1.5
-      },
-      "codeBlocks": {
-        "fontFamily": "Monospace (Consolas, Monaco, 'Courier New')",
-        "fontSizePx": 13
-      },
-      "timestamps": {
-        "fontSizePx": 11,
-        "fontWeight": 400,
-        "color": "Muted"
-      },
-      "agentName": {
-        "fontSizePx": 16,
-        "fontWeight": 500
-      },
-      "statusText": {
-        "fontSizePx": 12,
-        "fontWeight": 400
-      },
-      "inputText": {
-        "fontSizePx": 14,
-        "fontWeight": 400
-      },
-      "quickActions": {
-        "fontSizePx": 13,
-        "fontWeight": 400
-      },
-      "welcomeHeading": {
-        "fontSizePx": 24,
-        "fontWeight": 700
-      }
+      "messageText": "16 px, line height 1.5",
+      "composer": "16 px",
+      "timestamps": "13 px",
+      "code": "The project's monospace font at 14 px"
     },
     "spacing": {
-      "messageList": {
-        "paddingPx": 16,
-        "paddingBottomPx": 24,
-        "gapPx": 16
-      },
-      "messageBubble": {
-        "paddingPx": 12,
-        "maxWidthPercent": 85
-      },
-      "inputArea": {
-        "paddingPx": 16,
-        "paddingBottomIncludeSafeArea": true,
-        "gapBetweenInputAndSendButtonPx": 12,
-        "minHeightPx": 72
-      },
-      "header": {
-        "paddingPx": 12
-      }
+      "transcriptPaddingPx": 16,
+      "messageGapPx": 16,
+      "bubblePaddingPx": 12,
+      "composerPaddingPx": 12
     },
-    "borderRadius": {
-      "messageBubbles": "16px (asymmetric for speech bubble effect)",
-      "inputField": "20-24px",
-      "sendButton": "50% (circle) or 8-12px",
-      "quickActions": "16-18px",
-      "avatars": "50%",
-      "headerButtons": "6-8px"
+    "radius": {
+      "bubblePx": 16,
+      "composerPx": 12,
+      "buttonsPx": 8
     },
-    "shadows": {
-      "header": "0 1px 3px rgba(0, 0, 0, 0.1)",
-      "inputArea": "0 -2px 10px rgba(0, 0, 0, 0.05)",
-      "messageBubbles": "0 1px 2px rgba(0, 0, 0, 0.05)",
-      "sidebar": "4px 0 15px rgba(0, 0, 0, 0.1)"
-    }
-  },
-  "overflowPolicy": {
-    "messageList": {
-      "x": "hidden",
-      "y": "auto"
-    },
-    "messageContent": {
-      "codeBlocks": "allowInternalScroll",
-      "longText": "wordWrap"
-    }
+    "notes": "Bubble tails and shadows are optional decoration; the side and the speaker heading tell messages apart."
   },
   "dataStructures": {
     "message": {
-      "description": "Individual message object",
+      "description": "One message. Adapt the field names to the project, and keep their meaning.",
       "example": {
         "id": "msg_123",
         "role": "user",
-        "content": "Hello, how are you?",
-        "timestamp": "2026-02-01T10:30:00Z",
+        "content": "Summarize the Q3 report",
+        "createdAt": "2026-10-17T10:30:00Z",
         "status": "sent",
         "attachments": []
+      },
+      "fields": {
+        "role": "user or assistant",
+        "status": "The person's messages: sending, sent, or failed. Assistant messages use the reply's lifecycle (stateManagement.statesToTrack.replyState)."
       }
     },
     "conversation": {
-      "description": "Conversation metadata",
+      "description": "One entry in the conversation list.",
       "example": {
         "id": "conv_456",
-        "title": "Project Discussion",
-        "lastMessage": "Let me review that...",
-        "timestamp": "2026-02-01T10:30:00Z",
-        "unreadCount": 0,
-        "agentId": "agent_1"
-      }
-    },
-    "agent": {
-      "description": "AI agent information",
-      "example": {
-        "id": "agent_1",
-        "name": "Assistant",
-        "avatar": "/avatars/assistant.png",
-        "status": "online"
+        "title": "Q3 report summary",
+        "updatedAt": "2026-10-17T10:31:00Z",
+        "pinned": false
       }
     }
   },
   "commonVariations": {
-    "withoutSidebar": "Full-width chat, header contains conversation dropdown",
-    "compactMode": "Reduced padding, smaller avatars, good for widgets",
-    "embeddedWidget": "Floating button opens modal chat (400-500px width)",
-    "multiAgent": "Agent switcher in header, different colors per agent",
-    "richContent": "Images, file attachments, interactive cards in messages"
-  },
-  "zIndexLayers": {
-    "base": 0,
-    "messageBubbles": 1,
-    "inputArea": 10,
-    "header": 20,
-    "sidebarDesktop": 30,
-    "dropdownsPopovers": 40,
-    "mobileSidebarOverlay": 50,
-    "backdrop": 60,
-    "modals": 70
+    "withoutSidebar": "A single conversation, or a conversation picker in the header.",
+    "embeddedChat": "A launcher button opens the chat in a modal dialog (see the Dialog guide) or a side panel. A panel moves focus in when it opens, closes with Escape, returns focus to the launcher, and leaves the page usable.",
+    "multipleAssistants": "Each assistant message's heading names its assistant.",
+    "branching": "Optional. Helps when people edit an earlier question and expect the original answer kept. Editing creates a new version of the message, which shows \"2 of 3\" with Previous and Next version buttons; the transcript below follows the chosen version. Announce the change.",
+    "pinning": "Optional. Helps when people return to a few conversations often. Pinned conversations sit in their own group at the top of the list.",
+    "historySearch": "Optional. Helps when people ask where an earlier conversation went. A search over all conversations, with results that link to the conversation and its matching message. Announce the number of results.",
+    "keyboardShortcuts": "Optional. Helps people who chat all day, for example with a shortcut for New chat and one to the composer. Avoid keys the browser and screen readers use, list the shortcuts in the interface, and let people turn off single-key shortcuts (WCAG 2.1.4)."
   },
   "implementationDetails": {
-    "autoScroll": {
-      "behavior": "Scroll to bottom on new message",
-      "userScrollDetection": "Check scroll position, pause auto-scroll when user scrolled up",
-      "resume": "Resume auto-scroll when user scrolls to bottom",
-      "animation": "300ms ease-out smooth scroll"
+    "assistantMessages": "Assistant messages go through the project's renderer. With the AI Response Rendering Pattern, this layout owns the shell, the Send and Stop button, Edit on the person's messages, following new content, and the conversation's status region; the pattern owns the inside of each assistant message, including Copy, Regenerate, and feedback, and announces through this layout's status region.",
+    "actions": "With the AI Action Review Pattern, this layout places the review: a card in the transcript for low-risk actions, or a side panel, drawer, or dialog for the rest.",
+    "statusRegion": "One element with role=\"status\" per conversation, visually hidden and present before anything changes, holding one short sentence at a time.",
+    "attachments": "Type and size checks in the browser are a convenience; the server checks them again. Show file names as text.",
+    "performance": "Virtualize the transcript only when conversations get long (several hundred messages), and keep the newest messages and any focused element rendered. Update streaming content at most once per animation frame."
+  },
+  "frameworkPatterns": {
+    "note": "Short snippets in plain JavaScript for the parts that are easiest to get wrong; adapt them to the project's framework and its version. form, textarea, button, transcript, and jumpButton stand for the composer's and the transcript's elements; conversation, sendMessage(), showMessage(), and announce() stand for the app's state, its request, its transcript, and the status region.",
+    "composerEnterKey": {
+      "description": "Enter in the composer, as components.Composer.behavior.enter says.",
+      "script": "// Enter sends, and Shift+Enter adds a line. enterSends is the product's Enter-to-send\n// setting, or undefined to use the touch heuristic.\nconst touchPrimary = matchMedia('(hover: none) and (pointer: coarse)');\n\ntextarea.addEventListener('keydown', (event) => {\n  if (event.key !== 'Enter' || event.shiftKey) return;\n  // Enter that confirms an IME composition; Safari reports it as keyCode 229\n  if (event.isComposing || event.keyCode === 229) return;\n  // On-screen keyboards have no Shift+Enter, so there Enter adds a line by default\n  if (!(enterSends ?? !touchPrimary.matches)) return;\n  event.preventDefault();\n  // While a reply streams, Enter keeps the draft: the button is Stop\n  if (!conversation.replyInProgress) form.requestSubmit();\n});"
     },
-    "inputHandling": {
-      "autoExpand": "Increase textarea rows up to max (8)",
-      "enterBehavior": "Send message (Enter) or new line (Shift+Enter). Ignore Enter while an IME is composing text (isComposing or keyCode 229). When the primary input is touch (a heuristic that can't detect attached keyboards), Enter defaults to inserting a new line; an existing Enter-to-send setting overrides it",
-      "heightTransition": "150ms ease-in-out"
+    "sendStopButton": {
+      "description": "The composer's one button, Send or Stop: never disabled, and in Stop mode never blocked by form validation.",
+      "script": "// One submit button that sends, or stops the reply while one streams. It never gets the\n// disabled attribute, which would drop focus to the page: with nothing to send it's\n// aria-disabled, and the submit handler ignores it. Call this when a reply starts and ends.\nfunction updateComposerButton() {\n  const stop = conversation.replyInProgress;\n  button.dataset.mode = stop ? 'stop' : 'send';\n  button.setAttribute('aria-label', stop ? 'Stop response' : 'Send message');\n  button.formNoValidate = stop; // form validation, such as a required field, never blocks Stop\n  const nothingToSend = !stop && textarea.value.trim() === '';\n  button.setAttribute('aria-disabled', String(nothingToSend));\n}\n\ntextarea.addEventListener('input', updateComposerButton);"
     },
-    "messageStreaming": {
-      "optional": true,
-      "implementation": "Update message content as chunks arrive",
-      "throttle": "Use requestAnimationFrame or throttle for smooth updates",
-      "cursor": "Show streaming cursor during active stream"
+    "sendMessage": {
+      "description": "Sending: the draft stays until the server accepts the message, a double press sends once, each message has an id that Retry reuses, and the Stop button stops the reply.",
+      "script": "// The draft leaves the composer only once the server has accepted the message, so a failed\n// send loses nothing. showMessage() adds the message to the transcript with a new id;\n// sendMessage() sends it with that id, which Retry reuses, so the server can drop a copy it\n// already has. announce() writes to the conversation's status region.\nform.addEventListener('submit', async (event) => {\n  event.preventDefault();\n  if (conversation.replyInProgress) return conversation.stop(); // the button is Stop\n  const text = textarea.value;\n  if (!text.trim() || form.dataset.sending === 'true') return;\n  form.dataset.sending = 'true';\n  const message = showMessage(text, 'sending');\n  try {\n    await sendMessage(message); // resolves once the server has accepted the message\n    message.setStatus('sent');\n    if (textarea.value === text) textarea.value = ''; // keep a draft typed meanwhile\n  } catch {\n    message.setStatus('failed'); // \"Not sent\" with Retry; the draft is still in the composer\n    announce('Message not sent.');\n  }\n  form.dataset.sending = 'false';\n  updateComposerButton();\n});"
     },
-    "performance": {
-      "virtualization": "Use virtual scrolling for long message lists (>100 messages)",
-      "debounce": "Debounce input changes if doing heavy processing",
-      "lazyLoad": "Lazy load images and attachments"
+    "pinnedToBottom": {
+      "description": "Following new content only at the bottom, with Jump to latest.",
+      "script": "// The transcript follows new content only while the reader is at the bottom.\nlet pinned = true;\nlet lastTop = 0;\n\ntranscript.addEventListener('scroll', () => {\n  const nearBottom = transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 48;\n  // Only scrolling up unpins, so content that grows below the view never does\n  pinned = transcript.scrollTop < lastTop ? nearBottom : pinned || nearBottom;\n  lastTop = transcript.scrollTop;\n  jumpButton.hidden = pinned;\n});\n\n// Call after each update, and with true when the person sends a message\nfunction followIfPinned(pin = false) {\n  if (pin) pinned = true;\n  if (pinned) transcript.scrollTop = transcript.scrollHeight; // instant, never smooth\n}\n\njumpButton.addEventListener('click', () => {\n  textarea.focus(); // the button is about to hide, so focus goes to the composer\n  followIfPinned(true);\n});"
     }
   },
   "edgeCases": {
-    "longMessages": "Message bubble expands vertically, code blocks scroll horizontally",
-    "rapidSending": "Queue messages, show loading state per message, prevent duplicates",
-    "emptyInput": "Disable send button, visual indication of disabled state",
-    "failedSend": "Show error state on message, provide retry button, keep text in input",
-    "slowConnection": "Optimistic UI (show message immediately), loading indicator, timeout handling",
-    "messageOverflow": "Max-height with 'Read more' for extremely long messages"
+    "doubleSend": "The button is ignored while a message is being sent, so a double press or a held Enter sends once.",
+    "offline": "A send while offline fails like any other, with Not sent and Retry. Optionally, retry once the browser is back online, and say so.",
+    "replyDoesNotStart": "Give the request a time limit, for example 30 seconds, and show the failure with Retry when it runs out. Tell a timeout from other failures by the signal's reason, as the Dialog guide does.",
+    "longDraft": "If the product limits message length, show the count near the limit and explain an over-limit draft under the composer. Never cut the draft.",
+    "conversationSwitch": "See navigationBehavior.replyInProgress.",
+    "reload": "After a reload during a reply, show what the server saved, and continue the stream if the backend supports it.",
+    "longConversation": "See implementationDetails.performance."
   },
-  "testingChecklist": [
-    "Message bubbles display with correct user/agent styling",
-    "Input area stays fixed at bottom",
-    "Header remains fixed at top",
-    "Messages scroll smoothly in list",
-    "Auto-scroll works on new messages",
-    "User scroll detection pauses auto-scroll",
-    "Send button sends message",
-    "Enter key sends, Shift+Enter adds new line",
-    "Pressing Enter to confirm an IME candidate (Japanese, Chinese, Korean) doesn't send the message, including in Safari",
-    "With a phone's on-screen keyboard, Enter adds a new line and the send button sends",
-    "On a touchscreen laptop with a fine primary pointer, Enter sends and Shift+Enter adds a new line",
-    "On a tablet with an attached keyboard, Shift+Enter adds a new line and the send button sends, whichever Enter default the heuristic picked",
-    "If the product has an Enter-to-send setting, it overrides the heuristic on every device",
-    "Input expands as user types",
-    "Typing indicator animates",
-    "Sidebar opens/closes smoothly",
-    "Responsive at all breakpoints",
-    "Keyboard navigation works",
-    "Screen reader announces messages",
-    "Color contrast verified",
-    "Touch targets 44px+ on mobile",
-    "Empty state displays correctly",
-    "Failed message shows error state"
-  ],
   "projectDetection": {
     "framework": {
-      "description": "Detect project's framework by examining package.json, existing components, and project structure",
+      "description": "Find the framework, its version, and how existing components are written before writing code.",
       "detectionSteps": [
-        "Check package.json for framework dependencies",
-        "Examine existing component files for framework patterns",
-        "Check build configuration files",
-        "Look for framework-specific directories"
+        "Read the project's dependencies (package.json or its equivalent) for the framework and its version, and use the syntax that version supports.",
+        "Open two or three existing components to see their file structure, state handling, and naming.",
+        "Look for an existing component that already does this job, in the project or in a design system or UI library it uses, and build on it."
       ]
     },
     "stylingSystem": {
-      "description": "Detect project's styling approach by examining dependencies, config files, and existing styles",
+      "description": "Use the styling system the project already uses, and only that one.",
       "detectionSteps": [
-        "Check package.json for styling dependencies",
-        "Look for config files (tailwind.config.js, etc.)",
-        "Examine existing component files",
-        "Check for style files and naming conventions"
+        "Check the dependencies and config for the styling setup: Tailwind (version 4 keeps its theme in CSS with @theme, version 3 in tailwind.config.*), CSS Modules, Sass, CSS-in-JS, or plain CSS.",
+        "See how existing components apply styles and compose class names, for example with cn or clsx.",
+        "Check for design documentation: DESIGN.md, a design system package, or Storybook stories for existing components."
       ],
       "adaptationRules": [
-        "If Tailwind detected: Use Tailwind classes, respect existing config",
-        "If SCSS/CSS detected: Use SCSS/CSS files matching project structure",
-        "If styled-components detected: Use styled-components syntax",
-        "If CSS Modules detected: Use .module.css files",
-        "If no styling system: Use vanilla CSS or CSS Modules"
+        "Write styles the way existing components do, and add no new styling library or system.",
+        "With plain CSS, use classes in the project's stylesheets instead of inline styles, except for values computed at runtime.",
+        "If the setup is unclear or mixed, ask before choosing."
       ]
     },
     "designTokens": {
-      "description": "Identify existing design tokens, color systems, spacing scales from the project",
+      "description": "Use the project's tokens for color, spacing, radius, type, shadows, motion, and layering.",
       "detectionSteps": [
-        "Check for design token files",
-        "Examine Tailwind config for theme values",
-        "Look at existing components for patterns",
-        "Check CSS variables in global styles"
+        "Find the tokens: CSS custom properties, a Tailwind theme (@theme or config), a theme object, or a tokens file.",
+        "Use them instead of this guide's example values; where there are none, match the closest existing components.",
+        "Check that the colors you use meet the contrast minimums: 4.5:1 for text, and 3:1 for focus indicators, icons, and control boundaries."
       ]
     }
   },
   "outputConstraints": {
     "must": [
-      "Detect and use ONLY the project's existing framework",
-      "Detect and use ONLY the project's existing styling system",
-      "Use project's existing design tokens if available",
-      "Use project's class composition utility if it exists",
-      "Follow project's naming conventions",
-      "Match existing component patterns",
-      "Create CSS classes for vanilla CSS (never inline styles)"
+      "Build on the project's chat, message, and input components when they're suitable, and keep their APIs",
+      "Use the project's framework version, styling system, and tokens, the way existing components do",
+      "Implement only the parts and options the task needs",
+      "Keep the draft in the composer until the server accepts the message",
+      "Keep one Send and Stop button that changes state without losing focus"
     ],
     "mustNot": [
-      "Do NOT introduce new styling systems",
-      "Do NOT add <style> blocks unless that's the project's convention",
-      "Do NOT use inline style attributes (except dynamic values)",
-      "Do NOT create new CSS files unless that's how project structures styles",
-      "Do NOT hardcode colors/values - use project's design tokens",
-      "Do NOT import new UI libraries",
-      "Do NOT use string concatenation for class names"
+      "Add a dependency, such as a chat UI kit, an autosize library, or a focus-trap library, without asking",
+      "Send while an IME is composing text",
+      "Put the disabled attribute on the Send and Stop button",
+      "Put aria-label on messages, or make the transcript a live region that reads streamed text",
+      "Move the transcript while the reader is scrolled up, or follow new content with smooth scrolling",
+      "Use position: fixed for the header or the composer over a scrolling page",
+      "Use inline styles for static values in a plain-CSS project, or hardcode colors the project has tokens for"
     ]
   },
+  "testingChecklist": [
+    "Enter sends and Shift+Enter adds a line; Enter that confirms an IME composition (Japanese, Chinese, Korean) doesn't send, including in Safari",
+    "With a phone's on-screen keyboard, Enter adds a line and the button sends; an Enter-to-send setting overrides that on every device",
+    "While a reply streams, the button is Stop and keeps focus, form validation never blocks it, Stop keeps the reply's text, and Enter in the composer keeps the draft without sending",
+    "With nothing to send, the button is aria-disabled, stays focusable, and does nothing",
+    "A message that fails to send shows Not sent with Retry, the draft is still in the composer, and a screen reader hears that it wasn't sent",
+    "A draft typed while a message is being sent stays in the composer, and a double press sends once",
+    "The transcript follows new content only at the bottom; scrolled up, it stays put, and Jump to latest scrolls down and puts focus in the composer",
+    "A screen reader can move between messages by heading, hears that a reply started and ended, and never hears the streamed text",
+    "The header and the composer never cover the focused element, and on phones the composer stays above the browser's toolbars and the on-screen keyboard",
+    "With a long conversation list and a long conversation, each scrolls on its own, and the composer stays on screen",
+    "Below 1024 px the conversation list opens as a modal with a Close button, Escape closes it, and focus returns to the toggle; a closed list can't be reached with Tab",
+    "The open conversation has aria-current and is named in the page title, and a skip link moves past a long conversation list",
+    "At 320 px wide and at 400% zoom nothing scrolls sideways, and right-to-left languages mirror the layout",
+    "With reduced motion, nothing slides or fades, and following new content never animates",
+    "Styles come from the project's styling system and tokens, and text, the composer's edge, and focus indicators meet the contrast minimums"
+  ],
   "meta": {
     "created": "2026-02-01",
-    "updated": "2026-10-07",
+    "updated": "2026-10-17",
     "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
     "relatedPotions": [
       {
         "id": "ai-response-rendering",
         "category": "patterns",
         "relationship": "composes-with",
-        "description": "Companion pattern for what goes inside an assistant message bubble: streaming cursor, incremental Markdown, tool-call cards, collapsible reasoning, citations, artifact cards, per-message controls, and in-place error recovery. This layout owns the chat shell; the pattern owns the bubble interior. Hide this layout's typing indicator as soon as the pattern's streaming cursor appears.",
+        "description": "Optional: what goes inside an assistant message: streaming, Markdown, tool calls, citations, and per-message controls. This layout owns the shell, the Send and Stop button, Edit on the person's messages, following new content, and the status region; the pattern owns the inside of each assistant message. Hide the waiting indicator when its streaming cursor appears.",
         "required": false
       },
       {
         "id": "ai-action-review",
         "category": "patterns",
         "relationship": "composes-with",
-        "description": "Companion pattern for consequential agent actions proposed in the conversation: plan preview, risk labels, approve/reject/edit controls, undo, and audit trail. This layout hosts the review surface (inline card in the message list, side panel, drawer, or modal); consequential tool calls rendered inside assistant messages should hand off to that pattern before execution.",
-        "required": false
-      },
-      {
-        "id": "sidebar-navigation",
-        "category": "components",
-        "relationship": "complements",
-        "description": "Optional: A standalone sidebar navigation component for conversation history, agent switching, or settings panels alongside the chat area.",
-        "required": false
-      },
-      {
-        "id": "command-palette",
-        "category": "components",
-        "relationship": "complements",
-        "description": "Optional: Use Command Palette for quick prompt templates, tool actions, and conversation switches.",
-        "required": false
-      },
-      {
-        "id": "text-input",
-        "category": "components",
-        "relationship": "reuse",
-        "description": "Reuse for the message input field (auto-expanding textarea, states, accessibility).",
+        "description": "Optional: approving the actions the assistant proposes. This layout places the review, as a card in the transcript or in a side panel; the pattern owns everything in it.",
         "required": false
       },
       {
         "id": "dialog",
         "category": "components",
         "relationship": "reuse",
-        "description": "Reuse for confirmation dialogs (clear chat, delete message).",
+        "description": "Optional: for the conversation overlay below 1024 px, and for confirmations such as deleting a conversation.",
+        "required": false
+      },
+      {
+        "id": "sidebar-navigation",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: when the conversation list sits next to the app's own navigation.",
+        "required": false
+      },
+      {
+        "id": "command-palette",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: quick prompts, commands, and switching conversations from the keyboard.",
+        "required": false
+      },
+      {
+        "id": "text-input",
+        "category": "components",
+        "relationship": "reuse",
+        "description": "Optional: label, hint, and error conventions for the composer.",
         "required": false
       },
       {
         "id": "toast-notifications",
         "category": "components",
         "relationship": "reuse",
-        "description": "Reuse for success/error feedback (message sent, send failed).",
+        "description": "Optional: for feedback outside the conversation, such as a deleted conversation with Undo.",
         "required": false
       },
       {
         "id": "dropdown-select",
         "category": "components",
         "relationship": "reuse",
-        "description": "Reuse for agent selector or conversation switcher in header/sidebar.",
+        "description": "Optional: for an assistant or model picker.",
         "required": false
       },
       {
         "id": "navbar",
         "category": "components",
         "relationship": "complements",
-        "description": "Optional: header patterns (sticky, actions, mobile toggle) can inform chat header.",
+        "description": "Optional: when the chat sits under the site's own header.",
         "required": false
       },
       {
         "id": "button",
         "category": "components",
         "relationship": "reuse",
-        "description": "Reuse for send button, toolbar actions, and dialog action footers.",
+        "description": "Optional: for the composer's button and the header's actions.",
         "required": false
       }
     ],

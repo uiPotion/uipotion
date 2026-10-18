@@ -1,7 +1,7 @@
 # UI Potion Agent Instructions
 
 ## Purpose
-- UI Potion provides AI-agent-optimized UI specifications called "potions".
+- UI Potion provides UI behavior guides, called "potions", that coding agents apply to existing projects.
 - UI Potion is not a component library and does not provide copy-paste component packages.
 - Potions are framework-agnostic and styling-agnostic specifications that agents adapt to a user's existing stack.
 - In human-readable text, always write "UI Potion" with a space. Use `UIPotion` or `uipotion` only for technical identifiers such as file names, URLs, JSON keys, package names, and code references.
@@ -80,7 +80,7 @@ path: 'potions/components/component-name'
 - Optional `meta.relatedPotions` entries must use `required: false` unless there is a truly exceptional reason.
 
 ## Guide Rules
-Rules for guide content, in both formats. The Dialog guide follows all of them; bring other guides in line when you edit them.
+Rules for guide content, in both formats. The Dialog guide and the three AI guides follow all of them; bring other guides in line when you edit them.
 - State each rule once, mark options and suggested sizes as such, and end with a short acceptance checklist.
 - Tell agents to implement only what the task needs, keep existing APIs, build on a suitable existing component, and add no dependency without asking.
 - The project's conventions win for styling and visual defaults; conflicts with accessibility or correctness go to the user.

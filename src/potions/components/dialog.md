@@ -1,15 +1,15 @@
 ---
 layout: 'potion'
-title: 'Modal Dialog (Accessible) with Focus Trap and Actions'
+title: 'Modal Dialog'
 publicationDate: '2026-01-11'
-excerpt: 'An accessible modal dialog component with focus trapping, Escape/backdrop dismissal rules, scroll locking, and action footer. Includes confirm/alert variants and responsive fullscreen behavior on small screens.'
+excerpt: 'An accessible modal dialog for confirmations and short tasks, built on the project''s dialog component or the native dialog element: focus that moves in and comes back, Escape and backdrop rules, a busy state that survives a failed action, and a full-screen layout on phones.'
 category: 'Components'
 tags:
   - components
   - modal
   - dialog
   - overlay
-  - focus-trap
+  - focus-management
   - a11y
   - wcag
   - aria
