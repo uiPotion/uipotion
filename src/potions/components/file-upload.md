@@ -2,7 +2,7 @@
 layout: 'potion'
 title: 'File Upload Component'
 publicationDate: '2026-02-03'
-excerpt: 'A fully accessible file upload component with drag-and-drop, browse button fallback, validation (type/size/count), per-file progress, retry/cancel, and robust keyboard and screen reader support.'
+excerpt: 'A file upload that works by keyboard, pointer, and drag and drop: a button opens the picker, the whole area takes dropped files without the browser opening them, and each file is checked and listed with its own progress and Remove button, while the server checks everything again.'
 category: 'Components'
 tags:
   - components
@@ -19,272 +19,180 @@ tags:
 agentManifest: 'potions/components/file-upload.json'
 path: 'potions/components/file-upload'
 promptSubject: 'file upload'
+useWhen: 'people attach files to a form or upload them, such as documents, images, or a CSV import, and you need drag and drop that also works without dragging.'
+specifies:
+  - 'A Choose files button opens the picker, so nothing needs dragging, and files dropped anywhere in the area are added.'
+  - 'Each file is listed by name, with its progress and a Remove button named after it.'
+  - 'A file that can''t be added says why, and the server checks the type, size, and count again.'
+example: 'Someone drops three PDFs and a photo onto the area. The PDFs are listed and start uploading, and the photo shows "photo.heic isn''t a PDF or Word file" next to its name.'
 ---
 
-A fully accessible file upload component with drag-and-drop, browse button fallback, validation (type/size/count), per-file progress, retry/cancel, and robust keyboard and screen reader support. Supports single or multiple files, optional previews, and async upload integration.
+Attaching a file should work however people work: with a keyboard, a mouse, a touch screen, or by dragging from their desktop. This guide covers choosing and dropping files, checking them, and listing them with their progress and errors. It targets WCAG 2.2 AA.
 
-## Overview
+## Start from what the project has
 
-The File Upload component provides a dropzone that accepts files via drag-and-drop or by activating a browse control (keyboard or click). It validates files by type, size, and count; displays a manageable list with per-file status and progress; and integrates with async upload flows via hooks. The component meets WCAG AA requirements and avoids keyboard traps while keeping focus management predictable.
+1. If the project has an upload component, library, or service, configure or extend it to meet this guide. Keep its API and its upload code.
+2. Otherwise build on the native `<input type="file">`: a visible button opens it, and the app keeps the chosen files and sends them.
 
-## Component Structure
+Implement only what the task needs, and add no dependency without asking. The project's conventions win for styling and visual defaults. If one conflicts with an accessibility or correctness requirement here, ask instead of choosing.
 
-The component is built from a container that holds a label (with optional required indicator and tooltip), a dropzone, a hidden native file input, a file list, and optional hint and error text. The dropzone contains an icon, title, body text, and a browse button; it is wired to the hidden file input so that click or Enter/Space opens the system file picker. The file list shows one item per file: optional thumbnail, name, meta (size/type), status, optional progress bar, optional per-file error, and actions (remove, and optionally retry and cancel). A live region announces add/remove/error and status changes for screen readers.
+## Structure
 
-## States and Configuration
+- **Group**: an element with `role="group"`, named by the field's visible label (`aria-labelledby`). The whole group is the drop area. It isn't a button: interactive elements can't sit inside a button, and a drop area is a region, not a control.
+- **Hint**: what's accepted and the limits ("PDF or Word files, up to 10 MB each"), and that files can be dropped or chosen. It describes Choose files (`aria-describedby`).
+- **Error**: for the field as a whole, such as "Choose at least one file", also in Choose files' `aria-describedby`, empty and hidden until it's needed.
+- **Choose files**: a `<button type="button">` that opens the picker by calling the hidden input's `click()`. It's the way in that needs no dragging (WCAG 2.2 2.5.7).
+- **File input**: `type="file"` with `accept` and `multiple`, hidden. `accept` filters the picker.
+- **File list**: each file's name as text, never HTML, its size, its status, its progress while uploading, and its buttons.
+- **Status region**: one, present before it changes, for files added, removed, rejected, uploaded, and failed.
 
-### Component-Level State
-
-- **disabled**: When true, the entire control is non-interactive (no browse, no drop).
-- **required**: Shows required indicator (*) and affects validation messaging.
-- **multiple**: Single-file mode replaces the current file; multi-file mode appends up to maxFiles.
-- **accept**: Native file input accept string (e.g. `image/*,.pdf`) and used for validation messaging.
-- **maxFiles**: Maximum number of files in multi-file mode (default 10).
-- **maxSizeBytes**: Maximum file size in bytes (default 10MB).
-- **globalError**: A single message for errors such as too many files or invalid type.
-
-### Per-File State
-
-Each file item has a stable id and: file reference, name, size, optional mimeType, status (ready, uploading, success, error, canceled), optional progress (0–100), optional error message, optional previewUrl for images, and optional result payload. Preview URLs must be created and revoked (e.g. createObjectURL / revokeObjectURL) to avoid memory leaks.
-
-### Dropzone Visual State
-
-- **Default**: Neutral border and background.
-- **Drag over**: Accent border and subtle accent background; transition about 140ms with reduced motion respected.
-- **Focus**: Visible focus ring; dropzone is focusable and activates file picker with Enter or Space.
-
-## Required and Optional Props
-
-**Required**: Label (string) and name (string). The control must have an id (generated from name if not provided) and a programmatically associated label.
-
-**Optional configuration**: required (boolean), disabled (boolean), multiple (boolean), accept (string, e.g. `image/*,.pdf`), maxFiles (number, default 10), maxSizeBytes (number, default 10MB), hint (string), error (string or null for global error), showPreviews (boolean, default true), className (string).
-
-**Value and callbacks**: value (controlled array of file items) or defaultValue (uncontrolled); onChange (when file list changes); onFilesRejected (when validation fails); onUploadStart, onUploadProgress, onUploadComplete, onUploadError, onCancelUpload, onRetryUpload for async upload integration.
-
-**FileItem shape**: Each item has id, file, name, sizeBytes, optional mimeType, status (ready | uploading | success | error | canceled), optional progress (0–100), optional error message, optional previewUrl, optional result. Use stable ids (e.g. from name+size+lastModified or a generated id).
-
-## Validation
-
-Validation runs when files are added (via picker or drop). Rejected files get a reason (type, size, count, or unknown) and a message. When validation fails, set per-file error and/or globalError and optionally call onFilesRejected. Accepted files are normalized into internal file items with stable ids and appended (multi) or replace (single).
-
-## Interactions
-
-- **Dropzone click or Enter/Space**: Opens the native file picker (programmatic click on hidden input).
-- **Dropzone drag enter/leave**: Sets drag-over visual state; on drop, prevent default and ingest files from DataTransfer.
-- **Remove file**: Removes the item; if uploading, call onCancelUpload before removing; announce removal in live region; move focus to next logical target (next remove button or dropzone).
-- **Retry**: Calls onRetryUpload (or onUploadStart); resets error and sets status to uploading; announce in live region.
-- **Cancel**: Calls onCancelUpload; set status to canceled or remove; announce in live region.
-
-## Async Upload Integration
-
-The component exposes hooks for integration with your upload pipeline: onUploadStart, onUploadProgress (fileId, progress 0–100), onUploadComplete (fileId, result), onUploadError (fileId, error), onCancelUpload (fileId), onRetryUpload (fileId). The component does not upload by itself; it calls these so you can wire to your API. Per-file progress bar and status (uploading, success, error, canceled) should reflect the values you pass back via controlled state or callbacks.
-
-## Accessibility Requirements
-
-### WCAG 2.1 Level AA
-
-- **1.3.1**: Label is programmatically associated with the file control (for/id or aria-labelledby on the dropzone).
-- **1.4.3**: Text, borders, and focus indicators meet contrast requirements.
-- **2.1.1**: All functionality is keyboard operable (open picker, remove, retry, cancel).
-- **2.1.2**: No keyboard trap; Tab moves naturally through label, dropzone, and file list actions.
-- **2.4.3**: Logical focus order: label, then dropzone/button, then file list actions.
-- **2.4.7**: Visible focus indicator on dropzone and action buttons.
-- **3.3.1**: Errors clearly identified (global and per-file).
-- **4.1.2**: Controls expose name, role, and state (dropzone behaves like a button).
-- **4.1.3**: Status changes (added, removed, error, progress) announced via live region.
-
-### Keyboard Navigation
-
-- **Dropzone**: Tab to focus; Enter or Space to open file picker. Escape must not clear selection unexpectedly.
-- **File list**: Tab between remove/retry/cancel; Enter or Space to activate focused button; Delete or Backspace can remove the focused file if implemented on the row.
-
-### ARIA and Live Region
-
-- Dropzone: role button (or native button), aria-disabled when disabled, aria-labelledby (or aria-label), aria-describedby for hint + error + instructions, aria-invalid when global error exists.
-- File list: role list, aria-label "Selected files".
-- File item: role listitem; optional aria-label with name and status.
-- Progress: role progressbar, aria-valuemin 0, aria-valuemax 100, aria-valuenow current, aria-label "Upload progress for &lt;file name&gt;".
-- Live region: role status, aria-live polite, aria-atomic true for add/remove/error/status announcements.
-
-### Focus Management
-
-- After add: Do not steal focus; optionally move focus to first error if validation fails.
-- After remove: Move focus to next file action or back to dropzone if the list is empty.
-- When disabled: No interactive focus or set aria-disabled and prevent activation.
-
-## Responsive Behavior
-
-- **Mobile (under 768px)**: Stack content vertically; dropzone full-width; file list items in a single column with actions at end; minimum 44px touch targets for buttons and actions; optionally hide or reduce thumbnails.
-- **Desktop (1024px and up)**: Dropzone and file list in one column; actions inline to the right; larger previews; hover affordances on dropzone and list actions when not disabled.
-
-## Animations
-
-- **Drag over**: Border and background transition (about 140ms, cubic-bezier(0.4, 0, 0.2, 1)).
-- **File item enter**: Opacity and slight vertical translate (about 160ms).
-- **File item exit**: Opacity and translate out (about 140ms).
-- **Progress bar**: Width updates with short easing (about 120ms).
-- **Reduced motion**: Honor prefers-reduced-motion: reduce; disable transforms and minimize transitions.
-
-## Design Tokens (Reference)
-
-Layout: container min height 120px, padding 16px, border radius 8px, dropzone min height 96px, button height 40px, file list gap 10px, file item padding 12px, progress height 6px. Typography: label 14px weight 500, dropzone title 14px, body 13px, file name 14px, meta 12px, hint/error 13px. Motion: hover/focus transitions about 120–150ms, drag-over about 140ms, item enter/exit about 160ms/140ms, easing cubic-bezier(0.4, 0, 0.2, 1). Use your project design tokens for colors, spacing, and focus/error styles.
-
-## Common Variations
-
-- **Single file**: One file at a time; selecting a new file replaces the current one. Set multiple=false and show replace affordance when a file is present.
-- **Multi file**: Append until maxFiles; show count or list. Set multiple=true.
-- **With preview**: Image thumbnails via object URLs; set showPreviews=true; revoke URLs on remove or unmount to avoid memory leaks.
-- **Direct upload**: Wire onUploadStart, onUploadProgress, onUploadComplete, onUploadError, onCancelUpload, onRetryUpload and show per-file progress and status.
-- **Documents only**: Use accept (e.g. `.pdf,.doc,.docx`) and validate type; show clear error for wrong type.
-
-## Edge Cases
-
-- **Duplicate files**: User selects or drops the same file twice. Compare by name, size, and lastModified (or hash) and either reject with a message or ignore; document the chosen behavior.
-- **Very long filename**: Truncate with ellipsis in the UI; expose full name via title attribute or on focus; avoid layout overflow.
-- **Many files**: With many items (e.g. 50+), consider virtualizing the list or limiting visible items; enforce maxFiles and announce when limit reached.
-- **Paste from clipboard**: Optionally support paste events: read image (or file) items from the clipboard, run the same validation, and add to the list.
-- **Upload aborted**: If the user navigates away or the component unmounts during upload, call onCancelUpload for in-flight uploads and revoke any object URLs in cleanup.
-- **Required but empty**: When the field is required and no file is selected, show an error on submit and set aria-invalid with a clear global message.
-
-## Styling Approaches
-
-Use your project's styling system only. Match existing form components for focus ring, error borders, and disabled state.
-
-- **Tailwind**: Use space-y for container and file list; min-height and padding for dropzone; border-dashed and rounded-lg; focus:ring-2 focus:ring-blue-500; state classes for dropzone--drag, fileItem--error; progress bar with h-1.5 and transition-[width].
-- **CSS Modules / SCSS**: Create classes for container, label, dropzone, dropzone--drag, dropzone--disabled, fileList, fileItem, fileItem--error, progress, progressBar, hint, error. Use BEM or your project's convention.
-- **Styled-components**: Themed components with props for dragActive, disabled, hasError; use theme tokens for spacing, radius, and status colors.
-
-## Implementation Checklist
-
-- Label renders and is associated with the control (for/id or aria-labelledby).
-- Required indicator (*) when required=true.
-- Dropzone opens file picker with Enter/Space and click.
-- Drag-and-drop adds files and prevents default browser behavior.
-- Validation rejects invalid type, oversize, or over-count with clear messages.
-- Global error is visible and referenced via aria-describedby.
-- Per-file error is visible near the file item.
-- Remove works via mouse and keyboard; focus moves to next target or dropzone.
-- Cancel and retry work when provided.
-- Progress bar updates and is exposed with progressbar semantics when used.
-- Live region announces add, remove, error, and status transitions.
-- Disabled state prevents interaction and is communicated to assistive tech.
-- Focus ring is visible and meets contrast; no keyboard traps; Tab/Shift+Tab behave normally.
-- Mobile layout uses at least 44px touch targets; reduced motion respected.
-
-## Framework Examples
-
-### React (Controlled)
-
-Use useState for the files array and useRef for the hidden input. Assign a stable id per file (e.g. nanoid or name+size+lastModified). Wire onChange and upload callbacks.
-
-```jsx
-const [files, setFiles] = useState([]);
-
-<FileUpload
-  label="Documents"
-  name="documents"
-  multiple
-  accept=".pdf,.doc"
-  maxSizeBytes={5242880}
-  value={files}
-  onChange={setFiles}
-  onUploadStart={uploadFile}
-  onUploadProgress={setProgress}
-  onUploadComplete={onDone}
-  onUploadError={onErr}
-  error={errors.files}
-/>
-```
-
-### Vue
-
-Use ref for the files array and input element. Revoke object URLs in onBeforeUnmount. Use :value and @change (or v-model with computed get/set) for the file list.
-
-```vue
-<FileUpload
-  label="Documents"
-  name="documents"
-  :multiple="true"
-  accept=".pdf,.doc"
-  :max-size-bytes="5242880"
-  :value="files"
-  @change="files = $event"
-  @upload-start="uploadFile"
-  @upload-progress="setProgress"
-  :error="errors.files"
-/>
-```
-
-### Angular
-
-Integrate with Reactive Forms via ControlValueAccessor; value is an array of FileItem. Use ViewChild for the input element; call your upload service from onUploadStart and related outputs.
+The snippets in this guide are plain HTML and JavaScript; adapt them to the project's framework and its version.
 
 ```html
-<app-file-upload
-  [label]="'Documents'"
-  formControlName="documents"
-  [multiple]="true"
-  accept=".pdf,.doc"
-  [maxSizeBytes]="5242880"
-  (uploadStart)="uploadFile($event)">
-</app-file-upload>
+<div class="upload" role="group" aria-labelledby="documents-label">
+  <p class="upload-label" id="documents-label">Documents (optional)</p>
+  <p class="upload-hint" id="documents-hint">PDF or Word files, up to 10 MB each. Drop them here, or choose them.</p>
+  <p class="upload-error" id="documents-error" hidden></p>
+  <button type="button" class="upload-choose" aria-describedby="documents-hint documents-error">Choose files</button>
+  <input type="file" id="documents" multiple accept=".pdf,.doc,.docx" hidden>
+  <ul class="upload-files" aria-label="Chosen files">
+    <!-- One item per file, its name set as text, never as HTML -->
+    <li>
+      <span class="upload-name">report.pdf</span>
+      <progress max="100" value="40" aria-label="Uploading report.pdf"></progress>
+      <button type="button">Remove <span class="visually-hidden">report.pdf</span></button>
+    </li>
+  </ul>
+  <p class="visually-hidden" role="status"></p>
+</div>
 ```
 
-### Svelte
+## Choosing and dropping
 
-Use bind:value and on:change for the file list (or a reactive store). Use bind:this for the input element. Revoke object URLs when a file is removed or on destroy.
+- Choose files opens the picker with a click, Enter, or Space.
+- Files dropped anywhere in the area are added. The area highlights while files are dragged over it; a counter keeps the highlight steady while the pointer crosses the elements inside, and drags of text or links don't highlight it.
+- A file dropped just outside the area would open in the tab and replace the page, form and all. While the uploader is on the page, cancel `dragover` and `drop` for files on the whole page.
+- After reading the chosen files, clear the input's value. Otherwise, choosing the same file again, for example after removing it, fires no `change` in Chrome and Safari.
+- Paste (optional): pasted files go through the same checks.
 
-```svelte
-<FileUpload
-  label="Documents"
-  name="documents"
-  multiple
-  accept=".pdf,.doc"
-  maxSizeBytes={5242880}
-  bind:value={files}
-  on:change={(e) => files = e.detail}
-  on:uploadStart={handleUploadStart}
-  error={errors.files}
-/>
+```js
+// Choosing and dropping files. The whole upload group takes dropped files, and a counter keeps
+// its highlight steady while the pointer crosses the elements inside it. addFiles(files)
+// stands for the app's own handling: check each file, list it, and start its upload.
+const area = document.querySelector('.upload');
+const input = document.getElementById('documents');
+const hasFiles = (event) => event.dataTransfer?.types.includes('Files');
+let depth = 0;
+
+area.querySelector('.upload-choose').addEventListener('click', () => input.click());
+input.addEventListener('change', () => {
+  addFiles([...input.files]);
+  input.value = ''; // so choosing the same file again fires change again
+});
+
+area.addEventListener('dragenter', (event) => {
+  if (!hasFiles(event)) return;
+  depth += 1;
+  area.classList.add('is-dragging');
+});
+area.addEventListener('dragleave', (event) => {
+  if (hasFiles(event) && --depth === 0) area.classList.remove('is-dragging');
+});
+area.addEventListener('drop', (event) => {
+  depth = 0;
+  area.classList.remove('is-dragging');
+  addFiles([...event.dataTransfer.files]);
+});
+
+// A file dropped anywhere else on the page would open in the tab and replace it
+for (const type of ['dragover', 'drop']) {
+  window.addEventListener(type, (event) => {
+    if (hasFiles(event)) event.preventDefault();
+  });
+}
 ```
 
-## Testing Checklist
+## Checking files
 
-- Label association and required indicator.
-- Dropzone activates file picker with Enter/Space.
-- Drag-and-drop adds files; validation rejects invalid type/size/count with messages.
-- Global and per-file errors display and are announced.
-- Remove, retry, and cancel work (mouse and keyboard).
-- Progress and status update; progressbar semantics when used.
-- Live region announcements for add/remove/error/status.
-- Disabled state prevents interaction.
-- Focus order and visible focus; no keyboard traps.
-- Mobile layout and 44px touch targets; reduced motion support.
+- Check each file when it's added: its type against `accept`, its size, and the count. Reject it next to its name with the reason ("photo.heic isn't a PDF or Word file", "video.mp4 is larger than 10 MB"), and say it in the status region.
+- `file.type` is the browser's guess from the extension, and empty for types it doesn't know, so match `accept` against the extension too, ignoring case.
+- These checks are for the person's convenience. The server checks the type by the file's content, the size, and the count again, and treats file names as text.
+- With one file, a new choice replaces the current one, and the status region says so. With several, files are added up to the limit, and the status region says when it's reached.
+- A file with the same name, size, and modification time as one already chosen is ignored with a message, or replaces it; say which.
 
----
+```js
+// Why a file can't be added, or null when it can: its type against the input's accept list,
+// its size, and how many files are already chosen. file.type is the browser's guess from the
+// extension, and empty for types it doesn't know, so extensions count too, in any case. The
+// server checks everything again, the type by the file's content.
+function rejection(file, { accept = '', maxBytes = Infinity, chosen = 0, maxFiles = Infinity } = {}) {
+  const name = file.name.toLowerCase();
+  const type = file.type.toLowerCase();
+  const rules = accept.split(',').map((rule) => rule.trim().toLowerCase()).filter(Boolean);
+  const typeAllowed = rules.length === 0 || rules.some((rule) => (
+    rule.startsWith('.') ? name.endsWith(rule)
+      : rule.endsWith('/*') ? type.startsWith(rule.slice(0, -1))
+        : type === rule));
+  if (!typeAllowed) return 'type';
+  if (file.size > maxBytes) return 'size';
+  if (chosen >= maxFiles) return 'count';
+  return null;
+}
+```
 
-## See Also
+## The file list and uploads
 
-The File Upload component works well with these potions:
+- Each file shows its name, size, and status: ready, uploading, uploaded, failed, cancelled, or unknown. Its buttons are Remove, and Cancel or Retry while they apply, each named after the file, with visually hidden text after the visible word ("Remove report.pdf").
+- Progress is the native `<progress>` element, named after its file. `fetch()` reports no upload progress, so use `XMLHttpRequest`'s upload events, or the project's upload library.
+- Cancel aborts the request. Give each file an id (`crypto.randomUUID()`). A dropped connection leaves the outcome unknown, since the server may have the file: the status says so, and Retry sends the same id, so the server keeps one copy.
+- The status region says when each file is added, removed, uploaded, or fails ("report.pdf uploaded"), at meaningful moments, never every percent.
+- After Remove, focus moves to the next file's Remove button, or the previous one, or Choose files when the list is empty, never to the page body.
+- Image previews are optional: an `<img>` from `URL.createObjectURL()`, released with `URL.revokeObjectURL()` when the file is removed. An `<img>` doesn't run an SVG's scripts; a user's file never goes in an `<iframe>` or `<object>`.
+- Files sent with the form, rather than uploaded as they're added, are added to the form data by the app, since the input is cleared after each choice.
+- A form reset doesn't clear the app's list of chosen files, since the input is empty after each choice anyway. After a reset that wasn't cancelled, clear the list, cancel unfinished uploads, release preview URLs, and say so in the status region. Wait for the reset event to finish, and check `defaultPrevented` first: a later listener can still cancel the reset.
 
-- **[Dropdown/Select Component](/potions/components/dropdown-select.html)** - Often used alongside dropdowns in forms and settings; shares patterns for errors, focus, and keyboard support.
-- **[Form Validation Pattern](/potions/patterns/form-validation.html)** - Apply validation timing and error display best practices to file validation and submission flows.
-- **[Login & Registration Forms](/potions/features/form-login-register.html)** - Full form UX patterns; file upload often appears in profile and onboarding flows.
+## Accessibility
 
-These are suggestions. File Upload works independently and can be used in any context.
+- Everything works from the keyboard: Choose files, and each file's buttons. File rows aren't focusable, and there are no row shortcuts: Delete or Backspace on a row would need a Tab stop per file, and the Remove button is enough.
+- The hint says that files can be dropped, so the highlight isn't the only cue.
+- A required upload says so in words. A submit without a file shows the field's error, and focus moves to Choose files.
+- Text meets 4.5:1, and the area's edge, the highlight, and the focus indicator 3:1. Buttons are at least 24 by 24 px (44 px suggested on touch).
 
----
+## Layout and motion
 
-## Summary for AI Agents
+These are suggested defaults; the project's design and tokens win.
 
-**Goal**: Implement an accessible file upload with drag-and-drop and browse fallback, validation (type/size/count), per-file list with status and progress, retry/cancel hooks, and WCAG AA-compliant keyboard and screen reader support.
+- The area fills its container and is at least 96 px tall. On phones, the list is one column, with each file's buttons at the end of its row; thumbnails are optional.
+- At 320 px wide, long file names wrap, and nothing scrolls sideways.
+- Motion is optional: the highlight fades in over about 140 ms, and new files over 160 ms. Under `prefers-reduced-motion: reduce`, nothing moves, and the progress element still fills.
 
-**Critical requirements**:
-1. Detect the project's framework and styling system first; use only that system.
-2. Use a hidden native input type="file" wired to the dropzone/button; dropzone must be keyboard operable (Enter/Space).
-3. Validate accept, maxSizeBytes, maxFiles; set global and per-file errors and optional onFilesRejected.
-4. Maintain stable file ids and per-file state (status, progress, error); optional preview with safe URL lifecycle (createObjectURL/revokeObjectURL).
-5. Expose upload hooks (onUploadStart, onUploadProgress, onUploadComplete, onUploadError, onCancelUpload, onRetryUpload) for async integration.
-6. ARIA: label association, aria-describedby for hint/error/instructions, live region for add/remove/error/status, progressbar for progress.
-7. Focus: no trap; after remove, move focus to next action or dropzone; visible focus ring.
-8. Responsive: compact on mobile, 44px touch targets; reduced motion support.
+## Edge cases
+
+- **Long file names** wrap, or are shortened in the middle with the full name kept in the item's text for screen readers.
+- **Leaving during uploads**: warn before the page is left (`beforeunload`) while uploads run, or let them finish in the background if the app can.
+- **When the upload can't be used yet**: say why in text, and give Choose files `aria-disabled="true"`, so it can still be found.
+- **Files the server rejects** show its message next to the file, with Remove.
+
+## Acceptance checklist
+
+- [ ] Choose files opens the picker with a click, Enter, or Space, so nothing needs dragging
+- [ ] Files dropped anywhere in the area are added, and a file dropped elsewhere on the page doesn't open in the tab
+- [ ] The highlight shows only while files are dragged over the area, and doesn't flicker over the elements inside it
+- [ ] The same file can be chosen again after it was removed
+- [ ] Each file is checked against the accepted types, with extensions in any case, the size, and the count, and a rejected file says why, by name
+- [ ] The server checks the type by content, the size, and the count again, and file names are shown as text
+- [ ] Each file's Remove, Retry, and Cancel buttons are named after it, and its progress is a progress element named after it
+- [ ] One status region announces files added, removed, uploaded, and failed, without announcing every percent
+- [ ] After Remove, focus lands on another file's Remove button or on Choose files, never on the page body
+- [ ] A dropped connection shows the upload's outcome as unknown, and Retry doesn't create a second copy
+- [ ] A form reset clears the list of chosen files and cancels unfinished uploads, and a cancelled reset changes nothing
+- [ ] The area's edge, its text, and the focus indicator meet the contrast minimums, and buttons are at least 24 by 24 px
+- [ ] Styles come from the project's styling system and tokens, like its other form controls
+
+## See also
+
+- **[Form Validation Pattern](/potions/patterns/form-validation)**: required uploads, and errors when a form is submitted.
+- **[Select and Combobox](/potions/components/dropdown-select)**: the other fields in upload and settings forms.
+- **[Login & Registration Forms](/potions/features/form-login-register)**: registration and profile forms that ask for a photo or a document.
+
+These are suggestions; the upload works in any form.

@@ -1,8 +1,8 @@
 ---
 layout: 'potion'
-title: 'Text Input Field - Accessible Form Input with Label, Error, and Success States'
+title: 'Text Input Field'
 publicationDate: '2026-01-24'
-excerpt: 'An accessible text input component with label, hint text, error display, success indicator, and comprehensive state management. Foundation for all form inputs.'
+excerpt: 'An accessible text field on the native input or textarea: a visible label, hint and error text read with the field, required and optional marked in words, autocomplete for personal data, and a character count that never cuts text off.'
 category: 'Components'
 tags:
   - components
@@ -17,426 +17,186 @@ tags:
 agentManifest: 'potions/components/text-input.json'
 path: 'potions/components/text-input'
 promptSubject: 'text inputs'
+useWhen: 'you add or fix a text field, such as an email, name, search, or comment box, and want its label, hint, and errors to work for everyone.'
+specifies:
+  - 'Every field has a visible label, and screen readers read its hint and error with it.'
+  - 'Required and optional fields say so in words, not only with an asterisk or a color.'
+  - 'A length limit lets people type or paste past it, then says how many characters are too many.'
+example: 'Someone pastes a 230-character bio into a field with a 200-character limit. All of it stays, the count says 30 characters too many, and the form asks them to shorten it.'
 ---
 
-An accessible text input component with label, hint text, error display, success indicator, and comprehensive state management. Foundation for all form inputs with full keyboard and screen reader support.
+Most forms succeed or fail in their text fields: people need to know what to enter, whether they have to, and what went wrong. This guide covers single-line inputs and multi-line text areas, built on the native `<input>` and `<textarea>`, and targets WCAG 2.2 AA.
 
-## Overview
+## Start from what the project has
 
-The Text Input component provides a fully accessible form input field that handles all common states: default, focus, error, success, disabled, and readonly. It includes proper labeling, ARIA attributes, keyboard navigation, and screen reader support.
+1. If the project has a text field component, in its design system or a library it already uses, configure or extend it to meet this guide. Keep its API.
+2. Otherwise use the native `<input>` with the `type` that matches the data, or `<textarea>` for more than one line, with a `<label>`.
 
-## Component Structure
+Implement only what the task needs, and add no dependency without asking. The project's conventions win for styling and visual defaults. If one conflicts with an accessibility or correctness requirement here, ask instead of choosing.
 
-```
-Container
-├── Label
-│   ├── Label Text
-│   ├── Required Indicator (*) [optional]
-│   └── Tooltip [optional]
-├── Input Wrapper
-│   ├── Leading Icon [optional]
-│   ├── Input Field
-│   └── Trailing Icon/Button [optional]
-├── Hint Text [optional]
-├── Error Message [optional]
-└── Character Counter [optional]
-```
+## Structure
 
-## States
+- **Label**: visible text in a `<label for>` that names the field. A placeholder is never the label.
+- **Hint** (optional): short help, such as the format or why the field is asked for.
+- **Input**: `<input>` or `<textarea>`.
+- **Error**: an element that's empty and hidden until there's an error.
+- **Count** (optional): for fields with a length limit.
+- **Leading icon** (optional): decoration, with `aria-hidden="true"`.
+- **Trailing button** (optional): such as Clear or Show password, a real `<button type="button">` with a name, at least 24 by 24 px (44 px suggested on touch).
 
-### Default State
-- Clean, clear input field
-- Border: neutral gray (`border-gray-300`)
-- Background: white
-- Cursor: text cursor
+## Labels, hints, and required fields
 
-### Focus State
-- Border changes to focus color (`border-blue-500`)
-- Focus ring appears (`ring-2 ring-blue-500`)
-- Smooth transition (150ms)
-- Label optionally changes to primary color
+- The label is visible, and its text is the field's accessible name. A native `<label for>` is enough; use `aria-labelledby` only when the name has to come from elsewhere.
+- Say "required" or "optional" in words. When most fields are required, mark the optional ones "(optional)", and say so once at the top of the form: "All fields are required unless marked (optional)". If the design uses an asterisk, explain it at the top of the form, and don't color it like an error.
+- Put the native `required` attribute on required fields: screen readers announce it, and the form's validation reads it. When the app shows its own error messages, the form gets `novalidate` (see the Form Validation Pattern).
+- Hints are text below the label or the field, connected with `aria-describedby`. A placeholder disappears as soon as someone types, so it never holds the format or instructions. A placeholder that shows anything needed meets 4.5:1.
 
-### Error State
-- Border changes to error color (`border-red-500`)
-- Error message appears below input
-- Error icon shown
-- `aria-invalid='true'` set
-- Optional: subtle shake animation
+## Errors
 
-### Success State
-- Border changes to success color (`border-green-500`)
-- Checkmark icon appears (trailing)
-- `aria-invalid='false'` set
-- Validates field is correct
+- An error says what's wrong and how to fix it, such as "Enter an email address in the correct format, like name@example.com", in text next to the field, with an icon if the design uses one.
+- The error element stays in the field's `aria-describedby`, after the hint. With no error it's empty and hidden, so it adds nothing. While there's an error, the field has `aria-invalid="true"`.
+- Field errors are never live regions (`role="alert"` or `aria-live`): on a submit, every field would announce at once. When errors are announced and where focus goes is the form's job (see the Form Validation Pattern).
+- Keep what the person typed; never clear a field because it's wrong.
 
-### Disabled State
-- Background grayed out (`bg-gray-50`)
-- Text grayed (`text-gray-500`)
-- Cursor: not-allowed
-- Not interactive
-- Label grayed out
+The snippets in this guide are plain HTML and JavaScript; adapt them to the project's framework and its version.
 
-### Readonly State
-- Input not editable
-- Can be selected and copied
-- Visually distinct from disabled
-- Still keyboard accessible
-
-## Required Props
-
-```typescript
-{
-  label: string;        // Input label text
-  name: string;         // Input name attribute
-}
-```
-
-## Optional Props
-
-```typescript
-{
-  id?: string;                    // Input ID (generated if not provided)
-  value?: string;                 // Controlled value
-  defaultValue?: string;          // Uncontrolled default value
-  placeholder?: string;           // Placeholder text
-  type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'search';
-  error?: string | null;          // Error message
-  success?: boolean;              // Success state
-  hint?: string;                  // Hint text below input
-  required?: boolean;             // Required field
-  disabled?: boolean;             // Disabled state
-  readonly?: boolean;             // Readonly state
-  size?: 'small' | 'medium' | 'large';
-  leadingIcon?: ReactNode;        // Icon before input
-  trailingIcon?: ReactNode;       // Icon after input
-  maxLength?: number;             // Max character length
-  showCharacterCount?: boolean;   // Show character counter
-  fullWidth?: boolean;            // Full width (default: true)
-  onChange?: (value: string) => void;
-  onBlur?: () => void;
-  onFocus?: () => void;
-  autoComplete?: string;
-  autoFocus?: boolean;
-}
-```
-
-## Size Variants
-
-### Small
-- Height: 36px
-- Padding: 12px horizontal, 8px vertical
-- Font size: 14px
-- Label font size: 13px
-
-### Medium (Default)
-- Height: 44px
-- Padding: 14px horizontal, 11px vertical
-- Font size: 16px
-- Label font size: 14px
-
-### Large
-- Height: 52px
-- Padding: 16px horizontal, 14px vertical
-- Font size: 18px
-- Label font size: 16px
-
-## Common Variations
-
-### Search Input
-```jsx
-<TextInput
-  label="Search"
-  name="search"
-  type="search"
-  placeholder="Search..."
-  leadingIcon={<SearchIcon />}
-  trailingIcon={value ? <ClearButton /> : null}
-/>
-```
-
-### Password Input
-```jsx
-<TextInput
-  label="Password"
-  name="password"
-  type={showPassword ? 'text' : 'password'}
-  required
-  trailingIcon={<PasswordToggle />}
-/>
-```
-
-### Email Input with Validation
-```jsx
-<TextInput
-  label="Email Address"
-  name="email"
-  type="email"
-  required
-  error={errors.email}
-  success={isValid.email}
-  hint="We'll never share your email"
-  leadingIcon={<AtIcon />}
-/>
-```
-
-### Phone Input
-```jsx
-<TextInput
-  label="Phone Number"
-  name="phone"
-  type="tel"
-  placeholder="(555) 123-4567"
-  leadingIcon={<PhoneIcon />}
-  hint="Include area code"
-/>
-```
-
-## Accessibility Requirements
-
-### ARIA Attributes
-
-**Input Element:**
 ```html
-<input
-  id="email"
-  name="email"
-  type="email"
-  aria-labelledby="email-label"
-  aria-describedby="email-hint email-error"
-  aria-invalid="true"
-  aria-required="true"
-/>
-```
-
-**Label:**
-```html
-<label id="email-label" for="email">
-  Email Address
-  <span aria-hidden="true">*</span>
-</label>
-```
-
-**Error Message:**
-```html
-<div id="email-error" role="alert" aria-live="polite">
-  Please enter a valid email address
+<p>All fields are required unless marked (optional).</p>
+<div class="field">
+  <label for="email">Email address</label>
+  <input id="email" name="email" type="email" autocomplete="email" required
+    aria-describedby="email-hint email-error">
+  <p class="field-hint" id="email-hint">We'll send your receipt here.</p>
+  <p class="field-error" id="email-error" hidden></p>
+</div>
+<div class="field">
+  <label for="phone">Phone number (optional)</label>
+  <input id="phone" name="phone" type="tel" autocomplete="tel"
+    aria-describedby="phone-hint phone-error">
+  <p class="field-hint" id="phone-hint">Include the country code, for example +44 20 7946 0958.</p>
+  <p class="field-error" id="phone-error" hidden></p>
 </div>
 ```
 
-**Hint Text:**
+```js
+// Shows or clears a field's error. The error stays in aria-describedby, so it's read with the
+// field; cleared, it's empty and hidden and adds nothing. aria-invalid tells screen readers
+// that the value needs fixing.
+function setFieldError(input, message) {
+  const error = document.getElementById(`${input.id}-error`);
+  error.textContent = message;
+  error.hidden = !message;
+  if (message) input.setAttribute('aria-invalid', 'true');
+  else input.removeAttribute('aria-invalid');
+}
+```
+
+## Types, autocomplete, and paste
+
+- Use the `type` that matches the data: `email`, `tel`, `url`, `search`, or `password`. It brings the right phone keyboard, and `email` and `url` a format check.
+- Codes, card numbers, and IDs are `type="text"` with `inputmode="numeric"`, and one-time codes add `autocomplete="one-time-code"`. `type="number"` is for quantities.
+- Fields that ask for the person's own data get the matching `autocomplete` token (WCAG 1.3.5), such as `name`, `email`, `tel`, `street-address`, `postal-code`, or `bday`. Passwords get `current-password` at sign-in and `new-password` when one is created.
+- Never block paste or autofill. Password managers and copied codes depend on them (WCAG 2.2 3.3.8).
+- Text is at least 16 px on phones: iOS Safari zooms the page when a smaller field gets focus.
+
+## Variants
+
+- **Search**: `type="search"`, named "Search" by a visible or visually hidden label. Chromium and Firefox clear a search field on Escape themselves; no other field clears on Escape, since that would lose typing, and inside a dialog Escape closes the dialog. Chromium and WebKit also draw their own clear button in search fields, so a custom Clear button means hiding theirs (`::-webkit-search-cancel-button`).
+- **Password**: `type="password"` with the right `autocomplete`, `spellcheck="false"`, and paste allowed. A Show password button is a toggle: its name stays "Show password", `aria-pressed` gives its state, and focus stays on it. The password is hidden again when the form is sent. The Login & Registration Forms guide has the full pattern.
+- **Multi-line**: `<textarea>` with the same label, hint, and error. It can grow with its content (`field-sizing: content` where supported).
+- **Read-only**: `readonly` keeps the value focusable, selectable, and sent with the form. `disabled` removes it from the Tab order and the form data, so use it only for fields that really can't be used yet, and say why in text.
+- **Success** (optional): only for checks the person can't see, such as an available username, with text such as "Username available". Not a green border and check on every valid field.
+
+## Length limits
+
+- Don't use `maxlength` for a limit people can reach. It cuts longer typed or pasted text without a word (checked in Chromium, Firefox, and WebKit), and stops typing without saying why.
+- Show the limit up front ("You can enter up to 200 characters"), count as people type ("You have 12 characters left"), and let them go over ("You have 30 characters too many"). Over the limit, the field is invalid until it's shortened, and the server checks the limit again.
+- The visible count changes on every keystroke; screen readers hear it once typing pauses, through one status region.
+- Count characters the way the server does. The snippet counts code points, so an emoji counts as one.
+- The count and the validity also cover the text the page starts with, such as a saved bio, and the text a form reset puts back. A reset brings it back without an input event and without clearing custom validity, so the snippet updates after the reset event has finished, unless a listener cancelled the reset; neither is announced. After setting the text from script, run the same update.
+
 ```html
-<div id="email-hint">
-  We'll never share your email with anyone else
-</div>
+<label for="bio">Short bio (optional)</label>
+<textarea id="bio" name="bio" rows="4" aria-describedby="bio-count"></textarea>
+<p class="field-count" id="bio-count">You can enter up to 200 characters</p>
+<p class="visually-hidden" id="bio-count-status" role="status"></p>
 ```
 
-### Keyboard Navigation
+```js
+// A character count that lets people go over the limit, so a paste is never cut short, and
+// says by how much. The visible count changes as they type, and the status region speaks
+// once typing pauses. Over the limit, the field is invalid until it's shortened; the server
+// checks the limit again.
+const field = document.getElementById('bio');
+const count = document.getElementById('bio-count');
+const status = document.getElementById('bio-count-status');
+const limit = 200;
+const characters = (n) => `${n} ${n === 1 ? 'character' : 'characters'}`;
+let pause;
 
-- `Tab`: Focus input
-- `Shift+Tab`: Move focus away
-- `Escape`: Clear value (optional)
-- `Enter`: Submit form (if in form)
+// The count and the validity for the text as it is; call it again after setting the text
+// from script
+function update() {
+  const left = limit - [...field.value].length; // characters, not UTF-16 code units
+  if (field.value === '') count.textContent = `You can enter up to ${limit} characters`;
+  else count.textContent = left >= 0 ? `You have ${characters(left)} left` : `You have ${characters(-left)} too many`;
+  field.setCustomValidity(left >= 0 ? '' : `Enter ${limit} characters or fewer`);
+}
 
-### Screen Reader Behavior
-
-When input receives focus, screen reader announces:
-1. Label text ("Email Address")
-2. Required state ("required")
-3. Hint text ("We'll never share your email")
-4. Error message (if present)
-5. Current value (if any)
-
-When error appears:
-- Announced via `aria-live='polite'`
-- User hears error without losing context
-
-## Responsive Behavior
-
-### Mobile (< 768px)
-- **Full width by default**
-- **Font size: 16px minimum** (prevents iOS zoom)
-- **Touch targets: 44px minimum**
-- Trailing icons: 44px tap target
-
-### Desktop (>= 1024px)
-- Fixed or constrained width based on context
-- Hover state shows border color change
-- Default: 100% of parent width
-
-## Implementation Checklist
-
-### Visual
-- [ ] Label displays above input
-- [ ] Required indicator (*) shows when required
-- [ ] Hint text displays below input
-- [ ] Error message displays below input with icon
-- [ ] Success checkmark displays when valid
-- [ ] Focus ring visible and distinct
-- [ ] Disabled state is visually clear
-- [ ] All size variants work correctly
-
-### Functionality
-- [ ] Value updates on input change
-- [ ] onChange callback fires
-- [ ] onBlur callback fires
-- [ ] onFocus callback fires
-- [ ] Clear button clears value
-- [ ] Password toggle changes type
-- [ ] Character counter updates
-- [ ] Controlled and uncontrolled modes work
-
-### Keyboard
-- [ ] Tab focuses input
-- [ ] Shift+Tab moves focus away
-- [ ] Trailing button is keyboard accessible
-- [ ] Escape clears value (if implemented)
-
-### Accessibility
-- [ ] Label associated with input (for/id)
-- [ ] aria-required when required
-- [ ] aria-invalid when error
-- [ ] aria-describedby references hint and error
-- [ ] Error has role='alert' or aria-live
-- [ ] Focus ring has sufficient contrast (3:1)
-- [ ] Screen reader announces all states
-- [ ] Input font size >= 16px on mobile
-
-### Styling
-- [ ] Matches project styling system
-- [ ] Uses project design tokens
-- [ ] No inline styles (uses classes)
-- [ ] All colors have sufficient contrast
-
-## Framework Examples
-
-### React (Controlled)
-```jsx
-const [email, setEmail] = useState('');
-const [error, setError] = useState(null);
-
-<TextInput
-  label="Email"
-  name="email"
-  type="email"
-  value={email}
-  onChange={setEmail}
-  error={error}
-  required
-/>
+field.addEventListener('input', () => {
+  update();
+  clearTimeout(pause);
+  pause = setTimeout(() => { status.textContent = count.textContent; }, 1000);
+});
+// After a reset that wasn't cancelled, count the text the form put back, unannounced. The
+// text comes back only after the reset event, and a later listener can cancel the reset.
+field.form?.addEventListener('reset', (event) => setTimeout(() => {
+  if (event.defaultPrevented) return;
+  clearTimeout(pause);
+  update();
+}));
+update(); // text the page starts with, such as a saved bio, counts too
 ```
 
-### Vue
-```vue
-<template>
-  <TextInput
-    v-model="email"
-    label="Email"
-    name="email"
-    type="email"
-    :error="errors.email"
-    :required="true"
-  />
-</template>
-```
+## Appearance
 
-### Angular
-```typescript
-emailControl = new FormControl('', [Validators.required, Validators.email]);
+These are suggested defaults; the project's design and tokens win.
 
-<app-text-input
-  [label]="'Email'"
-  [formControl]="emailControl"
-  [error]="emailControl.errors?.email"
-  [required]="true"
-></app-text-input>
-```
+- States: default, hover, focus, error, read-only, disabled, and the optional success.
+- The field's edge has at least 3:1 contrast against the background in every state, and so does the focus indicator (WCAG 1.4.11). For example, `#6b7280` on white is 4.8:1, while the common `#d1d5db` is 1.5:1, too faint to find the field. Check the project's own colors.
+- The error state changes more than the color: it has its message, and an icon if the design uses one.
+- Focus shows with `:focus-visible`, an outline or a ring, and is never removed without a replacement.
+- Sizes: 44 px tall (36 px compact, 52 px large), 16 px text, and 14 px labels, hints, and errors.
+- A field fills its container and has no breakpoints of its own. At 320 px wide and at 200% text size, labels, hints, and errors wrap.
+- Motion is optional: a 150 ms transition on the border and the focus ring. Under `prefers-reduced-motion: reduce`, changes are instant.
 
-### Svelte
-```svelte
-<script>
-  let email = '';
-  let error = null;
-</script>
+## Edge cases
 
-<TextInput
-  bind:value={email}
-  label="Email"
-  name="email"
-  type="email"
-  {error}
-  required
-/>
-```
+- **Hint and error together**: both stay visible, and both stay in `aria-describedby`, the hint first.
+- **Errors from the server** show in the same error element, set the same way, at the field they belong to.
+- **Autofill**: autofilled values count as typed, and the field stays readable in the browser's autofill style (`:autofill`).
+- **Right-to-left**: icons and trailing buttons use logical properties, such as `padding-inline-start`, so they mirror.
 
-## Integration with Form Validation Pattern
+## Acceptance checklist
 
-This Text Input component is designed to work seamlessly with the [Form Validation Pattern](/potions/patterns/form-validation):
+- [ ] Every field has a visible label that is its accessible name, and no placeholder stands in for a label or a hint
+- [ ] Required and optional fields say so in words, and required fields have the required attribute
+- [ ] A screen reader reads the hint with the field, and the error too when there is one, with the field marked invalid
+- [ ] Errors say how to fix the problem, keep what was typed, and aren't live regions
+- [ ] Fields that ask for the person's own data have the matching autocomplete token, and paste works in every field
+- [ ] Codes and card numbers use inputmode="numeric", not type="number"
+- [ ] A field with a length limit keeps everything typed or pasted, says how many characters are too many, and announces the count only when typing pauses
+- [ ] The count and the validity are right for text the page starts with, and after a form reset; a cancelled reset changes nothing
+- [ ] Escape clears no field except a search field, where the browser does it
+- [ ] A Show password button keeps its name and focus, shows its state with aria-pressed, and the password is hidden again when the form is sent
+- [ ] Field edges and the focus indicator have at least 3:1 contrast and text 4.5:1, in every state
+- [ ] Text is at least 16 px on phones, and nothing is cut off at 320 px wide or at 200% text size
+- [ ] Styles come from the project's styling system and tokens, like its other form controls
 
-1. **Validation Timing**: Show errors only after `onBlur` (when touched)
-2. **Error Display**: Pass error message via `error` prop
-3. **Success State**: Pass `success` prop when field is validated
-4. **ARIA**: Errors are announced via `aria-live`
-5. **Keyboard**: Full keyboard support for accessible forms
+## See also
 
-## Design Tokens
+- **[Form Validation Pattern](/potions/patterns/form-validation)**: when errors appear, and where focus goes when a form is submitted.
+- **[Select and Combobox](/potions/components/dropdown-select)**: choices from a list, with the same label, hint, and error wiring.
+- **[Login & Registration Forms](/potions/features/form-login-register)**: email and password fields, and the full Show password pattern.
 
-### Colors
-- **Border Default**: `--color-gray-300` or `border-gray-300`
-- **Border Focus**: `--color-blue-500` or `border-blue-500`
-- **Border Error**: `--color-red-500` or `border-red-500`
-- **Border Success**: `--color-green-500` or `border-green-500`
-- **Background**: `--color-white` or `bg-white`
-- **Background Disabled**: `--color-gray-50` or `bg-gray-50`
-- **Text**: `--color-gray-900` or `text-gray-900`
-- **Text Disabled**: `--color-gray-500` or `text-gray-500`
-- **Label**: `--color-gray-700` or `text-gray-700`
-- **Hint**: `--color-gray-500` or `text-gray-500`
-- **Error**: `--color-red-600` or `text-red-600`
-
-### Spacing
-- **Label margin-bottom**: 6px
-- **Hint margin-top**: 6px
-- **Error margin-top**: 6px
-- **Input padding-x**: 14px (medium)
-- **Input padding-y**: 11px (medium)
-
-### Typography
-- **Label font-size**: 14px
-- **Label font-weight**: 500
-- **Input font-size**: 16px
-- **Hint font-size**: 14px
-- **Error font-size**: 14px
-
----
-
-## See Also
-
-The Text Input component works well with these potions:
-
-- **[Dropdown/Select Component](/potions/components/dropdown-select)** - Complementary form component for selection fields, works alongside text inputs in forms
-- **[Form Validation Pattern](/potions/patterns/form-validation)** - Apply validation timing and error display best practices to create user-friendly forms
-- **[Login & Registration Forms](/potions/features/form-login-register)** - Complete authentication forms that demonstrate Text Input in action
-
-These are suggestions to enhance your implementation. Text Input works independently and can be used in any context.
-
----
-
-## Summary for AI Agents
-
-**Goal**: Create accessible text input with label, error/success states, hint text, and ARIA support.
-
-**Critical Requirements**:
-1. Detect framework and styling system first
-2. Use project's design tokens for colors and spacing
-3. Implement proper ARIA: `aria-labelledby`, `aria-describedby`, `aria-invalid`, `aria-required`
-4. Show required indicator (*) when `required=true`
-5. Associate errors via `aria-describedby` and `role='alert'`
-6. Provide visible focus ring with sufficient contrast
-7. Set input font-size to 16px minimum on mobile (prevents iOS zoom)
-8. Support controlled/uncontrolled patterns appropriate for framework
-9. Make trailing icons keyboard accessible with `aria-label`
-10. Use classes, not inline styles
-
-**States to Handle**: default, focus, error, success, disabled, readonly
-
-**Integration**: Works with Form Validation Pattern for optimal UX timing.
+These are suggestions; the field works with any form setup.

@@ -152,7 +152,7 @@ We welcome contributions! UI Potion grows with community input.
 
 ## What Makes a Good Potion?
 
-The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. The Dialog guide and the three AI guides follow all of them; the others get them as they're revised.
+The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. The Dialog guide, the three AI guides, and the five form guides follow all of them; the others get them as they're revised.
 
 ### Human Documentation (Markdown)
 
@@ -164,19 +164,19 @@ The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. The D
 - Responsive behavior at relevant breakpoints
 - Accessibility requirements
 - Animation specifications where relevant
-- Testing checklist
+- A short acceptance checklist
 - Framework-agnostic examples
 
 ### AI Guide (JSON)
 
 - Structured, parseable data
 - Complete specifications that minimize ambiguity
-- Framework examples only where they help agents adapt the specification, labeled with the version they're for
-- Styling approach examples where useful
+- Short snippets in plain HTML and JavaScript for the parts that are easiest to get wrong, the same as in the Markdown, and framework examples only where they help, labeled with the version they're for
+- Styling guidance that defers to the project's styling system and tokens
 - State management guidance where relevant
 - Accessibility implementation details
 - Animation timing values where relevant
-- Testing verification steps
+- The acceptance checklist (`testingChecklist`), the same as in the Markdown
 
 ## Programmatic access (optional)
 

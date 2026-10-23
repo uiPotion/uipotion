@@ -188,11 +188,11 @@
         "progressive-disclosure",
         "user-experience"
       ],
-      "excerpt": "A comprehensive UX pattern for form validation covering timing strategies, error display, async validation, accessibility, and integration with form libraries.",
+      "excerpt": "When form errors appear, what they say, and where focus goes: errors when someone leaves a field they typed in or tries to submit, never while they type or tab through, an error summary for longer forms, and the browser's checks working with the project's form library.",
       "webUrl": "https://uipotion.com/potions/patterns/form-validation",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/form-validation.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24",
+      "updated": "2026-10-22",
       "markdownUrl": "https://uipotion.com/potions/patterns/form-validation.md"
     },
     {
@@ -218,7 +218,7 @@
     },
     {
       "id": "text-input",
-      "name": "Text Input Field (Accessible) with Label, Error, and Success States",
+      "name": "Text Input Field",
       "category": "components",
       "tags": [
         "components",
@@ -231,11 +231,11 @@
         "aria",
         "form-control"
       ],
-      "excerpt": "An accessible text input component with label, hint text, error display, success indicator, and comprehensive state management. Foundation for all form inputs.",
+      "excerpt": "An accessible text field on the native input or textarea: a visible label, hint and error text read with the field, required and optional marked in words, autocomplete for personal data, and a character count that never cuts text off.",
       "webUrl": "https://uipotion.com/potions/components/text-input",
       "agentGuideUrl": "https://uipotion.com/potions/components/text-input.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24",
+      "updated": "2026-10-22",
       "markdownUrl": "https://uipotion.com/potions/components/text-input.md"
     },
     {
@@ -252,16 +252,16 @@
         "accessibility",
         "forms"
       ],
-      "excerpt": "Complete authentication forms (login and registration) with real-time validation, error handling, password requirements, and accessibility. Follows current NIST password guidance, never reveals whether an email has an account, and works with password managers and passkeys.",
+      "excerpt": "Sign-in and registration forms that follow current NIST password guidance, never reveal whether an email has an account, work with password managers and passkeys, and keep passwords out of URLs, spell-check services, and plain view.",
       "webUrl": "https://uipotion.com/potions/features/form-login-register",
       "agentGuideUrl": "https://uipotion.com/potions/features/form-login-register.json",
       "created": "2026-01-24",
-      "updated": "2026-10-07",
+      "updated": "2026-10-22",
       "markdownUrl": "https://uipotion.com/potions/features/form-login-register.md"
     },
     {
       "id": "dropdown-select",
-      "name": "Dropdown/Select Component (Accessible) with Search and Multi-Select",
+      "name": "Select and Combobox",
       "category": "components",
       "tags": [
         "components",
@@ -275,11 +275,11 @@
         "aria",
         "keyboard-navigation"
       ],
-      "excerpt": "An accessible dropdown/select component with search/filter capability, multi-select support, keyboard navigation, and full ARIA combobox/listbox pattern. Supports grouped options, loading states, and error handling.",
+      "excerpt": "Choosing from a list: the native select for a simple choice, and a combobox for search and several choices that keeps focus in its input, highlights with aria-activedescendant, and never picks or submits anything by accident.",
       "webUrl": "https://uipotion.com/potions/components/dropdown-select",
       "agentGuideUrl": "https://uipotion.com/potions/components/dropdown-select.json",
       "created": "2026-01-25",
-      "updated": "2026-01-25",
+      "updated": "2026-10-22",
       "markdownUrl": "https://uipotion.com/potions/components/dropdown-select.md"
     },
     {
@@ -320,11 +320,11 @@
         "progress",
         "validation"
       ],
-      "excerpt": "A fully accessible file upload component with drag-and-drop, browse button fallback, validation (type/size/count), per-file progress, retry/cancel, and robust keyboard and screen reader support.",
+      "excerpt": "A file upload that works by keyboard, pointer, and drag and drop: a button opens the picker, the whole area takes dropped files without the browser opening them, and each file is checked and listed with its own progress and Remove button, while the server checks everything again.",
       "webUrl": "https://uipotion.com/potions/components/file-upload",
       "agentGuideUrl": "https://uipotion.com/potions/components/file-upload.json",
       "created": "2026-02-03",
-      "updated": "2026-02-03",
+      "updated": "2026-10-22",
       "markdownUrl": "https://uipotion.com/potions/components/file-upload.md"
     },
     {
@@ -528,5 +528,5 @@
     }
   ],
   "totalCount": 24,
-  "lastUpdated": "2026-10-17"
+  "lastUpdated": "2026-10-22"
 }

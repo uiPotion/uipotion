@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/features.schema.json",
   "id": "form-login-register",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "name": "Login & Registration Forms with Validation",
   "category": "features",
   "tags": [
@@ -14,730 +14,377 @@
     "accessibility",
     "forms"
   ],
-  "description": "Complete authentication forms (login and registration) with real-time validation, error handling, password requirements, and accessibility. Follows current NIST password guidance (SP 800-63B-4), never reveals whether an email has an account, works with password managers, and offers passkeys as an option.",
+  "description": "Sign-in, registration, and password reset forms that follow NIST SP 800-63B-4 for passwords, never reveal whether an email has an account, work with password managers and passkeys, and keep passwords out of URLs, spell-check services, and plain view, with field errors and busy states that keep focus where people are.",
   "tokens": {
+    "note": "Suggested defaults. The project's design tokens and existing forms win.",
     "layout": {
       "formMaxWidthPx": 420,
-      "formPaddingDesktopPx": 48,
-      "formPaddingMobilePx": 24,
-      "inputHeightPx": 48,
+      "formPaddingPx": {
+        "mobile": 24,
+        "desktop": 48
+      },
+      "mobileBreakpointPx": 768,
+      "fieldHeightPx": 48,
+      "buttonHeightPx": 48,
       "fieldGapPx": 24,
-      "buttonHeightPx": 48
+      "minTargetPx": 24
     },
     "motion": {
-      "errorShakeDurationMs": 300,
-      "transitionDurationMs": 200,
-      "loadingSpinnerMs": 1000,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
-    },
-    "breakpoints": {
-      "mobileMaxPx": 767,
-      "tabletMinPx": 768
+      "formSwitchMs": 200
     }
   },
   "aiAgentInstructions": {
-    "summary": "Implement login and registration forms with comprehensive validation, error handling, and accessibility. Apply Form Validation Pattern principles for validation timing. Use Text Input Component pattern for input fields. Adapt to the user's framework and styling system. Password rules, rate limits, and passkey support come from the project's authentication service when it has one; otherwise use the NIST SP 800-63B-4 defaults in this guide. Public error messages always follow this guide's account-privacy rules: map the service's error codes to them.",
+    "summary": "Build or fix sign-in, registration, and password reset forms. Password rules, rate limits, and passkey support come from the project's authentication service when it has one; otherwise use this guide's NIST SP 800-63B-4 defaults. Public messages always follow this guide's account-privacy rules: map the service's error codes to them. Forms post, passwords stay out of spell-check services and plain view, password managers and paste always work, and busy states keep focus. Build on the project's form, field, and button components, and its validation (the Form Validation Pattern). Implement only what the task needs, keep existing APIs, and match the project's styling and tokens. The project's conventions win for styling and visual defaults; if one conflicts with an accessibility or correctness requirement in this guide, ask the user instead of choosing silently. Target WCAG 2.2 AA.",
     "keyFeatures": [
-      "Login form: email + password with 'Remember me' and 'Forgot password' options. Sign-in checks only that a password is present, never its length or character types, so accounts with older passwords can still sign in",
-      "Registration form: name, email, password, password confirmation with a password requirements indicator",
-      "Real-time validation following Form Validation Pattern (on-blur for most, real-time for password confirmation)",
-      "Clear, actionable error messages positioned inline below fields",
-      "Success states with checkmarks for validated fields",
-      "Loading states for submit buttons with spinner",
-      "Password visibility toggle (eye icon)",
-      "Password feedback for registration and password reset: a requirements indicator (too short, too common, meets requirements), or the project's own pattern-aware strength estimator if it has one. Never rate a password strong from its length or character types",
-      "Messages never reveal whether an email has an account: one generic sign-in failure message, the same next step after every registration, and the same confirmation after every reset request",
-      "Works with password managers: correct autocomplete values, and paste and autofill always allowed (WCAG 3.3.8)",
-      "Optional passkey sign-in alongside the password form",
-      "Form switching: Toggle between login and registration",
-      "Full keyboard accessibility with proper ARIA attributes",
-      "CRITICAL: TIP: Consider using Text Input Component pattern for consistent input styling and behavior (optional)",
-      "CRITICAL: TIP: Apply Form Validation Pattern for optimal validation UX timing (optional)",
-      "CRITICAL: Styling MUST match project's existing conventions. Detect framework and styling system first.",
-      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes. NEVER use inline styles."
+      "Sign-in checks only that a password is there, so accounts made under older rules still work",
+      "Registration and reset follow NIST SP 800-63B-4: length, common and breached passwords, and no composition rules",
+      "Messages never reveal whether an email has an account: one sign-in failure message, the same next step after every registration, and the same confirmation after every reset request",
+      "A network or service failure gets its own message, so an outage never sends people to reset their password",
+      "Forms post (method=\"post\"), so a password never ends up in a URL",
+      "A Show password toggle with aria-pressed that keeps focus; the password is hidden again when the form is sent or reset, or the page comes back",
+      "spellcheck=\"false\" on password fields, the right autocomplete values, and paste always allowed (WCAG 2.2 3.3.8)",
+      "A busy Sign in button with aria-disabled that keeps focus and ignores a second press",
+      "Optional passkey sign-in with a fallback to the password form"
     ],
     "implementationSteps": [
-      "0. CRITICAL: Detect framework and styling system BEFORE writing code. Use ONLY the detected system.",
-      "0d. TIP: Check for existing form libraries (react-hook-form, formik, vee-validate, @angular/forms). If found, use library's validation and state management. If not found, implement vanilla form state management.",
-      "0e. Check how the project handles authentication: its own backend, or a provider or library (for example Auth0, Clerk, Supabase Auth, Firebase Auth, Amazon Cognito, or Auth.js). If it defines password rules, rate limits, or passkey support, follow them and use its components or SDK. Map its error codes to this guide's public messages, and never show provider messages that reveal whether an account exists (such as 'user not found' or 'email already in use'). If the service's UI or API can't avoid revealing that, tell the user about the conflict instead of shipping it silently. Otherwise this guide fills the gaps; it doesn't override the service's rules",
-      "1. TIP: Review Form Validation Pattern for validation timing best practices (optional reference)",
-      "2. TIP: Review Text Input Component for input field patterns (optional reference)",
-      "3. Create form state management: loginForm and registerForm with field values, errors, touched states",
-      "4. Implement login form: email (format check on blur), password (presence check only: no length or character-type rules at sign-in, so accounts with older passwords can still sign in), remember me checkbox",
-      "5. Implement registration form: name, email, password (with requirements indicator), password confirmation (real-time)",
-      "6. Add validation timing: on-blur for email/name/password, real-time for password confirmation",
-      "7. Implement password feedback for registration and password reset. If the project has a pattern-aware strength estimator, show its rating. Otherwise show a requirements indicator, not a strength rating: too short, too common (matches the client's short common-password list), or meets requirements. Length alone doesn't make a password strong ('aaaaaaaaaaaaaaaaaaaa' is long but trivial to guess), so never label one strong from its length or character types. Without rules from the auth service, use the NIST SP 800-63B-4 defaults: at least 15 characters when the password is the only sign-in factor (at least 8 when a second factor is always required), accept at least 64 characters, and accept spaces, all printable characters, and Unicode. Count length in Unicode code points, not UTF-16 units. The authoritative breached-password check runs on the server",
-      "8. Add password visibility toggles with eye icons",
-      "9. Implement submit handlers with loading states and error handling. Rejected credentials show one generic message ('Email or password is incorrect') that doesn't say which field was wrong. Network and service failures show a different message that doesn't blame the password ('Unable to sign in right now. Try again shortly'), the same for every account",
-      "9a. Never reveal whether an email has an account. Registration shows the same next step for every valid submission (for example 'Check your email to continue'), and the backend emails the existing account owner instead of the form saying the email is taken. This relies on email verification; if the product signs new users in immediately, raise the tradeoff with the user. A password reset request always confirms with 'If an account exists for this email, we've sent a reset link'",
-      "9b. Rate limits and lockouts: show one generic message with a retry hint (for example 'Too many attempts. Wait a few minutes and try again'), worded the same whether or not the account exists",
-      "10. Add form switching toggle (Login ↔ Register)",
-      "11. Style form cards with proper spacing, shadows, and responsive behavior",
-      "12. Add ARIA attributes: aria-invalid, aria-describedby, aria-live for errors",
-      "12a. Make the forms work with password managers: autocomplete='username' on the email field that identifies the account (also when it holds an email address), 'current-password' on sign-in, 'new-password' on registration and reset, and 'one-time-code' on verification-code fields. Never block paste or autofill (WCAG 3.3.8 Accessible Authentication)",
-      "13. Implement keyboard navigation and focus management",
-      "14. Add 'Forgot password', optional social sign-in such as 'Sign in with Google', and an optional 'Sign in with a passkey' option (UI only, backend integration not included). For passkey autofill, append 'webauthn' to the identifier field's autocomplete value (autocomplete='username webauthn'), and fall back to the password form if the passkey prompt is cancelled or fails",
-      "15. Test with keyboard and screen readers"
+      "1. Detect the framework and its version, the styling system, the tokens, and the existing components (projectDetection), plus the project's form library and validation.",
+      "2. Find how the project handles authentication: its own backend, or a provider or library, such as Auth0, Clerk, Supabase Auth, Firebase Auth, Amazon Cognito, or Auth.js. If it defines password rules, rate limits, or passkey support, follow them and use its components or SDK; this guide fills the gaps and doesn't override them. Map its error codes to implementationDetails.messages, and never show messages that reveal whether an account exists. If the service can't avoid revealing that, tell the user about the conflict instead of shipping it.",
+      "3. Choose the forms the task needs: sign-in, registration, password reset request (featureSpec.screens). Leave out the rest.",
+      "4. Build each form as in frameworkPatterns.signInForm: method=\"post\", a heading that names it, a status region, and the fields with their autocomplete values.",
+      "5. Add the Show password toggle (frameworkPatterns.passwordToggle) and, for registration and reset, the requirements indicator (frameworkPatterns.passwordRequirements, implementationDetails.passwordRules).",
+      "6. Apply the Form Validation Pattern's timing to the fields, and send the form as in frameworkPatterns.signInSubmit.",
+      "7. Add passkeys or social sign-in only if the task asks for them (implementationDetails.passkeys).",
+      "8. Check the result against testingChecklist with a keyboard, a screen reader, a password manager, and a phone, and run the project's existing tests and checks."
     ]
   },
   "featureSpec": {
-    "goal": "Provide complete, accessible authentication forms (login and registration) that follow validation UX best practices, handle errors gracefully, and guide users to successful submission.",
+    "goal": "Let people create an account, sign in, and ask for a password reset with their password manager, keyboard, or screen reader, without revealing who has an account and without leaking passwords.",
     "userJourney": [
-      "User lands on authentication page (default: login form)",
-      "User fills in email field, validation triggers on blur",
-      "User fills in password field, validation triggers on blur",
-      "User clicks Submit button",
-      "If validation fails: errors displayed, focus moves to first invalid field",
-      "If validation passes: button shows loading state, form submits",
-      "On success: navigate to dashboard or show success message",
-      "On rejected credentials: show 'Email or password is incorrect'. On a network or service failure: show 'Unable to sign in right now. Try again shortly' instead, so an outage doesn't send people to reset their password. Re-enable the form either way",
-      "Alternatively: User clicks 'Create account' to switch to registration form",
-      "Registration form: User fills name, email, password, password confirmation",
-      "Password requirements indicator updates in real time as user types",
-      "Password confirmation validates in real-time",
-      "Submit registration with same validation and error handling flow; every valid registration shows the same next step, whether or not the email already has an account"
+      "Someone opens the sign-in page; the form is named by its heading \"Sign in\"",
+      "They enter their email and password, typed, pasted, or filled by a password manager",
+      "They press Sign in; the button stays focused with aria-disabled, and the status region says \"Signing in…\"",
+      "On success, they go on to the app",
+      "On wrong details, the status region says \"Email or password is incorrect\", the email stays, and the button works again",
+      "On a network or service failure, it says \"Unable to sign in right now. Try again shortly\" instead",
+      "From the sign-in page they can go to registration, where every valid submission leads to the same \"Check your email to continue\" step",
+      "From the sign-in page they can ask for a password reset, which always confirms the same way"
     ],
     "screens": [
       {
-        "id": "login-form",
-        "purpose": "Allow existing users to authenticate with email and password",
+        "id": "sign-in",
+        "purpose": "Sign in with an email and a password, or a passkey.",
         "ui": {
-          "title": "Welcome Back",
-          "subtitle": "Sign in to your account",
+          "heading": "Sign in",
           "fields": [
-            "email",
-            "password"
+            "email (type=\"email\", autocomplete=\"username\")",
+            "password (autocomplete=\"current-password\", spellcheck=\"false\")"
           ],
           "extras": [
-            "rememberMe",
-            "forgotPassword",
-            "passkeySignIn (optional)"
+            "Show password toggle",
+            "Remember me (optional)",
+            "Forgot your password? link",
+            "Sign in with a passkey (optional)",
+            "social sign-in (optional)"
           ],
-          "cta": "Sign In",
-          "switchPrompt": "Don't have an account? Create one"
+          "action": "Sign in",
+          "switchPrompt": "New here? Create an account"
         },
         "validation": {
-          "email": {
-            "required": true,
-            "format": "Valid email format",
-            "timing": "on-blur",
-            "messages": {
-              "required": "Email is required",
-              "invalid": "Please enter a valid email address (e.g., name@example.com)"
-            }
-          },
-          "password": {
-            "required": true,
-            "timing": "on-blur",
-            "note": "Presence check only. Never enforce length or character-type rules at sign-in: accounts created under older rules must still be able to sign in, and the rules belong to registration and reset.",
-            "messages": {
-              "required": "Password is required",
-              "credentialsRejected": "Email or password is incorrect",
-              "serviceUnavailable": "Unable to sign in right now. Try again shortly"
-            }
-          }
+          "email": "Required, a valid email address, checked with the Form Validation Pattern's timing.",
+          "password": "Required: checked for presence only. No length or character rules at sign-in, so accounts made under older rules still work."
         },
         "states": [
           "idle",
-          "validating",
-          "valid",
-          "invalid",
-          "submitting",
-          "success",
-          "error"
+          "signing-in",
+          "rejected",
+          "unavailable",
+          "rate-limited",
+          "signed-in"
         ],
         "interactions": [
           {
-            "event": "emailBlur",
-            "result": "validateEmail",
+            "event": "submit",
+            "result": "signIn",
             "sideEffects": [
-              "setTouchedEmail",
-              "showErrorIfInvalid"
+              "setAriaDisabledOnButton",
+              "announceSigningIn",
+              "hidePassword"
             ],
-            "accessibilityNotes": "Error announced via aria-live region"
-          },
-          {
-            "event": "passwordBlur",
-            "result": "validatePassword",
-            "sideEffects": [
-              "setTouchedPassword",
-              "showErrorIfInvalid"
-            ]
-          },
-          {
-            "event": "submitClick",
-            "result": "validateAllFields",
-            "sideEffects": [
-              "setLoadingTrue",
-              "disableForm",
-              "focusFirstError"
-            ],
-            "accessibilityNotes": "Focus moves to first invalid field if validation fails"
-          },
-          {
-            "event": "forgotPasswordClick",
-            "result": "navigateToPasswordReset",
-            "sideEffects": []
+            "preventDefault": true,
+            "accessibilityNotes": "Field errors first, as in the Form Validation Pattern. Focus stays where it was, on the button or in the field where Enter was pressed (frameworkPatterns.signInSubmit)."
           },
           {
             "event": "passkeySignInClick",
-            "when": "passkeys are supported by the browser and enabled by the auth service",
+            "when": "the browser and the auth service support passkeys",
             "result": "startPasskeySignIn",
-            "sideEffects": [
-              "showBrowserPasskeyPrompt"
-            ],
-            "accessibilityNotes": "If the prompt is cancelled or fails, return focus to the passkey button, show a short generic message, and keep the password form available as a fallback"
-          },
-          {
-            "event": "switchToRegister",
-            "result": "showRegisterForm",
-            "sideEffects": [
-              "resetFormState",
-              "focusFirstField"
-            ]
+            "accessibilityNotes": "If the prompt is cancelled or fails, focus returns to the passkey button, a short generic message shows in the status region, and the password form stays available."
           }
-        ],
-        "stateModel": {
-          "email": {
-            "type": "string",
-            "description": "User's email address",
-            "default": ""
-          },
-          "password": {
-            "type": "string",
-            "description": "User's password",
-            "default": ""
-          },
-          "rememberMe": {
-            "type": "boolean",
-            "description": "Whether to keep user logged in",
-            "default": false
-          },
-          "touched": {
-            "type": "object",
-            "description": "Tracks which fields user has interacted with",
-            "default": {}
-          },
-          "errors": {
-            "type": "object",
-            "description": "Validation errors for each field",
-            "default": {}
-          },
-          "isSubmitting": {
-            "type": "boolean",
-            "description": "Whether form is currently submitting",
-            "default": false
-          }
-        }
+        ]
       },
       {
-        "id": "register-form",
-        "purpose": "Allow new users to create an account",
+        "id": "registration",
+        "purpose": "Create an account.",
         "ui": {
-          "title": "Create Account",
-          "subtitle": "Get started for free",
+          "heading": "Create an account",
           "fields": [
-            "name",
-            "email",
-            "password",
-            "passwordConfirm"
+            "full name (one field, autocomplete=\"name\")",
+            "email (type=\"email\", autocomplete=\"username\")",
+            "password (autocomplete=\"new-password\", spellcheck=\"false\") with the requirements indicator",
+            "password confirmation (optional; autocomplete=\"new-password\")"
           ],
           "extras": [
-            "passwordRequirementsIndicator",
-            "termsCheckbox"
+            "Show password toggle",
+            "terms checkbox, if the product needs one"
           ],
-          "cta": "Create Account",
+          "action": "Create account",
           "switchPrompt": "Already have an account? Sign in"
         },
         "validation": {
-          "name": {
-            "required": true,
-            "minLength": 2,
-            "timing": "on-blur",
-            "messages": {
-              "required": "Name is required",
-              "minLength": "Name must be at least 2 characters"
-            }
-          },
-          "email": {
-            "required": true,
-            "format": "Valid email format",
-            "timing": "on-blur",
-            "accountExistence": "Never reveal whether an email already has an account: no availability check while typing, and no 'already registered' error. Every valid submission shows the same next step, and the backend emails the existing account owner instead. This needs an email-verification step: if the product signs new users in immediately, registration can't hide whether an email exists, so raise that tradeoff with the user.",
-            "messages": {
-              "required": "Email is required",
-              "invalid": "Please enter a valid email address"
-            }
-          },
-          "password": {
-            "required": true,
-            "minLength": 15,
-            "minLengthNote": "NIST SP 800-63B-4 default when the password is the only sign-in factor. Use 8 when a second factor is always required, or the auth service's own rule when it has one. Count Unicode code points, not UTF-16 units.",
-            "maxLength": "Accept at least 64 characters; don't truncate silently",
-            "allowedCharacters": "Spaces, all printable characters, and Unicode. No composition rules (no required digits, symbols, or mixed case).",
-            "blocklist": "Reject common and known-breached passwords; the authoritative check runs on the server",
-            "indicator": "Too short, too common, or meets requirements. Show a strength rating only from a pattern-aware estimator the project already has, never from length or character types",
-            "timing": "on-blur (validation), real-time (indicator)",
-            "messages": {
-              "required": "Password is required",
-              "minLength": "Use at least 15 characters",
-              "common": "This password is too common. Choose a different one",
-              "breached": "This password has appeared in a data breach. Choose a different one"
-            }
-          },
-          "passwordConfirm": {
-            "required": true,
-            "match": "Must match password field",
-            "timing": "real-time (as user types)",
-            "messages": {
-              "required": "Please confirm your password",
-              "mismatch": "Passwords must match"
-            }
-          }
+          "name": "Required, with no minimum length: some names are one character.",
+          "email": "Required and a valid email address. No availability check and no \"already registered\" error: both reveal which emails have accounts.",
+          "password": "The password rules (implementationDetails.passwordRules).",
+          "passwordConfirmation": "Must match, with the Form Validation Pattern's timing: checked when left, then on every input once it shows \"Passwords must match\"."
         },
         "states": [
           "idle",
-          "validating",
-          "valid",
-          "invalid",
           "submitting",
-          "success",
-          "error"
-        ],
-        "interactions": [
-          {
-            "event": "nameBlur",
-            "result": "validateName",
-            "sideEffects": [
-              "setTouchedName",
-              "showErrorIfInvalid"
-            ]
-          },
-          {
-            "event": "emailBlur",
-            "result": "validateEmail",
-            "sideEffects": [
-              "setTouchedEmail",
-              "showErrorIfInvalid"
-            ]
-          },
-          {
-            "event": "passwordInput",
-            "result": "checkPasswordRequirements",
-            "sideEffects": [
-              "updateRequirementsIndicator"
-            ]
-          },
-          {
-            "event": "passwordBlur",
-            "result": "validatePassword",
-            "sideEffects": [
-              "setTouchedPassword",
-              "showErrorIfInvalid"
-            ]
-          },
-          {
-            "event": "passwordConfirmInput",
-            "result": "validatePasswordMatch",
-            "sideEffects": [
-              "showErrorIfMismatch",
-              "showSuccessIfMatch"
-            ]
-          },
-          {
-            "event": "submitClick",
-            "result": "validateAllFields",
-            "sideEffects": [
-              "setLoadingTrue",
-              "disableForm",
-              "focusFirstError"
-            ]
-          },
-          {
-            "event": "switchToLogin",
-            "result": "showLoginForm",
-            "sideEffects": [
-              "resetFormState",
-              "focusFirstField"
-            ]
-          }
-        ],
-        "stateModel": {
-          "name": {
-            "type": "string",
-            "description": "User's full name",
-            "default": ""
-          },
-          "email": {
-            "type": "string",
-            "description": "User's email address",
-            "default": ""
-          },
-          "password": {
-            "type": "string",
-            "description": "User's chosen password",
-            "default": ""
-          },
-          "passwordConfirm": {
-            "type": "string",
-            "description": "Password confirmation",
-            "default": ""
-          },
-          "passwordRequirementState": {
-            "type": "enum",
-            "description": "Requirement status shown under the password field. A pattern-aware strength estimator the project already has may add its own rating; never derive 'strong' from length or character types",
-            "default": "none",
-            "allowedValues": [
-              "none",
-              "too-short",
-              "too-common",
-              "meets-requirements"
-            ]
-          },
-          "agreeToTerms": {
-            "type": "boolean",
-            "description": "Whether user agreed to terms",
-            "default": false
-          },
-          "touched": {
-            "type": "object",
-            "description": "Tracks which fields user has interacted with",
-            "default": {}
-          },
-          "errors": {
-            "type": "object",
-            "description": "Validation errors for each field",
-            "default": {}
-          },
-          "isSubmitting": {
-            "type": "boolean",
-            "description": "Whether form is currently submitting",
-            "default": false
-          }
-        }
+          "check-your-email"
+        ]
+      },
+      {
+        "id": "password-reset-request",
+        "purpose": "Ask for a password reset link.",
+        "ui": {
+          "heading": "Reset your password",
+          "fields": [
+            "email (type=\"email\", autocomplete=\"username\")"
+          ],
+          "action": "Send reset link"
+        },
+        "validation": {
+          "email": "Required and a valid email address."
+        },
+        "states": [
+          "idle",
+          "submitting",
+          "requested"
+        ]
       }
     ],
     "states": [
-      "login-form-active",
-      "register-form-active",
-      "field-focused",
-      "field-blurred-valid",
-      "field-blurred-invalid",
-      "password-too-short",
-      "password-too-common",
-      "password-meets-requirements",
-      "form-submitting",
-      "form-success",
-      "form-error"
+      "idle",
+      "validating",
+      "submitting",
+      "signed-in",
+      "rejected",
+      "unavailable",
+      "rate-limited",
+      "check-your-email",
+      "reset-requested"
     ],
     "edgeCases": [
-      "User switches forms mid-validation (reset state)",
-      "User submits with Enter key from any field (trigger validation)",
-      "Server returns generic error (display in form-level error message)",
-      "Email already has an account: the form shows the same next step as any other valid registration, and the backend emails the account owner a sign-in or reset link. The screen never confirms that the account exists",
-      "Existing account with a password shorter than the current minimum: sign-in still works because sign-in checks presence only; ask for a new password after sign-in only if the auth service requires it",
-      "Password filled by a password manager or pasted: accept it; never block paste or autofill",
-      "Password with spaces or Unicode characters: accept it as typed and don't trim it silently",
-      "Too many attempts: show the generic rate-limit message, worded the same whether or not the account exists",
-      "Passkey prompt cancelled or failed: keep the password form available and return focus to the passkey button",
-      "Very long email or name (truncate or wrap, test with max-length)",
-      "Password contains special characters (ensure proper escaping)",
-      "User rapidly types in password confirmation (debounce validation)",
-      "Network timeout on submission (show timeout error, allow retry)",
-      "Screen reader navigation through all form states",
-      "Keyboard-only form completion and submission"
-    ],
-    "interactions": [
-      {
-        "event": "formSwitch",
-        "result": "toggleBetweenLoginAndRegister",
-        "sideEffects": [
-          "resetFormState",
-          "clearErrors",
-          "focusFirstField"
-        ],
-        "accessibilityNotes": "Focus should move to first field of newly displayed form"
-      },
-      {
-        "event": "fieldValidation",
-        "result": "validateField",
-        "sideEffects": [
-          "updateErrorState",
-          "updateFieldVisualState",
-          "announceErrorToScreenReader"
-        ],
-        "accessibilityNotes": "Errors announced via aria-live, field marked with aria-invalid"
-      },
-      {
-        "event": "formSubmission",
-        "result": "validateAndSubmit",
-        "sideEffects": [
-          "showLoadingState",
-          "disableInputs",
-          "scrollToError"
-        ],
-        "accessibilityNotes": "Focus management for errors, loading state announced"
-      }
+      "An email that already has an account: registration shows the same next step as for a new email, and the backend emails the account's owner a sign-in or reset link instead",
+      "An older account whose password is shorter than today's minimum still signs in; ask for a new password after sign-in only if the auth service requires it",
+      "A password filled by a password manager or pasted is accepted",
+      "Spaces and Unicode in a password are kept as typed, never trimmed",
+      "Too many attempts: the generic rate-limit message, worded the same whether or not the account exists",
+      "A passkey prompt cancelled or failed: the password form stays, and focus returns to the passkey button",
+      "A request that never answers ends at the time limit with the network message, and pressing Sign in again retries",
+      "A product that signs new users in immediately can't hide at registration whether an email has an account: raise that tradeoff with the user",
+      "Long emails and names scroll inside their fields, and nothing is cut off"
     ],
     "dataContract": {
-      "loginPayload": {
-        "email": "string (validated email format)",
-        "password": "string (required; no length or character rules at sign-in)",
-        "rememberMe": "boolean"
-      },
-      "registerPayload": {
-        "name": "string (min 2 chars)",
-        "email": "string (validated email format)",
-        "password": "string (default min 15 chars when the password is the only factor, at least 64 accepted, no composition rules, checked against breached passwords on the server)",
-        "agreeToTerms": "boolean (required true)"
-      },
-      "apiResponse": {
-        "signInSuccess": {
-          "status": "success",
-          "token": "string (JWT or session token)",
-          "user": "object (user details)"
-        },
-        "registrationAccepted": {
-          "status": "pending-verification",
-          "message": "string (the same 'Check your email to continue' message for new and existing emails)",
-          "note": "No session token or user object. The response must look the same whether or not the email already has an account; the account is created or the owner is notified by email. Products that sign new users in immediately can't hide account existence at registration, so raise that tradeoff with the user"
-        },
-        "error": {
-          "status": "error",
-          "message": "string (error message)",
-          "field": "string (optional field-specific error for registration fields; sign-in errors stay generic and never indicate whether an account exists)"
-        }
-      }
-    },
-    "analyticsEvents": [
-      "form_login_viewed",
-      "form_register_viewed",
-      "form_switched",
-      "field_validation_error",
-      "password_requirements_checked",
-      "form_submitted",
-      "form_submission_success",
-      "form_submission_error",
-      "forgot_password_clicked"
-    ]
+      "signInRequest": "POST with email and password as typed; never in the URL.",
+      "registrationRequest": "POST with name, email, and password; the answer looks the same for new and existing emails (the account is created, or its owner is emailed).",
+      "answers": "Map the auth service's answers to implementationDetails.messages: wrong details, rate limits, and failures each have one public message, the same for every account."
+    }
   },
   "accessibility": {
     "wcagCompliance": {
       "level": "AA",
+      "version": "2.2",
       "requirements": {
-        "1.3.1": "Labels programmatically associated with inputs via for/id",
-        "1.3.5": "Input purpose identified via autocomplete and type attributes",
-        "1.4.3": "Text and border colors maintain 4.5:1 contrast",
-        "2.1.1": "All form controls keyboard operable",
-        "2.4.3": "Logical focus order through form fields",
-        "2.4.7": "Visible focus indicators on all interactive elements",
-        "3.2.2": "No unexpected context changes on input",
-        "3.3.1": "Errors clearly identified in text",
-        "3.3.2": "Labels and required indicators provided",
-        "3.3.3": "Error messages provide guidance on fixing",
-        "3.3.4": "User can review before final submission",
-        "3.3.8": "Accessible Authentication (Minimum): no cognitive test without an alternative. Allow paste and password managers, and offer passkeys or email links where the auth service supports them",
-        "4.1.2": "Inputs have accessible names, roles, and states",
-        "4.1.3": "Error messages announced via aria-live"
+        "1.3.1": "Each form is named by its heading, and every field has a visible label.",
+        "1.3.5": "Fields have autocomplete values: username, current-password, new-password, name, and one-time-code.",
+        "2.4.3": "A failed submit moves focus to the first invalid field; switching forms moves it to the new form's heading.",
+        "2.5.8": "Buttons, including Show password, are at least 24 by 24 px.",
+        "3.3.1": "Field errors are shown in text next to their fields.",
+        "3.3.2": "Required and optional fields say so in words.",
+        "3.3.3": "Field errors say how to fix them, except where they must stay generic.",
+        "3.3.8": "No cognitive test without an alternative: paste and password managers always work, and passkeys or email links are offered where the auth service supports them.",
+        "4.1.2": "The Show password toggle exposes its state with aria-pressed.",
+        "4.1.3": "\"Signing in…\", sign-in results, and the requirement status are announced through one status region per form."
       }
     },
     "keyboardNavigation": {
-      "Tab": "Move through fields, checkboxes, links, and button in logical order",
-      "Shift+Tab": "Move backward through form",
-      "Enter": "Submit form from any field (except checkbox/link)",
-      "Space": "Toggle checkbox, activate button",
-      "Escape": "Optional: Clear current field"
+      "enter": "Enter in any field sends the form.",
+      "showPassword": "Space or Enter toggles it, and focus stays on it.",
+      "order": "Fields, Show password, Sign in, then the links."
     },
     "ariaAttributes": {
       "required": {
-        "inputs": {
-          "aria-labelledby": "Points to label element ID",
-          "aria-describedby": "Points to hint and/or error element IDs",
-          "aria-invalid": "true when error, false when valid",
-          "aria-required": "true for required fields",
-          "autocomplete": "username (the email field that identifies the account, also when it holds an email address), name, current-password (sign-in), new-password (registration and reset), one-time-code (verification codes). For passkey autofill, append webauthn: 'username webauthn'"
+        "form": {
+          "aria-labelledby": "The form's heading, so it is named, without role=\"form\""
         },
-        "errorMessages": {
-          "id": "Unique ID for aria-describedby reference",
-          "role": "alert",
-          "aria-live": "polite"
+        "status": {
+          "role": "status"
         },
-        "formContainer": {
-          "role": "form",
-          "aria-labelledby": "Points to form title/heading"
+        "showPassword": {
+          "aria-pressed": "\"true\" while the password is shown; the name stays \"Show password\"",
+          "aria-controls": "The password field's id"
         },
-        "submitButton": {
-          "aria-busy": "true when submitting",
-          "aria-disabled": "true when loading"
+        "submit": {
+          "aria-disabled": "\"true\" while the request runs"
         }
       }
     },
     "screenReader": {
-      "formTitle": "Announced when form loads or switches",
-      "fieldLabels": "Announced when field receives focus",
-      "requiredIndicators": "Conveyed via aria-required, not just asterisk",
-      "errors": "Announced via aria-live when they appear",
-      "passwordRequirements": "Requirement status announced when it changes, not on every keystroke",
-      "loadingState": "Announced when form submits",
-      "successMessage": "Announced via role=status or aria-live"
-    },
-    "focusManagement": {
-      "onLoad": "First field receives focus",
-      "onSwitch": "First field of new form receives focus",
-      "onError": "First invalid field receives focus after submit",
-      "onSuccess": "Focus moves to success message or next screen"
+      "formName": "The heading names the form, and the page title says which form it is.",
+      "status": "\"Signing in…\", the sign-in results, and the requirement status, each once, through the form's status region.",
+      "fieldErrors": "As in the Form Validation Pattern: read with their fields, never live regions."
     }
   },
   "animations": {
-    "errorShake": {
-      "durationMs": 300,
-      "easing": "ease-in-out",
-      "transform": "translateX(0) → translateX(-4px) → translateX(4px) → translateX(0)",
-      "trigger": "When error appears on field",
-      "optional": true
-    },
-    "errorFade": {
-      "durationMs": 200,
-      "easing": "ease-out",
-      "opacity": "0 → 1",
-      "trigger": "When error message appears"
-    },
-    "successFade": {
-      "durationMs": 200,
-      "easing": "ease-out",
-      "opacity": "0 → 1",
-      "trigger": "When success checkmark appears"
-    },
+    "note": "Optional.",
     "formSwitch": {
-      "durationMs": 300,
-      "easing": "ease-in-out",
-      "effect": "Fade out current form → Fade in new form",
-      "alternative": "Slide animation (optional)"
+      "durationMs": 200,
+      "effect": "A fade between sign-in and registration"
     },
-    "buttonLoading": {
-      "spinner": "Rotating spinner icon",
-      "durationMs": "Continuous rotation",
-      "trigger": "When form is submitting"
-    },
-    "prefersReducedMotion": {
-      "behavior": "Disable shake animation, use instant state changes",
-      "fadeOnly": "Keep fade animations but reduce to 100ms"
-    }
+    "reducedMotion": "Under prefers-reduced-motion: reduce, changes are instant."
   },
   "projectDetection": {
     "framework": {
-      "description": "Detect framework for form state management patterns",
+      "description": "Find the framework, its version, and how existing components are written before writing code.",
       "detectionSteps": [
-        "Check package.json for react, vue, @angular/core, svelte",
-        "Check for existing form components to match patterns",
-        "Identify state management approach (hooks, composition API, services, stores)"
+        "Read the project's dependencies (package.json or its equivalent) for the framework and its version, and use the syntax that version supports.",
+        "Open two or three existing components to see their file structure, state handling, and naming.",
+        "Look for an existing component that already does this job, in the project or in a design system or UI library it uses, and build on it."
       ]
     },
     "stylingSystem": {
-      "description": "Detect styling system to match existing form styles",
+      "description": "Use the styling system the project already uses, and only that one.",
       "detectionSteps": [
-        "Check for tailwindcss, styled-components, emotion, sass in package.json",
-        "Look for existing form styling patterns",
-        "Identify class naming conventions (BEM, camelCase, kebab-case)",
-        "Check for utility functions (cn, clsx, classnames)"
+        "Check the dependencies and config for the styling setup: Tailwind (version 4 keeps its theme in CSS with @theme, version 3 in tailwind.config.*), CSS Modules, Sass, CSS-in-JS, or plain CSS.",
+        "See how existing components apply styles and compose class names, for example with cn or clsx.",
+        "Check for design documentation: DESIGN.md, a design system package, or Storybook stories for existing components."
       ],
       "adaptationRules": [
-        "If Tailwind: Use ring utilities for focus, border-red-500 for error, input utilities",
-        "If SCSS/CSS: Create .form-input class with state modifiers (.form-input--error, .form-input--success, .form-input--disabled)",
-        "If styled-components: Use props for state styling, theme for colors",
-        "If CSS Modules: Create form.module.css with state classes"
+        "Write styles the way existing components do, and add no new styling library or system.",
+        "With plain CSS, use classes in the project's stylesheets instead of inline styles, except for values computed at runtime.",
+        "If the setup is unclear or mixed, ask before choosing."
       ]
     },
     "designTokens": {
-      "description": "Use existing design tokens for consistent styling",
+      "description": "Use the project's tokens for color, spacing, radius, type, shadows, motion, and layering.",
       "detectionSteps": [
-        "Check for form-specific colors (error-red, success-green, focus-blue)",
-        "Look for input height, padding, border radius tokens",
-        "Check for existing focus ring styling",
-        "Use project's typography and spacing scales"
+        "Find the tokens: CSS custom properties, a Tailwind theme (@theme or config), a theme object, or a tokens file.",
+        "Use them instead of this guide's example values; where there are none, match the closest existing components.",
+        "Check that the colors you use meet the contrast minimums: 4.5:1 for text, and 3:1 for focus indicators, icons, and control boundaries."
       ]
     }
   },
+  "frameworkPatterns": {
+    "note": "Short snippets in plain HTML and JavaScript for the parts that are easiest to get wrong; adapt them to the project's framework and its version.",
+    "signInForm": {
+      "description": "The sign-in form: method=\"post\", named by its heading, a status region, autocomplete values, spellcheck=\"false\" on the password, and the Show password toggle's markup.",
+      "html": "<!-- method=\"post\": a form sent before its script runs never puts the password in the URL -->\n<form id=\"sign-in\" method=\"post\" action=\"/sign-in\" aria-labelledby=\"sign-in-title\">\n  <h1 id=\"sign-in-title\">Sign in</h1>\n  <p class=\"form-status\" role=\"status\"></p>\n  <label for=\"sign-in-email\">Email address</label>\n  <input id=\"sign-in-email\" name=\"email\" type=\"email\" autocomplete=\"username\" required>\n  <label for=\"sign-in-password\">Password</label>\n  <div class=\"password-field\">\n    <input id=\"sign-in-password\" name=\"password\" type=\"password\" autocomplete=\"current-password\"\n      spellcheck=\"false\" autocapitalize=\"none\" required>\n    <button type=\"button\" class=\"password-toggle\" aria-pressed=\"false\"\n      aria-controls=\"sign-in-password\">Show password</button>\n  </div>\n  <button type=\"submit\">Sign in</button>\n  <p><a href=\"/forgot-password\">Forgot your password?</a></p>\n</form>"
+    },
+    "passwordToggle": {
+      "description": "The Show password toggle: a stable name with aria-pressed, focus kept, and the password hidden again when the form is sent or reset, or the page comes back from the back/forward cache.",
+      "script": "// The show-password button: a toggle with a name that stays the same and aria-pressed, so\n// screen readers announce its state, and focus stays on it. The password is hidden again\n// when the form is sent or reset, and when the page comes back from the back/forward cache.\nconst password = document.getElementById('sign-in-password');\nconst toggle = document.querySelector('[aria-controls=\"sign-in-password\"]');\n\nfunction setShown(shown) {\n  password.type = shown ? 'text' : 'password';\n  toggle.setAttribute('aria-pressed', String(shown));\n}\n\ntoggle.addEventListener('click', () => setShown(password.type === 'password'));\npassword.form.addEventListener('submit', () => setShown(false));\npassword.form.addEventListener('reset', () => setShown(false)); // hiding is always safe\nwindow.addEventListener('pageshow', (event) => {\n  if (event.persisted) setShown(false);\n});"
+    },
+    "signInSubmit": {
+      "description": "Sending the sign-in: a busy button with aria-disabled that keeps focus, a second press ignored, a time limit, and separate messages for wrong details, rate limits, and failures.",
+      "script": "// Sending the sign-in. The button keeps focus (aria-disabled, not disabled), a second submit\n// while one runs is ignored, and the status region says what's happening. Wrong details and\n// a failed connection get different messages, and neither says which field was wrong.\n// signIn() stands for the app's request and onSignedIn() for its next step; map the auth\n// service's answers to these messages.\nconst form = document.getElementById('sign-in');\nconst button = form.querySelector('[type=\"submit\"]');\nconst status = form.querySelector('[role=\"status\"]');\nconst messages = {\n  401: 'Email or password is incorrect',\n  429: 'Too many attempts. Wait a few minutes and try again',\n};\n\nform.addEventListener('submit', async (event) => {\n  event.preventDefault();\n  if (button.getAttribute('aria-disabled') === 'true') return;\n  button.setAttribute('aria-disabled', 'true');\n  status.textContent = 'Signing in…';\n  try {\n    const response = await signIn(new FormData(form), { signal: AbortSignal.timeout(30_000) });\n    if (response.ok) return onSignedIn(response);\n    status.textContent = messages[response.status] ?? 'Unable to sign in right now. Try again shortly';\n  } catch {\n    status.textContent = 'Unable to sign in right now. Try again shortly';\n  } finally {\n    button.removeAttribute('aria-disabled');\n  }\n});"
+    },
+    "passwordRequirements": {
+      "description": "The requirements indicator's state for registration and reset: too short, too common, or meets the requirements, counted in Unicode code points.",
+      "script": "// The requirements indicator's state. MIN_LENGTH comes from the auth service, or the\n// NIST SP 800-63B-4 default for password-only sign-in. isCommonPassword() checks a short\n// list on the client; the full breached-password check runs on the server.\nconst MIN_LENGTH = 15;\n\nfunction getPasswordRequirementState(password, isCommonPassword) {\n  const length = [...password].length; // count Unicode code points, not UTF-16 units\n  if (length === 0) return 'none';\n  if (length < MIN_LENGTH) return 'too-short';\n  if (isCommonPassword(password)) return 'too-common';\n  return 'meets-requirements';\n}"
+    }
+  },
+  "implementationDetails": {
+    "passwordRules": "Take the rules from the auth service when it has them. Otherwise, NIST SP 800-63B-4: at least 15 characters when the password is the only sign-in factor, and at least 8 when a second factor is always required; accept at least 64 characters, spaces, all printable characters, and Unicode, and don't trim or truncate them; no composition rules, so never ask for digits, symbols, or mixed case; and reject common and breached passwords, with the full check on the server. Count length in Unicode code points. Sign-in checks presence only.",
+    "requirementsIndicator": "For registration and reset: too short, too common, or meets the requirements (frameworkPatterns.passwordRequirements). It never says \"strong\" from length or character types; a pattern-aware strength estimator the project already has may rate instead. Its status is announced when it changes, through the form's status region, not on every keystroke.",
+    "messages": {
+      "credentialsRejected": "Email or password is incorrect",
+      "serviceUnavailable": "Unable to sign in right now. Try again shortly",
+      "registrationAccepted": "Check your email to continue",
+      "resetRequested": "If an account exists for this email, we've sent a reset link",
+      "rateLimited": "Too many attempts. Wait a few minutes and try again",
+      "fieldMessages": "Field errors stay specific: \"Enter your email address\", \"Use at least 15 characters\", \"This password is too common. Choose a different one\", \"This password has appeared in a data breach. Choose a different one\", and \"Passwords must match\".",
+      "placement": "Sign-in results show at the top of the form, in its status region, with the email kept."
+    },
+    "accountPrivacy": "Never reveal whether an email has an account: one sign-in failure message; the same next step after every valid registration, while the backend emails the existing account's owner instead; the same confirmation after every reset request; and rate-limit messages worded the same for every account. Registration needs email verification for this; if the product signs new users in immediately, raise the tradeoff with the user.",
+    "passwordsInTheBrowser": "Forms post (method=\"post\"): a form sent before its script runs, on a slow connection or a server-rendered page before hydration, would otherwise use GET and put the email and password in the URL, where history and server logs keep them. Password fields have spellcheck=\"false\" and autocapitalize=\"none\": shown as text, a password could otherwise reach a browser's online spell-check service (Chrome's Enhanced Spell Check and Microsoft Editor, when turned on; reported in 2022). The password is hidden again when the form is sent or reset, and when the page comes back from the back/forward cache (frameworkPatterns.passwordToggle).",
+    "passwordManagers": "autocomplete=\"username\" on the email that identifies the account, also when it holds an email address; current-password at sign-in; new-password at registration and reset; one-time-code on verification codes. Never block paste or autofill (WCAG 2.2 3.3.8).",
+    "sending": "Validation runs first, with the Form Validation Pattern's timing. While the request runs, the button has aria-disabled=\"true\", ignores another press, and keeps focus; the status region says \"Signing in…\". Don't disable the fields or the button: disabling the focused element drops focus to the page in Chromium and Firefox (checked). The request has a time limit (30 seconds, suggested); a timeout or a dropped connection gets the network message, never the wrong-details one.",
+    "passkeys": "Optional: a \"Sign in with a passkey\" button, and passkey autofill with autocomplete=\"username webauthn\" on the email field. If the prompt is cancelled or fails, focus returns to the passkey button, a short generic message shows, and the password form stays.",
+    "showPassword": "A <button type=\"button\"> next to the field, named \"Show password\", with aria-pressed; its name stays the same, screen readers announce its state, and focus stays on it. A \"Show password\" checkbox works too."
+  },
+  "outputConstraints": {
+    "must": [
+      "Follow the auth service's password rules, rate limits, and passkey support when it has them, and map its errors to this guide's public messages",
+      "Post the forms, and keep passwords out of URLs",
+      "Keep sign-in to a presence check, and registration and reset to the NIST rules",
+      "Keep messages generic wherever they could reveal whether an account exists",
+      "Use the project's framework version, styling system, and tokens, the way existing components do"
+    ],
+    "mustNot": [
+      "Add an auth, form, or password-strength library without asking",
+      "Ask for digits, symbols, or mixed case, or say \"strong\" from length alone",
+      "Say \"user not found\", \"email already in use\", or which field was wrong at sign-in",
+      "Block paste or autofill, or leave spell check on password fields",
+      "Disable the focused button or the fields while signing in",
+      "Use inline styles for static values in a plain-CSS project, or hardcode colors the project has tokens for"
+    ]
+  },
   "testingChecklist": [
-    "Login form displays with email and password fields",
-    "Registration form displays with name, email, password, confirm password",
-    "Email validation triggers on blur, shows specific error",
-    "Registration password validation triggers on blur, shows specific error",
-    "Sign-in accepts any non-empty password; no length error at sign-in",
-    "Password confirmation validates in real-time as user types",
-    "Password requirements indicator updates as user types",
-    "Success checkmarks appear on valid fields",
-    "Error messages appear below invalid fields",
-    "Submit button enables before validation",
-    "Submit button disables with spinner during submission",
-    "Form validates all fields on submit",
-    "Focus moves to first invalid field on submit error",
-    "All errors visible and scrolled into view",
-    "Form switch (Login ↔ Register) works, resets state",
-    "Password visibility toggle works (eye icon)",
-    "Remember me checkbox works (login)",
-    "Terms checkbox required (registration)",
-    "Forgot password link navigates correctly",
-    "Password feedback never asks for numbers or symbols. Without a pattern-aware estimator it never shows 'strong'; with one, 'aaaaaaaaaaaaaaaaaaaa' and 'abcdabcdabcdabcdabcd' don't rate strong",
-    "Passwords of 64+ characters, spaces, and Unicode are accepted",
-    "Registering an email that already has an account shows the same next step as a new email",
-    "A failed sign-in doesn't say whether the email or the password was wrong",
-    "A network or service failure shows 'Unable to sign in right now', not 'Email or password is incorrect'",
-    "A password reset request shows the same confirmation whether or not the account exists",
-    "Rate-limit message is the same whether or not the account exists",
-    "A password manager can save and autofill credentials; paste works in every password field",
-    "Passkey sign-in, if enabled, falls back to the password form when cancelled or failed",
-    "Tab key moves through fields in logical order",
-    "Shift+Tab moves backward correctly",
-    "Enter key submits form from any field",
-    "aria-invalid set on invalid fields",
-    "aria-describedby links errors to fields",
-    "aria-required on required fields",
-    "aria-live announces errors",
-    "aria-busy set during submission",
-    "Screen reader announces form title",
-    "Screen reader announces field labels",
-    "Screen reader announces errors when they appear",
-    "Screen reader announces password requirement status when it changes",
-    "Screen reader announces loading state",
-    "Focus ring visible on all interactive elements",
-    "Error messages clear, specific, actionable",
-    "Input font size 16px minimum on mobile (prevents zoom)",
-    "Form responsive on mobile and desktop",
-    "Styling matches project conventions",
-    "No inline styles (uses classes)"
+    "Each form posts (method=\"post\"), so a form sent before its script runs never puts a password in the URL",
+    "Sign-in accepts any non-empty password; registration and reset apply the length, common-password, and breach rules, with no composition rules",
+    "Passwords of 64 or more characters, spaces, and Unicode are accepted as typed",
+    "The requirements indicator never says \"strong\" from length alone, and screen readers hear its status when it changes",
+    "A failed sign-in says \"Email or password is incorrect\", a network or service failure says \"Unable to sign in right now\", and the email stays filled in",
+    "Registration, password reset, and rate-limit messages read the same whether or not the account exists",
+    "Password managers can save and fill the credentials, and paste works in every field",
+    "Show password keeps its name and focus, shows its state with aria-pressed, and the password is hidden again when the form is sent or reset, or the page comes back",
+    "Password fields have spellcheck=\"false\"",
+    "While signing in, the button keeps focus with aria-disabled, a second press sends nothing, and the status region says \"Signing in…\"",
+    "Field errors follow the Form Validation Pattern, and a failed submit moves focus to the first invalid field",
+    "Passkey sign-in, if offered, falls back to the password form when it's cancelled or fails",
+    "The forms work at 320 px wide, with 16 px text on phones",
+    "Styles come from the project's styling system and tokens"
   ],
   "meta": {
     "created": "2026-01-24",
-    "updated": "2026-10-07",
-    "webUrl": "https://uipotion.com/potions/features/form-login-register.html",
+    "updated": "2026-10-22",
+    "webUrl": "https://uipotion.com/potions/features/form-login-register",
     "relatedPotions": [
       {
         "id": "text-input",
         "category": "components",
         "relationship": "uses",
-        "description": "TIP: Consider using Text Input component pattern for consistent input fields (optional)",
+        "description": "Optional: the Text Input Field, for the email and password fields.",
         "required": false
       },
       {
         "id": "dropdown-select",
         "category": "components",
         "relationship": "uses",
-        "description": "Optional: Consider using Dropdown/Select component for country, language, or other selection fields in registration forms",
+        "description": "Optional: Select and Combobox, for a country or a language in registration forms.",
         "required": false
       },
       {
         "id": "button",
         "category": "components",
         "relationship": "uses",
-        "description": "Optional: Consider using Button component for submit, clear, and link-style actions.",
+        "description": "Optional: for Sign in, Show password, and link-style actions.",
         "required": false
       },
       {
         "id": "form-validation",
         "category": "patterns",
         "relationship": "applies",
-        "description": "TIP: Apply Form Validation pattern for optimal validation timing and UX (optional)",
+        "description": "Optional: when field errors appear, and where focus goes when a form is submitted.",
         "required": false
       }
     ],

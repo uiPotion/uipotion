@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/components.schema.json",
   "id": "file-upload",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "File Upload Component",
   "category": "components",
   "tags": [
@@ -16,752 +16,381 @@
     "progress",
     "validation"
   ],
-  "description": "A fully accessible file upload component with drag-and-drop, browse button fallback, validation (type/size/count), per-file progress, retry/cancel, and robust keyboard + screen reader support. Supports single or multiple files, optional previews, and async upload integration.",
+  "description": "A file upload that works by keyboard, pointer, touch, and drag and drop: a Choose files button opens the picker, the whole area takes dropped files without the browser opening them, each file is checked, listed by name with its own progress and buttons, and announced once, and the server checks everything again.",
   "tokens": {
+    "note": "Suggested defaults. The project's design tokens and existing components win.",
     "layout": {
-      "containerMinHeightPx": 120,
-      "containerPaddingPx": 16,
-      "borderWidthPx": 1,
+      "areaMinHeightPx": 96,
+      "areaPaddingPx": 16,
       "borderRadiusPx": 8,
-      "labelMarginBottomPx": 6,
-      "hintMarginTopPx": 6,
-      "errorMarginTopPx": 6,
-      "dropzoneGapPx": 10,
-      "dropzoneIconSizePx": 22,
-      "dropzoneMinHeightPx": 96,
-      "buttonHeightPx": 40,
-      "buttonPaddingXPx": 14,
-      "fileListGapPx": 10,
-      "fileItemPaddingPx": 12,
-      "fileItemRadiusPx": 8,
-      "fileThumbSizePx": 40,
-      "progressHeightPx": 6,
-      "actionIconSizePx": 18
+      "listGapPx": 8,
+      "thumbnailSizePx": 40,
+      "minTargetPx": 24,
+      "touchTargetPx": 44
     },
-    "typography": {
-      "labelFontSizePx": 14,
-      "labelFontWeight": 500,
-      "dropzoneTitleFontSizePx": 14,
-      "dropzoneBodyFontSizePx": 13,
-      "fileNameFontSizePx": 14,
-      "fileMetaFontSizePx": 12,
-      "hintFontSizePx": 13,
-      "errorFontSizePx": 13
+    "limits": {
+      "maxSizeBytes": 10485760,
+      "maxFiles": 10
     },
     "motion": {
-      "hoverTransitionMs": 120,
-      "focusTransitionMs": 150,
-      "dragOverTransitionMs": 140,
-      "itemEnterMs": 160,
-      "itemExitMs": 140,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+      "highlightMs": 140,
+      "itemEnterMs": 160
     }
   },
   "aiAgentInstructions": {
-    "summary": "Implement a fully accessible file upload component supporting drag-and-drop and a browse button fallback. Include validation (type/size/count), per-file progress, retry/cancel hooks, and robust keyboard + screen reader support (WCAG AA). Detect the project's framework and styling system first, then implement using ONLY that system.",
+    "summary": "Let people attach files by keyboard, pointer, touch, or drag and drop. A Choose files button opens the picker; the whole upload area takes dropped files, and a file dropped elsewhere on the page doesn't open in the tab. Check each file's type, size, and count in the browser for convenience, and on the server for real; list each file by name with its status, progress, and buttons named after it; and announce changes through one status region. Build on the project's upload component, library, or service when it has one. Implement only what the task needs, keep existing APIs, and match the project's styling and tokens. The project's conventions win for styling and visual defaults; if one conflicts with an accessibility or correctness requirement in this guide, ask the user instead of choosing silently. Target WCAG 2.2 AA.",
     "keyFeatures": [
-      "Label with optional required indicator (*) and optional tooltip",
-      "Dropzone that supports drag-and-drop AND keyboard-triggered file picker",
-      "Hidden native <input type='file'> wired to dropzone/button",
-      "Single-file and multi-file modes",
-      "Validation: accepted MIME/types/extensions, max file size, max file count",
-      "Per-file list with name, size, type, status, and remove action",
-      "Optional thumbnail preview for images (safe URL lifecycle: createObjectURL + revoke)",
-      "Per-file progress bar for uploading",
-      "Retry and cancel actions (hooks for integration)",
-      "Error state per-file and global error message",
-      "Live region announcements for add/remove/errors/progress",
-      "Visible dropzone icon (e.g. upload arrow, cloud-upload, or folder) using tokens.layout.dropzoneIconSizePx; prefer SVG or project icon set, not emoji only.",
-      "Icons for file list (e.g. document when no preview) and for remove/action buttons per tokens.layout.actionIconSizePx.",
-      "Strong text contrast: labels/titles dark (e.g. gray-800/slate-800); hints/meta readable (e.g. gray-600/slate-600); avoid light gray on white for body text. Clear visual hierarchy between titles, labels, dropzone copy, and hints.",
-      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework + styling first, then use ONLY that system.",
-      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes.",
-      "CRITICAL: Ensure keyboard access: Tab, Enter/Space, Escape, Delete/Backspace, and proper focus management."
+      "A Choose files button that opens the picker, so nothing needs dragging (WCAG 2.2 2.5.7)",
+      "The whole area takes dropped files, with a highlight that doesn't flicker and shows only for file drags",
+      "A file dropped elsewhere on the page doesn't open in the tab",
+      "The input cleared after each choice, so the same file can be chosen again",
+      "Checks against accept by type and extension in any case, size, and count, with the server checking again",
+      "A list of files by name with status, a named progress element, and Remove, Retry, and Cancel named after each file",
+      "One status region for added, removed, uploaded, and failed files",
+      "Uploads that can be cancelled, and retried without a second copy"
     ],
     "implementationSteps": [
-      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine package.json, existing components, config files, and style patterns.",
-      "0a. Detect framework patterns: React hooks, Vue composition API, Angular components/forms, or Svelte syntax.",
-      "0b. Detect styling conventions: Tailwind, SCSS, CSS Modules, styled-components, vanilla CSS.",
-      "0c. Detect design tokens: spacing, border radius, typography, form error/focus patterns.",
-      "0d. Use layout tokens for icon sizes: dropzoneIconSizePx for dropzone icon, actionIconSizePx for list action icons.",
-      "1. Build component anatomy: Container, Label, Dropzone, BrowseButton, HiddenFileInput, FileList, FileItem, Progress, Actions, HintText, ErrorMessage, LiveRegion.",
-      "2. Implement file selection via both: (a) click/keyboard on dropzone/button, (b) drag-and-drop onto dropzone.",
-      "3. Implement validation pipeline: accept/type, maxSizeBytes, maxFiles, disabled files, and duplicate handling rules.",
-      "4. Maintain stable file identity (id) and per-file state (status, progress, error).",
-      "5. Add async upload integration hooks: onChange (when file list changes), onUploadStart, onUploadProgress, onUploadComplete, onUploadError, onCancelUpload, onRetryUpload. Document or demonstrate integration: parent uses controlled value + onChange; onUploadStart starts upload; parent updates value with progress/status/error; onCancelUpload should abort in-flight request.",
-      "6. Implement per-file progress UI with accessible text and aria-valuenow where appropriate.",
-      "7. Implement remove file, retry, and cancel actions (mouse + keyboard).",
-      "8. Implement a11y: label association, instructions via aria-describedby, live region announcements, focus ring, and meaningful accessible names.",
-      "9. Implement responsive behavior: compact layout on mobile, maintain 44px touch targets, keep actions reachable.",
-      "10. Ensure reduced motion support and no keyboard traps. Test with keyboard and screen reader."
+      "1. Detect the framework and its version, the styling system, the tokens, and the existing components (projectDetection), plus any upload component, library, or service the project already uses. Build on them, and keep their APIs and upload code.",
+      "2. Choose what the task needs: one file or several, previews, uploading as files are added or with the form, paste. Leave out the rest.",
+      "3. Build the area as in frameworkPatterns.uploadMarkup: a group named by the field's label, the hint, the error, Choose files, the hidden file input, the list, and the status region.",
+      "4. Wire choosing and dropping as in frameworkPatterns.chooseAndDrop.",
+      "5. Check each file as in frameworkPatterns.fileCheck, and show rejections by name.",
+      "6. List the files and upload them (implementationDetails.fileList, implementationDetails.uploads), with focus kept after Remove.",
+      "7. Make sure the server checks the type by content, the size, and the count again.",
+      "8. Check the result against testingChecklist with a keyboard, a screen reader, a touch screen, and real drag and drop, and run the project's existing tests and checks."
     ]
   },
   "componentSpec": {
-    "goal": "Provide an accessible, framework-agnostic file upload component that supports drag-and-drop and browse selection, validates files, displays a manageable list with statuses and progress, and integrates cleanly with async upload flows—while meeting WCAG AA requirements.",
+    "goal": "Let anyone attach the right files, see what happens to each, and fix what's wrong, whether they use a keyboard, a pointer, a touch screen, or drag files from their desktop.",
     "anatomy": {
       "slots": [
-        "container",
+        "group",
         "label",
-        "requiredIndicator",
-        "labelTooltip",
-        "dropzone",
-        "dropzoneIcon",
-        "dropzoneTitle",
-        "dropzoneBody",
-        "browseButton",
-        "hiddenFileInput",
+        "hint",
+        "error",
+        "chooseButton",
+        "fileInput",
         "fileList",
         "fileItem",
-        "fileThumbnail",
-        "fileName",
-        "fileMeta",
-        "fileStatus",
-        "fileProgress",
-        "fileError",
-        "fileActions",
+        "progress",
         "removeButton",
         "retryButton",
         "cancelButton",
-        "hintText",
-        "errorMessage",
-        "liveRegion"
+        "status"
       ],
-      "hierarchy": "Container( Label(Text, RequiredIndicator?, Tooltip?), Dropzone( Icon?, Title, Body, BrowseButton?, HiddenFileInput ), FileList( FileItem( Thumbnail?, Name, Meta, Status, Progress?, Error?, Actions(Remove, Retry?, Cancel?) )* ), HintText?, ErrorMessage?, LiveRegion )"
+      "hierarchy": "The group holds the label, the hint, the field's error, Choose files, the hidden file input, the list of files, and the status region. The whole group is the drop area.",
+      "slotNotes": {
+        "group": "An element with role=\"group\", named by the field's visible label (aria-labelledby). It isn't a button: interactive elements can't sit inside a button, and the drop area is a region, not a control.",
+        "hint": "What's accepted and the limits (\"PDF or Word files, up to 10 MB each\"), and that files can be dropped or chosen; connected to Choose files with aria-describedby.",
+        "error": "For the field as a whole, such as \"Choose at least one file\", in Choose files' aria-describedby; empty and hidden until needed.",
+        "chooseButton": "A <button type=\"button\"> that opens the picker by calling the hidden input's click(). It's the way in that needs no dragging (WCAG 2.2 2.5.7).",
+        "fileInput": "type=\"file\" with accept and multiple, hidden; accept filters the picker. The app keeps the chosen files and sends them.",
+        "fileItem": "The file's name as text, never HTML, its size, its status, its progress while uploading, and its buttons.",
+        "progress": "The native <progress> element, named after its file (\"Uploading report.pdf\").",
+        "removeButton": "Named after its file: visible \"Remove\" plus visually hidden text with the name (\"Remove report.pdf\"). Retry and Cancel are named the same way.",
+        "status": "One status region, present before it changes, for files added, removed, rejected, uploaded, and failed."
+      }
     },
     "stateModel": {
-      "disabled": {
-        "type": "boolean",
-        "description": "Whether the entire component is disabled (no browse, no drop).",
-        "default": false,
-        "persistence": "props/config"
+      "files": {
+        "type": "array",
+        "description": "The chosen files, each with an id (crypto.randomUUID()), the File, its status (ready, uploading, uploaded, failed, cancelled, unknown), its progress, and its error.",
+        "default": [],
+        "persistence": "component state or form state"
       },
-      "required": {
+      "dragging": {
         "type": "boolean",
-        "description": "Whether field is required. Shows required indicator (*) and impacts validation messaging.",
+        "description": "Whether files are being dragged over the area; kept steady by a counter of dragenter and dragleave events.",
         "default": false,
-        "persistence": "props/config"
+        "persistence": "component state only"
       },
       "multiple": {
         "type": "boolean",
-        "description": "Whether multiple file selection is allowed.",
+        "description": "Whether several files can be chosen; with one, a new file replaces the current one.",
         "default": false,
         "persistence": "props/config"
       },
       "accept": {
         "type": "string",
-        "description": "Native file input accept string, e.g. 'image/*,.pdf'. Also used for validation messaging.",
+        "description": "The accepted extensions and types, such as \".pdf,.doc,.docx\" or \"image/*\", for the picker and the checks.",
         "default": "",
-        "persistence": "props/config"
-      },
-      "maxFiles": {
-        "type": "number",
-        "description": "Maximum number of files allowed (in multi mode).",
-        "default": 10,
         "persistence": "props/config"
       },
       "maxSizeBytes": {
         "type": "number",
-        "description": "Maximum file size in bytes.",
+        "description": "The size limit per file (10 MB suggested).",
         "default": 10485760,
         "persistence": "props/config"
       },
-      "files": {
-        "type": "array",
-        "description": "List of selected files with per-file state.",
-        "default": [],
-        "persistence": "component state or parent state",
-        "notes": "Each item should have a stable id plus file metadata and status."
+      "maxFiles": {
+        "type": "number",
+        "description": "How many files can be chosen.",
+        "default": 10,
+        "persistence": "props/config"
       },
-      "dragActive": {
-        "type": "boolean",
-        "description": "Whether a drag operation is currently over the dropzone (visual highlight).",
-        "default": false,
-        "persistence": "component state only"
-      },
-      "focusedFileId": {
+      "error": {
         "type": "string",
-        "description": "ID of the file item currently focused (used for keyboard interactions).",
+        "description": "The field's error, such as \"Choose at least one file\".",
         "default": "",
-        "persistence": "component state only"
-      },
-      "globalError": {
-        "type": "string",
-        "description": "Global error message (e.g., too many files, invalid type). Empty string means no error.",
-        "default": "",
-        "persistence": "props/parent state or component state"
+        "persistence": "form state"
       }
     },
     "interactions": [
       {
-        "event": "dropzoneClick",
-        "when": "!disabled",
+        "event": "chooseClick",
         "result": "openFilePicker",
-        "sideEffects": [
-          "Programmatically click the hidden file input",
-          "Clear globalError if appropriate"
-        ],
-        "preventDefault": true
-      },
-      {
-        "event": "dropzoneKeyDown",
-        "when": "!disabled",
-        "result": "handleDropzoneKeyboard",
-        "sideEffects": [
-          "Enter/Space: open file picker (same as click)",
-          "Tab: move focus naturally (no trap)"
-        ],
-        "preventDefault": true,
-        "accessibilityNotes": "CRITICAL: Dropzone must be keyboard operable like a button (Enter/Space)."
+        "accessibilityNotes": "A click, Enter, or Space on Choose files calls the hidden input's click()."
       },
       {
         "event": "inputChange",
-        "when": "!disabled",
-        "result": "ingestSelectedFiles",
+        "result": "addFiles",
         "sideEffects": [
-          "Read FileList from input",
-          "Normalize into internal file items (assign stable ids)",
-          "Run validation (accept, maxSizeBytes, maxFiles)",
-          "If valid: append/replace files depending on multiple mode",
-          "If invalid: set per-file error and/or globalError",
-          "Announce added/failed files via live region"
-        ]
+          "clearInputValue",
+          "announceAddedAndRejected"
+        ],
+        "accessibilityNotes": "After reading the files, clear the input's value: otherwise choosing the same file again fires no change in Chrome and Safari. Focus stays on Choose files."
       },
       {
-        "event": "dragEnter",
-        "when": "!disabled",
-        "result": "setDragActiveTrue",
-        "sideEffects": [
-          "Set dragActive=true",
-          "Show drag-over visual state"
-        ],
-        "preventDefault": true
-      },
-      {
-        "event": "dragLeave",
-        "when": "!disabled",
-        "result": "setDragActiveFalse",
-        "sideEffects": [
-          "Set dragActive=false"
-        ],
-        "preventDefault": true
+        "event": "dragEnterOrLeave",
+        "when": "the drag carries files",
+        "result": "updateHighlight",
+        "accessibilityNotes": "A counter of dragenter and dragleave events keeps the highlight steady while the pointer crosses elements inside the area. Drags of text or links don't highlight it."
       },
       {
         "event": "drop",
-        "when": "!disabled",
-        "result": "ingestDroppedFiles",
+        "result": "addFiles",
         "sideEffects": [
-          "Prevent browser from opening the file",
-          "Extract files from DataTransfer",
-          "Run validation and update files list",
-          "Set dragActive=false",
-          "Announce results via live region"
+          "removeHighlight",
+          "announceAddedAndRejected"
         ],
         "preventDefault": true
       },
       {
-        "event": "removeFileClick",
-        "when": "!disabled",
-        "result": "removeFile",
-        "sideEffects": [
-          "Remove file item from list",
-          "If file was uploading: call onCancelUpload(fileId) before removing (or mark as canceled)",
-          "Announce via live region: 'Removed <file name>'",
-          "Move focus to next logical target (next file remove button, or dropzone)"
-        ],
-        "stopPropagation": true
+        "event": "pageDragOverOrDrop",
+        "when": "the drag carries files and misses the area",
+        "result": "ignoreDrop",
+        "preventDefault": true,
+        "accessibilityNotes": "While the uploader is on the page, cancel dragover and drop for files on the whole page, so a near miss doesn't open the file in the tab and replace the page."
       },
       {
-        "event": "retryClick",
-        "when": "!disabled",
-        "result": "retryUpload",
+        "event": "removeClick",
+        "result": "removeFile",
         "sideEffects": [
-          "Call onRetryUpload(fileId) or onUploadStart(file)",
-          "Reset file error state",
-          "Set status to uploading and progress to 0",
-          "Announce via live region: 'Retrying <file name>'"
+          "cancelUploadIfRunning",
+          "revokePreviewUrl",
+          "announceRemoved",
+          "moveFocus"
         ],
-        "stopPropagation": true
+        "accessibilityNotes": "Focus moves to the next file's Remove button, or the previous one, or Choose files when the list is empty; never to the page body."
       },
       {
         "event": "cancelClick",
-        "when": "!disabled",
-        "result": "cancelUpload",
+        "when": "uploading",
+        "result": "abortUpload",
         "sideEffects": [
-          "Call onCancelUpload(fileId)",
-          "Set status to canceled (or remove file if configured)",
-          "Announce via live region: 'Canceled upload for <file name>'"
-        ],
-        "stopPropagation": true
+          "setStatusCancelled",
+          "announceCancelled"
+        ]
+      },
+      {
+        "event": "retryClick",
+        "when": "failed or unknown",
+        "result": "uploadAgain",
+        "accessibilityNotes": "The retry sends the file's id again, so the server keeps one copy if the first upload reached it."
       }
     ],
     "responsiveBehavior": {
-      "mobile": {
-        "maxWidthPx": 767,
-        "behavior": "Stack content vertically; keep primary dropzone full-width; file list items become single-column with actions aligned at end.",
-        "touchTargets": "Minimum 44px tap targets for buttons and actions.",
-        "previews": "Optionally hide thumbnails or reduce to maintain density."
-      },
-      "desktop": {
-        "minWidthPx": 1024,
-        "behavior": "Dropzone and file list can sit in a single column; actions may be inline to the right; allow larger previews.",
-        "hover": "Hover affordances for dropzone and list actions (if not disabled)."
-      }
+      "layout": "The area fills its container and is at least 96 px tall (suggested); it has no breakpoints of its own.",
+      "phones": "The list is one column, with each file's buttons at the end of its row; thumbnails are optional. Buttons are at least 44 by 44 px on touch (suggested).",
+      "reflow": "At 320 px wide, long file names wrap, and nothing scrolls sideways."
     },
     "variants": {
-      "singleFile": {
-        "description": "Single selection mode. Selecting a new file replaces the existing file.",
-        "behavior": "files length max 1, show replace affordance"
-      },
-      "multiFile": {
-        "description": "Multiple file selection mode with maxFiles enforcement.",
-        "behavior": "Append new files until maxFiles reached"
-      },
-      "withPreview": {
-        "description": "Show image thumbnails for image files.",
-        "behavior": "Use object URLs; revoke on removal/unmount to avoid memory leaks"
-      },
-      "directUpload": {
-        "description": "Integrates with async uploads and shows per-file progress and status.",
-        "behavior": "Expose hooks for start/progress/complete/error/cancel/retry"
-      }
-    },
-    "dataContract": {
-      "props": {
-        "label": {
-          "type": "string",
-          "required": true
-        },
-        "name": {
-          "type": "string",
-          "required": true
-        },
-        "id": {
-          "type": "string",
-          "required": false,
-          "default": "generated from name"
-        },
-        "required": {
-          "type": "boolean",
-          "required": false,
-          "default": false
-        },
-        "disabled": {
-          "type": "boolean",
-          "required": false,
-          "default": false
-        },
-        "multiple": {
-          "type": "boolean",
-          "required": false,
-          "default": false
-        },
-        "accept": {
-          "type": "string",
-          "required": false,
-          "default": ""
-        },
-        "maxFiles": {
-          "type": "number",
-          "required": false,
-          "default": 10
-        },
-        "maxSizeBytes": {
-          "type": "number",
-          "required": false,
-          "default": 10485760
-        },
-        "hint": {
-          "type": "string",
-          "required": false
-        },
-        "error": {
-          "type": "string | null",
-          "required": false,
-          "description": "Global error message (optional, controlled externally)."
-        },
-        "value": {
-          "type": "Array<FileItem> | null",
-          "required": false,
-          "controlled": true,
-          "description": "Controlled file items. Use stable ids and per-file status/progress."
-        },
-        "defaultValue": {
-          "type": "Array<FileItem> | null",
-          "required": false,
-          "uncontrolled": true
-        },
-        "onChange": {
-          "type": "(files: Array<FileItem>) => void",
-          "required": false,
-          "description": "Fired when file list changes (add/remove/replace)."
-        },
-        "onFilesRejected": {
-          "type": "(rejections: Array<FileRejection>) => void",
-          "required": false,
-          "description": "Optional callback when files fail validation."
-        },
-        "onUploadStart": {
-          "type": "(file: FileItem) => void",
-          "required": false
-        },
-        "onUploadProgress": {
-          "type": "(fileId: string, progress: number) => void",
-          "required": false
-        },
-        "onUploadComplete": {
-          "type": "(fileId: string, result: unknown) => void",
-          "required": false
-        },
-        "onUploadError": {
-          "type": "(fileId: string, error: unknown) => void",
-          "required": false
-        },
-        "onCancelUpload": {
-          "type": "(fileId: string) => void",
-          "required": false
-        },
-        "onRetryUpload": {
-          "type": "(fileId: string) => void",
-          "required": false
-        },
-        "showPreviews": {
-          "type": "boolean",
-          "required": false,
-          "default": true
-        },
-        "className": {
-          "type": "string",
-          "required": false
-        }
-      },
-      "types": {
-        "FileItem": {
-          "shape": "{ id: string; file: File; name: string; sizeBytes: number; mimeType?: string; status: 'ready'|'uploading'|'success'|'error'|'canceled'; progress?: number; error?: string; previewUrl?: string; result?: unknown }"
-        },
-        "FileRejection": {
-          "shape": "{ file: File; reason: 'type'|'size'|'count'|'unknown'; message: string }"
-        }
-      },
-      "events": {
-        "onChange": "Fired when the internal file list changes.",
-        "onFilesRejected": "Fired when one or more files fail validation.",
-        "onUploadStart": "Initiate upload integration for a file.",
-        "onUploadProgress": "Update progress (0-100) for a file.",
-        "onUploadComplete": "Upload succeeded with optional result payload.",
-        "onUploadError": "Upload failed with error payload.",
-        "onCancelUpload": "User canceled an in-flight upload.",
-        "onRetryUpload": "User retried an errored upload."
-      }
+      "singleFile": "One file: a new choice replaces the current one, and the status region says so.",
+      "multipleFiles": "Several files, up to maxFiles; the status region says when the limit is reached.",
+      "withPreview": "Optional image previews in an <img> from URL.createObjectURL(), released with URL.revokeObjectURL() when the file is removed. An <img> doesn't run an SVG's scripts; a user's file never goes in an <iframe> or <object>.",
+      "uploadOnAdd": "Each file uploads as it's added, with its own progress, Cancel, and Retry.",
+      "uploadWithForm": "The files are sent with the form; the app adds them to the form data, since the input is cleared after each choice."
     }
   },
   "animations": {
-    "dragOver": {
+    "note": "Optional.",
+    "highlight": {
       "durationMs": 140,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "properties": {
-        "border": "neutral → accent",
-        "background": "base → subtle-accent",
-        "transform": "none → scale(1.01) (optional)"
-      }
+      "properties": "border-color and background-color"
     },
     "fileItemEnter": {
       "durationMs": 160,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "properties": {
-        "opacity": "0 → 1",
-        "transform": "translateY(-6px) → translateY(0)"
-      }
+      "properties": "opacity"
     },
-    "fileItemExit": {
-      "durationMs": 140,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "properties": {
-        "opacity": "1 → 0",
-        "transform": "translateY(0) → translateY(-6px)"
-      }
-    },
-    "progress": {
-      "durationMs": 120,
-      "easing": "ease-out",
-      "properties": {
-        "width": "previous% → next%"
-      }
-    },
-    "reducedMotion": {
-      "behavior": "Disable transforms; keep minimal opacity transitions or instant changes.",
-      "implementation": "@media (prefers-reduced-motion: reduce) { /* disable transforms, minimize transitions */ }"
-    }
+    "reducedMotion": "Under prefers-reduced-motion: reduce, nothing moves; the progress element still fills."
   },
   "accessibility": {
     "wcagCompliance": {
       "level": "AA",
+      "version": "2.2",
       "requirements": {
-        "1.3.1": "Label is programmatically associated with the file input control (for/id) or via aria-labelledby on the interactive dropzone/button.",
-        "1.4.3": "Text, borders, and focus indicators meet contrast requirements.",
-        "2.1.1": "All functionality is keyboard operable: open picker, remove file, retry/cancel upload.",
-        "2.1.2": "No keyboard trap; Tab moves naturally through controls.",
-        "2.4.3": "Logical focus order: label → dropzone/button → file list actions.",
-        "2.4.7": "Visible focus indicator on dropzone and action buttons.",
-        "3.3.1": "Errors are clearly identified (global and per-file).",
-        "4.1.2": "Controls expose name/role/state (dropzone behaves like a button).",
-        "4.1.3": "Status changes (added/removed/error/progress) are announced via live region."
+        "1.3.1": "The group is named by the field's label, and the hint and the error describe Choose files.",
+        "1.4.3": "The area's text, file names, and messages meet 4.5:1.",
+        "1.4.11": "The area's edge, the highlight, and the focus indicator meet 3:1.",
+        "2.1.1": "Choosing, removing, retrying, and cancelling all work from the keyboard.",
+        "2.4.3": "After Remove, focus lands on another file's button or on Choose files.",
+        "2.5.7": "Choose files is the way in that needs no dragging.",
+        "2.5.8": "Buttons are at least 24 by 24 px.",
+        "3.3.1": "Rejected files say why, by name, in text.",
+        "4.1.2": "Each progress element and button is named after its file.",
+        "4.1.3": "Added, removed, rejected, uploaded, and failed files are announced through one status region."
       }
     },
     "keyboardNavigation": {
-      "dropzone": {
-        "Tab": "Moves focus to dropzone/button.",
-        "Enter": "Opens file picker (click hidden input).",
-        "Space": "Opens file picker (click hidden input).",
-        "Escape": "No-op unless an overlay is used; must not clear selection unexpectedly."
-      },
-      "fileItem": {
-        "Tab": "Moves between actions (remove/retry/cancel).",
-        "Enter": "Activates focused action button.",
-        "Space": "Activates focused action button.",
-        "Delete": "Removes the focused file (if implemented on file row).",
-        "Backspace": "Removes the focused file (optional parity with Delete)."
-      }
+      "choose": "Tab to Choose files; Enter or Space opens the picker.",
+      "fileButtons": "Tab moves through each file's buttons. File rows aren't focusable, and there are no row shortcuts: Delete or Backspace on a row would need a Tab stop per file, and the Remove button is enough."
     },
     "ariaAttributes": {
       "required": {
-        "dropzone": {
-          "role": "button (or use native button element)",
-          "tabindex": "0 if not a native button",
-          "aria-disabled": "true when disabled",
-          "aria-labelledby": "Points to label id (or use aria-label)",
-          "aria-describedby": "Points to hint + error + instructions ids (space-separated)",
-          "aria-invalid": "true when global error exists, otherwise false/omitted"
+        "group": {
+          "role": "group",
+          "aria-labelledby": "The field's visible label"
         },
-        "fileList": {
-          "role": "list",
-          "aria-label": "Selected files"
+        "chooseButton": {
+          "aria-describedby": "The hint and the field's error"
         },
-        "fileItem": {
-          "role": "listitem",
-          "aria-label": "File name + status (optional)"
-        },
-        "progress": {
-          "role": "progressbar",
-          "aria-valuemin": "0",
-          "aria-valuemax": "100",
-          "aria-valuenow": "current progress",
-          "aria-label": "Upload progress for <file name>"
+        "status": {
+          "role": "status"
         }
       },
       "optional": {
-        "liveRegion": {
-          "role": "status",
-          "aria-live": "polite",
-          "aria-atomic": "true"
+        "removeButton": {
+          "name": "Visible \"Remove\" plus visually hidden text with the file name"
         },
-        "perFileError": {
-          "role": "alert",
-          "aria-live": "polite"
+        "progress": {
+          "aria-label": "Uploading and the file name"
         }
       }
     },
     "screenReader": {
-      "focusDropzone": "Announce label, required state, instructions (supported formats, limits), and global error if present.",
-      "filesAdded": "Announce number of files added and any rejections.",
-      "fileRemoved": "Announce removed file name.",
-      "uploadProgress": "Announce meaningful milestones (e.g., 0%, 50%, 100%) rather than every tick.",
-      "uploadError": "Announce per-file error messages and expose them in DOM near the file item.",
-      "uploadComplete": "Announce completion and updated status."
-    },
-    "focusManagement": {
-      "afterAdd": "Do not steal focus on file add; keep focus where user initiated action. Optionally move focus to first error if validation fails.",
-      "afterRemove": "Move focus to next available file action, or back to dropzone if list becomes empty.",
-      "disabled": "Disabled state must remove interactive focus or set aria-disabled and prevent activation."
-    },
-    "implementationChecklist": [
-      "Dropzone is focusable and activates file picker with Enter/Space",
-      "Hidden native file input exists and is correctly wired",
-      "Label is associated via for/id OR aria-labelledby",
-      "Hint/error are referenced by aria-describedby",
-      "Global errors use aria-invalid and visible messaging",
-      "Per-file errors are exposed and announced",
-      "Live region announces add/remove/status changes",
-      "Progress uses progressbar semantics where applicable",
-      "No keyboard traps; Tab works naturally",
-      "Focus indicators are visible and meet contrast"
-    ]
+      "added": "\"2 files added: report.pdf, notes.docx\", and rejections by name with the reason.",
+      "progress": "Meaningful moments only, such as \"report.pdf uploaded\"; never every percent.",
+      "removed": "\"report.pdf removed\"."
+    }
   },
   "projectDetection": {
     "framework": {
-      "description": "Detect framework to implement state, refs, and event handling idiomatically.",
+      "description": "Find the framework, its version, and how existing components are written before writing code.",
       "detectionSteps": [
-        "Check package.json for react/vue/@angular/core/svelte",
-        "Inspect existing form inputs for patterns (controlled/uncontrolled, validation, error display)",
-        "Check for existing upload/dropzone patterns in the codebase",
-        "Identify state management conventions (hooks, stores, services)"
+        "Read the project's dependencies (package.json or its equivalent) for the framework and its version, and use the syntax that version supports.",
+        "Open two or three existing components to see their file structure, state handling, and naming.",
+        "Look for an existing component that already does this job, in the project or in a design system or UI library it uses, and build on it."
       ]
     },
     "stylingSystem": {
-      "description": "Match existing styling system and state class conventions.",
+      "description": "Use the styling system the project already uses, and only that one.",
       "detectionSteps": [
-        "Check package.json for Tailwind/SCSS/CSS Modules/styled-components",
-        "Inspect existing form components for focus/error/disabled patterns",
-        "Identify class naming convention for state modifiers",
-        "Look for utility helpers (cn/clsx) and design tokens/CSS vars"
+        "Check the dependencies and config for the styling setup: Tailwind (version 4 keeps its theme in CSS with @theme, version 3 in tailwind.config.*), CSS Modules, Sass, CSS-in-JS, or plain CSS.",
+        "See how existing components apply styles and compose class names, for example with cn or clsx.",
+        "Check for design documentation: DESIGN.md, a design system package, or Storybook stories for existing components."
       ],
       "adaptationRules": [
-        "If Tailwind: use existing ring/focus utilities and error border utilities consistent with other form fields",
-        "If SCSS/CSS: create state modifiers (.upload--drag, .upload--error, .upload--disabled)",
-        "If CSS Modules: create fileUpload.module.css with state classes",
-        "If styled-components: use theme tokens and state props"
+        "Write styles the way existing components do, and add no new styling library or system.",
+        "With plain CSS, use classes in the project's stylesheets instead of inline styles, except for values computed at runtime.",
+        "If the setup is unclear or mixed, ask before choosing."
       ]
     },
     "designTokens": {
-      "description": "Use existing tokens for spacing, borders, typography, and status colors.",
+      "description": "Use the project's tokens for color, spacing, radius, type, shadows, motion, and layering.",
       "detectionSteps": [
-        "Check for form focus ring token and error colors",
-        "Check spacing scale for paddings/gaps",
-        "Find border radius defaults for cards/inputs",
-        "Check typography scale for label/meta text"
+        "Find the tokens: CSS custom properties, a Tailwind theme (@theme or config), a theme object, or a tokens file.",
+        "Use them instead of this guide's example values; where there are none, match the closest existing components.",
+        "Check that the colors you use meet the contrast minimums: 4.5:1 for text, and 3:1 for focus indicators, icons, and control boundaries."
       ]
     }
   },
-  "testingChecklist": [
-    "Label renders and is associated with the control",
-    "Required indicator (*) appears when required=true",
-    "Dropzone activates file picker with Enter/Space",
-    "Drag-and-drop adds files and prevents default browser behavior",
-    "Validation rejects invalid type/oversize/over-count with clear messages",
-    "Global error displays and is referenced via aria-describedby",
-    "Per-file error displays near the file item",
-    "Remove action works via mouse and keyboard",
-    "Cancel and retry actions work when provided",
-    "Progress bar updates and is exposed accessibly (if used)",
-    "Live region announces add/remove/error/status transitions",
-    "Disabled state prevents interaction and communicates disabled state",
-    "Focus ring is visible and meets contrast requirements",
-    "No keyboard traps; Tab/Shift+Tab behave normally",
-    "Mobile layout is usable and touch targets meet 44px minimum",
-    "Reduced motion disables transforms/complex transitions"
-  ],
   "frameworkPatterns": {
-    "react": {
-      "controlled": "const [files, setFiles] = useState([]); <FileUpload value={files} onChange={setFiles} onUploadStart={handleUploadStart} />",
-      "uncontrolled": "<FileUpload defaultValue={[]} name='documents' multiple />",
-      "stateManagement": "Use useState for files array (or useRef for uncontrolled). Use useRef for hidden input element. Assign stable id (e.g. nanoid or file.name+size+lastModified) per file item.",
-      "customHooks": "Optional: useFileUpload hook for input ref, drag state, validation, and upload callback wiring",
-      "example": "<FileUpload label='Documents' name='documents' multiple accept='.pdf,.doc' maxSizeBytes={5242880} value={files} onChange={setFiles} onUploadStart={uploadFile} onUploadProgress={setProgress} onUploadComplete={onDone} onUploadError={onErr} error={errors.files} />"
+    "note": "Short snippets in plain HTML and JavaScript for the parts that are easiest to get wrong; adapt them to the project's framework and its version.",
+    "uploadMarkup": {
+      "description": "The upload area: a group named by the label, the hint and the error on Choose files, the hidden file input, a file in the list with its named progress and Remove button, and the status region.",
+      "html": "<div class=\"upload\" role=\"group\" aria-labelledby=\"documents-label\">\n  <p class=\"upload-label\" id=\"documents-label\">Documents (optional)</p>\n  <p class=\"upload-hint\" id=\"documents-hint\">PDF or Word files, up to 10 MB each. Drop them here, or choose them.</p>\n  <p class=\"upload-error\" id=\"documents-error\" hidden></p>\n  <button type=\"button\" class=\"upload-choose\" aria-describedby=\"documents-hint documents-error\">Choose files</button>\n  <input type=\"file\" id=\"documents\" multiple accept=\".pdf,.doc,.docx\" hidden>\n  <ul class=\"upload-files\" aria-label=\"Chosen files\">\n    <!-- One item per file, its name set as text, never as HTML -->\n    <li>\n      <span class=\"upload-name\">report.pdf</span>\n      <progress max=\"100\" value=\"40\" aria-label=\"Uploading report.pdf\"></progress>\n      <button type=\"button\">Remove <span class=\"visually-hidden\">report.pdf</span></button>\n    </li>\n  </ul>\n  <p class=\"visually-hidden\" role=\"status\"></p>\n</div>"
     },
-    "vue": {
-      "vModel": "Use :value and @change or v-model with computed get/set for file list",
-      "stateManagement": "Use ref for files array and inputRef. Use reactive for per-file status/progress. Revoke object URLs in onBeforeUnmount.",
-      "composable": "Optional: useFileUpload composable for drag state, validation, and upload integration",
-      "example": "<FileUpload label='Documents' name='documents' :multiple='true' accept='.pdf,.doc' :max-size-bytes='5242880' :value='files' @change='files = $event' @upload-start='uploadFile' @upload-progress='setProgress' :error='errors.files' />"
+    "chooseAndDrop": {
+      "description": "Choosing and dropping files: Choose files opens the picker, the input is cleared after each choice, a counter keeps the highlight steady, and the page doesn't open a file dropped elsewhere.",
+      "script": "// Choosing and dropping files. The whole upload group takes dropped files, and a counter keeps\n// its highlight steady while the pointer crosses the elements inside it. addFiles(files)\n// stands for the app's own handling: check each file, list it, and start its upload.\nconst area = document.querySelector('.upload');\nconst input = document.getElementById('documents');\nconst hasFiles = (event) => event.dataTransfer?.types.includes('Files');\nlet depth = 0;\n\narea.querySelector('.upload-choose').addEventListener('click', () => input.click());\ninput.addEventListener('change', () => {\n  addFiles([...input.files]);\n  input.value = ''; // so choosing the same file again fires change again\n});\n\narea.addEventListener('dragenter', (event) => {\n  if (!hasFiles(event)) return;\n  depth += 1;\n  area.classList.add('is-dragging');\n});\narea.addEventListener('dragleave', (event) => {\n  if (hasFiles(event) && --depth === 0) area.classList.remove('is-dragging');\n});\narea.addEventListener('drop', (event) => {\n  depth = 0;\n  area.classList.remove('is-dragging');\n  addFiles([...event.dataTransfer.files]);\n});\n\n// A file dropped anywhere else on the page would open in the tab and replace it\nfor (const type of ['dragover', 'drop']) {\n  window.addEventListener(type, (event) => {\n    if (hasFiles(event)) event.preventDefault();\n  });\n}"
     },
-    "angular": {
-      "formControl": "Use ControlValueAccessor to integrate with FormControl; value is array of FileItem",
-      "stateManagement": "Use ViewChild for input element. Manage files array in component; call upload service from onUploadStart/onUploadProgress/onUploadComplete.",
-      "example": "<app-file-upload [label]='Documents' formControlName='documents' [multiple]='true' accept='.pdf,.doc' [maxSizeBytes]='5242880' (uploadStart)='uploadFile($event)'></app-file-upload>"
-    },
-    "svelte": {
-      "binding": "Use bind:value and on:change for file list, or reactive store",
-      "stateManagement": "Use bind:this for input element. Assign stable id per file; revoke object URLs in onDestroy or when file removed.",
-      "example": "<FileUpload label='Documents' name='documents' multiple accept='.pdf,.doc' maxSizeBytes={5242880} bind:value={files} on:change={e => files = e.detail} on:uploadStart={handleUploadStart} error={errors.files} />"
+    "fileCheck": {
+      "description": "Why a file can't be added: its type against accept, by extension in any case and by type, its size, and the count. The server checks again.",
+      "script": "// Why a file can't be added, or null when it can: its type against the input's accept list,\n// its size, and how many files are already chosen. file.type is the browser's guess from the\n// extension, and empty for types it doesn't know, so extensions count too, in any case. The\n// server checks everything again, the type by the file's content.\nfunction rejection(file, { accept = '', maxBytes = Infinity, chosen = 0, maxFiles = Infinity } = {}) {\n  const name = file.name.toLowerCase();\n  const type = file.type.toLowerCase();\n  const rules = accept.split(',').map((rule) => rule.trim().toLowerCase()).filter(Boolean);\n  const typeAllowed = rules.length === 0 || rules.some((rule) => (\n    rule.startsWith('.') ? name.endsWith(rule)\n      : rule.endsWith('/*') ? type.startsWith(rule.slice(0, -1))\n        : type === rule));\n  if (!typeAllowed) return 'type';\n  if (file.size > maxBytes) return 'size';\n  if (chosen >= maxFiles) return 'count';\n  return null;\n}"
     }
   },
-  "stylingApproaches": {
-    "tailwindCSS": {
-      "container": "space-y-2 min-h-[120px] p-4",
-      "label": "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5",
-      "required": "text-red-500 ml-0.5",
-      "dropzone": "min-h-[96px] flex flex-col items-center justify-center gap-2.5 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
-      "dropzoneDragOver": "border-blue-500 bg-blue-50 dark:bg-blue-950/30",
-      "dropzoneTitle": "text-sm font-medium text-gray-700",
-      "dropzoneBody": "text-[13px] text-gray-500",
-      "browseButton": "h-10 px-3.5 text-sm font-medium text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded",
-      "fileList": "space-y-2.5",
-      "fileItem": "flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-white",
-      "fileItemError": "border-red-200 bg-red-50/50",
-      "progress": "h-1.5 rounded-full bg-gray-200 overflow-hidden",
-      "progressBar": "h-full bg-blue-500 transition-[width] duration-150 ease-out",
-      "hint": "text-[13px] text-gray-500",
-      "error": "text-[13px] text-red-600"
-    },
-    "cssModules": "Create fileUpload.module.css with .container, .label, .required, .dropzone, .dropzone--drag, .dropzone--disabled, .dropzoneTitle, .dropzoneBody, .browseButton, .fileList, .fileItem, .fileItem--error, .progress, .progressBar, .hint, .error classes",
-    "styledComponents": "Create styled components with props for state (dragActive, disabled, hasError); use theme tokens for spacing, radius, and status colors",
-    "scss": "Create _file-upload.scss with BEM or nested classes (.file-upload, .file-upload__label, .file-upload__dropzone, .file-upload__dropzone--drag, .file-upload__file-list, .file-upload__file-item)"
-  },
-  "commonVariations": {
-    "singleFile": {
-      "description": "One file at a time; selecting a new file replaces the current one",
-      "multiple": false,
-      "behavior": "files length max 1; show replace affordance in dropzone when file present"
-    },
-    "multiFile": {
-      "description": "Multiple file selection with maxFiles limit",
-      "multiple": true,
-      "behavior": "Append new files until maxFiles; show count or list"
-    },
-    "withPreview": {
-      "description": "Image thumbnails for image files",
-      "showPreviews": true,
-      "behavior": "Use createObjectURL for images; revoke on remove or component unmount to avoid memory leaks"
-    },
-    "directUpload": {
-      "description": "Async upload with per-file progress and status",
-      "behavior": "Wire onUploadStart, onUploadProgress, onUploadComplete, onUploadError, onCancelUpload, onRetryUpload; show progress bar and status per file"
-    },
-    "documentsOnly": {
-      "description": "Restrict to documents (e.g. PDF, DOC)",
-      "accept": ".pdf,.doc,.docx",
-      "behavior": "Use accept and validate type; show clear error for wrong type"
-    }
+  "implementationDetails": {
+    "checks": "Check each file when it's added (frameworkPatterns.fileCheck). Reject it next to its name with the reason (\"photo.heic isn't a PDF or Word file\", \"video.mp4 is larger than 10 MB\"), and say it in the status region. file.type is the browser's guess from the extension, and empty for types it doesn't know, so match accept against the extension too, ignoring case. These checks are for the person's convenience: the server checks the type by the file's content, the size, and the count again, and treats file names as text.",
+    "duplicates": "A file with the same name, size, and modification time as one already chosen is ignored with a message, or replaces it; say which.",
+    "fileList": "Each file shows its name, size, and status: ready, uploading, uploaded, failed, cancelled, or unknown. Its buttons are Remove, and Cancel or Retry while they apply, each named after the file. The status region says when a file is added, removed, uploaded, or fails, at meaningful moments, not every percent.",
+    "uploads": "fetch() reports no upload progress, so progress needs XMLHttpRequest's upload events, or the project's upload library. Cancel aborts the request. Give each file an id (crypto.randomUUID()); a dropped connection leaves the outcome unknown, since the server may have the file, so the status says so, and Retry sends the same id, so the server keeps one copy.",
+    "paste": "Optional: files pasted into the area go through the same checks.",
+    "reset": "A form reset doesn't clear the app's list of chosen files, since the input is empty after each choice anyway. After a reset that wasn't cancelled, clear the list, cancel unfinished uploads, release preview URLs, and say so in the status region. The form's reset event comes first, and a later listener can still cancel the reset, so wait for the event to finish and check defaultPrevented."
   },
   "edgeCases": {
-    "duplicateFiles": {
-      "issue": "User selects or drops the same file twice",
-      "solution": "Compare by name+size+lastModified (or hash) and either reject duplicate with message or ignore; document behavior"
-    },
-    "veryLongFilename": {
-      "issue": "File name is very long",
-      "solution": "Truncate with ellipsis in UI; show full name in title attribute or on focus; ensure no layout overflow"
-    },
-    "manyFiles": {
-      "issue": "User adds many files (e.g. 50+)",
-      "solution": "Consider virtualizing list or limiting display; keep list performant; enforce maxFiles and announce when limit reached"
-    },
-    "pasteFromClipboard": {
-      "issue": "User pastes image from clipboard",
-      "solution": "Optional: listen for paste event, get items from clipboard as files, run same validation and add to list"
-    },
-    "uploadAborted": {
-      "issue": "User navigates away or closes during upload",
-      "solution": "Call onCancelUpload for in-flight uploads; revoke object URLs in cleanup/unmount"
-    },
-    "requiredEmpty": {
-      "issue": "Field is required but no file selected",
-      "solution": "Show error on submit; set aria-invalid and global error message"
-    }
+    "longNames": "Long file names wrap, or are shortened in the middle with the full name kept in the item's text for screen readers.",
+    "manyFiles": "The status region says when the limit is reached; with many files, a summary such as \"8 of 10 files uploaded\".",
+    "leavingDuringUpload": "While uploads run, warn before the page is left (beforeunload), or let them finish in the background if the app can.",
+    "required": "A required upload says so in words; a submit without a file shows the field's error, and focus moves to Choose files.",
+    "disabled": "When the upload can't be used yet, say why in text, and give Choose files aria-disabled=\"true\" so it can still be found.",
+    "serverRejects": "A file the server rejects shows its message next to the file, with Remove."
   },
+  "outputConstraints": {
+    "must": [
+      "Build on the project's upload component, library, or service when it has one, and keep its API",
+      "Offer Choose files as the way in that needs no dragging",
+      "Check files on the server again, and show file names as text",
+      "Name each file's buttons and progress after the file",
+      "Use the project's framework version, styling system, and tokens, the way existing components do"
+    ],
+    "mustNot": [
+      "Add an upload or drag-and-drop library without asking",
+      "Make the drop area a button, or put buttons inside one",
+      "Trust the browser's type or size checks, or insert file names as HTML",
+      "Show a user's file in an <iframe> or <object>",
+      "Announce every percent of an upload",
+      "Use inline styles for static values in a plain-CSS project, or hardcode colors the project has tokens for"
+    ]
+  },
+  "testingChecklist": [
+    "Choose files opens the picker with a click, Enter, or Space, so nothing needs dragging",
+    "Files dropped anywhere in the area are added, and a file dropped elsewhere on the page doesn't open in the tab",
+    "The highlight shows only while files are dragged over the area, and doesn't flicker over the elements inside it",
+    "The same file can be chosen again after it was removed",
+    "Each file is checked against the accepted types, with extensions in any case, the size, and the count, and a rejected file says why, by name",
+    "The server checks the type by content, the size, and the count again, and file names are shown as text",
+    "Each file's Remove, Retry, and Cancel buttons are named after it, and its progress is a progress element named after it",
+    "One status region announces files added, removed, uploaded, and failed, without announcing every percent",
+    "After Remove, focus lands on another file's Remove button or on Choose files, never on the page body",
+    "A dropped connection shows the upload's outcome as unknown, and Retry doesn't create a second copy",
+    "A form reset clears the list of chosen files and cancels unfinished uploads, and a cancelled reset changes nothing",
+    "The area's edge, its text, and the focus indicator meet the contrast minimums, and buttons are at least 24 by 24 px",
+    "Styles come from the project's styling system and tokens, like its other form controls"
+  ],
   "meta": {
     "created": "2026-02-03",
-    "updated": "2026-02-03",
-    "webUrl": "https://uipotion.com/potions/components/file-upload.html",
+    "updated": "2026-10-22",
+    "webUrl": "https://uipotion.com/potions/components/file-upload",
     "relatedPotions": [
-      {
-        "id": "dropdown-select",
-        "category": "components",
-        "relationship": "complements",
-        "description": "Often used alongside dropdowns/selects in forms and settings pages; shares patterns for errors, focus, and keyboard support.",
-        "required": false
-      },
       {
         "id": "form-validation",
         "category": "patterns",
         "relationship": "complements",
-        "description": "Apply form validation timing and error display best practices to file validation and submission flows.",
+        "description": "Optional: required uploads, and errors when a form is submitted.",
+        "required": false
+      },
+      {
+        "id": "dropdown-select",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: Select and Combobox, for the other fields in upload and settings forms.",
         "required": false
       },
       {
         "id": "form-login-register",
         "category": "features",
         "relationship": "used-in",
-        "description": "Reference full form UX patterns; file upload frequently appears in profile and onboarding flows.",
+        "description": "Optional: registration and profile forms that ask for a photo or a document.",
         "required": false
       }
     ],
