@@ -293,7 +293,7 @@ Add these only when the product needs them.
 - **[Command Palette](/potions/components/command-palette)**: quick prompts, commands, and switching conversations from the keyboard.
 - **[Text Input](/potions/components/text-input)**: label, hint, and error conventions for the composer.
 - **[Toast Notifications](/potions/components/toast-notifications)**: feedback outside the conversation, such as a deleted conversation with Undo.
-- **[Dropdown/Select](/potions/components/dropdown-select)**: an assistant or model picker.
+- **[Select and Combobox](/potions/components/dropdown-select)**: an assistant or model picker.
 - **[Navigation Bar](/potions/components/navbar)**: when the chat sits under the site's own header.
 - **[Button](/potions/components/button)**: the composer's button and the header's actions.
 

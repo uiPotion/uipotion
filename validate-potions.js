@@ -26,20 +26,9 @@ const SITE_URL = 'https://uipotion.com';
 // warnings until each potion's pass fixes them and deletes them here. A line that no longer
 // matches a finding fails validation. Never add a line: fix a new break instead.
 const KNOWN_RULE_BREAKS = [
-  'components/data-table [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'components/data-table [urls]: meta.webUrl is "https://uipotion.com/potions/components/data-table.html", expected https://uipotion.com/potions/components/data-table',
-  'components/navbar [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'components/navbar [placeholder]: placeholders left in the Markdown: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'components/navbar [urls]: meta.webUrl is "https://uipotion.com/potions/components/navbar.html", expected https://uipotion.com/potions/components/navbar',
-  'components/sidebar-navigation [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'components/sidebar-navigation [urls]: meta.webUrl is "https://uipotion.com/potions/components/sidebar-navigation.html", expected https://uipotion.com/potions/components/sidebar-navigation',
-  'components/tabs [urls]: meta.webUrl is "https://uipotion.com/potions/components/tabs.html", expected https://uipotion.com/potions/components/tabs',
   'components/toast-notifications [urls]: meta.webUrl is "https://uipotion.com/potions/components/toast-notifications.html", expected https://uipotion.com/potions/components/toast-notifications',
   'features/pricing-table [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
   'features/pricing-table [urls]: meta.webUrl is "https://uipotion.com/potions/features/pricing-table.html", expected https://uipotion.com/potions/features/pricing-table',
-  'layouts/dashboard [emoji]: 1 emoji in the Markdown: 🔔',
-  'layouts/dashboard [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'layouts/dashboard [urls]: meta.webUrl is "https://uipotion.com/potions/layouts/dashboard.html", expected https://uipotion.com/potions/layouts/dashboard',
   'layouts/documentation [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
   'layouts/documentation [urls]: meta.webUrl is "https://uipotion.com/potions/layouts/documentation.html", expected https://uipotion.com/potions/layouts/documentation',
   'layouts/documentation [related-potions]: related potion components/command-palette has required: true (use false)',

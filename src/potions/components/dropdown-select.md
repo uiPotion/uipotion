@@ -228,7 +228,7 @@ These are suggested defaults; the project's design and tokens win.
 ## Edge cases
 
 - **Many options**: with hundreds, filter on the server or render only part of the list. Then each option needs `aria-setsize` and `aria-posinset`, since browsers can only count rendered options; otherwise leave them out.
-- **Options that can't be chosen right now** have `aria-disabled="true"`, and the arrows skip them.
+- **Options that can't be chosen right now** have `aria-disabled="true"`, and the arrows still reach them, so screen reader users learn they exist; Enter and a click don't pick them (APG).
 - **Edit forms** start with the chosen option's text in the input and its value in the hidden input. The snippet sets `aria-selected` and the validity from them when the page loads, and brings them back after a form reset that wasn't cancelled.
 - **In a dialog**: the first Escape closes the list, and the second the dialog.
 - **Before the script runs**: a server-rendered page can start with the native select and replace it with the combobox once the script runs.

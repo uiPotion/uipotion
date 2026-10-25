@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/components.schema.json",
   "id": "navbar",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "name": "Navigation Bar (Responsive) with Mobile Menu",
   "category": "components",
   "tags": [
@@ -14,567 +14,371 @@
     "dropdown",
     "a11y"
   ],
-  "description": "A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, optional transparent-to-solid transition, and first-class dropdown support. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.",
+  "description": "A responsive top bar for a site or app: a skip link, the logo, links with disclosure dropdowns, and the actions, plus a menu in a native dialog below 1024 px. It sticks with CSS alone, keeps focused elements clear of itself with scroll-padding, and stays below modals.",
   "tokens": {
+    "note": "Suggested defaults. The project's design tokens and existing components win.",
     "layout": {
-      "navbarHeightDesktopPx": 72,
-      "navbarHeightMobilePx": 60,
-      "scrollThresholdPx": 20,
-      "desktopBreakpointPx": 1024,
-      "zIndex": {
-        "backdrop": 50,
-        "mobileMenu": 60,
-        "navbar": 70,
-        "dropdowns": 80,
-        "tooltips": 90
-      }
+      "barHeightPx": 72,
+      "barHeightPhonePx": 60,
+      "linksFromPx": 1024,
+      "minTargetPx": 24,
+      "touchTargetPx": 44,
+      "layering": "Layers, bottom to top: the page, sticky bars, dropdowns and popovers, toasts, then modals, which make the rest of the page inert. The project's layering scale wins; native <dialog> and the popover attribute use the top layer and need no z-index. The bar is a sticky bar: an open dropdown list sits above the page, and a modal dialog covers the bar."
     },
     "motion": {
-      "stickyTransitionMs": 300,
-      "mobileMenuOpenMs": 300,
-      "mobileMenuCloseMs": 250,
-      "backdropFadeMs": 200,
-      "dropdownOpenMs": 180,
-      "dropdownCloseMs": 150,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "reducedMotionDurationMs": 100
+      "dropdownFadeMs": 150,
+      "menuSlideMs": 250,
+      "easing": "cubic-bezier(0.2, 0, 0, 1)"
     }
-  },
-  "projectDetection": {
-    "framework": {
-      "description": "Identify the UI framework and routing primitives so the navbar matches existing conventions.",
-      "detectionSteps": [
-        "Inspect package.json dependencies to identify the framework (React/Vue/Angular/Svelte) and router (Next.js, react-router, Vue Router, etc.).",
-        "Open 2-3 existing components to confirm patterns (hooks vs composition API, state conventions, folder structure).",
-        "Confirm SSR/hydration constraints (e.g., Next.js/Nuxt): do not access window/document before mount."
-      ]
-    },
-    "stylingSystem": {
-      "description": "Detect the project's styling approach and use ONLY that approach (no new styling systems).",
-      "detectionSteps": [
-        "Inspect package.json for tailwindcss, sass, styled-components, @emotion/*, vanilla-extract, css-modules tooling.",
-        "Inspect existing components: Tailwind utility usage vs CSS Modules vs SCSS imports vs styled-components/emotion patterns.",
-        "Inspect config files (tailwind.config.*, postcss.config.*, vite/webpack configs) to confirm the styling pipeline."
-      ],
-      "adaptationRules": [
-        "If Tailwind is present, use Tailwind utility classes and existing token conventions; do not add new CSS files.",
-        "If CSS Modules are used, create/extend a module stylesheet and follow existing naming conventions; avoid inline style attributes.",
-        "If SCSS is used, create/extend SCSS in the existing structure; keep mixins/variables consistent.",
-        "If styled-components/emotion is used, implement styles using that library; do not introduce class-based stylesheets.",
-        "If vanilla CSS is used, define reusable classes in a stylesheet (no inline style attributes)."
-      ]
-    },
-    "designTokens": {
-      "description": "Align spacing, typography, color surfaces, and elevation to existing project tokens.",
-      "detectionSteps": [
-        "Locate token sources (CSS variables, Tailwind theme, theme files, design system packages).",
-        "Identify surface/background colors and elevation/shadows for sticky/solid states.",
-        "Identify spacing/typography scales used in existing header/nav components."
-      ]
-    }
-  },
-  "outputConstraints": {
-    "must": [
-      "Match existing framework component patterns and routing/link components.",
-      "Match existing styling conventions exactly (Tailwind/CSS Modules/SCSS/styled-components/etc.).",
-      "Implement mobile menu as a modal dialog with focus trap + focus restoration.",
-      "Implement dropdowns using a disclosure pattern by default (button + panel), unless the project has an established menu pattern.",
-      "Be SSR/hydration safe (no DOM access before mount).",
-      "Respect prefers-reduced-motion: reduce durations to <= tokens.motion.reducedMotionDurationMs and avoid transform-based animations where possible."
-    ],
-    "mustNot": [
-      "Do not introduce a new styling system.",
-      "Do not add <style> blocks.",
-      "Do not use inline style attributes when vanilla CSS is detected.",
-      "Do not use role=\"menu\" / role=\"menuitem\" unless fully implementing the ARIA menu button pattern (arrow-key semantics, roles, and expectations).",
-      "Do not hardcode colors if the project uses design tokens or theme variables."
-    ]
   },
   "aiAgentInstructions": {
-    "summary": "Implement a responsive navigation bar with a mobile hamburger menu (modal dialog), sticky positioning (optional), optional transparent-to-solid scroll transition, and dropdown navigation. Dropdowns must work on desktop and integrate cleanly into the mobile dialog as accordion sections. Ensure WCAG AA compliance with correct ARIA, keyboard support, focus management, and reduced-motion behavior.",
+    "summary": "Build or extend a site's or app's top bar: a skip link, the logo, the main links with disclosure dropdowns, and the actions, plus a menu in a native dialog below 1024 px. The bar sticks with position: sticky, and scroll-padding-top keeps focused elements clear of it. Dropdowns are disclosures, never ARIA menus: a button that shows a list of links, closed by Escape, a click outside, or focus leaving the navigation. Build on the project's header or navigation component when it has a suitable one. Implement only what the task needs, keep existing APIs, and match the project's styling and tokens. The project's conventions win for styling and visual defaults; if one conflicts with an accessibility or correctness requirement in this guide, ask the user instead of choosing silently. Target WCAG 2.2 AA.",
     "keyFeatures": [
-      "Responsive: Desktop shows horizontal nav links; mobile/tablet show hamburger menu dialog",
-      "Sticky positioning: Fixed at top when scrolling (sticky=true)",
-      "Transparent→Solid: Background transitions on scroll (transparent=true; marketing recommended only)",
-      "Mobile menu: Modal dialog overlay with focus trap, focus restoration, inert/aria-hidden background, and body scroll lock",
-      "Dropdowns: Desktop disclosure dropdown panels; Mobile integrates dropdowns as accordion sections inside the dialog",
-      "Accessibility: ARIA attributes, keyboard navigation, Escape handling, focus visibility",
-      "Active link: Highlights current route with aria-current=\"page\"",
-      "Variants: Marketing (logo + links + CTA) and App (user menu, notifications)",
-      "Animations: 150–300ms transitions with prefers-reduced-motion support",
-      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system.",
-      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements."
+      "A <header> that starts with a skip link, a labelled <nav> with the links, and aria-current=\"page\" on the current one",
+      "Sticky with CSS alone, and scroll-padding-top at the bar's height, so focused elements and link targets stay clear of it (WCAG 2.2 2.4.11)",
+      "Disclosure dropdowns: a button with aria-expanded and aria-controls, a hidden list while closed, Escape back to the button, and closing when focus leaves or on a click outside",
+      "Below 1024 px, a menu in a native dialog that makes the page inert, with a visible Close button and accordion sections for groups",
+      "An app variant with an account menu that signs out with a button, and a notifications button whose name has the count",
+      "Optional: a transparent bar over a hero that turns solid once the page scrolls, switched by an IntersectionObserver"
     ],
     "implementationSteps": [
-      "0. CRITICAL: Detect framework + router + styling system + design tokens using projectDetection before writing code.",
-      "1. Build component anatomy: Logo, NavLinks (desktop), MobileToggle, Actions (CTA/User Menu/Notifications), DropdownPanels, MobileMenu (dialog).",
-      "2. Implement controlled/uncontrolled state for mobileMenuOpen and openDropdownId (desktop).",
-      "3. Mobile dropdown integration: render items with children as accordion sections inside the mobile dialog (expand/collapse without closing the dialog).",
-      "4. Add scroll detection for sticky and transparent→solid behavior (requestAnimationFrame or ~100ms throttle).",
-      "5. Mobile dialog a11y: focus trap, initial focus, focus restoration to toggle, Escape close, backdrop click close, inert/aria-hidden background.",
-      "6. Body scroll lock when mobile dialog is open; cleanup on close/unmount; add iOS handling if needed.",
-      "7. Desktop dropdown behavior: click toggle opens/closes; outside click closes; Escape closes and restores focus to the toggle; optionally close on route change.",
-      "8. Apply ARIA: navigation landmark, dialog semantics for mobile, disclosure semantics for dropdowns, aria-current for active route.",
-      "9. Add animations + prefers-reduced-motion behavior (avoid transform-based motion if reduced).",
-      "10. Implement active link detection via the project's routing solution.",
-      "11. Use ONLY the detected styling system and match naming/import conventions exactly.",
-      "12. Provide a test checklist covering keyboard + screen reader flows for mobile dialog and dropdowns."
+      "1. Detect the framework and its version, the styling system, the tokens, the router, and the existing components (projectDetection). If the project already has a header or navigation component, configure or extend it to meet this guide instead of building another one, and keep its API.",
+      "2. Choose what the task needs: the marketing or the app variant (componentSpec.variants), dropdowns, the transparent state. Leave out the rest.",
+      "3. Build the structure (componentSpec.anatomy): the header, the skip link, the logo, the labelled nav, and the actions.",
+      "4. Make the bar sticky, and set scroll-padding-top to its height (frameworkPatterns.skipLink).",
+      "5. Add the dropdowns as disclosures (frameworkPatterns.disclosure).",
+      "6. Below 1024 px, add the Menu button and the menu in a native dialog (implementationDetails.mobileMenu).",
+      "7. For the app variant, add the account menu and the notifications button (implementationDetails.appActions).",
+      "8. Check the result against testingChecklist with a keyboard, a screen reader, a phone, and 200% zoom, and run the project's existing tests and checks."
     ]
   },
   "componentSpec": {
-    "goal": "Provide a responsive navigation bar that adapts to screen sizes, supports sticky/transparent behavior, and includes accessible mobile menu and dropdown navigation.",
+    "goal": "Give every page the same way to its main sections, one that works with a keyboard, a pointer, a touch screen, and a screen reader, and never covers what has focus.",
     "anatomy": {
       "slots": [
+        "skipLink",
         "logo",
-        "navLinks",
-        "mobileToggle",
+        "nav",
+        "link",
+        "dropdownButton",
+        "dropdownList",
         "actions",
-        "dropdownPanels",
-        "mobileMenu"
+        "menuButton",
+        "menu"
       ],
-      "hierarchy": "Navbar → Logo | NavLinks (desktop, includes dropdown toggles/panels) | MobileToggle | Actions → MobileMenu (dialog) → NavLinks (accordion) | Actions"
+      "hierarchy": "header (banner) → skip link | logo link | nav \"Main\" → list of links and dropdown buttons, each button followed by its list | actions (a call to action, or the account menu and notifications) | Menu button (below 1024 px) → dialog \"Main menu\" with its own copy of the links and actions",
+      "slotNotes": {
+        "header": "The bar is the page's <header>, its banner landmark. It starts with the skip link, then the logo, a link to the home page named with the site's name (the logo image's alt text), then a <nav> with the site's links, labelled \"Main\", then the actions.",
+        "currentLink": "The current page's link has aria-current=\"page\" and looks different by more than color, such as an underline.",
+        "unavailableLink": "Leave out links the person can't use. One that has to show as unavailable for now is an <a> without href, with role=\"link\", tabindex=\"0\", and aria-disabled=\"true\", so it's still found and does nothing; say why next to it.",
+        "newTab": "A link that opens a new tab says so in its text, visible or visually hidden.",
+        "dropdownButton": "An item with children is a button that shows or hides its list of links, with aria-expanded and aria-controls. It has no aria-haspopup and no role=\"menu\": those announce an app menu with arrow-key behavior, and these are links.",
+        "linkWithChildren": "An item with its own page and children needs two controls: the link, and a separate button that shows the list, named after it (\"More Products pages\").",
+        "skipLink": "The skip link is the first focusable element: \"Skip to content\", shown while it has focus, going to <main id=\"main\" tabindex=\"-1\"> (WCAG 2.4.1)."
+      }
     },
     "stateModel": {
-      "mobileMenuOpen": {
+      "openDropdown": {
+        "type": "string",
+        "description": "The id of the open dropdown list, or empty when none is open; mirrored in aria-expanded on its button.",
+        "default": "",
+        "persistence": "component state only"
+      },
+      "menuOpen": {
         "type": "boolean",
-        "description": "Whether the mobile menu dialog is visible.",
+        "description": "Whether the menu dialog is open, below 1024 px.",
         "default": false,
         "persistence": "component state only"
       },
-      "scrolled": {
-        "type": "boolean",
-        "description": "Whether the page has scrolled beyond the threshold (used for transparent→solid and sticky elevation).",
-        "default": false,
-        "persistence": "component state only",
-        "determination": "Computed from window.scrollY > tokens.layout.scrollThresholdPx (default: 20px)"
-      },
       "activeLink": {
         "type": "string",
-        "description": "Current active navigation link ID/route.",
-        "default": "current route",
-        "persistence": "sync with router/URL",
-        "determination": "Compare current URL/route with navigation link hrefs"
+        "description": "The link for the current page, which gets aria-current=\"page\".",
+        "persistence": "router/URL",
+        "determination": "Compare the current route with the links' targets"
       },
-      "variant": {
-        "type": "enum",
-        "description": "Navbar style variant: marketing (logo + links + CTA) or app (user menu, notifications).",
-        "default": "marketing",
-        "allowedValues": [
-          "marketing",
-          "app"
-        ],
-        "persistence": "props/config"
-      },
-      "sticky": {
+      "scrolled": {
         "type": "boolean",
-        "description": "Whether the navbar is sticky (fixed to top).",
-        "default": true,
-        "persistence": "props/config",
-        "notes": "Default true for both variants. Set sticky=false explicitly if needed."
-      },
-      "transparent": {
-        "type": "boolean",
-        "description": "Whether the navbar starts transparent and becomes solid on scroll.",
+        "description": "Optional: whether the page has scrolled past the top, for the transparent state or a shadow.",
         "default": false,
-        "persistence": "props/config",
-        "notes": "Recommended only for marketing variant and only when contrast is sufficient (e.g., hero behind). If variant=app, force transparent=false."
-      },
-      "openDropdownId": {
-        "type": "string",
-        "description": "ID of the currently open desktop dropdown (null/empty means none).",
-        "default": "",
         "persistence": "component state only",
-        "notes": "Desktop only. Prefer a single open dropdown at a time for predictability."
-      },
-      "mobileExpandedItemIds": {
-        "type": "array",
-        "description": "IDs of expanded accordion sections inside the mobile dialog for items that have children.",
-        "default": [],
-        "persistence": "component state only",
-        "notes": "Mobile dialog only. Allow multiple expanded sections unless the product requires single-open behavior."
+        "determination": "An IntersectionObserver on a small element at the top of the page"
       }
     },
     "interactions": [
       {
-        "event": "mobileToggleClick",
-        "result": "toggleMobileMenu",
+        "event": "dropdownButtonActivate",
+        "result": "toggleList",
         "sideEffects": [
-          "moveFocusToFirstMenuItem",
-          "lockBodyScroll",
-          "updateAriaExpanded",
-          "setBackgroundInert"
-        ]
+          "closeOtherLists",
+          "updateAriaExpanded"
+        ],
+        "accessibilityNotes": "A click, Enter, or Space toggles the list; focus stays on the button."
       },
       {
         "event": "escapeKey",
-        "when": "mobileMenuOpen",
-        "result": "closeMobileMenu",
+        "when": "a list is open",
+        "result": "closeList",
         "sideEffects": [
-          "restoreFocusToToggle",
-          "unlockBodyScroll",
-          "updateAriaExpanded",
-          "unsetBackgroundInert"
+          "focusItsButton"
         ],
-        "preventDefault": true,
-        "stopPropagation": true,
-        "accessibilityNotes": "Escape closes the mobile dialog and restores focus to the toggle button."
+        "accessibilityNotes": "Escape closes the open list and puts focus back on its button."
       },
       {
-        "event": "backdropClick",
-        "when": "mobileMenuOpen",
-        "result": "closeMobileMenu",
-        "sideEffects": [
-          "restoreFocusToToggle",
-          "unlockBodyScroll",
-          "updateAriaExpanded",
-          "unsetBackgroundInert"
-        ],
-        "stopPropagation": true
-      },
-      {
-        "event": "mobileLinkClick",
-        "when": "mobileMenuOpen",
-        "result": "closeMobileMenu",
-        "sideEffects": [
-          "restoreFocusToToggle",
-          "unlockBodyScroll",
-          "updateAriaExpanded",
-          "unsetBackgroundInert",
-          "navigateToRoute"
-        ]
-      },
-      {
-        "event": "mobileAccordionToggleClick",
-        "when": "mobileMenuOpen && itemHasChildren",
-        "result": "toggleMobileAccordionSection",
-        "sideEffects": [
-          "updateAriaExpanded"
-        ],
-        "accessibilityNotes": "Toggling an accordion section must not close the mobile dialog; focus remains within the dialog."
-      },
-      {
-        "event": "scroll",
-        "when": "sticky || transparent",
-        "result": "updateScrolledState",
-        "sideEffects": [
-          "updateBackground",
-          "updateShadow"
-        ],
-        "accessibilityNotes": "Throttle/debounce for performance (requestAnimationFrame or ~100ms throttle)."
-      },
-      {
-        "event": "navLinkClick",
-        "result": "navigateToRoute",
-        "sideEffects": [
-          "updateActiveLink",
-          "updateAriaCurrent"
-        ]
-      },
-      {
-        "event": "dropdownToggleClick",
-        "when": "desktop && itemHasChildren",
-        "result": "toggleDropdown",
-        "sideEffects": [
-          "updateAriaExpanded",
-          "closeOtherDropdowns"
-        ],
-        "accessibilityNotes": "Use disclosure semantics (button + controlled panel)."
+        "event": "focusLeavesNav",
+        "when": "a list is open",
+        "result": "closeList",
+        "accessibilityNotes": "A focusout whose relatedTarget is outside the navigation closes the list. A null relatedTarget is left to the click handler, since macOS Safari doesn't focus a clicked link."
       },
       {
         "event": "outsideClick",
-        "when": "desktop && openDropdownId != ''",
-        "result": "closeDropdown",
-        "sideEffects": [
-          "updateAriaExpanded"
-        ],
-        "accessibilityNotes": "Outside click closes the open dropdown panel."
+        "when": "a list is open",
+        "result": "closeList",
+        "accessibilityNotes": "Focus stays where the click put it."
       },
       {
-        "event": "escapeKey",
-        "when": "desktop && openDropdownId != ''",
-        "result": "closeDropdown",
+        "event": "menuButtonActivate",
+        "when": "below 1024 px",
+        "result": "openMenuDialog",
         "sideEffects": [
-          "restoreFocusToDropdownToggle",
-          "updateAriaExpanded"
+          "showModal",
+          "lockScroll"
         ],
-        "preventDefault": true,
-        "stopPropagation": true,
-        "accessibilityNotes": "Escape closes dropdown and returns focus to its toggle."
+        "accessibilityNotes": "showModal() puts focus on the dialog's first control and makes the rest of the page inert."
       },
       {
-        "event": "windowResize",
-        "when": "mobileMenuOpen",
-        "result": "closeMobileMenuIfDesktop",
+        "event": "menuClose",
+        "when": "the menu is open",
+        "result": "closeMenuDialog",
         "sideEffects": [
-          "restoreFocusToToggle",
-          "unlockBodyScroll",
-          "updateAriaExpanded",
-          "unsetBackgroundInert"
+          "unlockScroll"
         ],
-        "accessibilityNotes": "Close the mobile dialog when switching to desktop breakpoint (>=1024px)."
+        "accessibilityNotes": "Close, Escape, a click on the backdrop, and a followed link close it; the browser returns focus to the Menu button."
+      },
+      {
+        "event": "breakpointChange",
+        "when": "the window crosses 1024 px",
+        "result": "keepFocusOnWhatStays",
+        "sideEffects": [
+          "closeMenuDialogWhenWidening",
+          "focusBarLinkWhenTheMenuOrItsButtonHides",
+          "focusMenuButtonWhenNarrowing"
+        ],
+        "accessibilityNotes": "React to a matchMedia change, not to resize events. Focus on what hides moves to what stays: widening with the menu open, or with focus on the Menu button, moves focus to a link in the bar; narrowing with focus on the bar's links moves it to the Menu button; focus anywhere else stays. Chromium drops focus from a hidden element before the listener runs, so remember the last focused element."
       }
     ],
     "responsiveBehavior": {
-      "mobile": {
-        "maxWidthPx": 767,
-        "behavior": "Logo left, hamburger right. Desktop links hidden. Mobile menu opens as modal dialog. Items with children render as accordion sections. Actions shown in the dialog.",
-        "heightPx": 60,
-        "mobileMenu": "Modal dialog overlay; full-screen or slide-in panel."
-      },
-      "tablet": {
-        "minWidthPx": 768,
-        "maxWidthPx": 1023,
-        "behavior": "Default to mobile dialog pattern. Dropdown items still behave as accordion sections inside the dialog.",
-        "heightPx": 72
-      },
-      "desktop": {
-        "minWidthPx": 1024,
-        "behavior": "Logo left, nav links horizontal, actions right. Items with children open disclosure dropdown panels on click (no hover-only behavior). Mobile menu hidden.",
-        "heightPx": 72
-      }
+      "fromDesktop": "From 1024 px: the logo, the links, and the actions in one row; dropdown lists open below their buttons.",
+      "belowDesktop": "Below 1024 px: the logo, the Menu button, and the actions that fit; everything else is in the menu dialog.",
+      "reflow": "At 320 px wide nothing scrolls sideways, and labels wrap instead of being cut off."
     },
     "variants": {
-      "marketing": "Logo + horizontal nav + primary CTA. Sticky by default. Optional transparent-on-hero mode (transparent=true) that becomes solid on scroll. Dropdowns supported for grouped marketing sections.",
-      "app": "Logo + nav + notifications + user menu. Solid background only (transparent forced false). Sticky by default. Dropdowns commonly used for user menu and nav groupings."
+      "marketing": "Links, dropdowns for groups of pages, and one call to action. A call to action that goes to a page is a link.",
+      "app": "Links, notifications, and the account menu (implementationDetails.appActions). The bar stays solid.",
+      "transparent": "Optional, for marketing pages: the bar starts transparent over a hero and turns solid once the page scrolls. An IntersectionObserver on a small element at the top of the page switches it exactly at the threshold, with no scroll listener; the same observer can add a shadow. The bar's text meets 4.5:1 against what's behind it in both states, the hero image included. App bars stay solid."
     },
     "dataContract": {
       "navItems": {
-        "description": "Navigation items for desktop and mobile. Supports hierarchical dropdowns (children).",
-        "shape": {
-          "id": "string",
-          "label": "string",
-          "href": "string (optional if children present)",
-          "external": "boolean (optional)",
-          "disabled": "boolean (optional)",
-          "items": "array of NavItem (optional children)"
-        },
-        "notes": "If items[] is present, treat the item as a dropdown/accordion parent. Parent may optionally also have an href (product-specific)."
-      },
-      "cta": {
-        "description": "Marketing variant CTA config.",
-        "shape": {
-          "label": "string",
-          "href": "string",
-          "variant": "string (maps to project button styles)"
-        }
-      },
-      "notifications": {
-        "description": "App variant notifications indicator.",
-        "shape": {
-          "unreadCount": "number",
-          "onOpen": "function (optional)"
-        }
-      },
-      "userMenu": {
-        "description": "App variant user menu trigger and items.",
-        "shape": {
-          "label": "string (optional)",
-          "items": "array of { id, label, href | onSelect }"
-        }
+        "shape": "{ label, href?, current?, external?, unavailable?, items?: NavItem[] }",
+        "notes": "An item with items is a dropdown; with an href as well, it gets both a link and a button. external links say they open a new tab; unavailable items follow componentSpec.anatomy.slotNotes.unavailableLink."
       }
     }
   },
   "animations": {
-    "stickyScroll": {
-      "durationMs": 300,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "properties": [
-        "background-color",
-        "box-shadow",
-        "backdrop-filter"
-      ],
-      "trigger": "Scroll position > tokens.layout.scrollThresholdPx (default: 20px)",
-      "implementation": "Use requestAnimationFrame or throttle (~100ms) for scroll detection"
-    },
-    "transparentToSolid": {
-      "durationMs": 300,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "background": "transparent/surface-overlay → surface-solid (use project tokens)",
-      "shadow": "none → elevated shadow (use project tokens)",
-      "backdropFilter": "blur(8px) → none (optional; prefer tokens)"
-    },
-    "mobileMenuOpen": {
-      "durationMs": 300,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "menu": "translateX(-100%) → translateX(0) or translateY(-100%) → translateY(0)",
-      "backdrop": "opacity: 0 → 1 (200ms)"
-    },
-    "mobileMenuClose": {
-      "durationMs": 250,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "menu": "translateX(0) → translateX(-100%)",
-      "backdrop": "opacity: 1 → 0 (150ms)"
-    },
-    "dropdownOpen": {
-      "durationMs": 180,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "properties": [
-        "opacity",
-        "transform",
-        "visibility"
-      ],
-      "notes": "If prefers-reduced-motion is enabled, avoid transform and reduce durations to <= tokens.motion.reducedMotionDurationMs."
-    },
-    "dropdownClose": {
+    "note": "Optional.",
+    "dropdown": {
       "durationMs": 150,
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "properties": [
-        "opacity",
-        "transform",
-        "visibility"
-      ],
-      "notes": "If prefers-reduced-motion is enabled, avoid transform and reduce durations to <= tokens.motion.reducedMotionDurationMs."
-    }
+      "properties": "opacity"
+    },
+    "menu": {
+      "durationMs": 250,
+      "properties": "transform and opacity"
+    },
+    "reducedMotion": "Under prefers-reduced-motion: reduce, the lists and the menu appear without movement."
   },
   "accessibility": {
     "wcagCompliance": {
       "level": "AA",
+      "version": "2.2",
       "requirements": {
-        "2.1.1": "All navbar controls operable via keyboard; focus trapped within mobile dialog while open.",
-        "2.1.2": "Escape closes mobile dialog and dropdowns; no keyboard trap beyond intended modal focus trap.",
-        "2.4.3": "Logical focus order; focus returns to the correct toggle when overlays close.",
-        "2.4.7": "Visible focus indicators for all interactive elements.",
-        "4.1.2": "Correct ARIA roles, names, and relationships."
+        "1.3.1": "The bar is the header landmark, the links are in a labelled nav, and dropdown buttons expose their state.",
+        "1.4.1": "The current page's link is marked by more than color.",
+        "1.4.3": "Link text meets 4.5:1, over a transparent bar's background too.",
+        "1.4.11": "Focus indicators and the current link's marker meet 3:1.",
+        "2.1.1": "Every link, dropdown, and the menu work from the keyboard.",
+        "2.4.1": "A skip link goes past the bar to the main area.",
+        "2.4.3": "Focus returns to the dropdown's button on Escape, and to the Menu button when the menu closes.",
+        "2.4.7": "Every link and button shows focus.",
+        "2.4.11": "scroll-padding-top keeps a focused element clear of the sticky bar.",
+        "2.5.8": "Links and buttons are at least 24 px tall.",
+        "4.1.2": "Dropdown buttons expose aria-expanded; the menu is a named dialog."
       }
     },
     "keyboardNavigation": {
-      "escapeKey": "Closes mobile dialog when open; otherwise closes an open desktop dropdown; restores focus to the corresponding toggle.",
-      "tabKey": "Mobile dialog traps focus while open; desktop dropdown panels do not trap focus (use normal Tab order).",
-      "initialFocus": "On opening mobile dialog, move focus to the first focusable element inside the dialog (often first nav link)."
+      "tab": "Moves through the skip link, the logo, the links and dropdown buttons, an open list's links, and the actions, in that order.",
+      "enterSpace": "Opens or closes a dropdown, and follows links.",
+      "escape": "Closes the open list or the menu, with focus back on its button."
     },
     "ariaAttributes": {
       "required": {
-        "navbar": {
-          "role": "navigation",
-          "aria-label": "Main navigation"
+        "nav": {
+          "aria-label": "Main"
         },
-        "mobileMenuToggle": {
-          "id": "navbar-menu-toggle",
-          "aria-label": "Toggle menu",
-          "aria-expanded": "true/false (dynamically updated)",
-          "aria-controls": "navbar-mobile-menu"
+        "currentLink": {
+          "aria-current": "page"
         },
-        "mobileMenu": {
-          "id": "navbar-mobile-menu",
-          "role": "dialog",
-          "aria-modal": "true",
-          "aria-labelledby": "navbar-menu-toggle",
-          "aria-hidden": "true when closed; false/omitted when open",
-          "note": "Mobile menu uses dialog semantics because it is modal with focus trap. Inside the dialog, include <nav aria-label=\"Main navigation\"> for links."
+        "dropdownButton": {
+          "aria-expanded": "\"true\" while its list shows",
+          "aria-controls": "The list's id"
         },
-        "activeNavLink": {
-          "aria-current": "page (on current page link only)"
-        },
-        "desktopDropdownToggle": {
-          "aria-haspopup": "true",
-          "aria-expanded": "true/false (dynamically updated)",
-          "aria-controls": "dropdown-panel-{id}",
-          "note": "Prefer disclosure semantics: button controls a panel of links. Avoid role=\"menu\" unless fully implementing menu keyboard semantics."
-        },
-        "desktopDropdownPanel": {
-          "id": "dropdown-panel-{id}",
-          "note": "Panel is a container for links; do not assign role=\"menu\" unless implementing full menu pattern."
-        },
-        "mobileAccordionToggle": {
-          "aria-expanded": "true/false (dynamically updated)",
-          "aria-controls": "accordion-panel-{id}"
-        },
-        "mobileAccordionPanel": {
-          "id": "accordion-panel-{id}"
+        "menuDialog": {
+          "aria-label or aria-labelledby": "Main menu"
         }
       },
       "optional": {
-        "logo": {
-          "alt": "Descriptive alt text for logo image"
+        "unavailableLink": {
+          "role": "link",
+          "tabindex": "0",
+          "aria-disabled": "true",
+          "note": "Only for a link that has to show as unavailable for now"
+        },
+        "notificationsBadge": {
+          "aria-hidden": "true",
+          "note": "The button's name has the count"
         }
       }
     },
+    "screenReader": {
+      "landmarks": "The banner, and a navigation landmark named \"Main\"; the menu dialog has its own nav.",
+      "dropdowns": "Each dropdown button reads its name and \"collapsed\" or \"expanded\"."
+    },
     "focusManagement": {
-      "notes": [
-        "Mobile dialog: implement focus trap and restore focus to the menu toggle on close.",
-        "Desktop dropdown: on Escape, close dropdown and restore focus to its toggle. Do not trap focus inside dropdown panels.",
-        "If multiple overlays exist (mobile dialog + dropdowns), the mobile dialog is the top-level focus scope; do not open desktop dropdowns behind it."
-      ]
-    },
-    "implementationChecklist": [
-      "Mobile menu uses role=\"dialog\" + aria-modal=\"true\" and contains <nav aria-label=\"Main navigation\">",
-      "Mobile menu toggle has id, aria-expanded, and aria-controls",
-      "Focus trap is active only while the mobile dialog is open; focus restores to the menu toggle on close",
-      "Background content is inert/aria-hidden while the mobile dialog is open",
-      "Body scroll lock is applied when mobile dialog is open and cleaned up on close",
-      "Desktop dropdown toggles have aria-expanded + aria-controls; Escape closes and restores focus",
-      "Mobile dropdowns are accordions with aria-expanded + aria-controls; expanding does not close the dialog",
-      "Active link uses aria-current=\"page\" correctly",
-      "All interactive elements have visible focus indicators",
-      "Prefers-reduced-motion reduces durations and avoids transform motion where possible"
-    ]
-  },
-  "frameworkPatterns": {
-    "react": {
-      "stateManagement": "useState for component state; custom hooks for scroll, focus trap, scroll lock, dropdown state, and outside click",
-      "customHooks": "Keep one concern per hook: useScrollPosition(threshold), useBodyScrollLock(isLocked), useFocusTrap(ref, isActive), useOutsideClick(ref, handler, enabled), useReducedMotion().",
-      "componentStructure": "<Navbar variant={variant} sticky={sticky} transparent={transparent} navItems={navItems} />"
-    },
-    "vue": {
-      "stateManagement": "ref/reactive for state; composables for scroll/outside click; watch for route changes",
-      "componentStructure": "<Navbar :variant='variant' :sticky='sticky' :transparent='transparent' :nav-items='navItems' />"
-    },
-    "angular": {
-      "stateManagement": "Component fields; RxJS streams for scroll/resize; host listeners for Escape/outside click",
-      "componentStructure": "<app-navbar [variant]='variant' [sticky]='sticky' [transparent]='transparent' [navItems]='navItems'></app-navbar>"
-    },
-    "svelte": {
-      "stateManagement": "writable stores for shared state; onMount for scroll; actions for outside click and focus trap",
-      "componentStructure": "<Navbar {variant} {sticky} {transparent} {navItems} />"
+      "dropdowns": "Focus stays on the button when the list opens, and Tab moves on into the list. One list is open at a time. A closed list has the hidden attribute, so its links aren't in the Tab order.",
+      "menu": "The menu is a native <dialog> opened with showModal(), named \"Main menu\". The browser makes the rest of the page inert, closes it on Escape, and returns focus to the Menu button (checked in Chromium, Firefox, and WebKit). Without a native dialog, follow the Modal Dialog guide's model: the rest of the page inert, and no focus-trap library.",
+      "notObscured": "scroll-padding-top on the root element, set to the bar's height, makes the page scroll focused elements and link targets clear of the bar (WCAG 2.2 2.4.11). Without it, a link focused under the bar stays covered (checked in Chromium, Firefox, and WebKit). Where the bar's height changes, as on phones, set the value again; keep the bar to one line so its height holds."
     }
   },
+  "projectDetection": {
+    "framework": {
+      "description": "Find the framework, its version, and how existing components are written before writing code.",
+      "detectionSteps": [
+        "Read the project's dependencies (package.json or its equivalent) for the framework and its version, and use the syntax that version supports.",
+        "Open two or three existing components to see their file structure, state handling, and naming.",
+        "Look for an existing component that already does this job, in the project or in a design system or UI library it uses, and build on it."
+      ]
+    },
+    "stylingSystem": {
+      "description": "Use the styling system the project already uses, and only that one.",
+      "detectionSteps": [
+        "Check the dependencies and config for the styling setup: Tailwind (version 4 keeps its theme in CSS with @theme, version 3 in tailwind.config.*), CSS Modules, Sass, CSS-in-JS, or plain CSS.",
+        "See how existing components apply styles and compose class names, for example with cn or clsx.",
+        "Check for design documentation: DESIGN.md, a design system package, or Storybook stories for existing components."
+      ],
+      "adaptationRules": [
+        "Write styles the way existing components do, and add no new styling library or system.",
+        "With plain CSS, use classes in the project's stylesheets instead of inline styles, except for values computed at runtime.",
+        "If the setup is unclear or mixed, ask before choosing."
+      ]
+    },
+    "designTokens": {
+      "description": "Use the project's tokens for color, spacing, radius, type, shadows, motion, and layering.",
+      "detectionSteps": [
+        "Find the tokens: CSS custom properties, a Tailwind theme (@theme or config), a theme object, or a tokens file.",
+        "Use them instead of this guide's example values; where there are none, match the closest existing components.",
+        "Check that the colors you use meet the contrast minimums: 4.5:1 for text, and 3:1 for focus indicators, icons, and control boundaries."
+      ]
+    }
+  },
+  "frameworkPatterns": {
+    "note": "Short snippets in plain HTML, CSS, and JavaScript for the parts that are easiest to get wrong; adapt them to the project's framework and its version.",
+    "disclosure": {
+      "description": "Disclosure dropdowns: a button that shows or hides its list of links, one list at a time, with Escape back to the button, and closing when focus leaves the navigation or on a click outside.",
+      "html": "<nav class=\"site-nav\" aria-label=\"Main\">\n  <ul>\n    <li>\n      <button type=\"button\" aria-expanded=\"false\" aria-controls=\"nav-products\">Products</button>\n      <ul id=\"nav-products\" hidden>\n        <li><a href=\"/analytics\">Analytics</a></li>\n        <li><a href=\"/reports\">Reports</a></li>\n      </ul>\n    </li>\n    <li>\n      <button type=\"button\" aria-expanded=\"false\" aria-controls=\"nav-company\">Company</button>\n      <ul id=\"nav-company\" hidden>\n        <li><a href=\"/about\">About</a></li>\n        <li><a href=\"/careers\">Careers</a></li>\n      </ul>\n    </li>\n    <li><a href=\"/pricing\" aria-current=\"page\">Pricing</a></li>\n  </ul>\n</nav>",
+      "script": "// Disclosure dropdowns: each button shows or hides its own list of links, one list at a time.\n// A closed list is hidden, so its links aren't in the Tab order.\nconst nav = document.querySelector('.site-nav');\nconst toggles = [...nav.querySelectorAll('button[aria-controls]')];\n\nfunction setOpen(toggle, open) {\n  toggle.setAttribute('aria-expanded', String(open));\n  document.getElementById(toggle.getAttribute('aria-controls')).hidden = !open;\n}\nconst closeAll = () => toggles.forEach((toggle) => setOpen(toggle, false));\n\nfor (const toggle of toggles) {\n  toggle.addEventListener('click', () => {\n    const open = toggle.getAttribute('aria-expanded') !== 'true';\n    closeAll();\n    setOpen(toggle, open);\n  });\n}\n// Escape closes the open list and puts focus back on its button\nnav.addEventListener('keydown', (event) => {\n  const open = toggles.find((toggle) => toggle.getAttribute('aria-expanded') === 'true');\n  if (event.key !== 'Escape' || !open) return;\n  setOpen(open, false);\n  open.focus();\n});\n// Focus moving out of the navigation, or a click outside it, closes the list. When focus goes\n// nowhere (relatedTarget is null, as when Safari doesn't focus a clicked link), the click decides.\nnav.addEventListener('focusout', (event) => {\n  if (event.relatedTarget && !nav.contains(event.relatedTarget)) closeAll();\n});\ndocument.addEventListener('click', (event) => {\n  if (!nav.contains(event.target)) closeAll();\n});"
+    },
+    "skipLink": {
+      "description": "The skip link as the header's first child, shown while it has focus, and the sticky bar with scroll-padding-top at its height.",
+      "html": "<!-- The skip link is the header's first child, so it's the page's first Tab stop -->\n<header class=\"site-header\">\n  <a class=\"skip-link\" href=\"#main\">Skip to content</a>\n  <a class=\"logo\" href=\"/\">Acme</a>\n  <!-- the site's <nav> -->\n</header>\n<main id=\"main\" tabindex=\"-1\">\n  <!-- the page -->\n</main>",
+      "css": "/* The bar stays at the top without a script, and the page scrolls focused elements and link\n   targets clear of it. Both use the bar's height; set it again where the height changes. */\n:root {\n  --site-header-height: 60px;\n}\n@media (min-width: 1024px) {\n  :root {\n    --site-header-height: 72px;\n  }\n}\nhtml {\n  scroll-padding-top: var(--site-header-height);\n}\n.site-header {\n  position: sticky;\n  top: 0;\n  z-index: 10; /* the sticky-bar layer of the project's scale */\n  min-height: var(--site-header-height);\n}\n/* The skip link shows over the bar while it has focus */\n.skip-link {\n  position: absolute;\n  inset-inline-start: 0.5rem;\n  top: 0.5rem;\n}\n.skip-link:not(:focus) {\n  clip-path: inset(50%);\n  height: 1px;\n  overflow: hidden;\n  white-space: nowrap;\n  width: 1px;\n}"
+    }
+  },
+  "implementationDetails": {
+    "sticky": "position: sticky with top: 0 keeps the bar at the top without a script. Switching to position: fixed from a scroll handler makes the content jump up by the bar's height. scroll-padding-top on the root element, set to the bar's height, makes the page scroll focused elements and link targets clear of the bar (WCAG 2.2 2.4.11). Without it, a link focused under the bar stays covered (checked in Chromium, Firefox, and WebKit). Where the bar's height changes, as on phones, set the value again; keep the bar to one line so its height holds.",
+    "transparentState": "Optional, for marketing pages: the bar starts transparent over a hero and turns solid once the page scrolls. An IntersectionObserver on a small element at the top of the page switches it exactly at the threshold, with no scroll listener; the same observer can add a shadow. The bar's text meets 4.5:1 against what's behind it in both states, the hero image included. App bars stay solid.",
+    "mobileMenu": "Below 1024 px, the links and the actions move into a menu opened by a Menu button. It's one switch: from 1024 px the bar shows its links, below that the Menu button. The menu is a native <dialog> opened with showModal(), named \"Main menu\". The browser makes the rest of the page inert, closes it on Escape, and returns focus to the Menu button (checked in Chromium, Firefox, and WebKit). Without a native dialog, follow the Modal Dialog guide's model: the rest of the page inert, and no focus-trap library. It has a visible Close button (\"Close menu\"), and it also closes on a click on the backdrop and when a link in it is followed. Inside it, an item with children is an accordion section: a button with aria-expanded that shows its links. Opening one doesn't close the menu, and several can be open. The page behind doesn't scroll: overflow: hidden on the root element while the menu is open (html:has(dialog:modal)), with scrollbar-gutter: stable, so the page doesn't shift. When the window crosses 1024 px, focus on an element that hides moves to the nearest control that stays, and focus anywhere else stays where it is. Widening with the menu open closes it and moves focus to the same link in the bar; widening with focus on the Menu button, which hides, moves focus to the current page's link in the bar. In both cases, when that link is in a closed dropdown list, focus goes to the first link in the bar that shows instead; narrowing with focus on the bar's links, which hide, moves focus to the Menu button. React to a matchMedia change, not to resize events. Chromium drops focus from an element a media query hides before the listener runs, so remember the last focused element and check whether it still shows. The menu's copy of the links gets its own ids.",
+    "appActions": "The account menu is a disclosure like the dropdowns: a button named \"Account\" (or the person's name) with aria-expanded, and a list of links. Sign out is a button that posts a form, not a link. The notifications button's name includes the count (\"Notifications, 3 unread\"), and the badge is hidden from screen readers, since the name already says it. The badge isn't a live region; new notifications, if announced at all, go through one polite status region.",
+    "layering": "Layers, bottom to top: the page, sticky bars, dropdowns and popovers, toasts, then modals, which make the rest of the page inert. The project's layering scale wins; native <dialog> and the popover attribute use the top layer and need no z-index. The bar is a sticky bar: an open dropdown list sits above the page, and a modal dialog covers the bar.",
+    "appearance": "Suggested defaults; the project's design and tokens win. The bar is 72 px tall from 1024 px and 60 px below. Links are 16 px, and links and buttons are at least 24 px tall (44 px is comfortable for touch). Text meets 4.5:1, and focus indicators and the current link's marker 3:1. A badge with white text needs a dark enough red: #dc2626 is 4.8:1, #ef4444 only 3.8:1. Check the project's own colors the same way. Labels wrap; nothing is cut off with an ellipsis. At 320 px wide nothing scrolls sideways. Motion is optional: a list fades in over 150 ms, and the menu slides in over 250 ms. Under prefers-reduced-motion: reduce, they appear without movement."
+  },
+  "edgeCases": {
+    "manyLinks": "Group them into dropdowns, or switch to the menu at a wider breakpoint, so the row never wraps under the bar.",
+    "noScript": "Render the links on the server. A dropdown's parent can be a link to an overview page, so every page is reachable before the script runs.",
+    "routeChange": "A route change closes an open list and the menu, and moves aria-current.",
+    "focusReturnTarget": "If the button that opened something is gone when it closes, move focus somewhere sensible nearby, such as the bar's first link, never the page's body."
+  },
+  "outputConstraints": {
+    "must": [
+      "Build on the project's header or navigation component when it has a suitable one, and keep its API",
+      "Use disclosure buttons for dropdowns, and hide closed lists",
+      "Keep focused elements clear of the sticky bar with scroll-padding-top",
+      "Use a native dialog, or the Modal Dialog guide's model, for the menu below 1024 px",
+      "Use the project's framework version, styling system, and tokens, the way existing components do"
+    ],
+    "mustNot": [
+      "Add a dependency, such as a focus-trap or scroll-lock library, without asking",
+      "Use role=\"menu\", role=\"menuitem\", or aria-haspopup for lists of links",
+      "Switch the bar to position: fixed from a scroll handler",
+      "Open dropdowns on hover alone",
+      "Handle Escape with a document-wide listener that stops other handlers",
+      "Use inline styles for static values in a plain-CSS project, or hardcode colors the project has tokens for"
+    ]
+  },
   "testingChecklist": [
-    "Navbar renders correctly on all breakpoints",
-    "Mobile menu dialog opens and closes via toggle, Escape, backdrop click, and link click",
-    "Focus is trapped within the mobile dialog while open",
-    "Focus is restored to the mobile toggle when the dialog closes",
-    "Body scroll is locked while the mobile dialog is open and restored on close",
-    "Sticky positioning works correctly when enabled",
-    "Transparent→Solid transition works on scroll when enabled (marketing only)",
-    "Active link is highlighted correctly and uses aria-current=\"page\"",
-    "Desktop dropdown opens/closes on toggle click",
-    "Desktop dropdown closes on outside click and Escape",
-    "Escape on desktop dropdown restores focus to the dropdown toggle",
-    "Desktop dropdown does not trap focus; Tab order is logical",
-    "Mobile dropdown items render as accordions inside the dialog",
-    "Mobile accordion expand/collapse updates aria-expanded and does not close the dialog",
-    "Route changes update active link and close open overlays if required by product rules",
-    "Window resize closes the mobile dialog when switching to desktop breakpoint",
-    "Prefers-reduced-motion reduces durations and avoids transform motion where possible",
-    "All interactive elements have visible focus indicators",
-    "Screen reader announces dialog state changes and expanded/collapsed states appropriately",
-    "SSR/hydration safe (no DOM access before mount)"
+    "The page starts with a \"Skip to content\" link that shows when it has focus and moves focus to the main area",
+    "The bar sticks to the top with CSS alone, and a link focused under it is scrolled clear of it (scroll-padding-top at the bar's height)",
+    "The bar is the page's header, its links are in a labelled nav, and the current page's link has aria-current=\"page\"",
+    "Each dropdown is a button with aria-expanded and aria-controls and no aria-haspopup, and a closed list is hidden",
+    "Focus stays on the button when its list opens, Tab moves through the list's links, and one list is open at a time",
+    "Escape closes the open list and returns focus to its button; a click outside, or focus leaving the navigation, closes it too",
+    "Lists open on a click, Enter, or Space, never on hover alone",
+    "Below 1024 px, a Menu button opens the links in a native dialog named \"Main menu\", with a visible Close button",
+    "While the menu is open, the rest of the page is inert and doesn't scroll; Close, Escape, the backdrop, and a followed link close it, and focus returns to the Menu button",
+    "Crossing 1024 px either way, focus on what hides moves to what stays: from the menu or the Menu button to the bar's links when widening, and from the bar's links to the Menu button when narrowing; focus anywhere else stays where it is",
+    "The account menu is a disclosure with a Sign out button, and the notifications button's name includes the unread count",
+    "An open modal dialog covers the bar, and a transparent bar's text meets 4.5:1 over whatever is behind it",
+    "Labels wrap instead of being cut off, nothing scrolls sideways at 320 px wide, and under reduced motion nothing slides",
+    "Styles come from the project's styling system and tokens"
   ],
-  "aiImplementationPrompt": "Implement a responsive Navigation Bar component with mobile hamburger menu as a modal dialog (role=\"dialog\" aria-modal=\"true\") including focus trap, focus restoration, inert background, and body scroll lock. Support sticky scroll behavior and optional transparent-to-solid transition (marketing recommended only). Add dropdown navigation: on desktop, implement disclosure dropdowns (button controlling a panel of links with aria-expanded/aria-controls; avoid role=\"menu\" unless fully implementing ARIA menu semantics). On mobile/tablet, integrate dropdown items as accordion sections inside the dialog (aria-expanded/aria-controls), and expanding must not close the dialog. Close the mobile dialog on Escape/backdrop/link click. Close desktop dropdown on outside click/Escape and restore focus to its toggle. Implement smooth animations and prefers-reduced-motion (reduce durations to <= tokens.motion.reducedMotionDurationMs and avoid transform-based motion where possible). Adapt to {{USER_FRAMEWORK}} and {{USER_STYLING_LIBRARY}}. CRITICAL: Use ONLY the detected styling system. If vanilla CSS is detected, create CSS classes in a stylesheet; never use inline style attributes. If React is detected, separate effects into single-concern hooks.",
   "meta": {
     "created": "2026-01-12",
-    "updated": "2026-02-22",
-    "webUrl": "https://uipotion.com/potions/components/navbar.html",
+    "updated": "2026-10-24",
+    "webUrl": "https://uipotion.com/potions/components/navbar",
     "relatedPotions": [
+      {
+        "id": "dialog",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: the Modal Dialog's model, for a menu without a native dialog.",
+        "required": false
+      },
       {
         "id": "command-palette",
         "category": "components",
         "relationship": "complements",
-        "description": "Optional: Add a global command surface in the header for keyboard-first navigation and actions.",
+        "description": "Optional: a search and command entry point in the bar, opened with Cmd or Ctrl+K.",
         "required": false
       },
       {
         "id": "dashboard",
         "category": "layouts",
         "relationship": "used-in",
-        "description": "Optional: Navigation Bar commonly appears in dashboard and admin interfaces.",
+        "description": "Optional: an app shell whose header has the same account menu and notifications.",
         "required": false
       },
       {
         "id": "ai-agent-chat",
         "category": "layouts",
         "relationship": "used-in",
-        "description": "Optional: Navigation Bar patterns can be adapted for AI chat app headers and top-level actions.",
+        "description": "Optional: the header of an AI chat.",
         "required": false
       }
     ],

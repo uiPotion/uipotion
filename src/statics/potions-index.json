@@ -8,14 +8,16 @@
         "layouts",
         "dashboard",
         "sidebar",
+        "app-shell",
         "responsive",
-        "admin"
+        "admin",
+        "a11y"
       ],
-      "excerpt": "A responsive admin dashboard layout with collapsible sidebar navigation and fixed header. Perfect for admin panels, SaaS applications, and data-driven interfaces.",
+      "excerpt": "An app shell where the page itself scrolls: a sticky header that never covers the focused element, the sidebar in its own column or as a drawer on small screens, and a footer that scrolls with the content.",
       "webUrl": "https://uipotion.com/potions/layouts/dashboard",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/dashboard.json",
       "created": "2026-01-10",
-      "updated": "2026-02-22",
+      "updated": "2026-10-24",
       "markdownUrl": "https://uipotion.com/potions/layouts/dashboard.md"
     },
     {
@@ -51,13 +53,14 @@
         "responsive",
         "mobile-menu",
         "sticky",
+        "dropdown",
         "a11y"
       ],
-      "excerpt": "A responsive navigation bar component with mobile hamburger menu, sticky scroll behavior, and transparent-to-solid transition. Supports marketing (logo + links + CTA) and app (user menu, notifications) variants.",
+      "excerpt": "A site's top bar with a skip link, links with disclosure dropdowns, and a menu in a native dialog on small screens. It sticks with CSS alone and keeps focused elements in view below it.",
       "webUrl": "https://uipotion.com/potions/components/navbar",
       "agentGuideUrl": "https://uipotion.com/potions/components/navbar.json",
       "created": "2026-01-12",
-      "updated": "2026-02-22",
+      "updated": "2026-10-24",
       "markdownUrl": "https://uipotion.com/potions/components/navbar.md"
     },
     {
@@ -99,11 +102,11 @@
         "admin",
         "dashboard"
       ],
-      "excerpt": "A comprehensive data table component with sorting, pagination, filtering, row selection, and responsive behavior. Includes loading, empty, and error states with full keyboard navigation support.",
+      "excerpt": "A table for browsing records, with sortable headers, a filter field, and pages, and a selection kept across pages with a header checkbox for the page. It stays a real table, with a caption and row headers.",
       "webUrl": "https://uipotion.com/potions/components/data-table",
       "agentGuideUrl": "https://uipotion.com/potions/components/data-table.json",
       "created": "2026-01-18",
-      "updated": "2026-01-18",
+      "updated": "2026-10-24",
       "markdownUrl": "https://uipotion.com/potions/components/data-table.md"
     },
     {
@@ -279,7 +282,7 @@
       "webUrl": "https://uipotion.com/potions/components/dropdown-select",
       "agentGuideUrl": "https://uipotion.com/potions/components/dropdown-select.json",
       "created": "2026-01-25",
-      "updated": "2026-10-22",
+      "updated": "2026-10-24",
       "markdownUrl": "https://uipotion.com/potions/components/dropdown-select.md"
     },
     {
@@ -300,7 +303,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/ai-agent-chat",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.json",
       "created": "2026-02-01",
-      "updated": "2026-10-17",
+      "updated": "2026-10-24",
       "markdownUrl": "https://uipotion.com/potions/layouts/ai-agent-chat.md"
     },
     {
@@ -389,11 +392,11 @@
         "responsive",
         "scrollable"
       ],
-      "excerpt": "An accessible tabs component for horizontal and vertical layouts with fixed or scrollable tab lists, keyboard navigation, optional manual activation, responsive behavior, and robust overflow handling for many tabs.",
+      "excerpt": "Tabs that switch panels in place, after the APG pattern: a named tab list that is one Tab stop, the arrow keys with Home and End, automatic or manual activation, and disabled tabs that can still be found.",
       "webUrl": "https://uipotion.com/potions/components/tabs",
       "agentGuideUrl": "https://uipotion.com/potions/components/tabs.json",
       "created": "2026-02-14",
-      "updated": "2026-02-14",
+      "updated": "2026-10-24",
       "markdownUrl": "https://uipotion.com/potions/components/tabs.md"
     },
     {
@@ -406,16 +409,16 @@
         "command-menu",
         "omnibox",
         "keyboard-shortcuts",
-        "fuzzy-search",
-        "productivity",
+        "search",
+        "combobox",
         "a11y",
         "aria"
       ],
-      "excerpt": "An accessible command palette component for keyboard-first navigation and action execution, with fuzzy search, grouped results, recent commands, and role-aware command visibility.",
+      "excerpt": "A search box for commands in a modal dialog: Cmd or Ctrl+K opens it, the first result is highlighted so Enter runs it, the arrows move a highlight while focus stays in the input, and Escape always closes it.",
       "webUrl": "https://uipotion.com/potions/components/command-palette",
       "agentGuideUrl": "https://uipotion.com/potions/components/command-palette.json",
       "created": "2026-02-22",
-      "updated": "2026-02-23",
+      "updated": "2026-10-24",
       "markdownUrl": "https://uipotion.com/potions/components/command-palette.md"
     },
     {
@@ -450,14 +453,14 @@
         "collapsible",
         "multi-level",
         "responsive",
-        "overlay",
+        "drawer",
         "a11y"
       ],
-      "excerpt": "A responsive sidebar navigation component with collapsible icon-only mode, multi-level nested groups, badge support, inline search, and mobile overlay. The primary navigation pattern for SaaS dashboards, admin panels, and application shells.",
+      "excerpt": "An app's side navigation: groups and nested lists, a collapsible icon rail that still names every link, a saved collapsed state that never jumps, and the same nav as a drawer on small screens.",
       "webUrl": "https://uipotion.com/potions/components/sidebar-navigation",
       "agentGuideUrl": "https://uipotion.com/potions/components/sidebar-navigation.json",
       "created": "2026-03-03",
-      "updated": "2026-03-03",
+      "updated": "2026-10-24",
       "markdownUrl": "https://uipotion.com/potions/components/sidebar-navigation.md"
     },
     {
@@ -528,5 +531,5 @@
     }
   ],
   "totalCount": 24,
-  "lastUpdated": "2026-10-22"
+  "lastUpdated": "2026-10-24"
 }

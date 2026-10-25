@@ -2,7 +2,7 @@
 layout: 'potion'
 title: 'Data Table (Sortable, Paginated, Filterable)'
 publicationDate: '2026-01-18'
-excerpt: 'A comprehensive data table component with sorting, pagination, filtering, row selection, and responsive behavior. Includes loading, empty, and error states with full keyboard navigation support.'
+excerpt: 'A table for browsing records, with sortable headers, a filter field, and pages, and a selection kept across pages with a header checkbox for the page. It stays a real table, with a caption and row headers.'
 category: 'Components'
 tags:
   - components
@@ -20,181 +20,219 @@ tags:
 agentManifest: 'potions/components/data-table.json'
 path: 'potions/components/data-table'
 promptSubject: 'data tables'
+useWhen: 'people browse, sort, filter, or select records in a table, such as orders or customers in an admin app.'
+specifies:
+  - 'Sortable headers are buttons inside the column headers, and only the sorted column has aria-sort.'
+  - 'The selection is kept across pages and filters, and the header checkbox shows only the rows on this page.'
+  - 'A filter field narrows the rows, goes back to page 1, and says how many rows match once typing pauses.'
+example: 'Someone selects Zoë Saldana and moves to page 2. The toolbar says "1 selected, 1 not on this page", and the header checkbox is empty again.'
 ---
 
-## Overview
+A data table is where people find and act on records. Its problems are mostly about reach and state: header cells that only a mouse can sort, `aria-sort` on every column, focusable rows that add a Tab stop each, a header checkbox that counts rows on other pages, and a Next button that drops focus on the last page. This guide covers a plain, sortable, filterable, paginated table with selection, and targets WCAG 2.2 AA.
 
-A comprehensive data table component designed for displaying and managing tabular data in admin panels, dashboards, and data-driven applications. The component provides essential features for data manipulation including column sorting (ascending/descending), client-side pagination with configurable page sizes, row selection (single and multi-select), and responsive behavior that adapts to mobile screens by displaying data in a card-based layout.
+## Start from what the project has
 
-The table supports multiple states including loading (with skeleton rows), empty state (when no data is available), and error state (when data fetching fails). All interactions are fully keyboard accessible with proper ARIA attributes, making it compliant with WCAG AA standards.
+1. If the project has a data table, or a table library it already uses, configure or extend it to meet this guide. Keep its API.
+2. Otherwise build it from a plain `<table>`.
 
-## Component Structure
+Implement only what the task needs, and add no dependency without asking. The project's conventions win for styling and visual defaults. If one conflicts with an accessibility or correctness requirement here, ask instead of choosing.
 
-The data table consists of several key sections organized in a clear hierarchy:
+## Structure
 
-**Main Container** - Root wrapper that manages responsive behavior and contains all table elements
-- **Table Header** - Contains column headers with sort indicators and selection checkbox
-- **Table Body** - Displays data rows or state indicators (loading/empty/error)
-- **Selection Controls** - Toolbar with bulk action buttons when rows are selected
-- **Pagination Controls** - Navigation controls at the bottom with page info and size selector
+- It's a real `<table>`. A `<caption>` names it, or `aria-labelledby` points to its heading. Column headers are `<th scope="col">`, and the cell that identifies a row, such as a name, is a `<th scope="row">`, so screen readers say whose row a cell is in.
+- It's a plain table, not a grid: Tab moves between its controls (sort buttons, checkboxes, links), and rows and cells aren't focusable. Arrow-key navigation between cells belongs to the grid pattern (`role="grid"`, one Tab stop, editing keys), which this guide doesn't cover.
+- Numbers are right-aligned, with tabular figures, and dates are `<time datetime>` elements.
+- A table wider than its container scrolls inside a region with `role="region"`, named by the caption, and `tabindex="0"`, so keyboard users can scroll to columns that have nothing focusable.
+- A cell that's cut short still gives a way to the whole value: let it wrap, or show it in the row's details.
 
-## Column Configuration
+## Sorting
 
-Each column in the table is defined with the following properties:
+- A sortable column has a `<button>` inside its `<th>`, named by the column's name; the header cell itself can't take focus. As in the APG sortable table example, the caption says that the column buttons sort.
+- `aria-sort` ("ascending" or "descending") is only on the sorted column's `<th>`. The other headers have none; ARIA allows one sorted header at a time.
+- A click on the sorted column reverses it, and a click on another column sorts it ascending. A third state that restores the original order is optional.
+- Each column compares by its type: numbers as numbers, dates by their value, and text with `Intl.Collator` (`numeric: true`), so "Émile" sorts with E, and "Item 2" comes before "Item 10".
+- The status region says how the table is sorted ("Sorted by Name, ascending"), and sorting goes back to page 1.
+- With sorting on the server, send the column and the direction, set `aria-sort` when the answer arrives, and let only the latest answer fill the table.
 
-**Column Definition Structure**:
-- **id** - Unique identifier for the column
-- **header** - Display text for column header
-- **accessor** - Key to access data from row object (or custom render function)
-- **sortable** - Whether the column supports sorting (default: true)
-- **width** - Optional fixed width (default: auto-sizing)
-- **align** - Text alignment: left (default), center, or right
-- **hidden** - Whether column is hidden on mobile breakpoints
+The snippets in this guide are plain HTML and JavaScript; adapt them to the project's framework and its version. The two scripts share the table; `status` is the table's status region, and `pageShown()` runs after a page of rows is rendered.
 
-## Sorting Behavior
+```html
+<p class="table-status visually-hidden" role="status"></p>
+<p class="selection-count"></p>
+<!-- The region scrolls sideways when the table is wider than the page; tabindex lets the
+     keyboard scroll it -->
+<div class="table-scroll" role="region" aria-labelledby="customers-caption" tabindex="0">
+  <table class="customers">
+    <caption id="customers-caption">Customers <span class="visually-hidden">(the column buttons sort the table)</span></caption>
+    <thead>
+      <tr>
+        <th scope="col"><input type="checkbox" class="select-all" aria-label="Select all customers on this page"></th>
+        <th scope="col" aria-sort="ascending"><button type="button">Name</button></th>
+        <th scope="col" data-type="number"><button type="button">Orders</button></th>
+        <th scope="col" data-type="date"><button type="button">Last order</button></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="checkbox" value="c-1042" aria-label="Select Émile Zola"></td>
+        <th scope="row">Émile Zola</th>
+        <td>12</td>
+        <td data-value="2026-10-02"><time datetime="2026-10-02">2 Oct 2026</time></td>
+      </tr>
+      <!-- one row per customer on this page -->
+    </tbody>
+  </table>
+</div>
+```
 
-Columns support three sort states that cycle on click:
-1. **Unsorted** (initial state) - No sort indicator
-2. **Ascending** - Upward arrow indicator, data sorted A-Z or 0-9
-3. **Descending** - Downward arrow indicator, data sorted Z-A or 9-0
+```js
+// Sortable headers, after the APG sortable table: a button in each sortable <th>, aria-sort on
+// the sorted column only, and a comparison for each column's type. Text sorts with
+// Intl.Collator, so "Émile" sorts with E, and "Item 2" comes before "Item 10".
+const table = document.querySelector('.customers');
+const status = document.querySelector('.table-status');
+const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+const compare = {
+  text: (a, b) => collator.compare(a, b),
+  number: (a, b) => Number(a) - Number(b),
+  date: (a, b) => (a < b ? -1 : a > b ? 1 : 0), // ISO dates in data-value sort as text
+};
 
-Clicking a sortable column header cycles through these states. Only one column can be sorted at a time (single-column sort). The active sort column is visually distinguished with a highlighted header and clear sort indicator.
+table.tHead.addEventListener('click', (event) => {
+  const button = event.target.closest('th button');
+  if (!button) return;
+  const header = button.closest('th');
+  const direction = header.getAttribute('aria-sort') === 'ascending' ? 'descending' : 'ascending';
+  for (const th of table.tHead.querySelectorAll('th')) th.removeAttribute('aria-sort');
+  header.setAttribute('aria-sort', direction);
+  const value = (row) => row.cells[header.cellIndex].dataset.value ?? row.cells[header.cellIndex].textContent.trim();
+  const sign = direction === 'ascending' ? 1 : -1;
+  const rows = [...table.tBodies[0].rows].sort((a, b) => sign * compare[header.dataset.type ?? 'text'](value(a), value(b)));
+  table.tBodies[0].append(...rows);
+  status.textContent = `Sorted by ${button.textContent}, ${direction}`;
+});
+```
 
-## Pagination
+## Filtering
 
-The pagination system provides intuitive navigation through large datasets:
+- One labelled filter field above the table ("Filter customers", an `<input type="search">`) narrows the rows by their text, in the browser or on the server.
+- Once typing pauses, the status region says how many rows match ("12 customers"). With none, the table says "No customers match", with a Clear filter button.
+- A new filter goes back to page 1, and only the latest answer counts: number the requests, or abort the previous one.
+- Rows the filter hides stay selected, and the selection toolbar counts them with the rows on other pages.
+- Optional: filters for single columns, such as a status select, in the same bar above the table, each with a visible label, and a Clear all button. The filter's value can also go in the URL, so a link opens the same view.
 
-**Pagination Controls Include**:
-- Previous/Next page buttons (disabled at boundaries)
-- Page number indicators (current page highlighted)
-- Page size selector (10, 25, 50, 100 rows per page)
-- Total results count display ("Showing 1-10 of 245 results")
-- Jump to first/last page buttons (optional)
+## Pages
 
-Pagination info updates immediately when changing page size or navigating. Page numbers adapt to show a limited range (e.g., "1 2 3 ... 15 16 17 ... 45") for large datasets.
+- Below the table: Previous and Next, page numbers from 768 px, a "Rows per page" select (10, 25, 50, or 100), and a summary ("Showing 11–20 of 245").
+- Previous on the first page and Next on the last use `aria-disabled="true"` and ignore presses. The native `disabled` attribute on a focused Next, as the last page loads, drops focus to the page (checked in Chromium, Firefox, and WebKit).
+- The current page's button has `aria-current="page"`, and page buttons are named with the word ("Page 3"), visible or visually hidden.
+- The status region says the new summary after a page change. If the page scrolls to the table's top, focus moves there too, to the caption or the table's heading (`tabindex="-1"`); otherwise the scroll position stays.
+- A new page size goes back to page 1. The page and its size can go in the URL. With pages on the server, send the page and the size, and show the total the server returns.
 
-## Row Selection
+## Selection
 
-Users can select individual rows or all rows on the current page:
+- Each row has a checkbox named after the row ("Select Émile Zola"), and the header has one for the page ("Select all customers on this page"). The checkbox is the one control: rows get neither `tabindex` nor `aria-selected`, which belong to the grid pattern.
+- The selection is kept by row id across pages and the filter. The header checkbox shows only this page: checked when every row on it is selected, and partly checked (`indeterminate`, read as "mixed") when some are.
+- Optional: Shift and a click selects the rows between the last one clicked and this one. Keyboard users check rows one at a time.
+- The selection toolbar's space is reserved above the table, so rows don't move under the pointer when it appears. It says how many rows are selected and how many of them aren't on this page ("5 selected, 2 not on this page"), with Clear selection and the bulk actions, named with the count ("Delete 5 customers"). Delete asks first or offers undo, as the Modal Dialog guide describes.
+- Optional: after the page is selected, the toolbar offers "Select all 245 customers".
 
-**Selection Features**:
-- **Header Checkbox** - Selects/deselects all rows on current page
-- **Row Checkboxes** - Individual row selection
-- **Shift+Click** - Range selection from last selected row
-- **Keyboard Navigation** - Space key toggles selection for focused row
-- **Selection Toolbar** - Appears above table showing count and bulk action buttons
-- **Clear Selection** - Button to deselect all selected rows
+```js
+// Row checkboxes, and the header checkbox for this page. The selection is kept by row id
+// across pages and filters; the header checkbox shows only this page: checked when every row
+// on it is selected, partly checked (indeterminate) when some are.
+const selectAll = table.querySelector('.select-all');
+const count = document.querySelector('.selection-count');
+const selected = new Set();
+const boxes = () => [...table.tBodies[0].querySelectorAll('input[type="checkbox"]')];
 
-Visual feedback includes highlighted background for selected rows and checkbox state indicators (checked, unchecked, indeterminate for header when some rows selected).
+function update() {
+  const onPage = boxes().filter((box) => box.checked).length;
+  selectAll.checked = onPage > 0 && onPage === boxes().length;
+  selectAll.indeterminate = onPage > 0 && onPage < boxes().length;
+  const elsewhere = selected.size - onPage;
+  count.textContent = selected.size === 0 ? '' : `${selected.size} selected${elsewhere ? `, ${elsewhere} not on this page` : ''}`;
+}
+function setRow(box, checked) {
+  box.checked = checked;
+  if (checked) selected.add(box.value);
+  else selected.delete(box.value);
+}
+table.tBodies[0].addEventListener('change', (event) => {
+  if (event.target.type === 'checkbox') setRow(event.target, event.target.checked);
+  update();
+});
+selectAll.addEventListener('change', () => {
+  for (const box of boxes()) setRow(box, selectAll.checked);
+  update();
+});
+// After a page of rows is rendered (paging, sorting on the server, filtering)
+function pageShown() {
+  for (const box of boxes()) box.checked = selected.has(box.value);
+  update();
+}
+```
 
-## Responsive Design
+## Loading, empty, and error
 
-The table adapts to different screen sizes with two distinct layouts:
+- While loading, skeleton rows keep the table's shape and are hidden from screen readers (`aria-hidden="true"`); the status region says "Loading customers…". The header stays.
+- Empty, the table says why, with the next step: "No customers yet" with the action that adds one, or, with a filter, "No customers match" with Clear filter.
+- On an error, the table shows a message and Retry, in text. Server errors and stack traces stay in the logs.
+- Each table keeps its own loading, empty, and error states, so it still works on its own.
 
-**Desktop (≥1024px)**:
-- Standard table layout with all columns visible
-- Horizontal scroll for wide tables if needed
-- Sticky header option for long tables
+## Phones
 
-**Tablet (768px - 1023px)**:
-- Simplified table layout with fewer columns
-- Non-essential columns hidden via column config
+- Below 768 px, rows can become cards in a list (`<ul>`), each card's fields a description list (`<dl>`), with the row's name as the card's heading. The checkboxes stay, named after their rows; sorting moves to a "Sort by" select, and pagination to Previous and Next.
+- When the columns need to be compared side by side, keep the table, scrolling in its region, instead.
 
-**Mobile (<768px)**:
-- Card-based layout replacing table rows
-- Each card displays key data fields vertically
-- Selection checkboxes maintained in card headers
-- Sorting and filtering preserved via dropdown controls
-- Pagination simplified to Previous/Next only
+## Sticky header
 
-## Loading, Empty, and Error States
+Optional: a sticky header row. Inside the horizontal scroll region, it doesn't stick to the page, since the region is its scroll container (checked in Chromium, Firefox, and WebKit). Use one per table: a sticky header without sideways scrolling, with `top` at the height of any sticky bar above it, or a region with a maximum height that scrolls both ways.
 
-The table handles data loading states gracefully:
+## Variations
 
-**Loading State**:
-- Skeleton rows with animated placeholders
-- Maintains table structure for smooth transition
-- Number of skeleton rows matches page size
-- Loading message for screen readers
+- Row details: a disclosure button in the row ("Show details for Émile Zola") with `aria-expanded`, and the details in the next row, across all columns.
+- Editing in cells is the grid pattern, beyond this guide; editing in a form or a dialog keeps the table plain.
+- Reordering rows or columns, or resizing columns, by dragging needs a way without dragging (WCAG 2.2 2.5.7), such as Move up and Move down buttons, or a width setting.
 
-**Empty State**:
-- Centered message with optional icon
-- Helpful text ("No data available" or "No results match your filters")
-- Optional call-to-action button
-- Maintains table header for context
+## Appearance
 
-**Error State**:
-- Error message with icon
-- Retry button to attempt data reload
-- Error details (optional, for debugging)
-- Maintains table structure
+These are suggested defaults; the project's design and tokens win.
 
-## Accessibility
+- Rows are 48 to 52 px tall, with 12 to 16 px of padding in each cell.
+- Text meets 4.5:1; sort icons, checkbox edges, and focus indicators 3:1. The current page's button can be `#2563eb` with white text (5.2:1); `#3b82f6` is only 3.7:1. Muted text can be `#6b7280` (4.8:1 on white); `#9ca3af` is 2.5:1. Check the project's own colors.
+- A selected row is marked by its checkbox and a background, not by color alone.
 
-The data table is fully accessible with comprehensive keyboard support:
+## Edge cases
 
-**Keyboard Navigation**:
-- **Tab** - Navigate between interactive elements (headers, checkboxes, pagination)
-- **Space** - Toggle row selection when row is focused
-- **Enter** - Activate sort on column header, activate buttons
-- **Arrow Keys** - Navigate between cells (optional advanced navigation)
-- **Shift+Click** - Range selection
+- **One page**: the pagination can go; the summary stays.
+- **Many columns**: the table scrolls in its region, or less important columns hide on smaller screens, never the row header.
+- **Thousands of rows**: use pages, or render only part of the rows; then the table gets `aria-rowcount` and each row `aria-rowindex`.
+- **Sorting a selection**: rows move with their checkboxes, and the selection stays.
+- **Deleting rows**: afterwards, focus moves somewhere sensible nearby, such as the caption or the next row's checkbox, never the page's body.
 
-**ARIA Attributes**:
-- `role="table"` on table container (or semantic `<table>`)
-- `role="columnheader"` with `aria-sort="ascending|descending|none"`
-- `aria-label` on interactive elements (sort buttons, checkboxes)
-- `aria-selected="true"` on selected rows
-- `aria-live="polite"` region for pagination updates
-- `aria-busy="true"` during loading state
+## Acceptance checklist
 
-**Screen Reader Support**:
-- Announces sort state changes
-- Announces pagination info updates
-- Announces selection count changes
-- Provides context for each table cell
+- [ ] It's a table with a caption, column headers with scope="col", and a row header for the cell that names each row
+- [ ] Sortable columns have a button inside the header, and aria-sort is on the sorted column only
+- [ ] Numbers sort as numbers, dates by their value, and text by language with Intl.Collator, and the status region says how the table is sorted
+- [ ] The filter field is labelled; a new filter goes back to page 1, only the latest answer counts, and the number of matches is said once typing pauses
+- [ ] Previous and Next at the ends use aria-disabled, so focus stays on them, and the current page has aria-current="page"
+- [ ] If a page change scrolls to the table, focus moves to the table too
+- [ ] Each row's checkbox is named after its row, and rows aren't focusable themselves
+- [ ] The header checkbox shows only this page: checked when all its rows are selected, mixed when some are
+- [ ] The selection is kept across pages and the filter, and the toolbar says how many selected rows aren't on this page
+- [ ] The toolbar's space is reserved, so rows don't move when it appears, and Delete asks first or offers undo
+- [ ] A wide table scrolls inside a named region with tabindex="0", and the page doesn't scroll sideways
+- [ ] Skeleton rows are hidden from screen readers, and empty and error states say what happened in text, with Clear filter or Retry
+- [ ] On phones, rows are cards in a list with their fields in a description list, or the table scrolls in its region
+- [ ] Styles come from the project's styling system and tokens
 
-**Focus Management**:
-- Clear focus indicators on all interactive elements
-- Focus preserved on current element during data updates
-- Focus moves logically through table structure
+## See also
 
-## Framework Patterns
+- **[Dashboard Layout with Collapsible Sidebar](/potions/layouts/dashboard)**: the app shell around the table, whose main column wide tables can't widen.
+- **[Tabs Component](/potions/components/tabs)**: views of the table, such as All, Open, and Archived, in tab panels.
+- **[Modal Dialog](/potions/components/dialog)**: confirming a bulk delete.
+- **[Select and Combobox](/potions/components/dropdown-select)**: filters for single columns.
 
-The data table can be implemented across different frameworks using appropriate patterns:
-
-**React**: Use `useState` for sort/page/selection state, `useMemo` for filtered/sorted data, custom hooks for table logic (`useTableSort`, `useTablePagination`, `useTableSelection`)
-
-**Vue**: Use `ref()` or `reactive()` for state, `computed()` for derived data (sorted/paginated), composables for reusable logic
-
-**Angular**: Component properties for state, getter methods or pipes for transformations, RxJS for async data loading
-
-**Svelte**: Reactive statements for derived data, stores for shared table state, actions for enhanced DOM interactions
-
-## Testing Checklist
-
-- [ ] Columns render with correct headers and data
-- [ ] Sorting works for all sortable columns (ascending, descending, clear)
-- [ ] Only one column sorted at a time
-- [ ] Pagination controls navigate correctly
-- [ ] Page size changes update results correctly
-- [ ] Row selection works (single, multiple, all)
-- [ ] Shift+click range selection works
-- [ ] Header checkbox has correct state (checked/unchecked/indeterminate)
-- [ ] Selected row count displays correctly
-- [ ] Bulk actions appear when rows selected
-- [ ] Clear selection works
-- [ ] Loading state displays skeleton rows
-- [ ] Empty state displays when no data
-- [ ] Error state displays with retry button
-- [ ] Mobile card layout renders correctly
-- [ ] Responsive breakpoints work correctly
-- [ ] Keyboard navigation works (Tab, Space, Enter)
-- [ ] Screen reader announces state changes
-- [ ] Focus indicators visible on all interactive elements
-- [ ] ARIA attributes present and correct
-- [ ] Color contrast meets WCAG AA (4.5:1)
-- [ ] Sort animations smooth (if implemented)
-- [ ] No layout shift during data updates
-- [ ] Table accessible via screen reader
-- [ ] All interactive elements keyboard accessible
+These are suggestions; the table works on its own.

@@ -1,775 +1,387 @@
 {
   "$schema": "https://uipotion.com/schema/categories/components.schema.json",
   "id": "command-palette",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Command Palette",
   "category": "components",
   "tags": [
-    "components",
     "command-palette",
     "command-menu",
     "omnibox",
     "keyboard-shortcuts",
-    "fuzzy-search",
-    "productivity",
+    "search",
+    "combobox",
     "a11y",
     "aria"
   ],
-  "description": "An accessible command palette component for keyboard-first navigation and action execution, with fuzzy search, grouped results, recent commands, and role-aware command visibility.",
+  "description": "A command palette: a search box in a modal dialog, opened with Cmd or Ctrl+K, after the APG combobox with automatic selection. Focus stays in the input, the first result is highlighted so Enter runs it, only the latest search's answer counts, Escape always closes it, and destructive commands ask first.",
   "tokens": {
+    "note": "Suggested defaults. The project's design tokens and existing components win.",
     "layout": {
       "panelMaxWidthPx": 720,
-      "panelMinWidthPx": 320,
-      "panelBorderRadiusPx": 12,
-      "inputHeightPx": 44,
+      "panelTopOffset": "12vh",
       "rowHeightPx": 44,
-      "rowPaddingXPx": 14,
-      "rowPaddingYPx": 10,
-      "groupGapPx": 12,
-      "listMaxHeightPx": 420
-    },
-    "typography": {
+      "inputHeightPx": 44,
       "inputFontSizePx": 16,
-      "rowLabelFontSizePx": 14,
-      "rowMetaFontSizePx": 12,
-      "groupLabelFontSizePx": 12
+      "layering": "Layers, bottom to top: the page, sticky bars, dropdowns and popovers, toasts, then modals, which make the rest of the page inert. The project's layering scale wins; native <dialog> and the popover attribute use the top layer and need no z-index. The palette is a modal: a native <dialog> in the top layer."
     },
     "motion": {
-      "openDurationMs": 180,
-      "closeDurationMs": 150,
-      "backdropDurationMs": 140,
-      "easing": "cubic-bezier(0.2, 0, 0, 1)"
+      "openMs": 150,
+      "statusPauseMs": 500
     }
   },
   "aiAgentInstructions": {
-    "summary": "Implement an accessible Command Palette component that opens with Cmd/Ctrl+K, supports fuzzy command search, grouped results, keyboard-first navigation, permission-aware filtering, and safe command execution. Match the detected framework and styling system exactly.",
+    "summary": "Build or extend a command palette: a search box for destinations and actions in a modal dialog, opened with Cmd or Ctrl+K. It follows the APG combobox with automatic selection: focus stays in the input, aria-activedescendant marks the highlighted command, and the first result is highlighted so Enter runs it. Only the latest search's answer counts, one status region says the results once typing pauses, Escape always closes it, and destructive commands ask first. Build on the project's command menu or combobox component when it has a suitable one. Implement only what the task needs, keep existing APIs, and match the project's styling and tokens. The project's conventions win for styling and visual defaults; if one conflicts with an accessibility or correctness requirement in this guide, ask the user instead of choosing silently. Target WCAG 2.2 AA.",
     "keyFeatures": [
-      "Global open shortcut (Cmd/Ctrl+K) with optional visible trigger",
-      "Modal dialog behavior with focus trap and focus restoration",
-      "Search input with fuzzy matching and keyword aliases",
-      "Grouped command results with optional icons and shortcut hints",
-      "Recent commands and suggested commands when query is empty",
-      "Permission-aware command filtering",
-      "Context-aware ranking for current workspace or route",
-      "Keyboard navigation with ArrowUp/ArrowDown and Enter execution — CRITICAL: navigation order must follow the visual (grouped) rendering order, not the raw score-sorted order",
-      "Loading, empty, error, and command execution states",
-      "Optional destructive command confirmation step",
-      "Reduced-motion support for open/close transitions",
-      "CRITICAL: Styling MUST match project conventions and use detected framework/styling system only",
-      "CRITICAL: Maintain accessible dialog/input/result semantics and reliable focus management"
+      "Cmd+K on macOS and Ctrl+K elsewhere, without taking over browser shortcuts such as Cmd or Ctrl+P",
+      "A native modal <dialog> with a visible Close button; Escape closes it and focus returns to where it was",
+      "A combobox input with type=\"text\" controlling a listbox; focus stays in the input, and the first result is highlighted",
+      "The arrows wrap through the results in the order on screen; Space types; input methods keep their keys",
+      "A highlight with 3:1 contrast that follows the pointer only when it moves",
+      "Only the latest search's answer counts, the previous results can't run while a search is out, and one status region says the results once typing pauses",
+      "Destructive commands ask first, with focus on Cancel; disabled commands are reachable but don't run"
     ],
     "implementationSteps": [
-      "0. Detect framework and styling system before writing code",
-      "1. Build trigger and global shortcut listener with collision-safe key handling",
-      "2. Render palette as a modal dialog with backdrop and panel",
-      "3. Move focus to search input on open and restore trigger focus on close",
-      "4. Implement query state and fuzzy filtering (including keyword aliases)",
-      "5. Add grouped results and clear active-row styling",
-      "6. CRITICAL: Build the keyboard navigation list from the grouped visual order (iterate groups in render order, concatenate items), NOT from the raw score-sorted flat list. Score sorting determines which items appear and their intra-group rank, but arrow keys must walk items in the same sequence the user sees on screen.",
-      "7. Implement keyboard navigation for result rows with disabled-row skipping",
-      "8. Suppress mouse hover selection during keyboard-triggered scrollIntoView — track a pointer-moved flag, set it to false on ArrowUp/ArrowDown, reset to true on pointermove, and only update the active row on mouseenter when the flag is true. Without this, scrolling the list under a stationary cursor fires mouseenter and fights the keyboard selection.",
-      "9. Execute command on Enter/click with async-safe loading handling",
-      "10. Add optional recent/suggested commands when query is empty",
-      "11. Add permission/context filtering before rendering results",
-      "12. Add destructive command confirmation behavior",
-      "13. Announce meaningful result count and execution feedback for assistive technology",
-      "14. Apply reduced-motion behavior for users who request it",
-      "15. Ensure responsive layout: on mobile the panel must be full-screen (h-dvh, no margin/rounding/border) with a visible close button in the search row (no Escape key on touch devices). On all viewports, use flex-column panel layout where search input and footer are shrink-0 and only the results list scrolls (flex-1 min-h-0 overflow-y-auto) so the footer always stays at the bottom.",
-      "16. Validate against keyboard, accessibility, and edge-case checklist",
-      "17. Use only project tokens and existing class conventions"
+      "1. Detect the framework and its version, the styling system, the tokens, and the existing components (projectDetection). If the project already has a command menu or a combobox, configure or extend it to meet this guide instead of building another one, and keep its API.",
+      "2. Build the dialog, the search box, and the results (componentSpec.anatomy, frameworkPatterns.searchKeys).",
+      "3. Add the shortcut and the optional trigger (implementationDetails.opening).",
+      "4. Connect the app's search (frameworkPatterns.latestSearch) and its commands (implementationDetails.running).",
+      "5. Add what the task needs: recent commands, groups, scopes, a confirmation step.",
+      "6. Check the result against testingChecklist with a keyboard, a screen reader, an input method editor, and a phone, and run the project's existing tests and checks."
     ]
   },
-  "structure": {
-    "slots": [
-      "root",
-      "trigger",
-      "dialog",
-      "backdrop",
-      "panel",
-      "searchInput",
-      "resultsRegion",
-      "groupHeader",
-      "commandList",
-      "commandItem",
-      "confirmationStep",
-      "emptyState",
-      "footerShortcuts"
-    ],
-    "hierarchy": "Root( Trigger?, Dialog( Backdrop, Panel( SearchInput, ResultsRegion( GroupHeader?, CommandList( CommandItem* ) ), ConfirmationStep?, EmptyState?, FooterShortcuts? ) ) )",
-    "idStrategy": {
-      "instanceIdFormat": "palette-{instanceId}",
-      "inputIdFormat": "palette-{instanceId}-input",
-      "listIdFormat": "palette-{instanceId}-list",
-      "itemIdFormat": "palette-{instanceId}-item-{commandId}",
-      "mappingRule": "If aria-activedescendant is used, active command item ID must match itemIdFormat and exist in the rendered list."
-    }
-  },
-  "components": {
-    "trigger": {
-      "description": "Optional visible trigger button in navbar/header with keyboard hint text.",
-      "requiredAttributes": [
-        "aria-haspopup='dialog'",
-        "aria-expanded",
-        "aria-controls (optional but recommended)"
-      ]
-    },
-    "dialog": {
-      "description": "Modal container for palette content.",
-      "requiredAttributes": [
-        "role='dialog'",
-        "aria-modal='true'",
-        "aria-labelledby or aria-label"
-      ]
-    },
-    "searchInput": {
-      "description": "Primary input for command lookup and filtering.",
-      "requiredAttributes": [
-        "id",
-        "type='text' or type='search'",
-        "aria-autocomplete",
-        "aria-controls (when listbox model is used)"
-      ]
-    },
-    "commandItem": {
-      "description": "Result row representing a command.",
-      "requiredAttributes": [
-        "stable id",
-        "aria-disabled when disabled",
-        "active state semantics (selected or activedescendant model)"
-      ]
-    },
-    "confirmationStep": {
-      "description": "Inline confirmation UI shown when a destructive command is selected. Replaces results region temporarily with a confirm/cancel prompt.",
-      "requiredAttributes": [
-        "role='alertdialog' or equivalent alert semantics",
-        "aria-describedby referencing the confirmation message",
-        "focusable confirm and cancel buttons"
-      ]
-    },
-    "mobileCloseButton": {
-      "description": "Close button visible only on mobile viewports (hidden on desktop where Escape key is available). Placed in the search input row. Required because touch devices have no Escape key.",
-      "requiredAttributes": [
-        "aria-label='Close'",
-        "visible only below mobile breakpoint (e.g. hidden sm:hidden, visible on max-sm)",
-        "minimum 44px touch target"
-      ]
-    }
-  },
-  "responsiveBreakpoints": {
-    "mobile": {
-      "maxWidthPx": 767,
-      "defaultBehavior": "Full-screen takeover dialog (h-dvh, no margin, no border-radius, no border) with large touch targets",
-      "touchTargets": "Minimum 44px row height",
-      "layoutGuidance": "Hide non-essential metadata first, keep labels and action clarity",
-      "closeButton": "CRITICAL: Mobile devices have no Escape key. A visible close button must appear in the search input row on mobile viewports. Hide it on desktop where Escape is available.",
-      "panelLayout": "Use flex-column layout so that the search input and footer are fixed (shrink-0) and only the results list scrolls (flex-1 min-h-0 overflow-y-auto). The footer must always remain visible at the bottom regardless of list length."
-    },
-    "tablet": {
-      "minWidthPx": 768,
-      "maxWidthPx": 1023,
-      "defaultBehavior": "Centered dialog with sticky search input and scrollable results"
-    },
-    "desktop": {
-      "minWidthPx": 1024,
-      "defaultBehavior": "Centered floating panel with grouped rows and optional rich metadata",
-      "layoutGuidance": "Show shortcut hints and optional subtitles when space allows"
-    }
-  },
   "componentSpec": {
-    "goal": "Provide a fast, keyboard-first command surface that lets users discover and execute navigation/actions from one accessible interface.",
+    "goal": "Let people reach any destination or action from one search box, quickly from the keyboard, without running anything by accident.",
     "anatomy": {
       "slots": [
-        "root",
         "trigger",
         "dialog",
-        "backdrop",
-        "panel",
-        "searchInput",
-        "resultsRegion",
-        "groupHeader",
-        "commandList",
-        "commandItem",
-        "confirmationStep",
-        "emptyState",
-        "footerShortcuts"
+        "label",
+        "input",
+        "closeButton",
+        "results",
+        "group",
+        "option",
+        "status",
+        "confirmation"
       ],
-      "hierarchy": "Root( Trigger?, Dialog( Backdrop, Panel( SearchInput, ResultsRegion( GroupHeader?, CommandList( CommandItem* ) ), ConfirmationStep?, EmptyState?, FooterShortcuts? ) ) )"
+      "hierarchy": "Optional trigger → dialog (modal, named by its label) → label | input (combobox) | Close | results (listbox: groups and options) | status region; a confirmation step replaces the results for destructive commands",
+      "slotNotes": {
+        "trigger": "Cmd+K on macOS and Ctrl+K elsewhere open it. A visible trigger in the header (\"Search\" or \"Commands\") shows the shortcut for the person's system, ⌘K or Ctrl K, and has aria-keyshortcuts=\"Meta+K Control+K\".",
+        "dialog": "The palette is a native <dialog> opened with showModal(), as in the Modal Dialog guide: focus goes into the search box, and the rest of the page is inert.",
+        "input": "The search box follows the APG combobox with list autocomplete and automatic selection. The input has role=\"combobox\", aria-autocomplete=\"list\", aria-expanded=\"true\" (the list always shows), and aria-controls pointing to the list, and it's labelled \"Search commands\", visibly or visually hidden. autocomplete=\"off\" and spellcheck=\"false\" keep the browser's suggestions out of the way.",
+        "results": "The results are a role=\"listbox\" of role=\"option\" rows with unique ids. Groups are role=\"group\" elements, labelled by their headings.",
+        "highlight": "The highlight is the focus indicator, since focus stays in the input: give it 3:1 contrast against what's around it, with an outline or a solid background. A faint tint such as bg-neutral-100 on white is 1.1:1. Style it from aria-selected or a class, not :focus; options never get focus.",
+        "disabledOption": "A command that's shown but can't run right now stays reachable with the arrows, has aria-disabled=\"true\", and Enter doesn't run it (APG). Commands the person can never run are left out. Hiding them is only for convenience: the server checks permission when a command runs.",
+        "status": "While a search is out, the previous results stay in view but can't run: nothing is highlighted, the list has aria-busy=\"true\" (which the project's styles can dim), Enter and clicks do nothing, and the previous announcement is cancelled. Otherwise, with results from a server, Enter in that moment runs a command from the previous query.",
+        "confirmation": "A destructive command asks first, in a step of the same dialog: the message, then Cancel and a button named for the action (\"Delete 3 projects\"). Focus goes to Cancel, which is described by the message, and Escape goes back to the results instead of closing the palette."
+      }
     },
     "stateModel": {
       "open": {
         "type": "boolean",
-        "description": "Whether the command palette is currently visible.",
+        "description": "Whether the palette is open.",
         "default": false,
-        "persistence": "component state or parent state"
+        "persistence": "component state only"
       },
       "query": {
         "type": "string",
-        "description": "Current query typed by the user.",
+        "description": "The search text.",
         "default": "",
-        "persistence": "component state"
+        "persistence": "component state only"
       },
-      "filteredCommands": {
-        "type": "array",
-        "description": "Filtered and ranked command list for current query and context. IMPORTANT: When results are grouped, this list must reflect the visual (group-by-group) render order so that keyboard navigation matches what the user sees. Do not use the raw score-sorted order for navigation.",
-        "default": [],
-        "persistence": "derived state"
+      "highlighted": {
+        "type": "number",
+        "description": "The index of the highlighted option in the order on screen, or -1; mirrored in aria-activedescendant. The first result whenever the list changes.",
+        "default": -1,
+        "persistence": "component state only"
       },
-      "activeCommandId": {
-        "type": "string",
-        "description": "Currently highlighted command ID for keyboard execution.",
-        "default": "",
-        "persistence": "component state"
-      },
-      "loadingResults": {
+      "running": {
         "type": "boolean",
-        "description": "Whether command data retrieval/filtering is waiting on async operations.",
+        "description": "Whether a command is running; a second Enter does nothing meanwhile.",
         "default": false,
-        "persistence": "component state"
+        "persistence": "component state only"
       },
-      "executionState": {
-        "type": "enum",
-        "description": "Execution lifecycle for the currently invoked command.",
-        "default": "idle",
-        "allowedValues": [
-          "idle",
-          "pending",
-          "success",
-          "error"
-        ],
-        "persistence": "component state"
-      },
-      "errorMessage": {
-        "type": "string",
-        "description": "Error text shown when query loading or command execution fails.",
-        "default": "",
-        "persistence": "component state"
-      },
-      "recentCommands": {
+      "recent": {
         "type": "array",
-        "description": "Recently executed command IDs shown when query is empty.",
+        "description": "Optional: the ids of recently run commands, shown when the box is empty.",
         "default": [],
-        "persistence": "local storage or app state",
-        "notes": "Avoid storing sensitive command payloads."
-      },
-      "suggestedCommands": {
-        "type": "array",
-        "description": "Context-aware command IDs surfaced when query is empty. Derived from current route, workspace, or usage patterns. Displayed alongside or after recent commands.",
-        "default": [],
-        "persistence": "derived from current route/context"
-      },
-      "confirmationActive": {
-        "type": "boolean",
-        "description": "Whether a destructive command confirmation step is currently shown instead of search results.",
-        "default": false,
-        "persistence": "component state"
-      },
-      "pendingCommandId": {
-        "type": "string",
-        "description": "ID of the destructive command awaiting confirmation. Empty when no confirmation is active.",
-        "default": "",
-        "persistence": "component state"
-      },
-      "scope": {
-        "type": "enum",
-        "description": "Optional command scope for filtering and ranking behavior.",
-        "default": "global",
-        "allowedValues": [
-          "global",
-          "workspace",
-          "project"
-        ],
-        "persistence": "derived from current route/context"
+        "persistence": "Storage under the app's own prefix, ids only"
       }
     },
     "interactions": [
       {
-        "event": "openShortcut",
-        "when": "user presses Cmd/Ctrl + K and no excluded input owns the shortcut",
+        "event": "shortcut",
+        "when": "Cmd+K on macOS, Ctrl+K elsewhere, unless an editor owns it",
         "result": "openPalette",
         "sideEffects": [
-          "Set open=true",
-          "Move focus to searchInput",
-          "Optionally preload recent commands"
+          "showModal",
+          "focusInput"
         ],
         "preventDefault": true
       },
       {
-        "event": "escapeKey",
-        "when": "palette is open",
-        "result": "closePaletteOrClearQuery",
+        "event": "typing",
+        "result": "search",
         "sideEffects": [
-          "If query has text and clearOnFirstEscape=true, clear query",
-          "Otherwise close palette and restore focus to trigger"
+          "clearHighlightAndMarkListBusy",
+          "highlightFirstResultWhenAnswered",
+          "announceCountWhenTypingPauses"
         ],
-        "preventDefault": true
+        "accessibilityNotes": "Space types. Until the latest answer arrives, the previous results can't run; only the latest answer fills the list."
       },
       {
-        "event": "backdropClick",
-        "when": "palette is open and click target is outside panel",
-        "result": "closePalette",
+        "event": "arrowDownOrUp",
+        "result": "moveHighlight",
         "sideEffects": [
-          "Restore focus to trigger"
+          "setAriaActivedescendant",
+          "scrollIntoView"
         ],
-        "preventDefault": false
-      },
-      {
-        "event": "queryChange",
-        "when": "user types in search input",
-        "result": "filterAndRankCommands",
-        "sideEffects": [
-          "Update query value",
-          "Update filteredCommands",
-          "Update activeCommandId to first enabled command"
-        ]
-      },
-      {
-        "event": "arrowDown",
-        "when": "palette is open and results are present",
-        "result": "moveActiveToNextEnabledCommand",
-        "sideEffects": [
-          "Skip disabled commands",
-          "Keep active row visible in scroll container",
-          "CRITICAL: Walk items in visual (grouped) render order, not raw score-sorted order — otherwise arrow keys jump between groups unpredictably",
-          "Set pointer-moved flag to false so that scroll-triggered mouseenter events do not override the keyboard selection"
-        ],
-        "preventDefault": true
-      },
-      {
-        "event": "arrowUp",
-        "when": "palette is open and results are present",
-        "result": "moveActiveToPreviousEnabledCommand",
-        "sideEffects": [
-          "Skip disabled commands",
-          "Keep active row visible in scroll container",
-          "CRITICAL: Walk items in visual (grouped) render order, not raw score-sorted order — otherwise arrow keys jump between groups unpredictably",
-          "Set pointer-moved flag to false so that scroll-triggered mouseenter events do not override the keyboard selection"
-        ],
-        "preventDefault": true
+        "preventDefault": true,
+        "accessibilityNotes": "Wraps at the ends; disabled commands are reachable. Left to an input method while it composes."
       },
       {
         "event": "enterKey",
-        "when": "active command exists and is enabled",
-        "result": "executeActiveCommand",
-        "sideEffects": [
-          "Set executionState to pending",
-          "Run command handler",
-          "On success optionally close palette",
-          "On error set executionState to error and keep palette open"
-        ],
-        "preventDefault": true
+        "when": "a command is highlighted",
+        "result": "runCommand",
+        "preventDefault": true,
+        "accessibilityNotes": "A disabled command doesn't run; a destructive one opens the confirmation step."
       },
       {
-        "event": "resultClick",
-        "when": "user clicks enabled command item",
-        "result": "executeClickedCommand",
-        "sideEffects": [
-          "Update activeCommandId",
-          "Run command handler",
-          "Persist recency on success"
-        ]
+        "event": "escapeKey",
+        "result": "closePalette",
+        "accessibilityNotes": "The native dialog closes, with text in the box too, and returns focus to the element that had it before. In the confirmation step, Escape goes back to the results instead."
       },
       {
-        "event": "asyncSearchResultResolve",
-        "when": "query source is asynchronous",
-        "result": "applyLatestResultSetOnly",
-        "sideEffects": [
-          "Discard stale responses for older queries",
-          "Clear loading state"
-        ]
+        "event": "optionClick",
+        "result": "runCommand",
+        "accessibilityNotes": "mousedown is cancelled, so focus stays in the input."
       },
       {
-        "event": "destructiveCommandSelection",
-        "when": "selected command has requiresConfirmation=true",
-        "result": "openConfirmationStep",
-        "sideEffects": [
-          "Set confirmationActive=true and pendingCommandId to selected command ID",
-          "Show confirmationStep slot with confirm and cancel actions",
-          "Do not execute command until explicit confirmation",
-          "On confirm: execute command and reset confirmationActive=false",
-          "On cancel: reset confirmationActive=false and return to results"
-        ],
-        "accessibilityNotes": "Confirmation UI must be keyboard and screen-reader accessible. Focus should move to the confirm/cancel actions."
+        "event": "pointerMove",
+        "when": "the pointer's position changed",
+        "result": "highlightOptionUnderPointer",
+        "accessibilityNotes": "Scrolling under a still pointer doesn't move the highlight."
       }
     ],
     "responsiveBehavior": {
-      "mobile": {
-        "maxWidthPx": 767,
-        "behavior": "Full-screen takeover (h-dvh, no margin/rounding/border) with large touch targets, compact metadata, and a visible close button in the search row since mobile has no Escape key."
-      },
-      "tablet": {
-        "minWidthPx": 768,
-        "maxWidthPx": 1023,
-        "behavior": "Use centered dialog with sticky input and grouped list."
-      },
-      "desktop": {
-        "minWidthPx": 1024,
-        "behavior": "Use centered floating panel with richer row metadata and shortcut hints."
-      }
+      "phones": "Below 768 px: the dialog fills the screen (100dvh), the search box stays at the top, and only the results scroll.",
+      "larger": "A centered panel up to 720 px wide, about 12% of the window's height from the top."
     },
     "variants": {
-      "globalPalette": {
-        "description": "Single command surface for app-wide navigation and actions."
-      },
-      "contextualPalette": {
-        "description": "Palette scoped to current page/workspace with higher context relevance."
-      },
-      "navigationFirst": {
-        "description": "Prioritize route commands before action commands."
-      },
-      "actionFirst": {
-        "description": "Prioritize workflow actions over navigation commands."
-      }
+      "global": "One palette for the whole app.",
+      "scoped": "A palette for the current project or workspace, which says so in its label."
     },
     "dataContract": {
-      "props": {
-        "commands": {
-          "type": "Array<{ id: string; label: string; keywords?: string[]; group?: string; icon?: string | ComponentNode; subtitle?: string; shortcut?: string; disabled?: boolean; requiresConfirmation?: boolean; priority?: number; permission?: string; run: () => Promise<void> | void }>",
-          "required": true
-        },
-        "open": {
-          "type": "boolean",
-          "required": false,
-          "controlled": true
-        },
-        "defaultOpen": {
-          "type": "boolean",
-          "required": false,
-          "uncontrolled": true
-        },
-        "query": {
-          "type": "string",
-          "required": false,
-          "controlled": true
-        },
-        "defaultQuery": {
-          "type": "string",
-          "required": false,
-          "uncontrolled": true
-        },
-        "scope": {
-          "type": "'global' | 'workspace' | 'project'",
-          "required": false
-        },
-        "closeOnExecute": {
-          "type": "boolean",
-          "required": false,
-          "default": true
-        },
-        "clearOnFirstEscape": {
-          "type": "boolean",
-          "required": false,
-          "default": false,
-          "description": "When true, first Escape press clears the query instead of closing the palette. Second Escape closes."
-        },
-        "onOpenChange": {
-          "type": "(open: boolean) => void",
-          "required": false
-        },
-        "onQueryChange": {
-          "type": "(query: string) => void",
-          "required": false
-        },
-        "onExecute": {
-          "type": "(commandId: string) => void",
-          "required": false
-        }
-      },
-      "events": {
-        "onOpenChange": "Fired whenever palette open state changes.",
-        "onQueryChange": "Fired whenever query text changes.",
-        "onExecute": "Fired after a command is selected for execution."
+      "commands": {
+        "shape": "{ id, label, keywords?, group?, icon?, shortcut?, disabled?, requiresConfirmation?, run() }[]",
+        "notes": "shortcut is a hint shown next to the label; disabled commands stay reachable; requiresConfirmation opens the confirmation step."
       }
     }
   },
-  "projectDetection": {
-    "framework": {
-      "description": "Detect framework-specific dialog, state, and keyboard event patterns before implementation.",
-      "detectionSteps": [
-        "Check package.json for react, vue, @angular/core, or svelte dependencies.",
-        "Inspect existing modal/dialog and search components for implementation patterns.",
-        "Follow existing event handling and state-control conventions."
-      ]
+  "animations": {
+    "note": "Optional.",
+    "open": {
+      "durationMs": 150,
+      "properties": "opacity"
     },
-    "stylingSystem": {
-      "description": "Detect and use only the project's established styling system.",
-      "detectionSteps": [
-        "Identify Tailwind, SCSS, CSS Modules, styled-components, or other established styling approaches.",
-        "Inspect existing overlay/dialog and list row class naming conventions.",
-        "Match focus ring, spacing, and interaction state patterns from existing components."
-      ],
-      "adaptationRules": [
-        "If Tailwind is used, compose utility classes that match current token and variant conventions.",
-        "If SCSS or CSS is used, implement class-based styles and explicit modifiers for active, disabled, and loading states.",
-        "If CSS Modules are used, keep styles local and map interaction states to module class names.",
-        "If styled-components are used, derive styles from theme tokens and component props."
-      ]
-    },
-    "designTokens": {
-      "description": "Map palette spacing, typography, colors, and motion to existing design tokens.",
-      "detectionSteps": [
-        "Locate current token sources (theme files, CSS variables, or Tailwind theme config).",
-        "Reuse existing overlay, input, list-item, and focus-ring tokens.",
-        "Avoid introducing new ad-hoc color and spacing values where tokens already exist."
-      ]
-    }
-  },
-  "frameworkPatterns": {
-    "react": {
-      "controlled": "const [open, setOpen] = useState(false); <CommandPalette open={open} onOpenChange={setOpen} commands={commands} />",
-      "uncontrolled": "<CommandPalette defaultOpen={false} commands={commands} />",
-      "notes": "Use refs for focus restoration and active row scroll-into-view."
-    },
-    "vue": {
-      "vModel": "<CommandPalette v-model:open='open' v-model:query='query' :commands='commands' />",
-      "notes": "Use composables for keyboard shortcuts and async-safe search handling."
-    },
-    "angular": {
-      "binding": "<app-command-palette [commands]='commands' [open]='open' (openChange)='onOpenChange($event)'></app-command-palette>",
-      "notes": "Bind aria attributes and keyboard handlers in template and component class."
-    },
-    "svelte": {
-      "binding": "<CommandPalette bind:open={open} bind:query={query} {commands} />",
-      "notes": "Use reactive statements for filtered command lists and active-row updates."
-    }
-  },
-  "stylingApproaches": {
-    "tailwindCSS": {
-      "overlay": "fixed inset-0 bg-black/40 backdrop-blur-[1px]",
-      "panel": "mx-4 mt-[12vh] flex max-h-[min(580px,80vh)] w-full max-w-2xl flex-col rounded-xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900 max-sm:mx-0 max-sm:mt-0 max-sm:h-dvh max-sm:max-h-none max-sm:max-w-none max-sm:rounded-none max-sm:border-0",
-      "resultsList": "min-h-0 flex-1 overflow-y-auto overscroll-contain",
-      "input": "h-11 w-full border-b border-neutral-200 bg-transparent px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-neutral-700",
-      "groupHeader": "px-3 pt-3 pb-1 text-xs font-medium uppercase tracking-wide text-neutral-500",
-      "item": "flex h-11 items-center justify-between rounded-md px-3 text-sm",
-      "itemActive": "bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100",
-      "itemDisabled": "opacity-50 cursor-not-allowed",
-      "shortcutHint": "ml-3 text-xs text-neutral-500"
-    },
-    "cssModules": "Create commandPalette.module.css with classes for overlay, panel, input, list, groupHeader, item, itemActive, itemDisabled, emptyState, and footer.",
-    "styledComponents": "Create styled wrappers for Overlay, Panel, Input, List, and Item components using theme tokens and active/disabled props.",
-    "scss": "Create _command-palette.scss with BEM classes (.command-palette, .command-palette__panel, .command-palette__input, .command-palette__item, .command-palette__item--active, .command-palette__item--disabled)."
+    "reducedMotion": "Under prefers-reduced-motion: reduce, the palette appears without movement."
   },
   "accessibility": {
     "wcagCompliance": {
       "level": "AA",
+      "version": "2.2",
       "requirements": {
-        "1.3.1": "Dialog, input, and result relationships are programmatically exposed.",
-        "1.4.3": "Text, active row, and focus indicators meet contrast requirements.",
-        "2.1.1": "Palette is fully operable with keyboard only.",
-        "2.1.2": "No keyboard trap; users can close and return focus predictably.",
-        "2.4.3": "Focus order is logical from input to results and controls.",
-        "2.4.7": "Visible focus indicator for all focusable controls.",
-        "3.2.2": "Command execution happens only on explicit activation.",
-        "4.1.2": "Names, roles, and states are correctly announced."
+        "1.3.1": "The input is a combobox controlling a listbox, groups are labelled, and the dialog is named.",
+        "1.4.3": "Labels, hints, and group labels meet 4.5:1 in both themes.",
+        "1.4.11": "The highlighted command and focus indicators meet 3:1.",
+        "2.1.1": "Opening, searching, choosing, and closing all work from the keyboard.",
+        "2.1.2": "Escape and Close always leave the palette.",
+        "2.4.3": "Focus returns to the element that had it before the palette opened.",
+        "2.4.7": "The highlighted command is the visible focus indicator while focus stays in the input.",
+        "3.2.2": "Typing never runs a command; only Enter or a click does.",
+        "4.1.2": "The combobox exposes its active option; options expose aria-selected and aria-disabled.",
+        "4.1.3": "The number of results and failures are announced through one status region."
       }
     },
     "keyboardNavigation": {
-      "Cmd/Ctrl+K": "Open palette and focus search input.",
-      "Escape": "Close palette (or clear query first if configured).",
-      "ArrowDown": "Move active selection to next enabled command.",
-      "ArrowUp": "Move active selection to previous enabled command.",
-      "Enter": "Execute active command.",
-      "Tab": "Move focus within dialog controls while focus trap remains active.",
-      "Shift+Tab": "Reverse focus movement within dialog."
+      "open": "Cmd+K on macOS, Ctrl+K elsewhere.",
+      "arrows": "Down and Up Arrow move the highlight and wrap at the ends, through the options in the order on screen: build the order from the rendered list, not from the ranked array, since grouping reorders the ranks. Space types, and while an input method composes text, its keys are its own (isComposing, and keyCode 229 in Safari).",
+      "enter": "Runs the highlighted command.",
+      "escape": "Closes the palette, or leaves the confirmation step.",
+      "tab": "Moves between the search box, Close, and the confirmation step's buttons; the rest of the page is inert."
     },
     "ariaAttributes": {
       "required": {
-        "triggerButton": {
-          "aria-haspopup": "dialog",
-          "aria-expanded": "reflect open state"
+        "input": {
+          "role": "combobox",
+          "aria-autocomplete": "list",
+          "aria-expanded": "true",
+          "aria-controls": "The listbox's id",
+          "aria-activedescendant": "The highlighted option's id, while one is highlighted"
+        },
+        "listbox": {
+          "role": "listbox",
+          "aria-labelledby": "The label's id"
+        },
+        "option": {
+          "role": "option",
+          "aria-selected": "\"true\" on the highlighted option"
         },
         "dialog": {
-          "role": "dialog",
-          "aria-modal": "true",
-          "aria-label": "or aria-labelledby to provide accessible name"
-        },
-        "searchInput": {
-          "aria-label": "Descriptive label such as 'Search commands'",
-          "aria-controls": "Result list ID when listbox pattern is used",
-          "aria-activedescendant": "Active command item ID when using virtual focus"
+          "aria-labelledby": "The label's id"
         }
       },
       "optional": {
-        "resultsCount": {
-          "aria-live": "polite region announcing result counts after query updates"
+        "trigger": {
+          "aria-keyshortcuts": "Meta+K Control+K"
         },
-        "disabledCommand": {
-          "aria-disabled": "true for non-interactive command rows"
+        "group": {
+          "role": "group",
+          "aria-labelledby": "The group heading's id"
+        },
+        "option": {
+          "aria-disabled": "true, for a command that can't run right now",
+          "aria-setsize and aria-posinset": "Only when the list renders part of its options"
         }
       }
     },
     "screenReader": {
-      "open": "Announce dialog open and place focus on search input.",
-      "queryUpdates": "Announce concise result count changes without excessive verbosity.",
-      "executionFeedback": "Announce success or error messages for executed commands when meaningful."
+      "highlight": "Each highlighted command is read through aria-activedescendant as the list changes or the arrows move.",
+      "results": "The status region says the number of results once typing pauses."
     },
     "focusManagement": {
-      "onOpen": "Move focus to search input.",
-      "trap": "Keep focus within palette while open.",
-      "onClose": "Restore focus to the trigger element.",
-      "activeRow": "Ensure active row remains visible and discoverable while navigating via keyboard."
-    },
-    "implementationChecklist": [
-      "Dialog has an accessible name and modal behavior.",
-      "Input has explicit accessible label.",
-      "Keyboard users can open, navigate, execute, and close without pointer.",
-      "Focus returns to trigger after close.",
-      "Result count announcements are concise and useful.",
-      "Disabled commands are not accidentally executable.",
-      "All focus indicators are visible and high contrast."
-    ]
-  },
-  "animations": {
-    "openClose": {
-      "durationMs": 180,
-      "easing": "cubic-bezier(0.2, 0, 0, 1)",
-      "properties": {
-        "opacity": "0 -> 1 on open, 1 -> 0 on close",
-        "transform": "translateY(8px) -> translateY(0)"
-      }
-    },
-    "backdrop": {
-      "durationMs": 140,
-      "easing": "linear",
-      "properties": {
-        "opacity": "0 -> target backdrop opacity"
-      }
-    },
-    "activeRow": {
-      "durationMs": 100,
-      "easing": "ease-out",
-      "properties": {
-        "backgroundColor": "subtle change when active row updates"
-      }
-    },
-    "reducedMotion": {
-      "behavior": "Disable translate transforms and keep only quick opacity transitions.",
-      "implementation": "@media (prefers-reduced-motion: reduce) { /* minimize motion */ }"
+      "open": "The palette is a native <dialog> opened with showModal(), as in the Modal Dialog guide: focus goes into the search box, and the rest of the page is inert.",
+      "close": "Focus returns to the element that had focus before it opened, which the native dialog does by itself (checked in Chromium, Firefox, and WebKit). The shortcut usually opens it, so that isn't the trigger. After a command navigates, focus goes where the new page puts it."
     }
+  },
+  "projectDetection": {
+    "framework": {
+      "description": "Find the framework, its version, and how existing components are written before writing code.",
+      "detectionSteps": [
+        "Read the project's dependencies (package.json or its equivalent) for the framework and its version, and use the syntax that version supports.",
+        "Open two or three existing components to see their file structure, state handling, and naming.",
+        "Look for an existing component that already does this job, in the project or in a design system or UI library it uses, and build on it."
+      ]
+    },
+    "stylingSystem": {
+      "description": "Use the styling system the project already uses, and only that one.",
+      "detectionSteps": [
+        "Check the dependencies and config for the styling setup: Tailwind (version 4 keeps its theme in CSS with @theme, version 3 in tailwind.config.*), CSS Modules, Sass, CSS-in-JS, or plain CSS.",
+        "See how existing components apply styles and compose class names, for example with cn or clsx.",
+        "Check for design documentation: DESIGN.md, a design system package, or Storybook stories for existing components."
+      ],
+      "adaptationRules": [
+        "Write styles the way existing components do, and add no new styling library or system.",
+        "With plain CSS, use classes in the project's stylesheets instead of inline styles, except for values computed at runtime.",
+        "If the setup is unclear or mixed, ask before choosing."
+      ]
+    },
+    "designTokens": {
+      "description": "Use the project's tokens for color, spacing, radius, type, shadows, motion, and layering.",
+      "detectionSteps": [
+        "Find the tokens: CSS custom properties, a Tailwind theme (@theme or config), a theme object, or a tokens file.",
+        "Use them instead of this guide's example values; where there are none, match the closest existing components.",
+        "Check that the colors you use meet the contrast minimums: 4.5:1 for text, and 3:1 for focus indicators, icons, and control boundaries."
+      ]
+    }
+  },
+  "frameworkPatterns": {
+    "note": "Short snippets in plain HTML and JavaScript for the parts that are easiest to get wrong; adapt them to the project's framework and its version. runCommand() and findCommands() stand for the app's commands and its search; the two scripts share the input, the list, and highlight().",
+    "searchKeys": {
+      "description": "The search box, after the APG combobox with automatic selection: focus stays in the input, aria-activedescendant and aria-selected mark the highlighted command, the arrows wrap, Enter runs, a disabled command doesn't run, input methods keep their keys, a click keeps focus in the input, and the highlight follows the pointer only when it really moves, even in WebKit, which fires pointermove when the list scrolls under a still mouse. type=\"text\", so Escape always closes the dialog.",
+      "html": "<dialog class=\"palette\" aria-labelledby=\"palette-label\">\n  <label class=\"visually-hidden\" id=\"palette-label\" for=\"palette-input\">Search commands</label>\n  <!-- type=\"text\": in a type=\"search\" field, Escape clears the text in some browsers instead of closing -->\n  <input id=\"palette-input\" type=\"text\" role=\"combobox\" autocomplete=\"off\" spellcheck=\"false\"\n    aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"palette-results\">\n  <form method=\"dialog\"><button class=\"palette-close\">Close</button></form>\n  <ul id=\"palette-results\" role=\"listbox\" aria-labelledby=\"palette-label\"></ul>\n  <p class=\"palette-status visually-hidden\" role=\"status\"></p>\n</dialog>",
+      "script": "// The search box, after the APG combobox with automatic selection: focus stays in the input,\n// aria-activedescendant marks the highlighted command, and the first result is highlighted\n// whenever the list changes, so Enter runs it. Space types, and keys that belong to an input\n// method are left to it. Escape is the dialog's own: it closes the palette.\nconst input = document.getElementById('palette-input');\nconst list = document.getElementById('palette-results');\n// The results that can run, in the order on screen: none while a search is out (the list is busy)\nconst options = () => (list.getAttribute('aria-busy') === 'true' ? [] : [...list.querySelectorAll('[role=\"option\"]')]);\nlet active = -1;\nlet pointer = null; // the pointer's last position; unknown again after an arrow key\n\nfunction highlight(index, scroll = true) {\n  active = index;\n  options().forEach((option, i) => option.setAttribute('aria-selected', String(i === index)));\n  const option = options()[index];\n  if (option) input.setAttribute('aria-activedescendant', option.id);\n  else input.removeAttribute('aria-activedescendant');\n  if (option && scroll) option.scrollIntoView({ block: 'nearest' });\n}\nfunction run(option) {\n  if (options().includes(option) && option.getAttribute('aria-disabled') !== 'true') runCommand(option.dataset.command);\n}\ninput.addEventListener('keydown', (event) => {\n  const count = options().length;\n  if (event.isComposing || event.keyCode === 229 || count === 0) return;\n  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {\n    event.preventDefault();\n    pointer = null;\n    highlight((active + (event.key === 'ArrowDown' ? 1 : -1) + count) % count);\n  } else if (event.key === 'Enter' && active >= 0) {\n    event.preventDefault();\n    run(options()[active]);\n  }\n});\nlist.addEventListener('mousedown', (event) => event.preventDefault()); // focus stays in the input\nlist.addEventListener('click', (event) => run(event.target.closest('[role=\"option\"]')));\n// The highlight follows the pointer only when it moves. Scrolling the list under a still\n// pointer fires pointermove in WebKit, so a move counts only from a known, different position.\nlist.addEventListener('pointermove', (event) => {\n  const position = `${event.clientX},${event.clientY}`;\n  const moved = pointer !== null && position !== pointer;\n  pointer = position;\n  const option = event.target.closest('[role=\"option\"]');\n  if (moved && option) highlight(options().indexOf(option), false);\n});"
+    },
+    "latestSearch": {
+      "description": "Only the latest search's answer fills the list. While a search is out, the previous results can't run: nothing is highlighted, the list is busy, and the previous announcement is cancelled. When the answer arrives, the first result is highlighted, and the status region says the number of results, \"No matching commands\", or a failure once typing pauses.",
+      "script": "// Only the latest search's answer fills the list: a slower answer to an older query is\n// dropped. While a search is out, the previous results stay in view but can't run: nothing is\n// highlighted, the list is busy, and the previous announcement is cancelled. findCommands()\n// stands for the app's search, local or on the server.\nconst status = document.querySelector('.palette-status');\nlet latest = 0;\nlet pause;\n\ninput.addEventListener('input', async () => {\n  const request = ++latest;\n  clearTimeout(pause);\n  highlight(-1);\n  list.setAttribute('aria-busy', 'true');\n  let commands = null;\n  try {\n    commands = await findCommands(input.value);\n  } catch {\n    // shown below, if this is still the latest search\n  }\n  if (request !== latest) return;\n  list.replaceChildren(...(commands ?? []).map((command) => {\n    const option = Object.assign(document.createElement('li'), { id: `command-${command.id}`, textContent: command.label });\n    option.setAttribute('role', 'option');\n    option.dataset.command = command.id;\n    if (command.disabled) option.setAttribute('aria-disabled', 'true');\n    return option;\n  }));\n  list.removeAttribute('aria-busy');\n  highlight(commands?.length ? 0 : -1);\n  pause = setTimeout(() => { // said once typing pauses, not on every key\n    const n = commands?.length;\n    status.textContent = !commands ? 'Search failed. Try again.' : n ? `${n} ${n === 1 ? 'command' : 'commands'}` : 'No matching commands';\n  }, 500);\n});"
+    }
+  },
+  "implementationDetails": {
+    "opening": "Cmd+K on macOS and Ctrl+K elsewhere open it. A visible trigger in the header (\"Search\" or \"Commands\") shows the shortcut for the person's system, ⌘K or Ctrl K, and has aria-keyshortcuts=\"Meta+K Control+K\". Don't take over Cmd or Ctrl+P, which is the browser's Print, or other browser shortcuts. When focus is in a rich text editor that uses the same shortcut, the editor keeps it. The palette is a native <dialog> opened with showModal(), as in the Modal Dialog guide: focus goes into the search box, and the rest of the page is inert. Escape closes it, with text in the box too. The input is type=\"text\": in a type=\"search\" field inside a modal dialog, Chromium and Firefox clear the text on the first Escape and keep the palette open, while WebKit closes it at once (checked). Focus returns to the element that had focus before it opened, which the native dialog does by itself (checked in Chromium, Firefox, and WebKit). The shortcut usually opens it, so that isn't the trigger. After a command navigates, focus goes where the new page puts it. A visible Close button is always there, since touch screens and many tablets have no Escape key; a button in a <form method=\"dialog\"> closes the dialog without a script.",
+    "searching": "Matching is up to the app: fuzzy matching, keywords and aliases, and ranking by prefix, recent use, and the current context. Matched characters show in bold, not only in color. With an empty box, show recent and suggested commands. Recent commands are kept under the app's own storage prefix, as ids, never with their data. Only the latest search's answer fills the list: number the requests and drop older answers, or abort the previous request. While a search is out, the previous results stay in view but can't run: nothing is highlighted, the list has aria-busy=\"true\" (which the project's styles can dim), Enter and clicks do nothing, and the previous announcement is cancelled. Otherwise, with results from a server, Enter in that moment runs a command from the previous query. One status region, present from the start, says the number of results once typing pauses (\"3 commands\"), \"No matching commands\", and failures. It doesn't speak on every key. A long list can render only part of itself; then the highlighted option stays rendered, and every option has aria-setsize and aria-posinset.",
+    "running": "A navigation command goes to its page and closes the palette. An action runs; when it succeeds, the palette closes and the outcome goes to the app's status region or a toast. When it fails, the palette stays open with the error in text. A command that opens a dialog closes the palette first, so no dialog opens on top of it. A destructive command asks first, in a step of the same dialog: the message, then Cancel and a button named for the action (\"Delete 3 projects\"). Focus goes to Cancel, which is described by the message, and Escape goes back to the results instead of closing the palette. While a command runs, a second Enter does nothing.",
+    "layering": "Layers, bottom to top: the page, sticky bars, dropdowns and popovers, toasts, then modals, which make the rest of the page inert. The project's layering scale wins; native <dialog> and the popover attribute use the top layer and need no z-index. The palette is a modal: a native <dialog> in the top layer, above sticky bars, dropdowns, and toasts.",
+    "appearance": "Suggested defaults; the project's design and tokens win. The panel is up to 640 to 720 px wide and about 12% of the window's height from the top; on phones it fills the screen (100dvh), with the search box at the top and only the results scrolling. Rows are 44 px tall, and the input's text is 16 px, so iOS doesn't zoom into it. Text meets 4.5:1 in both themes, shortcut hints and group labels included: text-neutral-500 is only 3.8:1 on a dark panel. Check the project's own colors. Motion is optional: the panel fades in over 150 ms. Under prefers-reduced-motion: reduce, it appears without movement."
   },
   "edgeCases": {
-    "shortcutConflict": {
-      "issue": "Cmd/Ctrl+K can conflict with browser or in-app editor shortcuts.",
-      "solution": "Allow configurable shortcut enable/disable and exclude focused rich editors when needed."
-    },
-    "staleAsyncResults": {
-      "issue": "Older async query responses can overwrite newer results.",
-      "solution": "Track request tokens and apply only latest response."
-    },
-    "noVisibleCommands": {
-      "issue": "Permissions/context can filter all commands.",
-      "solution": "Show explicit empty guidance and fallback actions."
-    },
-    "destructiveMisfire": {
-      "issue": "Dangerous command could run immediately from Enter key.",
-      "solution": "Require confirmation for commands flagged requiresConfirmation."
-    },
-    "largeCommandSets": {
-      "issue": "Thousands of commands degrade responsiveness.",
-      "solution": "Use indexed search, memoized ranking, and list virtualization."
-    },
-    "mobileNoEscapeKey": {
-      "issue": "Touch devices have no physical Escape key, leaving users with no way to close the palette except tapping the backdrop (which is hidden when the panel is full-screen).",
-      "solution": "Add a visible close button in the search input row, shown only on mobile viewports and hidden on desktop where Escape is available."
-    },
-    "footerScrolledAway": {
-      "issue": "If the footer is inside the scroll container with the results list, it scrolls out of view when the list is long, making keyboard hints invisible.",
-      "solution": "Use a flex-column panel layout: search input (shrink-0), results list (flex-1 min-h-0 overflow-y-auto), footer (shrink-0). Only the results list scrolls."
-    },
-    "navigationOrderMismatch": {
-      "issue": "When results are grouped by category, the score-sorted flat list order diverges from the visual group-by-group render order. Arrow key navigation follows the flat list, causing the active row to appear to jump forward across groups and then snap back — a confusing and broken-feeling experience.",
-      "solution": "After grouping, rebuild the flat navigation list by concatenating groups in render order (Array.from(groupMap.values()).flat()). Arrow keys must always walk this visual-order list, never the raw score-sorted array."
-    },
-    "scrollInducedHoverFight": {
-      "issue": "Arrow key navigation calls scrollIntoView to keep the active row visible. The resulting scroll moves list items under the stationary mouse cursor, triggering mouseenter events that immediately overwrite the keyboard-selected active row. The user sees the highlight flicker or jump back on every key press.",
-      "solution": "Track a pointer-moved boolean flag (e.g. via ref or variable). Set it to false on every ArrowUp/ArrowDown key press. Reset it to true on the pointermove event (real physical mouse movement). Only update the active row from mouseenter when the flag is true. This is the same pattern used by VS Code, Linear, and cmdk."
-    }
+    "noCommands": "Say so, and offer a way on, such as the settings or the help page.",
+    "manyCommands": "Search an index, rank once per query, and render only part of the list.",
+    "scopes": "A palette for the current project or workspace says so in its label, and lists that context's commands first."
   },
   "outputConstraints": {
     "must": [
-      "Detect and use only the project's existing framework and styling system.",
-      "Use existing design tokens and naming conventions for overlay, input, list, and focus states.",
-      "Implement reliable keyboard-first open, navigation, execution, and close behavior.",
-      "Implement modal focus trap and focus restoration on close.",
-      "Provide accessible labels/roles/states for dialog, input, and command rows.",
-      "Handle loading, empty, error, and executing states.",
-      "Keep command execution idempotent-safe by preventing duplicate submits while pending.",
-      "Derive the keyboard navigation order from the visual (grouped) render order, not from the raw score-sorted list.",
-      "Suppress mouseenter-based active row updates during keyboard-triggered scrollIntoView by tracking a pointer-moved flag.",
-      "Use flex-column panel layout: search input and footer are shrink-0, results list is flex-1 min-h-0 overflow-y-auto — the footer must always remain at the bottom regardless of list length.",
-      "On mobile, render the panel as full-screen (h-dvh, no margin, no rounding, no border) and show a visible close button in the search input row since touch devices have no Escape key."
+      "Build on the project's command menu or combobox component when it has a suitable one, and keep its API",
+      "Keep focus in the input, with aria-activedescendant for the highlight",
+      "Highlight the first result whenever the list changes",
+      "Let only the latest search's answer fill the list, and let nothing run from the previous results while a search is out",
+      "Use the project's framework version, styling system, and tokens, the way existing components do"
     ],
     "mustNot": [
-      "Introduce a new styling system or dependency only for this component.",
-      "Use inline style attributes when project conventions are class-based.",
-      "Execute destructive commands without confirmation when requiresConfirmation is true.",
-      "Leave focus trapped or orphaned after closing palette.",
-      "Allow stale async results to override latest query results.",
-      "Use a raw score-sorted array for arrow key navigation when results are rendered in grouped order — this causes the active row to jump between groups unpredictably.",
-      "Update the active row on mouseenter without checking whether the pointer has physically moved — scrollIntoView can trigger mouseenter on a stationary cursor and fight keyboard navigation.",
-      "Rely only on Escape key for closing the palette — mobile devices have no Escape key, so a visible close button is required on mobile viewports.",
-      "Place both the results list and the footer inside the same scroll container — the footer must remain fixed at the panel bottom, not scroll with the list."
+      "Add a dependency, such as a command menu or fuzzy search library, without asking",
+      "Use type=\"search\" for the input, or make Escape clear the text instead of closing",
+      "Take over Cmd or Ctrl+P, or other browser shortcuts",
+      "Move focus into the results, or style the highlight with :focus",
+      "Run a disabled command, or a destructive one without asking",
+      "Use inline styles for static values in a plain-CSS project, or hardcode colors the project has tokens for"
     ]
   },
   "testingChecklist": [
-    "Cmd/Ctrl+K opens the palette from standard app contexts.",
-    "Escape closes palette and restores focus to trigger.",
-    "Input is focused immediately on open.",
-    "Typing query filters results with fuzzy matching.",
-    "Result ranking prioritizes exact and context-relevant matches.",
-    "ArrowDown and ArrowUp move active row correctly in visual (grouped) order — never jumping across groups unexpectedly.",
-    "Arrow navigation order matches rendered group order, not raw score order, when a search query is active.",
-    "Arrow navigation with scrollIntoView does not cause hover flicker when the mouse cursor is stationary over the list.",
-    "Arrow navigation skips disabled commands.",
-    "Enter executes active command once.",
-    "Clicking a command executes same behavior as Enter.",
-    "Pending execution prevents duplicate triggering.",
-    "Destructive commands require explicit confirmation.",
-    "Empty query can show recent or suggested commands.",
-    "No-result query shows helpful empty state.",
-    "Async search loading state is visible and non-blocking.",
-    "Stale async responses do not replace newer result sets.",
-    "Permission-restricted commands are hidden or disabled correctly.",
-    "Dialog has proper role and accessible name.",
-    "Search input has proper accessible label.",
-    "Result count announcements are exposed via polite live region.",
-    "Focus trap prevents focus leaving dialog while open.",
-    "Focus return on close works for keyboard and pointer scenarios.",
-    "Visible focus styles meet contrast requirements.",
-    "Touch targets are at least 44px on mobile.",
-    "Mobile panel is full-screen with no margin, rounding, or border.",
-    "Mobile close button is visible and functional (since there is no Escape key on touch devices).",
-    "Footer with keyboard hints stays fixed at the bottom and does not scroll with the results list.",
-    "Mobile sheet/dialog remains usable with virtual keyboard open.",
-    "Long command labels truncate safely without breaking layout.",
-    "Very large command lists remain performant.",
-    "Reduced-motion mode minimizes transforms.",
-    "Styling matches project conventions (Tailwind, SCSS, CSS Modules, styled-components, etc.).",
-    "No inline styles when class-based styling is expected."
+    "Cmd+K on macOS and Ctrl+K elsewhere open it, Cmd or Ctrl+P is left to the browser, and a visible trigger shows the right shortcut",
+    "It's a modal dialog: focus goes into the search box, the rest of the page is inert, and a visible Close button is always there",
+    "Escape closes it, even with text in the box, and focus returns to the element that had focus before it opened",
+    "The search box is a combobox controlling a listbox; focus stays in it, and aria-activedescendant marks the highlighted command",
+    "The first result is highlighted whenever the list changes, so Enter runs it, and the arrows wrap through the results in the order on screen",
+    "Space types, and keys that belong to an input method are left to it",
+    "The highlighted command has at least 3:1 contrast against what's around it, and follows the pointer only when the pointer moves",
+    "A disabled command is reachable with the arrows, and Enter doesn't run it",
+    "Only the latest search's answer fills the list, and a failed search says so",
+    "While a search is out, the previous results can't run, by Enter or by a click, and nothing is highlighted",
+    "One status region says the number of results once typing pauses, and \"No matching commands\"",
+    "A destructive command asks first, with focus on Cancel, and Escape goes back to the results",
+    "A command that opens a dialog closes the palette first, and the server checks permission when a command runs",
+    "On phones it fills the screen, with 44 px rows and 16 px text",
+    "Styles come from the project's styling system and tokens"
   ],
   "meta": {
     "created": "2026-02-22",
-    "updated": "2026-02-23",
+    "updated": "2026-10-24",
     "webUrl": "https://uipotion.com/potions/components/command-palette",
     "relatedPotions": [
       {
         "id": "navbar",
         "category": "components",
         "relationship": "complements",
-        "description": "Optional: Add a command palette trigger and shortcut hint in the global navigation bar.",
+        "description": "Optional: the bar with the palette's visible trigger.",
         "required": false
       },
       {
         "id": "dashboard",
         "category": "layouts",
         "relationship": "used-in",
-        "description": "Optional: Command Palette is commonly paired with dashboard layouts for fast navigation.",
+        "description": "Optional: dense admin apps with many destinations.",
+        "required": false
+      },
+      {
+        "id": "dropdown-select",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: the same combobox keys, with manual selection, for form fields.",
+        "required": false
+      },
+      {
+        "id": "dialog",
+        "category": "components",
+        "relationship": "complements",
+        "description": "Optional: the modal dialog the palette is built on.",
         "required": false
       },
       {
         "id": "ai-agent-chat",
         "category": "layouts",
         "relationship": "complements",
-        "description": "Optional: Use Command Palette for prompt presets, tool actions, and context switches in chat apps.",
+        "description": "Optional: quick access to prompts, tools, and conversations in an AI chat.",
         "required": false
       }
     ],

@@ -164,9 +164,9 @@ We'll review your potion for schema compliance and best practices, suggest impro
 - **Be comprehensive** — Include all necessary details for AI to implement, and say each rule once
 - **Be framework-agnostic** — Avoid framework-specific code in descriptions
 - **Include accessibility where relevant** — WCAG 2.2 AA, ARIA, keyboard navigation
-- **Follow the Guide Rules** — In [AGENTS.md](AGENTS.md#guide-rules); the Dialog guide, the three AI guides, and the five form guides follow all of them
+- **Follow the Guide Rules** — In [AGENTS.md](AGENTS.md#guide-rules); the Dialog guide, the three AI guides, the five form guides, and the six navigation and app shell guides follow all of them
 - **Include responsive specs where relevant** — Mobile, tablet, desktop breakpoints
-- **Keep code to short snippets** — Plain HTML and JavaScript for the parts that are easiest to get wrong, the same in the Markdown and the JSON, and checked in a browser
+- **Keep code to short snippets** — Plain HTML, CSS, and JavaScript for the parts that are easiest to get wrong, the same in the Markdown and the JSON, and checked in a browser
 - **End with a short acceptance checklist** — What to verify after implementation, the same in the Markdown and the JSON (`testingChecklist`)
 
 ## Questions?

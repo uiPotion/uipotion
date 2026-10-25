@@ -152,7 +152,7 @@ We welcome contributions! UI Potion grows with community input.
 
 ## What Makes a Good Potion?
 
-The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. The Dialog guide, the three AI guides, and the five form guides follow all of them; the others get them as they're revised.
+The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. The Dialog guide, the three AI guides, the five form guides, and the six navigation and app shell guides follow all of them; the others get them as they're revised.
 
 ### Human Documentation (Markdown)
 
@@ -171,7 +171,7 @@ The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. The D
 
 - Structured, parseable data
 - Complete specifications that minimize ambiguity
-- Short snippets in plain HTML and JavaScript for the parts that are easiest to get wrong, the same as in the Markdown, and framework examples only where they help, labeled with the version they're for
+- Short snippets in plain HTML, CSS, and JavaScript for the parts that are easiest to get wrong, the same as in the Markdown, and framework examples only where they help, labeled with the version they're for
 - Styling guidance that defers to the project's styling system and tokens
 - State management guidance where relevant
 - Accessibility implementation details
