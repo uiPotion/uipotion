@@ -623,12 +623,85 @@ function readJsonFile(file) {
   }
 }
 
+const CODE_KEYS = ['frameworkPatterns', 'stylingApproaches']; // they hold code, not references
+const FILE_EXTENSION = /^(json|css|scss|js|mjs|cjs|jsx|ts|tsx|md|html|svg|ya?ml)$/;
+
+/**
+ * The dotted references a guide makes to its own parts, such as edgeCases.busyClose: the ones
+ * whose first part is a top-level key, outside the code keys, and not file names (tokens.json).
+ * Returns [{ where, ref }], where is the path of the text that cites it.
+ */
+function findSectionRefs(data) {
+  const refs = [];
+  (function walk(value, where) {
+    if (typeof value === 'string') {
+      const found = new Set(value.match(/(?<![\w$.\/-])[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)+/g) || []);
+      found.forEach(ref => {
+        const parts = ref.split('.');
+        if (Object.hasOwn(data, parts[0]) && !FILE_EXTENSION.test(parts[parts.length - 1])) refs.push({ where, ref });
+      });
+    } else if (Array.isArray(value)) {
+      value.forEach((item, i) => walk(item, `${where}[${i}]`));
+    } else if (isPlainObject(value)) {
+      Object.entries(value).forEach(([key, item]) => {
+        if (where === '' && CODE_KEYS.includes(key)) return;
+        walk(item, where ? `${where}.${key}` : key);
+      });
+    }
+  })(data, '');
+  return refs;
+}
+
+// Follow a reference through the guide: object keys, and array items by their event
+// (componentSpec.interactions.escapeKey)
+function resolvesInGuide(data, ref) {
+  let value = data;
+  return ref.split('.').every(part => {
+    if (Array.isArray(value)) value = value.find(item => isPlainObject(item) && item.event === part);
+    else value = isPlainObject(value) && Object.hasOwn(value, part) ? value[part] : undefined;
+    return value !== undefined;
+  });
+}
+
+// The text of a parsed Markdown node, without its formatting
+const textOf = node => node.value || (node.children || []).map(textOf).join('');
+
+/**
+ * The items of each "Acceptance checklist" section in a Markdown body, read from the parsed tree
+ * in document order, so any heading or list syntax counts, including a heading the parser puts
+ * inside the list before it. A section runs to the next heading of its level or above. Each list
+ * item in it is { text, box }: the item's source with line breaks read as spaces and without its
+ * "[ ] " box, and whether it has the box.
+ */
+function acceptanceChecklists(tree, body) {
+  const sections = [];
+  let section = null;
+  (function walk(node) {
+    if (node.type === 'heading') {
+      if (section && node.depth <= section.depth) section = null;
+      if (textOf(node).replace(/\s+/g, ' ').trim().toLowerCase() === 'acceptance checklist') {
+        section = { depth: node.depth, items: [] };
+        sections.push(section.items);
+      }
+    } else if (node.type === 'listItem' && section) {
+      const first = node.children[0];
+      const last = node.children[node.children.length - 1];
+      const source = first ? body.slice(first.position.start.offset, last.position.end.offset).replace(/\s*\n\s*/g, ' ').trim() : '';
+      const box = /^\[ \](?:\s|$)/.test(source);
+      section.items.push({ text: box ? source.slice(3).trim() : source, box });
+    } else {
+      (node.children || []).forEach(walk);
+    }
+  })(tree);
+  return sections;
+}
+
 /**
  * Check the authoring rules in AGENTS.md: each potion's Markdown and JSON in a category folder
  * with a schema, front matter, tags, titles and names, the potion page fields, no emoji, text
  * diagrams, Markdown tables, or level-1 headings, no template placeholders, the guide URLs,
- * related potions, and the dates. Each finding names the exact break, so a known break can't
- * hide a new one.
+ * related potions, the dates, the guide's references to its own parts, and the acceptance
+ * checklist. Each finding names the exact break, so a known break can't hide a new one.
  */
 async function checkAuthoringRules(potions) {
   const findings = []; // { key, rule, message }
@@ -660,6 +733,11 @@ async function checkAuthoringRules(potions) {
       return; // parse failures are already reported by schema validation
     }
     if (!isPlainObject(data)) return;
+
+    // The guide's references to its own parts resolve, so agents can follow them by name
+    findSectionRefs(data).forEach(({ where, ref }) => {
+      if (!resolvesInGuide(data, ref)) add(key, 'section-refs', `${where} cites ${ref}, which isn't in the guide`);
+    });
 
     const mdPath = path.join(MARKDOWN_DIR, category, `${slug}.md`);
     if (!fs.existsSync(mdPath)) {
@@ -737,12 +815,26 @@ async function checkAuthoringRules(potions) {
 
     // No level-1 heading in the body: the potion page shows the title as its only h1
     const h1s = [];
-    const textOf = node => node.value || (node.children || []).map(textOf).join('');
     (function walk(node) {
       if (node.type === 'heading' && node.depth === 1) h1s.push(JSON.stringify(textOf(node)));
       else (node.children || []).forEach(walk);
     })(tree);
     if (h1s.length) add(key, 'markdown-h1', `${h1s.length} level-1 heading(s) in the Markdown: ${h1s.join(', ')} (the page shows the title as its h1, so headings start at ##)`);
+
+    // Each "Acceptance checklist" section lists exactly testingChecklist, in order, as "[ ] " items,
+    // so the count an agent reports from the JSON matches the page
+    const jsonItems = Array.isArray(data.testingChecklist) ? data.testingChecklist : [];
+    acceptanceChecklists(tree, body).forEach(checklist => {
+      const length = Math.max(checklist.length, jsonItems.length);
+      let item = 0;
+      while (item < length && checklist[item] && checklist[item].box && checklist[item].text === jsonItems[item]) item += 1;
+      if (item < length) {
+        const found = checklist[item] || {};
+        const box = found.box === false ? ' (without a "[ ] " box)' : '';
+        const counts = checklist.length === jsonItems.length ? '' : ` (${checklist.length} items in the Markdown, ${jsonItems.length} in testingChecklist)`;
+        add(key, 'checklist', `the acceptance checklist differs from testingChecklist at item ${item + 1}: ${shown(found.text)}${box} in the Markdown, ${shown(jsonItems[item])} in the JSON${counts}`);
+      }
+    });
 
     // Template placeholders that nothing fills in, listed one by one
     [['JSON', jsonText], ['Markdown', markdown]].forEach(([where, text]) => {

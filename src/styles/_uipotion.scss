@@ -1691,6 +1691,11 @@ html {
   font-size: 0.875rem;
 }
 
+/* Its own line under the file buttons */
+.potion-resources-bar-files-note {
+  flex-basis: 100%;
+}
+
 .potion-resources-bar-download {
   display: inline-flex;
   align-items: center;

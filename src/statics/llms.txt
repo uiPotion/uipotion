@@ -7,6 +7,8 @@ Use this file as the entrypoint for discovery. Each potion is available in three
 - `agentGuideUrl` (JSON specification for AI agents)
 - `markdownUrl` (raw Markdown source)
 
+Read a guide whole, from the file: download the JSON and read all of it, since page-fetch tools often return only a summary.
+
 ## Core discovery
 
 - [UI Potion manifest](https://uipotion.com/uipotion-manifest.json): Start here for platform metadata and discovery workflow.

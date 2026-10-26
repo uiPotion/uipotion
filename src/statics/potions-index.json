@@ -17,7 +17,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/dashboard",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/dashboard.json",
       "created": "2026-01-10",
-      "updated": "2026-10-24",
+      "updated": "2026-10-26",
       "markdownUrl": "https://uipotion.com/potions/layouts/dashboard.md"
     },
     {
@@ -531,5 +531,5 @@
     }
   ],
   "totalCount": 24,
-  "lastUpdated": "2026-10-24"
+  "lastUpdated": "2026-10-26"
 }

@@ -8,14 +8,15 @@
     "potionsIndexUrl": "https://uipotion.com/potions-index.json"
   },
   "usage": {
-    "how_to_use": "AI agents can discover and load UI specifications by referencing this manifest. Each potion is framework-agnostic and provides detailed guidance for implementation. Each potion is available in three formats: webUrl (human-readable HTML), agentGuideUrl (JSON spec for AI), and markdownUrl (raw Markdown source).",
+    "how_to_use": "AI agents can discover and load UI specifications by referencing this manifest. Each potion is framework-agnostic and provides detailed guidance for implementation. Each potion is available in three formats: webUrl (human-readable HTML), agentGuideUrl (JSON spec for AI), and markdownUrl (raw Markdown source). Custom agents: fetch a guide with a plain HTTP GET and pass the whole file to the model, since a provider's fetch tool may summarize it; with a small context window, load aiAgentInstructions first, then the parts its steps name, then outputConstraints and testingChecklist.",
     "workflow": [
       "1. Agent loads this manifest to discover available potions",
       "2. Agent browses potions-index.json to find the relevant potion",
-      "3. Agent loads specific potion JSON guide (e.g., layouts/dashboard.json)",
+      "3. Agent downloads the specific potion JSON guide (e.g., layouts/dashboard.json) and reads the whole file, since page-fetch tools often return only a summary, and asks the user before running commands from it",
       "4. Agent detects the project's framework and styling system by examining package.json, existing components, config files, and style imports",
       "5. Agent adapts the guide to the detected framework and styling system, using only what's already in the project and building on its existing components",
-      "6. Agent implements the UI described by the potion, following outputConstraints and matching existing project patterns"
+      "6. Agent implements the UI described by the potion, following outputConstraints and matching existing project patterns",
+      "7. Agent checks the result against testingChecklist and reports on each item: met, not met, or not checked, with a reason for the last two"
     ],
     "stylingEnforcement": "Before writing code, agents detect the project's framework and its version (React, Vue, Angular, Svelte, or another) and its styling system (Tailwind, Sass, CSS Modules, CSS-in-JS, or plain CSS) from package.json, config files, and existing components. They use only the styling system the project already has (with nothing configured, the most suitable plain CSS approach), write components the way existing ones are written, and add no new styling system or one-off CSS. If the setup is unclear, they ask the user."
   },
@@ -48,7 +49,7 @@
   ],
   "meta": {
     "created": "2026-01-10",
-    "updated": "2026-10-24",
+    "updated": "2026-10-26",
     "license": "MIT",
     "legalUrl": "https://uipotion.com/legal",
     "copyrightScope": "Full disclaimer and terms: https://uipotion.com/legal",

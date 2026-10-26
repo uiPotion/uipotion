@@ -26,6 +26,7 @@ const INDEX = 'src/statics/potions-index.json';
 const MANIFEST = 'src/statics/uipotion-manifest.json';
 const BUTTON = 'components/button'; // a potion without known breaks
 const BUTTON_URL = 'https://uipotion.com/potions/components/button';
+const DIALOG = 'components/dialog'; // a potion with an acceptance checklist
 const TABLE = '| a | b |\n| --- | --- |\n| 1 | 2 |';
 // A run takes about 2 seconds and 300 MB, so only a few run at once
 const CONCURRENCY = Math.max(1, Math.min(8, os.availableParallelism() - 1));
@@ -572,6 +573,120 @@ describe('validate-potions.js', { concurrency: CONCURRENCY }, () => {
     const f = fixture(t);
     f.write(MANIFEST, '{');
     assertOneErrorStarting(await f.run(), 'site [dates]: could not read src/statics/uipotion-manifest.json: ');
+  });
+
+  // References to the guide's own parts, and the acceptance checklist
+
+  it("fails on a guide's references to parts it doesn't have", async t => {
+    const f = fixture(t);
+    let step;
+    f.editJson(guide(BUTTON), data => {
+      step = data.aiAgentInstructions.implementationSteps.length;
+      data.aiAgentInstructions.implementationSteps.push('Check accessibility.noSuchPart and componentSpec.interactions.noSuchEvent.');
+    });
+    assertErrors(await f.run(), [
+      `components/button [section-refs]: aiAgentInstructions.implementationSteps[${step}] cites accessibility.noSuchPart, which isn't in the guide`,
+      `components/button [section-refs]: aiAgentInstructions.implementationSteps[${step}] cites componentSpec.interactions.noSuchEvent, which isn't in the guide`
+    ]);
+  });
+
+  it('accepts references that resolve, array items by their event, and skips code and file names', async t => {
+    const f = fixture(t);
+    f.editJson(guide(BUTTON), data => {
+      data.aiAgentInstructions.implementationSteps.push('Follow componentSpec.interactions.click and accessibility.focusManagement, with values from tokens.json.');
+      data.frameworkPatterns.snippet = 'accessibility.noSuchPart();';
+      data.stylingApproaches.snippet = 'componentSpec.noSuchPart';
+    });
+    assertPasses(await f.run());
+  });
+
+  it('fails when the acceptance checklist differs from testingChecklist', async t => {
+    const f = fixture(t);
+    const items = JSON.parse(f.read(guide(DIALOG))).testingChecklist;
+    f.edit(markdown(DIALOG), text => text.replace(`- [ ] ${items[1]}\n`, () => `- [ ] ${items[1]} (changed)\n`));
+    assertErrors(await f.run(), [
+      `components/dialog [checklist]: the acceptance checklist differs from testingChecklist at item 2: ${JSON.stringify(`${items[1]} (changed)`)} in the Markdown, ${JSON.stringify(items[1])} in the JSON`
+    ]);
+  });
+
+  it('fails when the acceptance checklist and testingChecklist have different counts', async t => {
+    const f = fixture(t);
+    let items;
+    f.editJson(guide(DIALOG), data => {
+      items = [...data.testingChecklist];
+      data.testingChecklist.pop();
+    });
+    assertErrors(await f.run(), [
+      `components/dialog [checklist]: the acceptance checklist differs from testingChecklist at item ${items.length}: ${JSON.stringify(items.at(-1))} in the Markdown, missing in the JSON (${items.length} items in the Markdown, ${items.length - 1} in testingChecklist)`
+    ]);
+  });
+
+  it('reads the acceptance checklist up to the next heading, with the heading in any case, outside code', async t => {
+    const f = fixture(t);
+    const items = JSON.parse(f.read(guide(BUTTON))).testingChecklist;
+    const section = list => `## Acceptance Checklist\n\n${list.map(item => `- [ ] ${item}`).join('\n')}\n\n`;
+    const changed = [...items.slice(0, -1), 'A different last item'];
+    // Button's Implementation Checklist, the next section, has "- [ ] " items too
+    f.edit(markdown(BUTTON), text => text.replace('## Implementation Checklist\n', heading => (
+      `\`\`\`md\n${section(['Not an item'])}\`\`\`\n\n${section(changed)}${heading}`
+    )));
+    assertErrors(await f.run(), [
+      `components/button [checklist]: the acceptance checklist differs from testingChecklist at item ${items.length}: "A different last item" in the Markdown, ${JSON.stringify(items.at(-1))} in the JSON`
+    ]);
+  });
+
+  // Any Markdown syntax for the checklist's heading and items (chunk 14 review round 1)
+
+  const changedItem = items => `components/dialog [checklist]: the acceptance checklist differs from testingChecklist at item 2: ${JSON.stringify(`${items[1]} (changed)`)} in the Markdown, ${JSON.stringify(items[1])} in the JSON`;
+
+  [
+    ['with closing hashes', '## Acceptance checklist ##'],
+    ['in Setext syntax', 'Acceptance checklist\n--------------------'],
+    ['indented by three spaces', '   ## Acceptance checklist'],
+    ['at level 3', '### Acceptance checklist']
+  ].forEach(([name, heading]) => {
+    it(`checks an acceptance checklist under a heading ${name}`, async t => {
+      const f = fixture(t);
+      const items = JSON.parse(f.read(guide(DIALOG))).testingChecklist;
+      f.edit(markdown(DIALOG), text => text
+        .replace('## Acceptance checklist\n', () => `${heading}\n`)
+        .replace(`- [ ] ${items[1]}\n`, () => `- [ ] ${items[1]} (changed)\n`));
+      assertErrors(await f.run(), [changedItem(items)]);
+    });
+  });
+
+  it('fails on a continuation line added to a checklist item', async t => {
+    const f = fixture(t);
+    const items = JSON.parse(f.read(guide(DIALOG))).testingChecklist;
+    f.edit(markdown(DIALOG), text => text.replace(`- [ ] ${items[1]}\n`, () => `- [ ] ${items[1]}\n  (changed)\n`));
+    assertErrors(await f.run(), [changedItem(items)]);
+  });
+
+  it('accepts a checklist item wrapped over two lines', async t => {
+    const f = fixture(t);
+    const items = JSON.parse(f.read(guide(DIALOG))).testingChecklist;
+    const wrapped = items[1].replace(/(.{30,}?) /, '$1\n  ');
+    assert.notEqual(wrapped, items[1]);
+    f.edit(markdown(DIALOG), text => text.replace(`- [ ] ${items[1]}\n`, () => `- [ ] ${wrapped}\n`));
+    assertPasses(await f.run());
+  });
+
+  it('fails on a checklist item without a box', async t => {
+    const f = fixture(t);
+    const items = JSON.parse(f.read(guide(DIALOG))).testingChecklist;
+    f.edit(markdown(DIALOG), text => text.replace(`- [ ] ${items[1]}\n`, () => `- ${items[1]}\n`));
+    assertErrors(await f.run(), [
+      `components/dialog [checklist]: the acceptance checklist differs from testingChecklist at item 2: ${JSON.stringify(items[1])} (without a "[ ] " box) in the Markdown, ${JSON.stringify(items[1])} in the JSON`
+    ]);
+  });
+
+  it('reads the acceptance checklist past lower headings, up to the next heading of its level in any syntax', async t => {
+    const f = fixture(t);
+    const items = JSON.parse(f.read(guide(DIALOG))).testingChecklist;
+    f.edit(markdown(DIALOG), text => text
+      .replace(`- [ ] ${items[6]}\n`, () => `- [ ] ${items[6]}\n\n### When it closes\n\n`)
+      .replace('## See also\n', 'See also\n--------\n'));
+    assertPasses(await f.run());
   });
 
   // The known-breaks list. These tests go when KNOWN_RULE_BREAKS is deleted.

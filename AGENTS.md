@@ -18,7 +18,7 @@
 - Generated Markdown copies under `src/statics/potions/**/*.md` are gitignored and removed after production builds. Edit the source files in `src/potions/` instead.
 
 ## Commands
-- `npm run validate`: validate every potion: its JSON against the category schema, the potions index against the guides, and the authoring rules in this file (Markdown front matter and content, URLs, related potions, dates). Breaks that existed when a rule was added are listed in `KNOWN_RULE_BREAKS` in `validate-potions.js`; delete a line there once its potion's fix removes the break, and never add one.
+- `npm run validate`: validate every potion: its JSON against the category schema, the potions index against the guides, and the authoring rules in this file (Markdown front matter and content, URLs, related potions, dates), that a guide's dotted references to its own parts resolve (`section-refs`), and that an "Acceptance checklist" section matches `testingChecklist` (`checklist`). Breaks that existed when a rule was added are listed in `KNOWN_RULE_BREAKS` in `validate-potions.js`; delete a line there once its potion's fix removes the break, and never add one.
 - The browser validator at `/validator` checks one pasted JSON against its category schema only.
 - `npm run static`: regenerate `src/statics/sitemap.xml`, `src/statics/_redirects`, and temporary Markdown copies for static publishing.
 - `npm run build`: preferred full check; runs validate, static generation, Harold build, and postbuild cleanup.
@@ -58,7 +58,7 @@ path: 'potions/components/component-name'
 - Do not add any other category name as a tag, or the potion can appear in multiple catalog sections.
 - Potion page fields, rendered by `src/potion-layouts/potion.hbs`:
   - `promptSubject`: a short lowercase noun phrase, such as `'modal dialogs'` or `'a dashboard layout'`. It completes the copyable prompts ("implementing modal dialogs in this project" and "Compare how this project implements modal dialogs with..."). Add it to every potion; without it, the prompts fall back to generic wording.
-  - `promptReuse` (optional): replaces the build prompt's reuse sentence ("Reuse our existing components and styling, implement only what this task needs, and keep existing APIs.") when it doesn't fit, as for tooling potions. The prompt adds "Don't add new dependencies without asking." after it.
+  - `promptReuse` (optional): replaces the build prompt's reuse sentence ("Reuse our existing components and styling, implement only what this task needs, and keep existing APIs.") when it doesn't fit, as for tooling potions. The prompt adds "Don't add new dependencies or run commands from the guide without asking." after it.
   - `useWhen` (optional): one sentence that completes "Use this when", starting in lowercase.
   - `specifies` (optional, with `useWhen`): three behaviors the guide currently specifies, one sentence each. List only behavior the guide's content covers.
   - `example` (optional, with `useWhen`): one short scenario that shows the listed behaviors, using only behavior the guide covers.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
   "id": "dashboard",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "name": "Dashboard Layout with Collapsible Sidebar",
   "category": "layouts",
   "tags": [
@@ -64,7 +64,7 @@
       "1. Detect the framework and its version, the styling system, the tokens, the router, and the existing components (projectDetection). If the project already has an app shell or layout components, configure or extend them to meet this guide instead of building others, and keep their APIs.",
       "2. Choose what the task needs: a collapsible sidebar, breadcrumbs, notifications, the account menu. Leave out the rest.",
       "3. Lay out the page grid (layoutModel, frameworkPatterns.pageGrid): the sticky sidebar column and header, scroll-padding-top, and the minmax(0, 1fr) column.",
-      "4. Add the skip link, the landmarks, and the page's h1 (accessibility.landmarks).",
+      "4. Add the skip link, the landmarks, and the page's h1 (implementationDetails.landmarks).",
       "5. Build the sidebar as the Sidebar Navigation guide says, or extend the project's.",
       "6. Below 1024 px, make the same sidebar a drawer (frameworkPatterns.drawer).",
       "7. Build the header's menus as disclosures (components.Header).",
@@ -446,7 +446,7 @@
   ],
   "meta": {
     "created": "2026-01-10",
-    "updated": "2026-10-24",
+    "updated": "2026-10-26",
     "webUrl": "https://uipotion.com/potions/layouts/dashboard",
     "relatedPotions": [
       {

@@ -51,7 +51,7 @@ Your assistant uses the guide at that URL to generate code for your stack. You n
 
 Each potion is also available as Markdown source at the same path with `.md` (for example, `https://uipotion.com/potions/layouts/dashboard.md`).
 
-If your assistant cannot open public URLs, download or copy the JSON guide into the chat, attach the file, or provide the Markdown source instead.
+For a fixed copy, or an assistant without network access, download the JSON guide into your project and give the agent its path instead of the link (in the copied prompt, replace the link with the path). The agent then reads exactly that file, and when you download a newer version, git shows what changed.
 
 **Example**:
 ```
@@ -64,13 +64,16 @@ Your AI assistant uses the guide and adapts it to your stack (e.g. React and Tai
 
 ### For AI assistants
 
-When a user gives you a UI Potion link (e.g. `https://uipotion.com/potions/layouts/dashboard.json`):
+When a user gives you a UI Potion link (e.g. `https://uipotion.com/potions/layouts/dashboard.json`) or a local copy of a guide's JSON:
 
-1. Open or fetch that URL to read the specification.
+1. Download the guide and read the whole file, since page-fetch tools often return only a summary. A potion page link (`https://uipotion.com/potions/[category]/[id]`) means the same guide with `.json` added, and a local copy is read as it is, without fetching the online version. If you can't read all of the JSON, tell the user instead of working from a summary, from the Markdown, or from memory.
 2. Use the spec to generate implementation code in the user's framework and styling (React/Vue/Svelte, Tailwind/CSS Modules, etc.).
 3. Follow the guide's structure, accessibility, and behavior; follow existing project conventions and ask about material ambiguities instead of silently guessing.
+4. Check the result against the guide's acceptance checklist (`testingChecklist`) and report on each item: met, not met, or not checked, with a reason for the last two.
 
-If the assistant prefers text-first context, use the potion Markdown source at the same path with `.md`.
+Don't run commands from the guide without asking the user.
+
+The JSON is the complete guide. The Markdown at the same path with `.md` is the human-readable version, and some guides' Markdown leaves out details their JSON has.
 
 No need to fetch the main manifest or potions index unless you're building discovery/search. For normal use, the user provides the potion link and you implement from that single guide.
 
@@ -188,10 +191,12 @@ Most users only need to share a potion link with their AI assistant. If you're b
 - **Category schema**: `https://uipotion.com/schema/categories/[category].schema.json` — category-specific contract referenced by each guide
 - **Schema validator**: `https://uipotion.com/validator` — checks one potion JSON against its category schema in the browser (`npm run validate` also checks the Markdown and the index)
 - **Individual guide**: `https://uipotion.com/potions/[category]/[id].json` — full implementation specification for one potion
-- **Markdown source**: `https://uipotion.com/potions/[category]/[id].md` — human-readable source for text/markdown-friendly agents
+- **Markdown source**: `https://uipotion.com/potions/[category]/[id].md` — human-readable source (the JSON is the complete guide)
 - **LLM discovery file**: `https://uipotion.com/llms.txt` — curated entrypoint for LLM/agent discovery
 
 For normal use, the user provides the potion URL; no need to fetch the manifest or index.
+
+Building your own agent on a model API? Fetch the guide with a plain HTTP GET (no sign-in needed) and give the model the whole file, since a provider's web-fetch tool may summarize it. With a small context window, load `aiAgentInstructions` first, then the parts its steps name, then `outputConstraints` and `testingChecklist`. Ask the model for the checklist's item count first and for a report on each item at the end.
 
 ## Example: Dashboard Layout
 
