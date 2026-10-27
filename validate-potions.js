@@ -27,14 +27,6 @@ const SITE_URL = 'https://uipotion.com';
 // matches a finding fails validation. Never add a line: fix a new break instead.
 const KNOWN_RULE_BREAKS = [
   'components/toast-notifications [urls]: meta.webUrl is "https://uipotion.com/potions/components/toast-notifications.html", expected https://uipotion.com/potions/components/toast-notifications',
-  'features/pricing-table [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'features/pricing-table [urls]: meta.webUrl is "https://uipotion.com/potions/features/pricing-table.html", expected https://uipotion.com/potions/features/pricing-table',
-  'layouts/documentation [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'layouts/documentation [urls]: meta.webUrl is "https://uipotion.com/potions/layouts/documentation.html", expected https://uipotion.com/potions/layouts/documentation',
-  'layouts/documentation [related-potions]: related potion components/command-palette has required: true (use false)',
-  'layouts/ecommerce-product-page [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'layouts/landing-page [placeholder]: placeholders left in the JSON: {{USER_FRAMEWORK}}, {{USER_STYLING_LIBRARY}}',
-  'layouts/landing-page [urls]: meta.webUrl is "https://uipotion.com/potions/layouts/landing-page.html", expected https://uipotion.com/potions/layouts/landing-page',
   'patterns/dark-light-mode [urls]: meta.webUrl is "https://uipotion.com/potions/patterns/dark-light-mode.html", expected https://uipotion.com/potions/patterns/dark-light-mode',
   'tooling/eslint-config [first-tag]: the first tag is "eslint", expected "tooling"',
   'tooling/eslint-config [urls]: meta.webUrl is "https://uipotion.com/potions/tooling/eslint-config.html", expected https://uipotion.com/potions/tooling/eslint-config'

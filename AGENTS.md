@@ -80,7 +80,7 @@ path: 'potions/components/component-name'
 - Optional `meta.relatedPotions` entries must use `required: false` unless there is a truly exceptional reason.
 
 ## Guide Rules
-Rules for guide content, in both formats. The Dialog guide, the three AI guides, the five form guides, and the six navigation and app shell guides follow all of them; bring other guides in line when you edit them.
+Rules for guide content, in both formats. Every guide but Button, Toast Notifications, Dark/Light Mode, and ESLint Config follows all of them; bring those in line when you edit them.
 - State each rule once, mark options and suggested sizes as such, and end with a short acceptance checklist.
 - Tell agents to implement only what the task needs, keep existing APIs, build on a suitable existing component, and add no dependency without asking.
 - The project's conventions win for styling and visual defaults; conflicts with accessibility or correctness go to the user.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
   "id": "landing-page",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Landing Page Layout (Marketing)",
   "category": "layouts",
   "tags": [
@@ -12,1203 +12,465 @@
     "testimonials",
     "cta",
     "responsive",
-    "conversion"
+    "a11y"
   ],
-  "description": "A conversion-optimized marketing landing page layout with hero section, feature highlights, social proof, and multiple CTAs. Perfect for product launches, SaaS marketing, and lead generation campaigns.",
+  "description": "A marketing landing page from the header to the footer: a header that sticks with CSS alone and can turn solid as the page scrolls, calls to action that are links named by their visible text, social proof from the user's real content, and motion that never leaves a section hidden.",
   "tokens": {
+    "note": "Suggested defaults. The project's design tokens and existing components win.",
     "layout": {
       "contentMaxWidthPx": 1200,
-      "wideContentMaxWidthPx": 1400,
-      "sectionPaddingDesktopPx": 96,
-      "sectionPaddingMobilePx": 48,
-      "gridGapDesktopPx": 32,
-      "gridGapMobilePx": 24,
-      "zIndex": {
-        "base": 0,
-        "navbar": 50,
-        "modal": 100
-      }
+      "sectionPaddingPx": 96,
+      "sectionPaddingPhonePx": 48,
+      "gridGapPx": 32,
+      "gridGapPhonePx": 24,
+      "headerHeightPx": 64,
+      "headerSolidAfterPx": 48,
+      "menuBelowPx": 1024,
+      "minTargetPx": 24,
+      "touchTargetPx": 44,
+      "layering": "Layers, bottom to top: the page, sticky bars, dropdowns and popovers, toasts, then modals, which make the rest of the page inert. The project's layering scale wins; native <dialog> and the popover attribute use the top layer and need no z-index. The header is a sticky bar; the menu is a modal."
     },
     "motion": {
-      "defaultDurationMs": 600,
-      "defaultEasing": "cubic-bezier(0.4, 0, 0.2, 1)",
-      "fastDurationMs": 300,
-      "staggerDelayMs": 100
-    },
-    "breakpoints": {
-      "tabletMinPx": 768,
-      "desktopMinPx": 1024
-    }
-  },
-  "layoutPresets": {
-    "default": {
-      "heroHeight": "600-700px",
-      "sectionPaddingPx": 96
-    },
-    "compact": {
-      "heroHeight": "500-600px",
-      "sectionPaddingPx": 64
+      "headerFadeMs": 300,
+      "revealMs": 600,
+      "revealDistancePx": 16,
+      "easing": "ease-out"
     }
   },
   "layoutModel": {
     "type": "stack",
     "scrollRegion": "page",
     "positioningContract": {
-      "navbar": "fixed-top",
-      "sections": "sequential-stack",
-      "footer": "inline-bottom"
+      "header": "Sticky at the top, in the page's flow; scroll-padding-top at its height",
+      "hero": "The first section; pulled up under the header by its height when the header starts transparent",
+      "sections": "In source order, in the page's normal flow",
+      "footer": "At the end of the page, scrolling with it"
     },
     "invariants": [
-      "Sections stack vertically in source order",
-      "Entire page scrolls (no nested scroll containers)",
-      "Navbar remains fixed and may transition on scroll (transparent to solid)",
-      "No horizontal page scroll is introduced",
-      "First section (hero) should be above the fold"
+      "The page scrolls, not a box inside it",
+      "scroll-padding-top at the header's height keeps focused elements and link targets clear of the sticky header",
+      "Nothing scrolls sideways down to 320 px wide, and no section hides its overflow",
+      "Every section is visible without script, under reduced motion, and when printing"
     ]
   },
   "aiAgentInstructions": {
-    "summary": "Implement a conversion-optimized marketing landing page layout with hero section, feature highlights, social proof/testimonials, and strategic CTAs. The layout is framework-agnostic and should adapt to the user's chosen stack (React, Vue, Angular, Svelte, etc.) and styling approach (Tailwind, CSS Modules, Chakra UI, etc.).",
+    "summary": "Build or extend a marketing landing page: a sticky header, a hero, features, social proof, an optional pricing section, a closing call to action, and a footer. Calls to action are links named by their visible text; testimonials, logos, and numbers are the user's real content; motion is optional and never leaves a section hidden. Build on the project's header, section, card, and button components when it has suitable ones. Implement only what the task needs, keep existing APIs, and match the project's styling and tokens. The project's conventions win for styling and visual defaults; if one conflicts with an accessibility or correctness requirement in this guide, ask the user instead of choosing silently. Target WCAG 2.2 AA.",
     "keyFeatures": [
-      "Above-the-fold hero section with headline, subheadline, primary CTA, and hero image/video",
-      "Feature highlights section with 3-4 responsive grid cards",
-      "Social proof section with testimonials or client logos",
-      "Final CTA section before footer",
-      "Fixed navbar with optional scroll transition (transparent to solid)",
-      "Fully responsive with mobile-first approach",
-      "Scroll-triggered entrance animations (optional but recommended)",
-      "High accessibility with semantic HTML and ARIA labels",
-      "CRITICAL: Styling MUST match the project's existing conventions. Detect framework and styling system first, then use ONLY that system. Do NOT introduce new styling systems.",
-      "CRITICAL: When detecting vanilla CSS, ALWAYS create CSS classes in a stylesheet. NEVER use inline style attributes on HTML elements.",
-      "CRITICAL: When detecting React, extract logic into separate custom hooks that do ONE thing each."
+      "A header that sticks with CSS alone, with scroll-padding-top at its height and a skip link; optionally transparent over the hero until the page scrolls",
+      "Below 1024 px, the links in a native dialog, as in the Navigation Bar guide",
+      "Calls to action that are links, named by their visible text (WCAG 2.5.3)",
+      "Social proof from the user's real content, or marked placeholders; nothing invented",
+      "A hero that is visible at load, with a high-priority image and sizes on every image",
+      "An optional scroll reveal that hides nothing without script, under reduced motion, or when printing"
     ],
     "implementationSteps": [
-      "0. CRITICAL: Detect the project's framework and styling system BEFORE writing any code. Examine: (a) package.json for framework and styling dependencies, (b) existing component files to see styling patterns, (c) config files, (d) existing style files and their structure. Use ONLY the detected system.",
-      "0a. Detect framework patterns: Check how existing components are structured, how state is managed, and what patterns are used.",
-      "0b. Detect styling conventions: Identify class naming, how styles are imported, whether there's a design system or token system.",
-      "0c. If detection is uncertain, ask the user about their styling approach and framework before proceeding.",
-      "1. Create main layout component structure with sequential sections",
-      "2. Implement navbar component (fixed position, optional scroll transition)",
-      "3. Build hero section with headline, subheadline, CTA buttons, and hero media",
-      "4. Create features grid section with responsive cards (3-4 columns desktop, 2 tablet, 1 mobile)",
-      "5. Add testimonials/social proof section",
-      "6. Implement final CTA section before footer",
-      "7. Add footer with links and copyright",
-      "8. Implement responsive breakpoints and mobile-first styles",
-      "9. Add scroll-triggered animations for section entrance (optional, respect prefers-reduced-motion)",
-      "10. Ensure all CTAs are keyboard accessible with proper focus indicators",
-      "11. Add semantic HTML5 elements and ARIA labels for accessibility",
-      "12. Use ONLY the detected styling system. Do NOT add <style> blocks, inline styles, or new CSS files unless that's the project's convention."
+      "1. Detect the framework and its version, the styling system, the tokens, the router, and the existing components (projectDetection). If the project already has a header, sections, cards, or buttons, configure or extend them to meet this guide instead of building others, and keep their APIs.",
+      "2. Collect the content: the user's copy, testimonials, logos, and numbers. Where any are missing, use marked placeholders and ask for the real ones (implementationDetails.content).",
+      "3. Lay out the sections in order with their headings (structure, layoutModel).",
+      "4. Build the header (components.Header, frameworkPatterns.stickyHeader) and its menu below 1024 px (components.Header.behavior.menu).",
+      "5. Build the hero, the features, and the social proof (components.Hero, components.Features, components.SocialProof), with the calls to action as links (implementationDetails.callsToAction).",
+      "6. Add the optional parts the task asks for: the email signup (implementationDetails.signup), the scroll reveal (frameworkPatterns.scrollReveal).",
+      "7. Check the result against testingChecklist with a keyboard, a screen reader, a phone, 200% zoom, and reduced motion, and run the project's existing tests and checks."
     ]
   },
   "structure": {
     "hierarchy": {
-      "LandingPageContainer": {
-        "description": "Root container, full viewport height, controls overall page layout",
+      "Page": {
+        "description": "The landing page",
         "children": {
-          "Navbar": {
-            "description": "Fixed navigation bar at top, may transition on scroll",
-            "children": [
-              "Logo",
-              "NavigationLinks",
-              "CTAButton"
-            ]
+          "Header": {
+            "description": "Sticky: the skip link, the logo, the main navigation, and one call to action; the Menu button below 1024 px"
           },
-          "HeroSection": {
-            "description": "Above-the-fold hero section with primary value proposition",
-            "children": [
-              "Headline",
-              "Subheadline",
-              "CTAGroup",
-              "HeroMedia"
-            ]
-          },
-          "FeaturesSection": {
-            "description": "Feature highlights in responsive grid layout",
-            "children": [
-              "SectionHeading",
-              "FeatureGrid",
-              "FeatureCard[]"
-            ]
-          },
-          "TestimonialsSection": {
-            "description": "Social proof with customer testimonials or logos",
-            "children": [
-              "SectionHeading",
-              "TestimonialGrid",
-              "TestimonialCard[]"
-            ]
-          },
-          "CTASection": {
-            "description": "Final call-to-action section before footer",
-            "children": [
-              "CTAHeadline",
-              "CTASubtext",
-              "CTAButton"
-            ]
+          "Main": {
+            "description": "main#main with tabindex=\"-1\"",
+            "children": {
+              "Hero": {
+                "description": "The h1, the subheadline, the calls to action, and the product image or video"
+              },
+              "Features": {
+                "description": "An h2 and a grid of feature cards"
+              },
+              "SocialProof": {
+                "description": "Testimonials, client logos, or numbers, from the user"
+              },
+              "Pricing": {
+                "description": "Optional: the Pricing Table guide"
+              },
+              "ClosingCta": {
+                "description": "A short heading, a sentence, and the primary call to action"
+              }
+            }
           },
           "Footer": {
-            "description": "Page footer with links, social, and copyright",
-            "children": [
-              "FooterLinks",
-              "SocialLinks",
-              "Copyright"
-            ]
+            "description": "Link groups, social links, and the legal line"
+          },
+          "StatusRegion": {
+            "description": "One polite status region, present from the start, for the email signup's result"
           }
         }
       }
     }
   },
   "components": {
-    "Navbar": {
-      "description": "Fixed navigation bar at top of page with optional scroll transition",
+    "Header": {
+      "description": "The header starts with a skip link, \"Skip to content\", shown while it has focus and going to <main id=\"main\" tabindex=\"-1\"> (WCAG 2.4.1). Then the logo, a link to the home page named with the site's name, a <nav> labelled \"Main\", and one call to action.",
       "dimensions": {
         "heightPx": 64,
-        "paddingHorizontalPx": "24-32",
-        "position": "fixed top"
+        "solidAfterPx": 48
       },
       "states": [
-        "default",
-        "scrolled"
+        "transparent",
+        "solid",
+        "menu-open"
       ],
-      "elements": {
-        "Logo": {
-          "heightPx": "32-40",
-          "position": "left",
-          "linkable": true
-        },
-        "NavigationLinks": {
-          "display": "horizontal (desktop), hamburger menu (mobile)",
-          "fontSizePx": "14-16",
-          "gapPx": "24-32"
-        },
-        "CTAButton": {
-          "heightPx": "40-44",
-          "paddingPx": "12-16 horizontal",
-          "position": "right"
-        }
-      },
       "behavior": {
-        "scrollTransition": {
-          "enabled": "optional",
-          "trigger": "scroll > 50px",
-          "changes": "background: transparent → solid, shadow: none → subtle",
-          "durationMs": 300
-        },
-        "mobileMenu": {
-          "breakpoint": "< 768px",
-          "display": "hamburger icon → fullscreen overlay or slide-in drawer",
-          "backdropDismiss": true,
-          "criticalImplementationNotes": [
-            "CRITICAL: Hamburger button MUST have explicit z-index higher than other content (e.g., z-index: 60, navbar is 50)",
-            "CRITICAL: Button MUST have pointer-events: auto and cursor: pointer",
-            "CRITICAL: Button MUST have min-width and min-height of at least 44px for touch targets",
-            "CRITICAL: Event listener MUST be attached after DOM is ready (DOMContentLoaded or defer script)",
-            "CRITICAL: Use event.stopPropagation() on button click to prevent immediate closure from document click handlers",
-            "CRITICAL: Mobile menu MUST have z-index higher than navbar (e.g., z-index: 100)",
-            "CRITICAL: Test on actual mobile devices, not just browser DevTools"
-          ],
-          "debuggingChecklist": [
-            "Verify hamburger button is visible and clickable (inspect z-index, pointer-events)",
-            "Check browser console for JavaScript errors during initialization",
-            "Verify event listener is actually attached (add console.log in click handler)",
-            "Check if click event is being prevented or stopped by parent elements",
-            "Verify button is not covered by transparent overlays or pseudo-elements",
-            "Test with both click and touch events on mobile",
-            "Ensure menu state toggle logic is correct (open/close alternates properly)"
-          ]
-        }
+        "sticky": "position: sticky; top: 0 keeps the header at the top without a script and keeps its space in the page. A fixed header takes no space, so the page would need padding that matches its height. scroll-padding-top on the root element, set to the header's height, scrolls focused elements and in-page link targets clear of it (WCAG 2.2 2.4.11).",
+        "transparentOverHero": "Optional: the header starts transparent over the hero and turns solid once the page has scrolled past a threshold. The hero is pulled up under the header by the header's height. An IntersectionObserver on a sentinel at the top of the page, as tall as the threshold, switches it, with no scroll listener. At exactly the threshold, the sentinel's edge still touches the window, so the header turns solid one pixel later (checked in Chromium, Firefox, and WebKit). Without script, the header stays solid.",
+        "contrast": "The header's text meets 4.5:1 in both states: in the transparent state against the hero behind it, the lightest part of a hero image included.",
+        "menu": "Below 1024 px, the links move into a menu opened by a Menu button, and from 1024 px the header shows them: one switch, as in the Navigation Bar guide. The menu is a native <dialog> opened with showModal() and named \"Main menu\", so the rest of the page is inert, Escape closes it, and focus returns to Menu. It has a visible Close button (\"Close menu\"), and closes when a link in it is followed. A click on the backdrop closes it as in the Modal Dialog guide: the <dialog> has no padding of its own (an inner wrapper has it), so only the backdrop makes the dialog the click's target, and the press has to start on the backdrop too. A rule that checks only the target also closes the menu on a click on its padding, and on a drag from inside it onto the backdrop (checked in Chromium, Firefox, and WebKit). Menu and Close are at least 44 px square on touch screens."
       }
     },
-    "HeroSection": {
-      "description": "Above-the-fold hero section with primary value proposition and CTA",
+    "Hero": {
+      "description": "The headline, a short subheadline, the calls to action, and a product image or video. On phones they stack in that order; from 1024 px, text and media sit side by side.",
       "dimensions": {
-        "minHeightPx": "600 (desktop), 500 (mobile)",
-        "paddingVerticalPx": "96-120 (desktop), 60-80 (mobile)",
-        "paddingHorizontalPx": "24-32",
-        "contentMaxWidthPx": 1200
-      },
-      "states": [
-        "loading",
-        "ready"
-      ],
-      "elements": {
-        "Headline": {
-          "fontSizePx": "48-64 (desktop), 32-40 (mobile)",
-          "fontWeight": "700-900",
-          "lineHeight": "1.1-1.2",
-          "maxWidthPx": 800,
-          "marginBottomPx": 24
-        },
-        "Subheadline": {
-          "fontSizePx": "18-24 (desktop), 16-20 (mobile)",
-          "fontWeight": "400",
-          "lineHeight": "1.5-1.6",
-          "maxWidthPx": 700,
-          "marginBottomPx": 32
-        },
-        "CTAGroup": {
-          "layout": "horizontal (desktop), vertical (mobile)",
-          "gapPx": 16,
-          "marginBottomPx": 48
-        },
-        "PrimaryCTA": {
-          "heightPx": "48-56",
-          "paddingPx": "16-24 horizontal",
-          "fontSizePx": "16-18",
-          "fontWeight": "500-600",
-          "borderRadiusPx": "8-12"
-        },
-        "SecondaryCTA": {
-          "heightPx": "48-56",
-          "paddingPx": "16-24 horizontal",
-          "fontSizePx": "16-18",
-          "fontWeight": "500",
-          "style": "outlined or ghost button"
-        },
-        "HeroMedia": {
-          "type": "image, video, or illustration",
-          "widthPercent": "100 (mobile), 50-60 (desktop)",
-          "aspectRatio": "16:9 or 4:3",
-          "position": "below CTAs (mobile), right side (desktop)",
-          "loading": "eager (above fold)"
-        }
+        "headlinePx": "48 to 64 from 1024 px, 32 to 40 on phones",
+        "subheadlinePx": "18 to 24"
       },
       "behavior": {
-        "layout": "single column (mobile), two-column with 50/50 or 60/40 split (desktop)",
-        "alignment": "center (mobile), left-aligned text + right-aligned media (desktop)",
-        "backgroundOptions": [
-          "solid color",
-          "gradient",
-          "image with overlay",
-          "video background"
-        ]
+        "visibleAtLoad": "The headline and the image are visible at load. They're usually the Largest Contentful Paint, so they don't fade in from opacity 0.",
+        "images": "The hero image is never lazy-loaded and gets fetchpriority=\"high\". Every image gets width and height, so nothing shifts while images load, and srcset with sizes when it comes in several widths.",
+        "textOverImage": "Text over an image gets an overlay or a scrim that keeps it at 4.5:1, checked over the lightest part of the image.",
+        "video": "A background video is muted and playsinline, has a visible pause button (WCAG 2.2.2), and doesn't play on its own under prefers-reduced-motion: reduce, where its poster image shows. A demo video with speech has captions."
       }
     },
-    "FeaturesSection": {
-      "description": "Feature highlights in responsive grid layout",
-      "dimensions": {
-        "paddingVerticalPx": "96-120 (desktop), 60-80 (mobile)",
-        "paddingHorizontalPx": "24-32",
-        "contentMaxWidthPx": 1200
-      },
-      "states": [
-        "loading",
-        "ready"
-      ],
-      "elements": {
-        "SectionHeading": {
-          "fontSizePx": "32-40 (desktop), 24-32 (mobile)",
-          "fontWeight": "600-700",
-          "textAlign": "center",
-          "marginBottomPx": 48
-        },
-        "FeatureGrid": {
-          "columns": "3-4 (desktop ≥1024px), 2 (tablet 768-1023px), 1 (mobile <768px)",
-          "gapPx": "32 (desktop), 24 (mobile)",
-          "layout": "CSS Grid or Flexbox"
-        },
-        "FeatureCard": {
-          "paddingPx": "32-40",
-          "borderRadiusPx": "12-16",
-          "background": "white or subtle card background",
-          "shadow": "subtle or none",
-          "border": "optional 1px subtle"
-        },
-        "FeatureIcon": {
-          "sizePx": "48-64",
-          "marginBottomPx": 16,
-          "color": "primary or accent color"
-        },
-        "FeatureTitle": {
-          "fontSizePx": "18-20",
-          "fontWeight": "600",
-          "marginBottomPx": 12
-        },
-        "FeatureDescription": {
-          "fontSizePx": "14-16",
-          "lineHeight": "1.5-1.6",
-          "color": "muted text color"
-        }
-      },
+    "Features": {
+      "description": "A grid from CSS alone, such as repeat(auto-fit, minmax(min(16rem, 100%), 1fr)), or one, two, and three columns at 768 and 1024 px. It needs no resize handler.",
       "behavior": {
-        "responsiveGrid": "Auto-adjust columns based on breakpoint",
-        "cardHover": "Subtle lift or shadow increase (optional)",
-        "scrollAnimation": "Fade in + slide up when entering viewport (optional)"
+        "cards": "Each card has a decorative icon (aria-hidden=\"true\"), an <h3>, and a short description.",
+        "many": "More than six features: a second row, not a carousel or tabs. A carousel hides features behind controls, and one that turns on its own needs a pause button (WCAG 2.2.2)."
       }
     },
-    "TestimonialsSection": {
-      "description": "Social proof with customer testimonials or client logos",
-      "dimensions": {
-        "paddingVerticalPx": "96-120 (desktop), 60-80 (mobile)",
-        "paddingHorizontalPx": "24-32",
-        "contentMaxWidthPx": 1200
-      },
-      "states": [
-        "loading",
-        "ready"
-      ],
-      "elements": {
-        "SectionHeading": {
-          "fontSizePx": "32-40 (desktop), 24-32 (mobile)",
-          "fontWeight": "600-700",
-          "textAlign": "center",
-          "marginBottomPx": 48
-        },
-        "TestimonialGrid": {
-          "columns": "3 (desktop ≥1024px), 2 (tablet 768-1023px), 1 (mobile <768px)",
-          "gapPx": "32 (desktop), 24 (mobile)"
-        },
-        "TestimonialCard": {
-          "paddingPx": "32-40",
-          "borderRadiusPx": "12-16",
-          "background": "white or subtle card background"
-        },
-        "Quote": {
-          "fontSizePx": "16-18",
-          "lineHeight": "1.6-1.7",
-          "fontStyle": "italic (optional)",
-          "marginBottomPx": 24
-        },
-        "AuthorInfo": {
-          "layout": "horizontal with avatar + name + title"
-        },
-        "Avatar": {
-          "sizePx": "48-56",
-          "borderRadiusPx": "50% (circle)",
-          "marginRightPx": 16
-        },
-        "AuthorName": {
-          "fontSizePx": "14-16",
-          "fontWeight": "600"
-        },
-        "AuthorTitle": {
-          "fontSizePx": "14",
-          "color": "muted text color"
-        }
-      },
+    "SocialProof": {
+      "description": "Testimonials, client logos, or numbers, all from the user.",
       "behavior": {
-        "variant": "testimonials with quotes OR client logo grid",
-        "scrollAnimation": "Fade in when entering viewport (optional)"
+        "testimonials": "A testimonial is a <figure> with the quote in a <blockquote> and the name, role, and company in a <figcaption>. The name isn't a heading. An avatar beside the name is decorative (alt=\"\"), or the name is read twice.",
+        "logos": "Client logos are a list of images, each named after its company (\"Acme\"), not \"logo\".",
+        "numbers": "Numbers (customers, uptime, ratings) come from the user, with their source; they're claims like any other.",
+        "none": "With no testimonials yet, leave the section out, or show a logo list; never fill it with invented quotes."
       }
     },
-    "CTASection": {
-      "description": "Final call-to-action section before footer",
-      "dimensions": {
-        "paddingVerticalPx": "96-120 (desktop), 60-80 (mobile)",
-        "paddingHorizontalPx": "24-32",
-        "contentMaxWidthPx": 800
-      },
-      "states": [
-        "default"
-      ],
-      "elements": {
-        "CTAHeadline": {
-          "fontSizePx": "32-48 (desktop), 24-32 (mobile)",
-          "fontWeight": "700",
-          "textAlign": "center",
-          "marginBottomPx": 16
-        },
-        "CTASubtext": {
-          "fontSizePx": "16-18",
-          "textAlign": "center",
-          "marginBottomPx": 32
-        },
-        "CTAButton": {
-          "heightPx": "48-56",
-          "paddingPx": "20-28 horizontal",
-          "fontSizePx": "16-18",
-          "fontWeight": "600",
-          "display": "centered"
-        }
-      },
-      "behavior": {
-        "background": "accent color or gradient for visual emphasis",
-        "ctaAction": "link to signup, demo, or pricing page"
-      }
+    "ClosingCta": {
+      "description": "A short heading, one sentence, and the page's primary call to action, again as a link."
     },
     "Footer": {
-      "description": "Page footer with links, social, and copyright",
-      "dimensions": {
-        "paddingVerticalPx": "48-64",
-        "paddingHorizontalPx": "24-32",
-        "contentMaxWidthPx": 1200
-      },
-      "states": [
-        "default"
-      ],
-      "elements": {
-        "FooterLinks": {
-          "layout": "grid or horizontal list",
-          "columns": "4 (desktop), 2 (tablet), 1 (mobile)",
-          "gapPx": "24-32",
-          "fontSizePx": "14-16"
-        },
-        "LinkGroup": {
-          "heading": "Category heading (e.g., Product, Company, Resources)",
-          "links": "array of links"
-        },
-        "SocialLinks": {
-          "layout": "horizontal row",
-          "iconSizePx": "20-24",
-          "gapPx": 16
-        },
-        "Copyright": {
-          "fontSizePx": 14,
-          "textAlign": "center or left",
-          "color": "muted text color"
-        }
-      },
-      "behavior": {
-        "borderTop": "1px solid subtle divider color",
-        "background": "subtle background (light gray or match body)"
-      }
+      "description": "Link groups under headings, social links named after their service (\"Acme on GitHub\", saying so when they open a new tab), and the legal line. It scrolls with the page."
     }
   },
   "responsiveBreakpoints": {
     "desktop": {
       "minWidth": "1024px",
-      "hero": "Two-column layout (text left, media right), 50/50 or 60/40 split",
-      "features": "3-4 column grid",
-      "testimonials": "3 column grid",
-      "navbar": "Full navigation links visible",
-      "footer": "4 column grid"
+      "header": "The links in the header",
+      "hero": "Text and media side by side",
+      "grids": "Three columns, or as many as fit"
     },
     "tablet": {
       "minWidth": "768px",
       "maxWidth": "1023px",
-      "hero": "Two-column or stacked (depends on design)",
-      "features": "2 column grid",
-      "testimonials": "2 column grid",
-      "navbar": "Hamburger menu or condensed nav",
-      "footer": "2 column grid"
+      "header": "The Menu button and the menu dialog",
+      "hero": "Stacked, media below the calls to action",
+      "grids": "Two columns"
     },
     "mobile": {
       "maxWidth": "767px",
-      "hero": "Single column, stacked (headline → subheadline → CTAs → media)",
-      "features": "1 column stack",
-      "testimonials": "1 column stack",
-      "navbar": "Hamburger menu",
-      "footer": "1 column stack",
-      "ctaGroup": "Vertical stacking instead of horizontal"
+      "header": "The Menu button and the menu dialog",
+      "hero": "Stacked: headline, subheadline, calls to action, media",
+      "grids": "One column; nothing scrolls sideways at 320 px wide"
     },
     "resizeHandling": {
-      "debounceMs": 200,
-      "behavior": "Re-evaluate grid columns on resize"
+      "approach": "CSS does the layout at every width. The menu reacts to a change of matchMedia('(min-width: 1024px)'), not to resize events: widening closes it, as the Navigation Bar guide says."
     }
   },
   "stateManagement": {
     "statesToTrack": {
-      "navbarScrolled": {
+      "headerSolid": {
         "type": "boolean",
-        "description": "Whether user has scrolled past threshold (for navbar transition)",
-        "default": false,
-        "determination": "window.scrollY > 50",
+        "description": "Whether the header is solid. Only with the optional transparent state.",
+        "default": true,
+        "determination": "An IntersectionObserver on the sentinel at the top of the page: transparent while it is in view",
         "persistence": "component state only"
       },
-      "mobileMenuOpen": {
+      "menuOpen": {
         "type": "boolean",
-        "description": "Whether mobile hamburger menu is open",
+        "description": "Whether the menu dialog is open, below 1024 px.",
         "default": false,
         "persistence": "component state only"
       },
-      "formState": {
-        "type": "object",
-        "description": "Email/newsletter form state (if applicable). Contains fields: email, submitting, error, success",
-        "persistence": "component state only",
-        "notes": "Only applicable if form is included in the landing page"
+      "signupStatus": {
+        "type": "enum",
+        "description": "The email signup's state, when the page has one.",
+        "default": "idle",
+        "allowedValues": [
+          "idle",
+          "sending",
+          "done",
+          "error"
+        ],
+        "persistence": "component state only"
       }
     },
     "ssrConsiderations": {
-      "scrollListener": "Only add scroll listener in onMounted/useEffect, check for window object",
-      "defaultState": "Use false as default for navbarScrolled, update after mount"
+      "header": "Render the header solid; the script makes it transparent at the top of the page.",
+      "reveal": "Render every section visible; the script hides only sections still below the window once the page has loaded."
     }
   },
   "navigationBehavior": {
-    "smoothScroll": {
-      "enabled": "optional",
-      "implementation": "CSS scroll-behavior: smooth or JS scrollIntoView({ behavior: 'smooth' })",
-      "anchorLinks": "navbar links can scroll to sections within page"
-    },
-    "onRouteChange": {
-      "mobileMenu": "close"
-    }
+    "inPageLinks": "Links to sections (#features) land below the header through scroll-padding-top. Smooth scrolling only under prefers-reduced-motion: no-preference.",
+    "onRouteChange": "Close the menu."
   },
   "mobileSafeArea": {
     "applyTo": [
-      "navbar"
+      "header"
     ],
-    "topInset": "env(safe-area-inset-top)",
-    "notes": "On mobile devices with notches, add safe-area padding to fixed navbar."
+    "notes": "On phones with a notch, env(safe-area-inset-top) pads the header only when the viewport meta tag has viewport-fit=cover; without it, the values are 0."
   },
   "motionPreferences": {
-    "prefersReducedMotion": {
-      "behavior": "reduce",
-      "rules": [
-        "Disable scroll-triggered entrance animations",
-        "Reduce or disable hero section entrance animations",
-        "Keep essential transitions subtle (< 200ms)",
-        "Maintain CTA hover states but reduce motion"
-      ]
-    }
+    "prefersReducedMotion": "Under prefers-reduced-motion: reduce, nothing is hidden or slides, the header changes without a fade, in-page links jump, and a background video shows its poster."
   },
-  "frameworkPatterns": {
-    "react": {
-      "stateManagement": "useState for component state, useEffect for scroll listener, custom hooks for reusable logic",
-      "example": "const [scrolled, setScrolled] = useState(false); useEffect(() => { const handleScroll = () => setScrolled(window.scrollY > 50); window.addEventListener('scroll', handleScroll); return () => window.removeEventListener('scroll', handleScroll); }, []);",
-      "customHooks": "Extract scroll detection into useScrollPosition() hook. Extract intersection observer for animations into useInView() hook.",
-      "componentStructure": "<LandingPage><Navbar transparent={!scrolled} /><HeroSection /><FeaturesSection features={features} /><TestimonialsSection testimonials={testimonials} /><CTASection /><Footer /></LandingPage>"
-    },
-    "vue": {
-      "stateManagement": "ref() for state, onMounted() for scroll listener, provide/inject for sharing",
-      "example": "const scrolled = ref(false); onMounted(() => { window.addEventListener('scroll', () => { scrolled.value = window.scrollY > 50; }); });",
-      "componentStructure": "<LandingPage><Navbar :transparent='!scrolled' /><HeroSection /><FeaturesSection :features='features' /><TestimonialsSection :testimonials='testimonials' /><CTASection /><Footer /></LandingPage>"
-    },
-    "angular": {
-      "stateManagement": "Component properties, RxJS for scroll events, @HostListener for scroll",
-      "example": "@HostListener('window:scroll') onScroll() { this.scrolled = window.scrollY > 50; }",
-      "componentStructure": "<app-landing-page><app-navbar [transparent]='!scrolled'></app-navbar><app-hero-section></app-hero-section><app-features-section [features]='features'></app-features-section><app-testimonials-section [testimonials]='testimonials'></app-testimonials-section><app-cta-section></app-cta-section><app-footer></app-footer></app-landing-page>"
-    },
-    "svelte": {
-      "stateManagement": "writable stores for state, onMount for scroll listener",
-      "example": "let scrolled = false; onMount(() => { window.addEventListener('scroll', () => { scrolled = window.scrollY > 50; }); });",
-      "componentStructure": "<LandingPage><Navbar transparent={!scrolled} /><HeroSection /><FeaturesSection {features} /><TestimonialsSection {testimonials} /><CTASection /><Footer /></LandingPage>"
-    }
-  },
-  "stylingApproaches": {
-    "note": "These are implementation examples showing how to apply the designSystem specifications using different styling tools. The designSystem section contains the authoritative design values.",
-    "tailwindCSS": {
-      "description": "Use utility classes with responsive modifiers",
-      "heroExample": "class='min-h-[600px] py-24 lg:py-32 px-6 flex items-center' <div class='max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center'>",
-      "featuresExample": "class='grid md:grid-cols-2 lg:grid-cols-3 gap-8'",
-      "navbarExample": "class='fixed top-0 w-full h-16 transition-all duration-300' :class=\"{' bg-white shadow-sm': scrolled, 'bg-transparent': !scrolled}\"",
-      "key": "Use responsive modifiers (sm:, md:, lg:) for breakpoints. Use arbitrary values for exact pixel values."
-    },
-    "cssModules": {
-      "description": "Scoped CSS classes with responsive media queries",
-      "approach": "Define .hero, .features, .testimonials classes with @media queries for breakpoints",
-      "example": ".hero { min-height: 600px; padding: 96px 24px; } @media (max-width: 767px) { .hero { min-height: 500px; padding: 60px 16px; } }"
-    },
-    "styledComponents": {
-      "description": "CSS-in-JS with theme and responsive helpers",
-      "approach": "Use styled-components with theme values and media query helpers",
-      "example": "const Hero = styled.section`min-height: 600px; padding: 96px 24px; @media (max-width: 767px) { min-height: 500px; padding: 60px 16px; }`"
-    },
-    "chakraUI": {
-      "components": "Use Box, Container, Grid, Flex, Heading, Text, Button",
-      "approach": "Use Chakra responsive props: py={{base: 12, lg: 24}}, grid={{base: 1, md: 2, lg: 3}}",
-      "theme": "Extend Chakra theme with custom colors, spacing, and typography"
-    },
-    "materialUI": {
-      "components": "Use Box, Container, Grid, Typography, Button",
-      "approach": "Use MUI sx prop for responsive styles: sx={{py: {xs: 6, lg: 12}}}, Grid container spacing={4}",
-      "theme": "Override MUI theme to match design system"
-    },
-    "vanillaCSS": {
-      "description": "Standard CSS with media queries. CRITICAL: ALWAYS create CSS classes, NEVER use inline styles.",
-      "approach": "Define semantic classes (.hero, .features, .cta-section) with @media queries",
-      "example": ".hero{min-height:600px;padding:96px 24px} @media(max-width:767px){.hero{min-height:500px;padding:60px 16px}}",
-      "note": "Apply classes via className attribute: <section class='hero'> NOT <section style='min-height: 600px'>"
-    },
-    "sass": {
-      "description": "SCSS with variables, mixins, and nested media queries",
-      "approach": "Define SCSS variables for breakpoints and spacing, use mixins for responsive",
-      "example": "$mobile: 767px; .hero { min-height: 600px; @media (max-width: $mobile) { min-height: 500px; } }"
-    }
+  "overflowPolicy": {
+    "page": "No sideways scrolling, down to 320 px wide",
+    "sections": "Don't hide overflow on sections. overflow-x: hidden makes the other axis compute to auto, so the section becomes a scroll container, and a sticky element inside it sticks to the section instead of the page (checked in Chromium, Firefox, and WebKit). Fix what overflows; if something has to be cut, overflow-x: clip doesn't make a scroll container."
   },
   "animations": {
-    "heroEntrance": {
-      "elements": {
-        "headline": {
-          "animation": "fade in + slide up",
-          "durationMs": 800,
-          "delayMs": 0,
-          "easing": "ease-out"
-        },
-        "subheadline": {
-          "animation": "fade in + slide up",
-          "durationMs": 800,
-          "delayMs": 100,
-          "easing": "ease-out"
-        },
-        "ctaGroup": {
-          "animation": "fade in + slide up",
-          "durationMs": 800,
-          "delayMs": 200,
-          "easing": "ease-out"
-        },
-        "heroMedia": {
-          "animation": "fade in + scale(0.95 → 1)",
-          "durationMs": 1000,
-          "delayMs": 300,
-          "easing": "ease-out"
-        }
-      },
-      "triggerEvent": "page load",
-      "implementation": "CSS animations or JS animation library (GSAP, Framer Motion, etc.)"
+    "note": "Optional.",
+    "headerFade": {
+      "durationMs": 300,
+      "properties": "background-color"
     },
     "scrollReveal": {
-      "description": "Fade in elements when scrolling into viewport",
-      "elements": [
-        "feature cards",
-        "testimonial cards",
-        "CTA section"
-      ],
-      "animation": "fade in + slide up",
       "durationMs": 600,
-      "threshold": "10% of element visible",
-      "implementation": "Intersection Observer API",
-      "stagger": "100-150ms between cards in same section"
+      "properties": "opacity and translate",
+      "from": "opacity 0, 16 px lower",
+      "note": "It observes with threshold 0 and no root margin. A threshold is a share of the section, so with 0.1 a section taller than ten windows never shows, and a root shrunk at the bottom never meets a short last section at the end of the page (both checked in Chromium, Firefox, and WebKit). Focus in a section shows it at once: a waiting section skips the fade, which would start it at opacity 0, and a fade that's under way ends, through transition: none on the section while it has focus. That rule covers every section, not only fading ones, so a transition the project gives the section doesn't fade it in either, and it has to win over that transition. It has to be none: only a property that leaves transition-property cancels its running transition, and a zero duration leaves the fade running (checked in Chromium, Firefox, and WebKit)."
     },
-    "ctaHover": {
-      "transform": "scale(1.05) or translateY(-2px)",
-      "durationMs": 200,
-      "shadow": "increase elevation on hover",
-      "easing": "ease-out"
+    "hover": {
+      "note": "A hover lift on cards and buttons is optional; under reduced motion, use a color change instead."
     },
-    "navbarTransition": {
-      "properties": [
-        "background-color",
-        "box-shadow"
-      ],
-      "durationMs": 300,
-      "easing": "ease-in-out",
-      "trigger": "scroll > 50px"
-    },
-    "prefersReducedMotion": {
-      "disable": [
-        "heroEntrance",
-        "scrollReveal"
-      ],
-      "keep": [
-        "ctaHover (but subtle)",
-        "navbarTransition"
-      ],
-      "implementation": "@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: 0.01ms !important; } }"
-    }
+    "reducedMotion": "Nothing is hidden and nothing slides under prefers-reduced-motion: reduce."
   },
   "accessibility": {
     "wcagCompliance": {
       "level": "AA",
+      "version": "2.2",
       "requirements": {
-        "1.1.1": "Non-text Content - All images have descriptive alt text, decorative images have alt=''",
-        "1.3.1": "Info and Relationships - Use semantic HTML5 elements (<header>, <main>, <section>, <footer>)",
-        "1.4.3": "Contrast Minimum - 4.5:1 for normal text, 3:1 for large text and UI components (verify CTAs)",
-        "2.1.1": "Keyboard - All CTAs and links keyboard accessible (Tab, Enter/Space to activate)",
-        "2.4.2": "Page Titled - Descriptive page title in <title> tag",
-        "2.4.4": "Link Purpose - Descriptive CTA text (not just 'Click Here' or 'Learn More' without context)",
-        "2.4.7": "Focus Visible - Clear focus indicators on all interactive elements",
-        "4.1.2": "Name, Role, Value - All buttons and links have accessible names"
+        "1.1.1": "Images have alt text that says what they show; decorative images, and avatars beside a name, have alt=\"\".",
+        "1.2.2": "A video with speech has captions.",
+        "1.3.1": "Landmarks, one h1, and an h2 per section; testimonials are figures with a blockquote.",
+        "1.4.3": "Text meets 4.5:1, text over images included.",
+        "1.4.10": "At 320 px wide nothing scrolls sideways.",
+        "1.4.11": "Focus indicators and the outlines of secondary calls to action meet 3:1.",
+        "2.2.2": "A background video, or anything that moves on its own, has a pause button.",
+        "2.4.1": "A skip link goes past the header to the main area.",
+        "2.4.4": "Calls to action say where they go.",
+        "2.4.11": "scroll-padding-top keeps a focused element clear of the sticky header.",
+        "2.5.3": "A call to action's accessible name starts with its visible text.",
+        "4.1.3": "The email signup's result goes to one polite status region."
       }
     },
     "keyboardNavigation": {
-      "tabOrder": "Navbar → Hero CTAs → Feature links (if any) → Testimonial links (if any) → Final CTA → Footer links",
-      "implementation": "Ensure logical tab order, no keyboard traps"
+      "order": "The skip link, the header, then each section in order, then the footer: the order on screen.",
+      "menu": "Escape closes the menu, and focus returns to Menu."
     },
     "ariaAttributes": {
       "required": {
-        "mainContent": {
-          "html": "<main id='main-content' role='main'>",
-          "note": "Use semantic <main> element or role='main'"
+        "nav": {
+          "aria-label": "Main"
+        },
+        "menuDialog": {
+          "aria-label or aria-labelledby": "Main menu"
         },
         "sections": {
-          "html": "<section aria-labelledby='features-heading'><h2 id='features-heading'>Features</h2>",
-          "note": "Link sections to their headings with aria-labelledby"
+          "aria-labelledby": "Each section's heading"
         },
-        "ctaButtons": {
-          "html": "<button aria-label='Start free trial'>Get Started</button>",
-          "note": "Use aria-label if button text isn't descriptive enough"
-        },
-        "heroMedia": {
-          "image": "<img src='...' alt='Product dashboard showing analytics and insights' />",
-          "video": "<video aria-label='Product demo video showing key features'>",
-          "decorative": "<img src='...' alt='' role='presentation' /> (for purely decorative images)"
-        },
-        "mobileMenu": {
-          "button": "<button aria-label='Open menu' aria-expanded='false' aria-controls='mobile-menu'>",
-          "menu": "<nav id='mobile-menu' aria-hidden='true'>"
+        "main": {
+          "id": "main",
+          "tabindex": "-1"
         }
       },
       "optional": {
-        "landmarks": {
-          "header": "<header role='banner'> (semantic HTML preferred)",
-          "nav": "<nav role='navigation' aria-label='Main navigation'>",
-          "footer": "<footer role='contentinfo'>"
+        "decorativeIcons": {
+          "aria-hidden": "true"
         }
       }
     },
     "screenReader": {
-      "headingHierarchy": {
-        "structure": "One <h1> (page title/hero headline), <h2> for section headings, <h3> for subsections",
-        "requirement": "Logical heading order (don't skip levels)"
-      },
-      "altText": {
-        "descriptive": "Describe what the image shows and its purpose",
-        "decorative": "Use alt='' or role='presentation' for decorative images",
-        "complex": "For complex images (charts, diagrams), provide longer description via aria-describedby"
-      },
-      "hiddenText": {
-        "srOnly": "Use .sr-only class for screen-reader-only text",
-        "css": ".sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }"
-      }
+      "callsToAction": "Its visible text says where it goes (\"Start free trial\", \"Book a demo\"), and nothing replaces that text as its name: an aria-label that differs from the visible text fails WCAG 2.5.3, since voice control users say what they see. Where two calls to action read the same but go to different places, add visually hidden words after the visible text (\"Get started\", then hidden \"with Professional\").",
+      "testimonials": "A testimonial is a <figure> with the quote in a <blockquote> and the name, role, and company in a <figcaption>. The name isn't a heading. An avatar beside the name is decorative (alt=\"\"), or the name is read twice."
     },
     "focusManagement": {
-      "focusVisible": {
-        "required": true,
-        "implementation": "Clear focus indicators on all interactive elements",
-        "css": "button:focus-visible, a:focus-visible { outline: 2px solid [primary-color]; outline-offset: 2px; }",
-        "fallback": ":focus for older browsers"
-      },
-      "focusOrder": {
-        "principle": "Logical reading order (top to bottom, left to right)",
-        "testing": "Tab through page to verify order makes sense"
-      }
+      "notObscured": "position: sticky; top: 0 keeps the header at the top without a script and keeps its space in the page. A fixed header takes no space, so the page would need padding that matches its height. scroll-padding-top on the root element, set to the header's height, scrolls focused elements and in-page link targets clear of it (WCAG 2.2 2.4.11).",
+      "menu": "The menu is a native <dialog> opened with showModal() and named \"Main menu\", so the rest of the page is inert, Escape closes it, and focus returns to Menu. It has a visible Close button (\"Close menu\"), and closes when a link in it is followed."
     },
     "colorContrast": {
-      "requirement": "WCAG AA: 4.5:1 for normal text, 3:1 for large text (18pt+ or 14pt+ bold)",
-      "verification": "Use WebAIM Contrast Checker or similar tool",
-      "criticalAreas": [
-        "Hero headline and subheadline on background",
-        "CTA button text on button background",
-        "Body text on section backgrounds",
-        "Footer text on footer background",
-        "Link text on background (including hover state)"
-      ],
-      "recommendation": "Aim for 7:1 contrast for important CTAs (WCAG AAA)"
-    },
-    "implementationChecklist": [
-      "All images have descriptive alt text (or alt='' if decorative)",
-      "Semantic HTML5 elements used (<header>, <main>, <section>, <footer>)",
-      "One <h1> per page, logical heading hierarchy",
-      "All CTAs keyboard accessible (Tab + Enter/Space)",
-      "Clear focus indicators on all interactive elements",
-      "Color contrast verified with contrast checker (4.5:1 minimum)",
-      "Mobile menu has aria-expanded and aria-controls",
-      "Sections linked to headings with aria-labelledby",
-      "No keyboard traps or inaccessible content",
-      "Screen reader tested with NVDA, VoiceOver, or JAWS"
-    ]
+      "note": "See designSystem.colors; check the project's own colors, and text over images, the same way."
+    }
   },
   "designSystem": {
-    "note": "These design specifications are tool-agnostic and should be implemented using the project's chosen styling approach.",
-    "colorGuidelines": {
-      "hero": {
-        "background": {
-          "options": [
-            "Solid color (white, light gray #f9fafb, or brand color at 5-10% opacity)",
-            "Gradient (brand colors, subtle)",
-            "Image with overlay (dark overlay 40-60% opacity for text readability)",
-            "Video background with text overlay"
-          ]
-        },
-        "text": {
-          "headline": "High contrast (black #000000, dark gray #111827 on light bg; white #ffffff on dark bg)",
-          "subheadline": "Medium contrast (dark gray #374151 on light bg; light gray #e5e7eb on dark bg)",
-          "contrast": "Minimum 4.5:1 (WCAG AA)"
-        },
-        "ctaPrimary": {
-          "background": "Brand primary color (high saturation, e.g., #3b82f6, #10b981)",
-          "text": "White #ffffff or very light (ensure 4.5:1 contrast)",
-          "hover": "Darken background 10-15% or increase shadow"
-        },
-        "ctaSecondary": {
-          "background": "Transparent or white",
-          "border": "2px solid primary or neutral",
-          "text": "Primary color or dark gray",
-          "hover": "Light background fill or darken border"
-        }
-      },
-      "sections": {
-        "background": {
-          "alternating": "White #ffffff and light gray #f9fafb or #f5f5f5 for visual separation",
-          "accent": "Brand color at 5-10% opacity for CTA section"
-        },
-        "text": {
-          "headings": "Dark gray #111827 or #1f2937",
-          "body": "Medium gray #374151 or #6b7280",
-          "muted": "Light gray #9ca3af for subtle text (author titles, captions)"
-        }
-      },
-      "cards": {
-        "background": "White #ffffff",
-        "border": "Optional: 1px solid #e5e7eb",
-        "shadow": "Subtle: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)",
-        "hover": "Increase shadow or lift slightly (optional)"
-      },
-      "navbar": {
-        "default": "Transparent or white",
-        "scrolled": "White with shadow (or dark with shadow for dark mode)",
-        "text": "Dark gray #111827 (light bg) or white #ffffff (dark bg)",
-        "links": {
-          "default": "Medium gray #6b7280",
-          "hover": "Primary color or darker gray",
-          "active": "Primary color"
-        }
-      },
-      "footer": {
-        "background": "Light gray #f9fafb or #f5f5f5",
-        "text": "Medium gray #6b7280",
-        "links": {
-          "default": "Medium gray #6b7280",
-          "hover": "Primary color or darker gray"
-        },
-        "border": "Top border: 1px solid #e5e7eb"
+    "note": "Suggested defaults for projects without a design. The project's tokens and existing components win; check its colors meet the same contrast.",
+    "colors": {
+      "light": {
+        "page": "#ffffff and #f9fafb for alternating sections",
+        "text": "#111827 for headings (17.7:1 on white), #374151 for body text (10.3:1), #4b5563 for muted text (7.6:1, and 7.2:1 on #f9fafb)",
+        "primaryCta": "#2563eb with #ffffff text (5.2:1); #3b82f6 is only 3.7:1. A green call to action needs #047857 (5.5:1); #10b981 is only 2.5:1.",
+        "secondaryCta": "A 2 px #2563eb outline (5.2:1) with #2563eb text",
+        "footer": "#f9fafb with #4b5563 text (7.2:1); #6b7280 on #f5f5f5 is only 4.4:1"
       }
     },
     "typography": {
-      "fontFamily": "Use project's font stack (typically: system-ui, -apple-system, sans-serif or custom brand font like Inter, Poppins, etc.)",
-      "hero": {
-        "headline": "48-64px (desktop), 32-40px (mobile), bold 700-900, line-height 1.1-1.2",
-        "subheadline": "18-24px (desktop), 16-20px (mobile), regular 400, line-height 1.5-1.6"
-      },
-      "sections": {
-        "heading": "32-40px (desktop), 24-32px (mobile), semibold 600-700",
-        "body": "16-18px, regular 400, line-height 1.5-1.6"
-      },
-      "cards": {
-        "title": "18-20px, semibold 600",
-        "description": "14-16px, regular 400, line-height 1.5"
-      },
-      "cta": {
-        "button": "16-18px, medium 500-600"
-      },
-      "footer": {
-        "links": "14-16px, regular 400",
-        "copyright": "14px, regular 400"
-      }
+      "headline": "48 to 64 px from 1024 px, 32 to 40 px on phones, weight 700 to 800, line height 1.1 to 1.2",
+      "sectionHeading": "32 to 40 px, weight 600 to 700",
+      "body": "16 to 18 px, line height 1.5"
     },
     "spacing": {
-      "scale": "Use consistent spacing scale: 4, 8, 12, 16, 24, 32, 48, 64, 80, 96, 120px",
-      "sections": {
-        "paddingVertical": "96-120px (desktop), 60-80px (mobile)",
-        "paddingHorizontal": "24-32px",
-        "marginBottom": "48px between section heading and content"
-      },
-      "hero": {
-        "paddingVertical": "96-120px (desktop), 60-80px (mobile)",
-        "contentSpacing": "24px between headline and subheadline, 32px between subheadline and CTAs"
-      },
-      "grids": {
-        "gap": "32px (desktop), 24px (mobile)"
-      },
-      "cards": {
-        "padding": "32-40px",
-        "gap": "16px between card elements"
-      },
-      "navbar": {
-        "height": "64px",
-        "padding": "24-32px horizontal"
-      },
-      "footer": {
-        "padding": "48-64px vertical, 24-32px horizontal"
-      }
-    },
-    "shadows": {
-      "cards": {
-        "default": "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
-        "hover": "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)"
-      },
-      "navbar": {
-        "scrolled": "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)"
-      },
-      "cta": {
-        "default": "0 2px 4px rgba(0, 0, 0, 0.1)",
-        "hover": "0 4px 8px rgba(0, 0, 0, 0.15)"
-      }
-    },
-    "borderRadius": {
-      "buttons": "8-12px",
-      "cards": "12-16px",
-      "inputs": "8px (if form present)",
-      "images": "8-12px (optional, depends on design style)"
-    },
-    "visualHierarchy": {
-      "principles": [
-        "Hero headline is largest, boldest element on page",
-        "Section headings clearly separate content areas",
-        "Primary CTA stands out with high contrast color",
-        "Secondary CTA has lower visual weight (outlined or ghost style)",
-        "Alternating section backgrounds create visual rhythm",
-        "White space creates breathing room and guides eye flow",
-        "Feature cards have consistent visual treatment"
-      ]
+      "sectionPaddingPx": 96,
+      "sectionPaddingPhonePx": 48,
+      "gridGapPx": 32,
+      "gridGapPhonePx": 24
     }
-  },
-  "overflowPolicy": {
-    "page": "noHorizontalScroll",
-    "sections": {
-      "x": "hidden",
-      "y": "auto (natural page scroll)"
-    },
-    "heroMedia": "Ensure images/videos don't overflow container on small screens",
-    "longContent": "Allow natural vertical overflow (page scroll)"
-  },
-  "dataStructures": {
-    "features": {
-      "description": "Array of feature objects",
-      "example": [
-        {
-          "id": "feature-1",
-          "icon": "ChartIcon",
-          "title": "Advanced Analytics",
-          "description": "Track your metrics in real-time with powerful analytics tools."
-        },
-        {
-          "id": "feature-2",
-          "icon": "LockIcon",
-          "title": "Secure & Private",
-          "description": "Enterprise-grade security keeps your data safe and compliant."
-        },
-        {
-          "id": "feature-3",
-          "icon": "ZapIcon",
-          "title": "Lightning Fast",
-          "description": "Optimized for speed with sub-second response times."
-        }
-      ]
-    },
-    "testimonials": {
-      "description": "Array of testimonial objects",
-      "example": [
-        {
-          "id": "testimonial-1",
-          "quote": "This product transformed how we work. Highly recommended!",
-          "author": "Jane Doe",
-          "title": "CEO, TechCorp",
-          "avatar": "/avatars/jane.jpg"
-        },
-        {
-          "id": "testimonial-2",
-          "quote": "Best investment we made this year. ROI was immediate.",
-          "author": "John Smith",
-          "title": "CTO, StartupXYZ",
-          "avatar": "/avatars/john.jpg"
-        }
-      ]
-    }
-  },
-  "commonVariations": {
-    "heroLayout": "Single column centered, two-column (text + media), full-width background image/video",
-    "ctaPlacement": "Hero only, hero + final section, hero + multiple sections throughout",
-    "socialProof": "Testimonials with quotes, client logo grid, stats/metrics section, trust badges",
-    "formInclusion": "Newsletter signup in hero, email capture in CTA section, contact form",
-    "navbarStyle": "Always solid, transparent → solid on scroll, dark with light text",
-    "featuresCount": "3 features (balanced), 4 features (grid), 6 features (two rows)"
-  },
-  "zIndexLayers": {
-    "base": 0,
-    "navbar": 50,
-    "mobileMenu": 100,
-    "modal": 1000
   },
   "implementationDetails": {
-    "mobileMenuReliability": {
-      "when": "Mobile hamburger menu must work consistently",
-      "criticalRequirements": [
-        "1. DOM Ready: Attach event listeners only after DOM is fully loaded (use DOMContentLoaded or defer/type=module script)",
-        "2. Z-Index: Hamburger button z-index must be > navbar (e.g., button: 60, navbar: 50, menu: 100)",
-        "3. Touch Targets: Button must be at least 44x44px (better: 48x48px) for reliable touch interaction",
-        "4. Pointer Events: Button must have pointer-events: auto and cursor: pointer",
-        "5. Event Propagation: Use event.stopPropagation() on button click to prevent conflicts with document-level handlers",
-        "6. Click vs Touch: Listen for both 'click' event (works for touch and mouse) rather than separate touch handlers",
-        "7. State Management: Track menu state (open/closed) to prevent race conditions",
-        "8. CSS Display: Ensure button is visible on mobile (display: flex) and hidden on desktop (display: none at ≥768px)"
-      ],
-      "commonIssues": {
-        "buttonNotClickable": "Check z-index, pointer-events, and ensure no transparent overlays covering button",
-        "intermittentFailure": "Event listener may be attaching before DOM ready, or being removed accidentally",
-        "worksInDevToolsNotOnDevice": "Touch target too small, or click event not being captured properly",
-        "menuClosesImmediately": "Document click handler is firing immediately, use stopPropagation on button click",
-        "buttonDisappearsOnScroll": "Check if navbar transition is affecting button visibility or z-index"
-      },
-      "robustImplementation": {
-        "initialization": "Use 'DOMContentLoaded' event or module script with defer, check if element exists before adding listener",
-        "eventListener": "button.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); })",
-        "stateTracking": "Use boolean flag or class toggle to track open/closed state",
-        "cleanup": "For SPAs, remove event listeners on component unmount to prevent memory leaks"
-      },
-      "testingChecklist": [
-        "Test on actual iOS device (Safari)",
-        "Test on actual Android device (Chrome)",
-        "Test with browser DevTools responsive mode",
-        "Test rapid clicking (should not break state)",
-        "Test after scrolling page",
-        "Test after resizing window",
-        "Check browser console for JavaScript errors"
-      ]
-    },
-    "scrollListener": {
-      "when": "Navbar transition on scroll",
-      "implementation": "Add scroll event listener, update state when scrollY > threshold (e.g., 50px)",
-      "cleanup": "Remove listener on unmount",
-      "optimization": "Debounce or throttle scroll handler for performance"
-    },
-    "intersectionObserver": {
-      "when": "Scroll-triggered entrance animations",
-      "implementation": "Use Intersection Observer API to detect when elements enter viewport",
-      "threshold": "0.1 (10% of element visible)",
-      "rootMargin": "Optional: '-50px' to trigger slightly before element fully visible"
-    },
-    "lazyLoading": {
-      "images": "Use loading='lazy' attribute for images below fold",
-      "heroImage": "Use loading='eager' for hero image (above fold)",
-      "implementation": "<img src='...' alt='...' loading='lazy' />"
-    },
-    "responsiveImages": {
-      "srcset": "Provide multiple image sizes for different screen widths",
-      "implementation": "<img srcset='hero-400.jpg 400w, hero-800.jpg 800w, hero-1200.jpg 1200w' sizes='(max-width: 768px) 100vw, 1200px' src='hero-800.jpg' alt='...' />"
-    }
-  },
-  "edgeCases": {
-    "mobileMenuNotWorking": "CRITICAL: If mobile menu is intermittent: (1) Verify DOM ready before attaching listeners, (2) Check z-index hierarchy (button > navbar), (3) Ensure 44x44px minimum touch target, (4) Use event.stopPropagation() on button click, (5) Test on real devices not just DevTools, (6) Check browser console for errors, (7) Verify pointer-events: auto on button",
-    "longHeadlines": "Reduce font size on mobile, ensure text doesn't overflow",
-    "manyFeatures": "Use carousel or tabs if more than 6 features",
-    "noTestimonials": "Replace with client logos or skip section entirely",
-    "videoHero": "Provide fallback image, mute video, autoplay with playsinline attribute",
-    "slowImageLoading": "Show skeleton loaders or placeholders",
-    "formErrors": "Display clear error messages, maintain focus management",
-    "verySmallScreens": "Test on 320px width, reduce padding if needed"
-  },
-  "accessibilityExamples": {
-    "semanticHTML": {
-      "html": "<header><nav><a href='/'>Logo</a><ul><li><a href='#features'>Features</a></li></ul></nav></header><main><section aria-labelledby='hero-heading'><h1 id='hero-heading'>Build amazing products</h1></section></main><footer><p>&copy; 2026 Company</p></footer>"
-    },
-    "ctaButton": {
-      "html": "<button class='btn-primary' aria-label='Start your free 14-day trial'>Get Started Free</button>",
-      "note": "Use descriptive text, avoid generic 'Click Here'"
-    },
-    "heroImage": {
-      "html": "<img src='hero.jpg' alt='Product dashboard showing real-time analytics, user management, and reporting features' loading='eager' />",
-      "note": "Descriptive alt text explains what's in the image and its relevance"
-    },
-    "decorativeImage": {
-      "html": "<img src='pattern.svg' alt='' role='presentation' />",
-      "note": "Decorative images don't need description"
-    },
-    "mobileMenu": {
-      "button": "<button class='menu-toggle' aria-label='Open menu' aria-expanded='false' aria-controls='mobile-nav'><span class='sr-only'>Menu</span><svg aria-hidden='true'>...</svg></button>",
-      "nav": "<nav id='mobile-nav' class='mobile-menu' aria-hidden='true'>...</nav>"
-    }
+    "content": "The page uses the user's real copy, testimonials, client logos, and numbers. Where the task doesn't give them, use placeholders that look like placeholders, such as \"[Customer quote]\" and \"[Name, role, company]\", and ask for the real ones. Never invent testimonials, customer names, logos, ratings, or statistics. Invented social proof misleads visitors, and fake reviews and testimonials are against consumer protection rules in the US and the EU.",
+    "callsToAction": "A call to action that goes to a page (sign up, book a demo, see pricing) is a link (<a href>). A button is only for an action on this page, such as opening a dialog. Its visible text says where it goes (\"Start free trial\", \"Book a demo\"), and nothing replaces that text as its name: an aria-label that differs from the visible text fails WCAG 2.5.3, since voice control users say what they see. Where two calls to action read the same but go to different places, add visually hidden words after the visible text (\"Get started\", then hidden \"with Professional\"). One primary call to action per section; the secondary one is outlined or a text link.",
+    "socialProof": "A testimonial is a <figure> with the quote in a <blockquote> and the name, role, and company in a <figcaption>. The name isn't a heading. An avatar beside the name is decorative (alt=\"\"), or the name is read twice. Client logos are a list of images, each named after its company (\"Acme\"), not \"logo\". Numbers (customers, uptime, ratings) come from the user, with their source; they're claims like any other. With no testimonials yet, leave the section out, or show a logo list; never fill it with invented quotes.",
+    "signup": "Optional, in the hero or the closing section. The field has a visible label, not just a placeholder, type=\"email\", and autocomplete=\"email\"; the text says what people sign up for and how often they'll hear from you. Its result (\"Check your inbox to confirm\") and its errors go to one polite status region that's in the page from the start; a field error goes in the field's description, as the Form Validation Pattern says.",
+    "motion": "All motion is optional. The scroll reveal fades sections in as they reach the window. It hides only what it can show again: sections still below the window once the page has loaded and the browser has restored its scroll position, on screens, when motion is allowed. After a reload or Back, WebKit restores the position only after the load event, so a section hidden earlier blinks out and fades back in (checked). Without script, under reduced motion, and when printing, nothing is hidden. It observes with threshold 0 and no root margin. A threshold is a share of the section, so with 0.1 a section taller than ten windows never shows, and a root shrunk at the bottom never meets a short last section at the end of the page (both checked in Chromium, Firefox, and WebKit). Focus in a section shows it at once: a waiting section skips the fade, which would start it at opacity 0, and a fade that's under way ends, through transition: none on the section while it has focus. That rule covers every section, not only fading ones, so a transition the project gives the section doesn't fade it in either, and it has to win over that transition. It has to be none: only a property that leaves transition-property cancels its running transition, and a zero duration leaves the fade running (checked in Chromium, Firefox, and WebKit). The hero never fades in, since it holds the largest paint. Smooth scrolling for in-page links goes in @media (prefers-reduced-motion: no-preference). Turn each animation off where it's defined, rather than with one rule for every element: a reset that removes all animations leaves keyframe-based reveals stuck on their first frame. A hover lift on cards and buttons is optional; under reduced motion, use a color change instead.",
+    "overflow": "At 320 px wide nothing scrolls sideways, and long headlines wrap (overflow-wrap: break-word). Don't hide overflow on sections. overflow-x: hidden makes the other axis compute to auto, so the section becomes a scroll container, and a sticky element inside it sticks to the section instead of the page (checked in Chromium, Firefox, and WebKit). Fix what overflows; if something has to be cut, overflow-x: clip doesn't make a scroll container.",
+    "layering": "Layers, bottom to top: the page, sticky bars, dropdowns and popovers, toasts, then modals, which make the rest of the page inert. The project's layering scale wins; native <dialog> and the popover attribute use the top layer and need no z-index. The header is a sticky bar; the menu is a modal.",
+    "appearance": "Suggested defaults; the project's design and tokens win. Content up to 1200 px wide, centered; section padding 96 px from 1024 px and 48 px on phones; grid gaps 32 px and 24 px. The headline 48 to 64 px from 1024 px and 32 to 40 px on phones, line height 1.1 to 1.2; section headings 32 to 40 px; body text 16 to 18 px at line height 1.5. Calls to action at least 24 px tall, 44 px suggested, with a 2 px focus outline at a 2 px offset."
   },
   "projectDetection": {
     "framework": {
-      "description": "Detect the project's framework by examining package.json, existing component files, and project structure.",
+      "description": "Find the framework, its version, and how existing components are written before writing code.",
       "detectionSteps": [
-        "Check package.json for framework dependencies (react, vue, @angular/core, svelte)",
-        "Examine existing component files for framework-specific patterns",
-        "Check build configuration files",
-        "Look for framework-specific directories"
+        "Read the project's dependencies (package.json or its equivalent) for the framework and its version, and use the syntax that version supports.",
+        "Open two or three existing components to see their file structure, state handling, and naming.",
+        "Look for an existing component that already does this job, in the project or in a design system or UI library it uses, and build on it."
       ]
     },
     "stylingSystem": {
-      "description": "Detect the project's styling approach. Use the detected system exclusively.",
+      "description": "Use the styling system the project already uses, and only that one.",
       "detectionSteps": [
-        "Check package.json for styling dependencies: tailwindcss, styled-components, emotion, sass, etc.",
-        "Look for config files: tailwind.config.js, postcss.config.js, etc.",
-        "Examine existing component files to see how styles are imported and used",
-        "Check for style files and their extensions",
-        "Identify class naming conventions and utility functions"
+        "Check the dependencies and config for the styling setup: Tailwind (version 4 keeps its theme in CSS with @theme, version 3 in tailwind.config.*), CSS Modules, Sass, CSS-in-JS, or plain CSS.",
+        "See how existing components apply styles and compose class names, for example with cn or clsx.",
+        "Check for design documentation: DESIGN.md, a design system package, or Storybook stories for existing components."
       ],
       "adaptationRules": [
-        "If Tailwind is detected: Use Tailwind utility classes exclusively",
-        "If SCSS/CSS is detected: Create SCSS/CSS files matching project structure",
-        "If styled-components is detected: Use styled-components syntax",
-        "If CSS Modules is detected: Use .module.css files",
-        "If no styling system: Use vanilla CSS with semantic class names"
+        "Write styles the way existing components do, and add no new styling library or system.",
+        "With plain CSS, use classes in the project's stylesheets instead of inline styles, except for values computed at runtime.",
+        "If the setup is unclear or mixed, ask before choosing."
       ]
     },
     "designTokens": {
-      "description": "Identify existing design tokens from the project. Use these instead of hardcoding values.",
+      "description": "Use the project's tokens for color, spacing, radius, type, shadows, motion, and layering.",
       "detectionSteps": [
-        "Check for design token files (tokens.json, theme.js, etc.)",
-        "Examine Tailwind config for theme values if using Tailwind",
-        "Look at existing components for color, spacing, and typography patterns",
-        "Check CSS variables (--color-*, --spacing-*, etc.) in global styles"
+        "Find the tokens: CSS custom properties, a Tailwind theme (@theme or config), a theme object, or a tokens file.",
+        "Use them instead of this guide's example values; where there are none, match the closest existing components.",
+        "Check that the colors you use meet the contrast minimums: 4.5:1 for text, and 3:1 for focus indicators, icons, and control boundaries."
       ]
     }
   },
+  "frameworkPatterns": {
+    "note": "Short snippets in plain HTML, CSS, and JavaScript for the parts that are easiest to get wrong; adapt them to the project's framework and its version. The header's links, dropdowns, and menu are in the Navigation Bar guide.",
+    "stickyHeader": {
+      "description": "The sticky header with scroll-padding-top at its height, transparent over the hero until the page has scrolled 48 px: an IntersectionObserver on a sentinel switches it, and without script it stays solid.",
+      "html": "<!-- The sentinel is as tall as the distance the page scrolls before the bar turns solid -->\n<div class=\"scroll-sentinel\" aria-hidden=\"true\"></div>\n<header class=\"site-header\">\n  <a class=\"skip-link\" href=\"#main\">Skip to content</a>\n  <a class=\"logo\" href=\"/\">Acme</a>\n  <!-- the site's <nav> (the Navigation Bar guide) and the call to action -->\n</header>\n<main id=\"main\" tabindex=\"-1\">\n  <section class=\"hero\" aria-labelledby=\"hero-title\">\n    <h1 id=\"hero-title\">Reports your whole team reads</h1>\n    <!-- the subtitle, the calls to action, the product image -->\n  </section>\n  <!-- the other sections -->\n</main>",
+      "css": "/* The bar sticks with CSS alone and keeps its space. The hero is pulled up under it, so the bar\n   can start transparent over the hero, and the page scrolls focused elements and link targets\n   clear of it. */\n:root {\n  --site-header-height: 64px;\n}\nhtml {\n  scroll-padding-top: var(--site-header-height);\n}\n.site-header {\n  background: var(--surface);\n  min-height: var(--site-header-height);\n  position: sticky;\n  top: 0;\n  transition: background-color 300ms;\n  z-index: 10; /* the sticky-bar layer of the project's scale */\n}\n.site-header.is-transparent {\n  background: transparent; /* its text meets 4.5:1 against the hero behind it */\n}\n.hero {\n  margin-top: calc(-1 * var(--site-header-height));\n  padding-top: calc(var(--site-header-height) + 48px);\n}\n.scroll-sentinel {\n  height: 48px; /* the bar turns solid after 48 px of scrolling */\n  pointer-events: none;\n  position: absolute;\n  top: 0;\n  width: 1px;\n}\n@media (prefers-reduced-motion: reduce) {\n  .site-header {\n    transition: none;\n  }\n}",
+      "script": "// The bar is transparent while the sentinel at the top of the page is in view, and solid once\n// the page has scrolled past it. An IntersectionObserver switches it, so nothing runs while the\n// page scrolls; without script, the bar stays solid.\nconst header = document.querySelector('.site-header');\nnew IntersectionObserver(([entry]) => {\n  header.classList.toggle('is-transparent', entry.isIntersecting);\n}).observe(document.querySelector('.scroll-sentinel'));"
+    },
+    "scrollReveal": {
+      "description": "An optional scroll reveal that hides only sections still below the window once the page has loaded and its scroll position is restored, on screens and when motion is allowed; threshold 0 and no root margin, so tall and short sections show; and focus shows a section at once, without the fade or in the middle of one (transition: none while it has focus).",
+      "css": "/* Sections fade in as they scroll into view: only on screens, and only when motion is allowed.\n   The script marks the sections it hides (.is-waiting); without it, nothing is hidden. */\n@media screen and (prefers-reduced-motion: no-preference) {\n  .reveal.is-waiting {\n    opacity: 0;\n    translate: 0 16px;\n  }\n  .reveal.is-fading-in {\n    transition: opacity 600ms ease-out, translate 600ms ease-out;\n  }\n  /* Focus in a section shows it at once, over this fade or any transition the project gives the\n     section. \"none\", not a shorter duration: only a property that leaves transition-property\n     cancels its running transition. It comes last, to win over .is-fading-in. */\n  .reveal:focus-within {\n    transition: none;\n  }\n}",
+      "script": "// Hides only what it can show again: sections still below the window once the page has loaded\n// and the browser has restored its scroll position (WebKit does that after the load event), so\n// nothing in view ever disappears. Threshold 0 and no root margin, so a section taller than the\n// window, and a short one at the very end of the page, still show. Focus shows a waiting\n// section at once; the CSS ends a fade that's under way.\nfunction setUp() {\n  const observer = new IntersectionObserver((entries) => {\n    for (const entry of entries) {\n      if (!entry.isIntersecting) continue;\n      entry.target.classList.replace('is-waiting', 'is-fading-in');\n      observer.unobserve(entry.target);\n    }\n  });\n  for (const section of document.querySelectorAll('.reveal')) {\n    if (section.getBoundingClientRect().top < innerHeight) continue; // in view, or above it\n    section.classList.add('is-waiting');\n    observer.observe(section);\n  }\n}\ndocument.addEventListener('focusin', (event) => event.target.closest('.reveal')?.classList.remove('is-waiting'));\nif ('IntersectionObserver' in window) {\n  const later = () => requestAnimationFrame(() => requestAnimationFrame(setUp));\n  if (document.readyState === 'complete') later();\n  else addEventListener('load', later, { once: true });\n}"
+    }
+  },
+  "edgeCases": {
+    "noProof": "Leave the section out, or show a list of client logos; never invent them.",
+    "manyFeatures": "A second row of cards, not a carousel.",
+    "longHeadline": "It wraps on phones; shorten it before making the text smaller than 32 px.",
+    "noScript": "Every section is visible and the header is solid. Below 1024 px the menu needs the script, so keep the main pages reachable without it too, such as from the footer.",
+    "pricingSection": "The Pricing Table guide covers the billing choice and the plans."
+  },
   "outputConstraints": {
     "must": [
-      "Detect and use ONLY the project's existing framework - match existing component patterns",
-      "Detect and use ONLY the project's existing styling system - match existing styling patterns",
-      "Use project's existing design tokens, color system, and spacing scales if available",
-      "Use semantic HTML5 elements (<header>, <main>, <section>, <footer>)",
-      "Ensure all CTAs are keyboard accessible with clear focus indicators",
-      "Provide descriptive alt text for all images",
-      "Maintain 4.5:1 color contrast ratio minimum (WCAG AA)",
-      "Implement responsive breakpoints (mobile, tablet, desktop)",
-      "Follow project's naming conventions and file structure"
+      "Build on the project's header, section, card, and button components when they're suitable, and keep their APIs",
+      "Use the user's real testimonials, logos, and numbers, or placeholders marked as such",
+      "Make calls to action that go to a page links, named by their visible text",
+      "Let the header stick with CSS, with scroll-padding-top at its height",
+      "Use the project's framework version, styling system, and tokens, the way existing components do"
     ],
     "mustNot": [
-      "Do NOT introduce new styling systems (if project uses Tailwind, don't add SCSS)",
-      "Do NOT add <style> blocks unless that's the project's convention",
-      "Do NOT use inline style attributes unless necessary for dynamic values",
-      "Do NOT hardcode colors/values - use project's design tokens",
-      "Do NOT import new UI libraries or styling dependencies",
-      "Do NOT create inaccessible content (missing alt text, poor contrast, keyboard traps)",
-      "CRITICAL: When vanilla CSS is detected, NEVER use inline style attributes. ALWAYS create CSS classes in a stylesheet.",
-      "CRITICAL: When React is detected, NEVER put multiple concerns in a single useEffect. Extract logic into separate custom hooks."
+      "Invent testimonials, customer names, logos, ratings, or statistics",
+      "Add a dependency, such as an animation or scroll library, without asking",
+      "Hide a section before the script runs, under reduced motion, or when printing",
+      "Fade in the hero, or lazy-load its image",
+      "Give a call to action an aria-label that replaces its visible text",
+      "Hide overflow on sections",
+      "Use inline styles for static values in a plain-CSS project, or hardcode colors the project has tokens for"
     ]
   },
   "testingChecklist": [
-    "Hero section displays correctly on all breakpoints (desktop, tablet, mobile)",
-    "Feature cards display in correct grid layout (3-4 desktop, 2 tablet, 1 mobile)",
-    "Testimonials display correctly in responsive grid",
-    "All CTAs link to correct destinations and are clickable",
-    "Navbar transitions smoothly on scroll (if applicable)",
-    "CRITICAL: Mobile menu hamburger button works consistently (test multiple times, test on real devices)",
-    "CRITICAL: Mobile menu hamburger button has 44x44px minimum touch target",
-    "CRITICAL: Mobile menu button has proper z-index and is always clickable",
-    "Mobile menu opens and closes correctly on first attempt every time",
-    "Mobile menu closes when clicking outside (backdrop dismiss)",
-    "Mobile menu closes when pressing Escape key",
-    "Mobile menu works after scrolling the page",
-    "Mobile menu works after resizing browser window",
-    "All images load and have proper alt text",
-    "No horizontal scroll on any breakpoint",
-    "Keyboard navigation works (Tab through all CTAs and links)",
-    "Focus indicators visible on all interactive elements",
-    "Color contrast meets WCAG AA (4.5:1 minimum)",
-    "Semantic HTML used (<header>, <main>, <section>, <footer>)",
-    "Heading hierarchy is logical (one <h1>, <h2> for sections)",
-    "Screen reader reads content in logical order",
-    "Entrance animations trigger correctly (if implemented)",
-    "Scroll-triggered animations work (if implemented)",
-    "Animations respect prefers-reduced-motion",
-    "Page loads quickly (LCP < 2.5s, no layout shift)",
-    "Images lazy-load below fold, eager-load above fold",
-    "Forms submit successfully (if present)",
-    "Mobile safe area respected on notched devices (if fixed navbar)",
-    "Touch interactions work on mobile (tap targets ≥44x44px)",
-    "No console errors or warnings",
-    "Styling uses only project conventions (no ad-hoc CSS)",
-    "Test on actual iOS device (Safari) - not just DevTools",
-    "Test on actual Android device (Chrome) - not just DevTools"
+    "The page starts with a skip link to the main area, and has one h1, the hero's headline, with an h2 for each section",
+    "The header sticks with CSS alone, and a link focused under it, or a section reached by an in-page link, is scrolled clear of it (scroll-padding-top at its height)",
+    "A header that starts transparent over the hero turns solid once the page has scrolled past the threshold, stays solid without script, and its text meets 4.5:1 in both states",
+    "Below 1024 px, a Menu button opens the links in a native dialog named \"Main menu\"; Close, Escape, a click that starts and ends on the backdrop, and a followed link close it, and focus returns to Menu",
+    "Calls to action that go to a page are links, and each one's accessible name starts with its visible text",
+    "Testimonials, logos, and numbers are the user's real content, or placeholders marked as such; nothing is invented",
+    "Testimonials are figures with a blockquote and a figcaption; an avatar beside its name has empty alt text, and logos are named after their company",
+    "The hero's headline and image are visible at load; the hero image has fetchpriority=\"high\", and every image has width and height",
+    "A background video has a visible pause button and doesn't play on its own under reduced motion; a video with speech has captions",
+    "Without script, under reduced motion, and when printing, every section is visible; with the scroll reveal, nothing in view is ever hidden, after a reload or Back included, a section fades in once any part of it scrolls into view, and focus shows it at once, mid-fade included",
+    "The grids come from CSS alone, nothing scrolls sideways at 320 px wide, and no section hides its overflow",
+    "An email signup has a visible label, type=\"email\" with autocomplete=\"email\", and gives its result in the status region",
+    "Text meets 4.5:1 and focus indicators 3:1 against every section's background, text over images included",
+    "Styles come from the project's styling system and tokens"
   ],
-  "aiImplementationPrompt": "Create a conversion-optimized marketing landing page layout with the following sections: (1) Hero section with headline, subheadline, primary CTA, and hero image/video (min-height 600px desktop, 500px mobile), (2) Features section with 3-4 responsive grid cards (3-4 columns desktop, 2 tablet, 1 mobile), (3) Testimonials section with customer quotes or client logos in responsive grid, (4) Final CTA section with prominent call-to-action, and (5) Footer with links and copyright. Include a fixed navbar (64px height) with optional scroll transition (transparent to solid). Use semantic HTML5 elements (<header>, <main>, <section>, <footer>) and ensure all images have descriptive alt text. Implement responsive breakpoints (mobile <768px, tablet 768-1023px, desktop ≥1024px) with mobile-first approach. All CTAs must be keyboard accessible with clear focus indicators (2px outline, 2px offset). Ensure 4.5:1 color contrast minimum (WCAG AA). Optional: Add scroll-triggered entrance animations (fade in + slide up) respecting prefers-reduced-motion. Adapt the implementation to use {{USER_FRAMEWORK}} with {{USER_STYLING_LIBRARY}}. CRITICAL: If vanilla CSS is detected, create CSS classes in a stylesheet, never use inline styles. If React is detected, extract useEffect logic into separate custom hooks.",
   "meta": {
     "created": "2026-01-24",
-    "updated": "2026-01-24",
-    "webUrl": "https://uipotion.com/potions/layouts/landing-page.html",
+    "updated": "2026-10-26",
+    "webUrl": "https://uipotion.com/potions/layouts/landing-page",
     "relatedPotions": [
       {
         "id": "navbar",
         "category": "components",
         "relationship": "complements",
-        "description": "Optional: For the header navigation.",
-        "required": false
-      },
-      {
-        "id": "button",
-        "category": "components",
-        "relationship": "used-in",
-        "description": "Optional: For hero and section CTAs (primary, secondary).",
+        "description": "Optional: the header in full, with its dropdowns and the menu on small screens.",
         "required": false
       },
       {
         "id": "pricing-table",
         "category": "features",
         "relationship": "used-in",
-        "description": "Optional: For the pricing section.",
+        "description": "Optional: a pricing section with a billing choice.",
+        "required": false
+      },
+      {
+        "id": "button",
+        "category": "components",
+        "relationship": "used-in",
+        "description": "Optional: the calls to action's styles and states.",
+        "required": false
+      },
+      {
+        "id": "form-validation",
+        "category": "patterns",
+        "relationship": "used-in",
+        "description": "Optional: the email signup's errors and timing.",
+        "required": false
+      },
+      {
+        "id": "blog",
+        "category": "layouts",
+        "relationship": "complements",
+        "description": "Optional: a blog that shares the header and the footer.",
         "required": false
       }
     ],

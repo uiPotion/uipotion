@@ -65,7 +65,7 @@
     },
     {
       "id": "pricing-table",
-      "name": "3-Tier SaaS Pricing Table with Monthly/Yearly Toggle",
+      "name": "Pricing Table",
       "category": "features",
       "tags": [
         "features",
@@ -77,11 +77,11 @@
         "responsive",
         "conversion"
       ],
-      "excerpt": "A responsive 3-tier pricing table component with monthly/yearly billing toggle, highlighted 'Most Popular' plan, and feature comparison. Perfect for SaaS marketing pages, product pages, and subscription-based services.",
+      "excerpt": "Pricing plans with a monthly or yearly billing choice: a radio group drawn as a segmented control, prices and savings worked out from each plan's prices, and calls to action that are links.",
       "webUrl": "https://uipotion.com/potions/features/pricing-table",
       "agentGuideUrl": "https://uipotion.com/potions/features/pricing-table.json",
       "created": "2026-01-18",
-      "updated": "2026-01-18",
+      "updated": "2026-10-26",
       "markdownUrl": "https://uipotion.com/potions/features/pricing-table.md"
     },
     {
@@ -146,13 +146,13 @@
         "testimonials",
         "cta",
         "responsive",
-        "conversion"
+        "a11y"
       ],
-      "excerpt": "A conversion-optimized marketing landing page layout with hero section, feature highlights, social proof, and multiple CTAs. Perfect for product launches, SaaS marketing, and lead generation campaigns.",
+      "excerpt": "A marketing page from the header to the footer: a header that sticks with CSS alone and turns solid as the page scrolls, calls to action that are links, social proof from the user's real content, and motion that never leaves a section hidden.",
       "webUrl": "https://uipotion.com/potions/layouts/landing-page",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/landing-page.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24",
+      "updated": "2026-10-26",
       "markdownUrl": "https://uipotion.com/potions/layouts/landing-page.md"
     },
     {
@@ -370,11 +370,11 @@
         "pagination",
         "newsletter"
       ],
-      "excerpt": "A comprehensive blog layout covering the list frontpage (post cards, grid, pagination) and single post layout (article, sidebar, comments, related posts). Includes all UI sections typically needed in blogs.",
+      "excerpt": "A blog's list page and post page: post cards whose title link covers the card, an article with underlined links and code that scrolls inside itself, pagination that marks the current page, and sharing without third-party scripts.",
       "webUrl": "https://uipotion.com/potions/layouts/blog",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/blog.json",
       "created": "2026-02-12",
-      "updated": "2026-02-13",
+      "updated": "2026-10-26",
       "markdownUrl": "https://uipotion.com/potions/layouts/blog.md"
     },
     {
@@ -435,11 +435,11 @@
         "scroll-spy",
         "a11y"
       ],
-      "excerpt": "A three-column documentation website layout with hierarchical sidebar navigation, prose content area, and scroll-spy table of contents. Inspired by Next.js docs, Nextra, Docusaurus, and Mintlify.",
+      "excerpt": "A documentation site's layout: a sidebar that's a sticky column from 1024 px and a drawer below, the article with code that Copy copies, and a table of contents that marks the section being read without touching the URL.",
       "webUrl": "https://uipotion.com/potions/layouts/documentation",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/documentation.json",
       "created": "2026-02-24",
-      "updated": "2026-02-25",
+      "updated": "2026-10-26",
       "markdownUrl": "https://uipotion.com/potions/layouts/documentation.md"
     },
     {
@@ -470,19 +470,19 @@
       "tags": [
         "layouts",
         "ecommerce",
-        "merchandising",
         "product-page",
         "product-detail-page",
         "pdp",
         "conversion",
         "reviews",
-        "responsive"
+        "responsive",
+        "merchandising"
       ],
-      "excerpt": "A conversion-oriented ecommerce product detail page layout with media gallery, buy box, variant selectors, shipping and returns context, reviews, and mobile sticky purchase actions.",
+      "excerpt": "A product page whose gallery and buy box share the first screen: options that say when they're sold out, an Add to cart that is never disabled and points to the missing choice, and a cart request the server prices.",
       "webUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page.json",
       "created": "2026-03-24",
-      "updated": "2026-03-24",
+      "updated": "2026-10-26",
       "markdownUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page.md"
     },
     {

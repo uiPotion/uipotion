@@ -2,7 +2,7 @@
 layout: 'potion'
 title: 'Blog Layout (List and Post)'
 publicationDate: '2026-02-12'
-excerpt: 'A comprehensive blog layout covering the list frontpage (post cards, grid, pagination) and single post layout (article, sidebar, comments, related posts). Includes all UI sections typically needed in blogs.'
+excerpt: 'A blog''s list page and post page: post cards whose title link covers the card, an article with underlined links and code that scrolls inside itself, pagination that marks the current page, and sharing without third-party scripts.'
 category: 'Layouts'
 tags:
   - layouts
@@ -17,483 +17,210 @@ tags:
 agentManifest: 'potions/layouts/blog.json'
 path: 'potions/layouts/blog'
 promptSubject: 'a blog layout'
+useWhen: 'a site needs a blog: a list of posts with pagination, and a post page with the article, its author and date, and related posts.'
+specifies:
+  - 'A post card is one link, named by its title, that covers the whole card, and a category link inside it still works.'
+  - 'Links in the article are underlined, code blocks scroll inside themselves, and dates are machine-readable.'
+  - 'Share links need no third-party scripts, and Copy link says whether copying worked.'
+example: 'A screen reader user lists the links on the blog''s front page and hears each post''s title once, instead of each card read out as one long link.'
 ---
 
-A comprehensive blog layout covering both the list frontpage and the single post page. Includes all UI sections typically needed in blogs: navbar, hero, post list, post card, article header, article content, sidebar, newsletter signup, footer, pagination, comments, share buttons, and related posts.
+A blog has two pages, the list and the post, which share a header and a footer. On the list page, the common mistakes are cards that read as one long link and pagination that nobody can tell apart; on the post page, links lost in the text, code that pushes the page sideways, and share buttons that bring in trackers. This guide covers both pages, and targets WCAG 2.2 AA.
 
-## Structure Specification
+## Start from what the project has
 
-### Two Page Types
+1. If the project has blog templates or a theme, in its CMS, its static site generator, or a library it already uses, configure or extend them to meet this guide. Keep their APIs.
+2. Otherwise build them from plain HTML: `<main>`, an `<article>` for the post, an `<aside>` for the sidebar, and a `<nav>` for the pagination.
+3. The colors, type, and shapes under "Appearance" are a fallback for a project without a design of its own.
 
-The blog layout defines two distinct page structures:
+Implement only what the task needs, and add no dependency without asking. The project's conventions win for styling and visual defaults. If one conflicts with an accessibility or correctness requirement here, ask instead of choosing.
 
-1. **Blog List Page (Frontpage)**: Displays a grid of post cards with optional hero, sidebar, and pagination
-2. **Post Page (Single Article)**: Displays the full article with header, content, optional sidebar, comments, share buttons, and related posts
+## The two pages
 
-Both pages share the navbar and footer components for consistency.
+- **The list page**: the header, an optional hero with the blog's title, the post cards, an optional sidebar, the pagination, and the footer. The blog's title is the page's `<h1>`, and each card's title an `<h2>`.
+- **The post page**: the header, the post in an `<article>` (its title as the page's `<h1>`, the author, the date, the reading time, and an optional image), share links, comments, related posts, and the footer. Comments and related posts are sections with an `<h2>`, and a related post's card title is an `<h3>`.
+- Both pages share the header and the footer, start with a skip link to `<main id="main" tabindex="-1">`, and put an optional sidebar in an `<aside>` named by its heading.
 
-### Blog List Page Hierarchy
+## The header
 
-- **Navbar**: Fixed or sticky navigation with logo, links, optional search, newsletter link
-- **Hero Section** (optional): Blog title and tagline
-- **Main Content**: Post grid with optional sidebar
-  - **Post List**: Grid of PostCard components (2 columns desktop with sidebar, 3 without sidebar; 2 tablet, 1 mobile)
-  - **Sidebar**: Categories, tags, search, newsletter form
-- **Pagination**: Previous, next, and page numbers
-- **Footer**: Links, social, copyright
+- The site's header: a skip link, the logo, a `<nav>` labelled "Main", and the links that apply (Search, Subscribe). If it sticks, `position: sticky` and `scroll-padding-top` at its height keep focused elements clear of it (WCAG 2.2 2.4.11).
+- Below 1024 px, the links move into a menu in a native `<dialog>`, as the Navigation Bar guide says.
 
-### Post Page Hierarchy
+## Post cards
 
-- **Navbar**: Shared navigation
-- **Article Header**: Full-width hero section with post title, meta (date, author, reading time), optional featured image
-- **Main Content**: Article body (constrained width for readability) with optional sidebar
-  - **Article Content**: Full article body with proper typography
-  - **Sidebar**: Table of contents, author bio, related posts
-- **Share Buttons**: Social share links
-- **Comments Section**: Comments list and form (integration-ready)
-- **Related Posts**: Section with related post cards
-- **Footer**: Shared footer
+- The card's title link covers the whole card, so a click anywhere follows it, while the card stays one link named by its title. Making the whole card an `<a>` would read the card's text as the link's name, and the category and author links inside it would be nested links.
+- Other links in the card (a category, an author) sit above the cover, and still work (checked in Chromium, Firefox, and WebKit). The trade-off: the excerpt's text can't be selected.
+- The image is decorative (`alt=""`), since the title names the link. Images in the first screen load at once, the featured one with `fetchpriority="high"`; the rest can be `loading="lazy"`. Every image has `width` and `height`.
+- Titles wrap; nothing is cut off with an ellipsis. An excerpt may be clamped to two or three lines, since the post is a click away.
+- The date is a `<time datetime="2026-10-01">`, and the meta line reads in a sensible order: category, date, reading time.
+- The focus ring goes around the whole card, and a hover changes the shadow; under reduced motion, cards don't move.
 
-## Detailed Component Specifications
+The snippets in this guide are plain HTML, CSS, and JavaScript; adapt them to the project's framework and its version.
 
-### 1. Navbar Component
-
-**Dimensions:**
-- Height: 64px (fixed or sticky)
-- Padding: 24-32px horizontal
-- Position: Fixed at top or sticky
-
-**States:**
-- `default` (initial)
-- `scrolled` (for optional background transition)
-
-**Elements:**
-- **Logo**: 32-40px height, left-aligned, links to homepage
-- **Navigation Links**: Blog, About, Contact, Categories (typical links)
-- **Search Link** (optional): Icon, right-aligned
-- **Newsletter Link** (optional): Right-aligned
-
-**Behavior:**
-- Optional scroll transition (transparent to solid background)
-- Mobile: Hamburger menu below 768px
-
-### 2. Hero Section (Blog List Page)
-
-**Dimensions:**
-- Padding: 48-80px vertical (desktop), 32-48px (mobile)
-- Padding: 24-32px horizontal
-- Content max-width: 1200px
-
-**Elements:**
-- **Blog Title**: 36-48px (desktop), 28-36px (mobile), bold
-- **Blog Tagline**: 16-20px, muted color, max-width 600px
-
-**Behavior:**
-- Optional; some blogs skip hero and start with post list
-- Center-aligned or left-aligned
-
-### 3. Post Card Component
-
-**Dimensions:**
-- Min-height: 280px
-- Border radius: 8-12px
-
-**States:**
-- `default`
-- `hover` (subtle lift or shadow)
-- `loading` (skeleton state)
-
-**Elements:**
-- **Featured Image**: 16:9 or 4:3 aspect ratio, 160-200px height, object-fit cover, lazy loading
-- **Category Tag** (optional): 12-14px, above title
-- **Post Title**: 18-22px, weight 600-700, line-clamp 2-3 lines
-- **Excerpt**: 14-16px, line-clamp 2-3, muted color
-- **Post Meta**: 12-14px, muted, includes date, author, reading time
-
-**Behavior:**
-- Entire card or title links to post
-- Hover: Subtle lift (translateY -2px) or shadow increase
-
-### 4. Article Header (Post Page)
-
-**Dimensions:**
-- Padding: 48-80px vertical (desktop), 32-48px (mobile)
-- Width: Full-width hero section (spans entire viewport width for visual impact)
-- Content max-width: 1200px or none (for contained look within the full-width section)
-
-**Layout Note:**
-The article header should span full width to create a strong visual impact when entering a post. Only the article content area should be constrained to ~720px for optimal readability.
-
-**Elements:**
-- **Category Tag** (optional): 12-14px
-- **Post Title**: 32-48px (desktop), 24-32px (mobile), weight 700-800
-- **Post Meta**: Date, author, reading time in horizontal layout
-- **Author Info** (optional): Avatar 40-48px, name
-- **Featured Image** (optional): 16:9 or 21:9, below meta
-
-### 5. Article Content
-
-**Dimensions:**
-- Max-width: 720px (optimal reading width)
-- Padding: 24-48px vertical
-- Line height: 1.6-1.8
-
-**Elements:**
-- **Article Body**: 16-18px font size, 24px paragraph spacing
-- **Headings**: Logical hierarchy (h2, h3, h4)
-- **Code Blocks**: 14-16px, padding 16px, border radius 8px
-- **Blockquotes**: Left border 4px, padding left 16px, italic
-- **Images**: Max-width 100%, border radius 8-12px
-
-### 6. Sidebar Component
-
-**Dimensions:**
-- Width: 280-320px (desktop)
-- Padding: 24px
-- Position: Right on desktop, below content on mobile
-
-**List Page Sidebar Elements:**
-- **Section Heading**: 14-16px, weight 600
-- **Categories List**: 14-16px
-- **Tags Cloud**: 12-14px, flex-wrap layout
-- **Search Input**: 40px height
-- **Newsletter Form**: Email input, submit button
-
-**Post Page Sidebar Elements:**
-- **Table of Contents**: 14-16px, nested headings with indent
-- **Author Bio**: Avatar 64-80px, name, short bio
-- **Related Posts**: Small post cards
-
-**Behavior:**
-- Optional sticky on desktop
-- Full width below content on mobile
-
-### 7. Pagination Component
-
-**Dimensions:**
-- Padding: 32px vertical
-- Gap: 8px between elements
-
-**States:**
-- `default`
-- `disabled` (prev on first page, next on last page)
-- `active` (current page highlighted)
-
-**Elements:**
-- **Prev Link**: Label "Previous" or "Prev"
-- **Page Numbers**: 1, 2, 3... or ellipsis for long lists
-- **Next Link**: Label "Next"
-
-**Behavior:**
-- aria-label="Pagination"
-- Tab through links for keyboard navigation
-
-### 8. Share Buttons
-
-**Dimensions:**
-- Gap: 12px between buttons
-- Icon size: 20-24px
-
-**Platforms:**
-- Twitter, LinkedIn, Facebook, Copy link
-
-**Behavior:**
-- Each button has descriptive aria-label
-- Placement: Below article or in sidebar
-
-### 9. Comments Section
-
-**Dimensions:**
-- Padding: 48px vertical
-- Max-width: 720px
-
-**States:**
-- `default`
-- `loading`
-- `empty`
-
-**Elements:**
-- **Section Heading**: "Comments" or similar
-- **Comments List**: Avatar, name, date, body; optional nesting for replies
-- **Comment Form**: Name, email, body fields, submit button
-
-**Behavior:**
-- Integration-ready placeholder for Disqus, Commento, or custom implementation
-
-### 10. Related Posts Section
-
-**Dimensions:**
-- Padding: 48px vertical
-- Content max-width: 1200px
-
-**Elements:**
-- **Section Heading**: "Related Posts" or similar
-- **Related Post Cards**: Same as PostCard but may be smaller (2-3 columns desktop)
-
-### 11. Newsletter Section
-
-**Dimensions:**
-- Padding: 48-64px vertical
-- Padding: 24px horizontal
-
-**States:**
-- `default`
-- `submitting`
-- `success`
-- `error`
-
-**Elements:**
-- **Headline**: 20-24px, weight 600
-- **Subtext**: 14-16px, muted
-- **Email Input**: 44px height
-- **Submit Button**: 44px height
-
-### 12. Footer Component
-
-**Dimensions:**
-- Padding: 48-64px vertical
-- Padding: 24-32px horizontal
-- Content max-width: 1200px
-
-**Elements:**
-- **Footer Links**: Grid or horizontal, 2-4 columns desktop
-- **Social Links**: Horizontal row, 20-24px icons
-- **Copyright**: 14px, muted color
-
-## Responsive Breakpoints
-
-### Desktop (1024px and above)
-- Blog list: 2 column grid when sidebar visible (for better card proportions ~360-400px each), 3 columns if no sidebar
-- Layout note: With a 320px sidebar, 3 columns makes cards too narrow (~240px each). Use 2 columns for optimal card sizing.
-- Post page: Full-width article header, constrained article content, sidebar right (280-320px)
-- Sidebar always visible
-
-### Tablet (768px - 1023px)
-- Blog list: 2 column grid
-- Sidebar: Full width below content or hidden
-- Post page: Article full width or sidebar below
-
-### Mobile (below 768px)
-- Blog list: 1 column stack
-- Post page: Article full width
-- Sidebar: Full width below content
-- Pagination: Prev/next only or condensed page numbers
-
-## Accessibility Requirements
-
-### WCAG 2.1 Level AA
-
-- **1.1.1 Non-text Content**: Descriptive alt text for all images
-- **1.3.1 Info and Relationships**: Semantic HTML (header, main, article, nav, footer)
-- **2.1.1 Keyboard**: All interactive elements keyboard accessible
-- **2.4.2 Page Titled**: Descriptive page title in `<title>`
-- **2.4.4 Link Purpose**: Descriptive link text (avoid generic "Read more" without context)
-- **2.4.7 Focus Visible**: Clear focus indicators on all interactive elements
-
-### Keyboard Navigation
-
-**Tab Order:**
-- Navbar, main content, sidebar, pagination, footer
-
-**Pagination:**
-- Tab through prev, page numbers, next links
-
-### ARIA Attributes
-
-- `<main role="main">` for main content
-- `<article>` for post content
-- `aria-label="Pagination"` on pagination nav
-- `aria-label="Main navigation"` on nav
-- `aria-label="Search"` on search input
-
-### Heading Hierarchy
-
-- One `<h1>` per page (post title on post page, blog title on list page)
-- Logical `<h2>`, `<h3>`, `<h4>` for sections
-- No skipped levels
-
-## State Management
-
-### States to Track
-
-1. **mobileMenuOpen**: Boolean, mobile hamburger menu state
-2. **navbarScrolled**: Boolean, for navbar background transition
-3. **currentPage**: Number, from URL query or route for pagination
-4. **newsletterForm**: Object with email, submitting, error, success
-5. **commentForm**: Object with name, email, body, submitting, error
-
-### Persistence
-
-- Pagination: Current page in URL (query param or route)
-- Other state: Component state only (no persistence)
-
-## Framework Patterns
-
-### React Example
-```jsx
-<BlogLayout>
-  <Navbar />
-  <main>
-    {isListPage ? (
-      <>
-        <HeroSection />
-        <PostGrid posts={posts} />
-        <Pagination currentPage={page} totalPages={total} />
-      </>
-    ) : (
-      <>
-        <ArticleHeader post={post} />
-        <ArticleContent content={post.content} />
-        <ShareButtons url={post.url} title={post.title} />
-        <CommentsSection postId={post.id} />
-        <RelatedPosts posts={relatedPosts} />
-      </>
-    )}
-  </main>
-  <Footer />
-</BlogLayout>
+```html
+<article class="post-card">
+  <img src="/images/grid-layouts.jpg" alt="" width="640" height="360">
+  <h2 class="post-card-title"><a href="/posts/grid-layouts">Grid layouts that survive real content</a></h2>
+  <p>Why minmax(0, 1fr) matters, and three layouts that hold up with long words and wide tables.</p>
+  <p class="post-card-meta">
+    <a class="post-card-category" href="/categories/css">CSS</a>
+    <time datetime="2026-10-01">1 October 2026</time>
+  </p>
+</article>
 ```
 
-### Vue Example
-```vue
-<BlogLayout>
-  <Navbar />
-  <main>
-    <BlogListPage v-if="isListPage" :posts="posts" />
-    <PostPage v-else :post="post" />
-  </main>
-  <Footer />
-</BlogLayout>
+```css
+/* The title's link covers the whole card, so a click anywhere on it follows the link, while the
+   card stays one link named by its title. Other links in the card sit above the cover. */
+.post-card {
+  position: relative;
+}
+.post-card-title a::after {
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+.post-card-category {
+  position: relative;
+  z-index: 1;
+}
+/* The focus ring goes around the whole card */
+.post-card-title a:focus-visible {
+  outline: none;
+}
+.post-card-title a:focus-visible::after {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
 ```
 
-## Design System Guidelines
+## The article
 
-### Typography
-- **Post title (page)**: 32-48px desktop, 24-32px mobile, weight 700-800
-- **Card title**: 18-22px, weight 600-700
-- **Body**: 16-18px, line-height 1.6-1.8
-- **Meta**: 12-14px, muted color
+- The body is 16 to 18 px with a line height of 1.6 to 1.8, at most about 70 characters a line (720 px). Headings go `<h2>` to `<h4>` in order.
+- Links in the text are underlined. Without an underline, a link's color needs 3:1 against the text around it and another cue on hover and focus (WCAG 1.4.1); the safe default is the underline.
+- Images have alt text that says what they show; an image with a caption is a `<figure>` with a `<figcaption>`.
+- A code block scrolls sideways inside itself, never the page. A block that scrolls gets `tabindex="0"`, so the keyboard can scroll it, and sits in a `<figure>` whose caption names it, as the Documentation guide shows.
+- A post has a table of contents only if it's long; the Documentation guide covers one that marks the section being read.
 
-### Spacing
-- Use consistent scale: 4, 8, 12, 16, 24, 32, 48, 64, 96px
-- Section padding: 48-64px vertical
-- Grid gap: 24-32px
+## The sidebar
 
-### Colors
-- Body background: White or light gray (#f9fafb)
-- Text: Dark gray (#111827)
-- Muted: Medium gray (#6b7280)
-- Links: Primary color on hover
+- On the list page: categories, tags, search, and the newsletter. Search is a labelled field in a `<search>` element (or a form with `role="search"`), so it's a landmark. On the post page: the table of contents, the author's bio, and related posts.
+- Sticky is optional, and only if the sidebar fits the window below the sticky header; otherwise it scrolls inside itself (`max-height` the window's height minus the header's, `overflow-y: auto`), or its end can't be reached until the page ends.
+- From 1024 px it sits beside the posts, 280 to 320 px wide; below that it follows the content.
 
-## Modern UI Quality Contract (Framework-Agnostic)
+## Pagination
 
-This potion should produce polished, modern results without requiring exact font families, UI kits, or brand-specific styles.
+- A `<nav aria-label="Pagination">` with a list of links. The current page is marked with `aria-current="page"` and looks different by more than color.
+- Links can't be disabled, so there's no Previous link on the first page and no Next link on the last; show nothing, or plain text.
+- A page number's name includes the number it shows: "Page", visually hidden, then "2". On phones, Previous, "Page 2 of 8", and Next are enough.
+- Each page has its own URL (`/blog/page/2` or `?page=2`), so pages can be shared and Back works.
 
-### Core Principles
+## Sharing
 
-- Use one coherent surface language for cards, panels, forms, nav, and footer (consistent radius, border style, depth, and hover behavior)
-- Establish clear above-the-fold hierarchy (primary focal point, secondary metadata, visible primary actions)
-- Keep spacing rhythm predictable across sections; avoid random jumps in vertical density
-- Use subtle depth layering (elevation, section separation, background treatment) to avoid flat starter aesthetics
-- Ensure interaction states are deliberate and consistent (default, hover, focus-visible, active, disabled)
+- Share links are plain links to each site's share page (X, LinkedIn, Facebook, Mastodon), without the sites' scripts, which track readers. Each is named "Share on X", and says so when it opens a new tab.
+- Copy link copies the post's canonical address, not the one with tracking parameters. It says "Link copied" on the button for a moment and in the page's one status region, which is emptied first, so a second copy is announced too. The clipboard can refuse: `navigator.clipboard.writeText` was refused in Chromium without the clipboard permission and allowed after a click in Firefox and WebKit (checked), so a failure is said too.
+- `navigator.share()` opens the device's share sheet where it exists; feature-detect it, and keep the links for everyone else.
 
-### Composition Rules
+```html
+<button type="button" class="copy-link">Copy link</button>
+<!-- once per page, in the page from the start -->
+<p class="visually-hidden" role="status" id="page-status"></p>
+```
 
-- Include at least one high-emphasis entry section (hero or full-width article header) that creates immediate visual identity
-- Keep utility/sidebar modules visually grouped and clearly secondary to core reading content
-- Optimize card grid readability before increasing density
-- Reuse accents intentionally; avoid random one-off styling per component
+```js
+// Copies the post's address and says so: on the button for a moment, and in the page's status
+// region, which is emptied first, so copying again is announced again. The clipboard can refuse,
+// so a failure is said too.
+const button = document.querySelector('.copy-link');
+const status = document.getElementById('page-status');
+const label = button.textContent;
+let reset;
 
-### Anti-Patterns to Avoid
+function say(message) {
+  status.textContent = '';
+  setTimeout(() => { status.textContent = message; }, 100);
+}
+button.addEventListener('click', async () => {
+  const url = document.querySelector('link[rel="canonical"]')?.href ?? location.href;
+  try {
+    await navigator.clipboard.writeText(url);
+    button.textContent = 'Link copied';
+    say('Link copied');
+  } catch {
+    say("Couldn't copy the link. Copy it from the address bar.");
+  }
+  clearTimeout(reset);
+  reset = setTimeout(() => { button.textContent = label; }, 2000);
+});
+```
 
-- Plain scaffold look with mostly default framework styles
-- Mixed visual systems in one page (different corner radii, shadow logic, and component behavior)
-- Decoration that harms readability or contrast
-- Inconsistent focus and hover behavior across interactive elements
+## Comments
 
-### Quick Quality Gate (Before Finalizing)
+- Comments are user content: render them as text, or as HTML sanitized on the server, never as raw HTML. The server handles spam and moderation.
+- The form's fields have visible labels: name (`autocomplete="name"`), email (`type="email"`, `autocomplete="email"`), and the comment. Errors and timing follow the Form Validation Pattern, and the result goes to the status region.
+- An embedded comment service loads third-party scripts and tracking; say so, and ask before adding one.
 
-- [ ] The first screen has a clear focal point and readable supporting content
-- [ ] Cards, sidebar blocks, forms, and navigation feel like one design system
-- [ ] Interactive elements have visible and consistent state behavior
-- [ ] Section spacing follows a repeatable rhythm
-- [ ] The result does not look like a default starter template
+## Newsletter
 
-## Layout Best Practices
+- The form says what people sign up for and how often they'll hear from you. The field has a visible label, `type="email"`, and `autocomplete="email"`; the result ("Check your inbox to confirm") and errors go to the status region.
 
-### Blog List Grid Columns
+## Motion
 
-When implementing the blog list page, choose the appropriate number of columns based on whether a sidebar is present:
+- All motion is optional. The hero and the first cards are visible at load; they don't fade in from opacity 0, which would delay the largest image's paint.
+- A scroll reveal, if any, hides only cards below the window when the script runs, on screens, when motion is allowed, as the Landing Page guide's does. Without script, under reduced motion, and when printing, nothing is hidden.
+- Under `prefers-reduced-motion: reduce`, card hovers change color or shadow only.
 
-**With Sidebar (Recommended Default):**
-- Use **2 columns** on desktop
-- With a 320px sidebar, this gives each card approximately 360-400px width
-- Cards at this width maintain proper proportions and readability
+## Layers
 
-**Without Sidebar:**
-- Use **3 columns** on desktop
-- Without the sidebar constraint, cards can be distributed across more columns
-- Maintains optimal card sizing across the full content width
+Layers, bottom to top: the page, sticky bars, dropdowns and popovers, toasts, then modals, which make the rest of the page inert. The project's layering scale wins; native `<dialog>` and the `popover` attribute use the top layer and need no z-index. A sticky header is a sticky bar, and the menu is a modal.
 
-**Why Not 3 Columns With Sidebar?**
-- Three columns with a 320px sidebar results in cards that are only ~240px wide
-- Cards become too narrow, causing images and text to lose impact
-- The layout feels cramped and reduces scannability
+## Layout
 
-### Post Page Header Layout
+- One column of cards below 768 px, two from 768 px; from 1024 px, two beside a sidebar, or three without one, since three beside a 320 px sidebar leaves cards about 240 px wide.
+- The post's header can span the page's width; the body stays at its reading width.
+- At 320 px wide nothing scrolls sideways.
 
-The article header on post pages should create a strong visual entry point:
+## Appearance
 
-**Full-Width Hero:**
-- Span the entire viewport width for visual impact
-- Content within can be constrained (up to 1200px) but the section itself is full-width
-- Creates a clear distinction between blog list and post page
+- These values are a fallback for a project without a design of its own; the project's styles, tokens, and components win.
+- Colors: a `#ffffff` page (or `#f8fafc`), `#0f172a` text (17.9:1 on white), `#334155` for secondary text (10.4:1), and `#475569` for muted text (7.6:1, and 7.2:1 on `#f8fafc`). Links take the text color and an underline. The accent is neutral: buttons in `#0f172a` with `#ffffff` text (17.9:1), and a `#0f172a` focus ring, 2 px at a 2 px offset. `#e2e8f0` is for dividers and card edges only; a form field's edge needs 3:1, such as `#64748b` (4.8:1).
+- Type: the project's font stack; the post title `clamp(2rem, 4vw, 3.25rem)` at line height 1.15 to 1.3, card titles 18 to 22 px, the body 18 px at line height 1.7.
+- Shape: cards with a 12 px radius, a `#e2e8f0` edge, and the shadow `0 1px 3px rgb(15 23 42 / 8%)`, raised to `0 8px 24px rgb(15 23 42 / 12%)` on hover; buttons and fields with an 8 px radius.
+- Spacing: 48 to 72 px between sections of the list page, 40 to 64 px in the post, and 20 to 28 px inside cards.
 
-**Constrained Content:**
-- Only the article body content should be constrained to ~720px
-- This optimal reading width applies to paragraphs, headings, and body content
-- Sidebar sits alongside this constrained content area
+## Edge cases
 
-**Why Not Constrain the Header?**
-- A constrained header at 720px looks cramped and diminishes the post entry experience
-- Full-width headers provide breathing room and visual hierarchy
-- Separates the "landing" (header) from "reading" (content) experiences
+- **A post without an image**: the card keeps the same title, excerpt, and meta; leave the image's space out rather than showing an empty box.
+- **A long title**: it wraps on every screen; nothing is cut off.
+- **The first and last pages**: no Previous link on the first page and no Next link on the last.
+- **No comments yet**: say so in a sentence, with the form below it.
+- **Before the script runs**: every card is visible and every link works; only Copy link and the share sheet need the script.
 
-## Testing Checklist
+## Acceptance checklist
 
-### Blog List Page
-- [ ] Post grid displays correctly (2 columns desktop with sidebar, 3 without; 2 tablet; 1 mobile)
-- [ ] Post cards show image, title, excerpt, date, author
-- [ ] Post cards are properly sized (not too narrow ~240px, but ~360-400px when sidebar is visible)
-- [ ] Pagination works (prev, next, page numbers)
-- [ ] Sidebar displays or collapses on mobile
-- [ ] Hero section displays (if implemented)
+- [ ] The list page and the post page each start with a skip link and have one h1; the post is an article, the sidebar an aside, and the pagination a nav
+- [ ] A post card is one link, its title, which covers the whole card; a category or author link inside it still works, and the focus ring goes around the card
+- [ ] Card images are decorative (alt="") when the title names the link; images in the first screen load at once, and every image has width and height
+- [ ] Card titles wrap instead of being cut off; only an excerpt may be clamped
+- [ ] Links in the article's text are underlined, and text meets 4.5:1
+- [ ] A code block scrolls sideways inside itself and can be reached with Tab, and the page never scrolls sideways at 320 px wide
+- [ ] Dates are time elements with a datetime attribute
+- [ ] Pagination marks the current page with aria-current="page", and has no Previous link on the first page or Next link on the last
+- [ ] Share links go to each site's share page without third-party scripts, and say so when they open a new tab
+- [ ] Copy link copies the post's address and says so in the status region, or says that copying failed; a second copy is announced too
+- [ ] Comments are rendered as text or sanitized HTML, never as raw HTML
+- [ ] The newsletter and comment forms have visible labels, and their results go to the status region
+- [ ] A sticky sidebar fits the window below the header, or scrolls inside itself
+- [ ] Without script, under reduced motion, and when printing, nothing is hidden, and cards don't move on hover under reduced motion
+- [ ] Styles come from the project's styling system and tokens; the guide's colors are only a fallback
 
-### Post Page
-- [ ] Article header spans full width (not constrained to article width)
-- [ ] Article header shows title, meta, author, reading time with visual impact
-- [ ] Article content is constrained to optimal reading width (~720px)
-- [ ] Sidebar displays TOC, author bio, related posts
-- [ ] Share buttons are accessible
-- [ ] Comments section structure present
-- [ ] Related posts display
+## See also
 
-### Shared
-- [ ] Navbar and footer consistent across pages
-- [ ] Keyboard navigation works
-- [ ] Focus indicators visible
-- [ ] Images have alt text
-- [ ] Heading hierarchy logical
-- [ ] No horizontal scroll
-- [ ] Mobile menu works (if implemented)
+- **[Navigation Bar (Responsive) with Mobile Menu](/potions/components/navbar)**: the header and its menu on small screens.
+- **[Landing Page Layout (Marketing)](/potions/layouts/landing-page)**: a landing page that shares the header, the footer, and the scroll reveal.
+- **[Documentation Website Layout](/potions/layouts/documentation)**: code blocks with Copy, and a table of contents that marks the section being read.
+- **[Text Input Field](/potions/components/text-input)**: the search, newsletter, and comment fields.
+- **[Form Validation Pattern](/potions/patterns/form-validation)**: errors and timing in the newsletter and comment forms.
+- **[Button](/potions/components/button)**: Copy link, Subscribe, and the forms' buttons.
 
-## See Also
-
-The blog layout works well with these potions:
-
-- **[Navbar Component](/potions/components/navbar)** - For the header navigation bar
-- **[Button](/potions/components/button)** - For newsletter submit, pagination, share buttons
-- **[Text Input](/potions/components/text-input)** - For search input, newsletter email, comment form
-- **[Landing Page Layout](/potions/layouts/landing-page)** - Blog can share hero patterns with landing pages
-
-These are suggestions. The blog layout is self-contained and works independently.
+These are suggestions; the blog works on its own.
