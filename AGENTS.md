@@ -6,6 +6,12 @@
 - Potions are framework-agnostic and styling-agnostic specifications that agents adapt to a user's existing stack.
 - In human-readable text, always write "UI Potion" with a space. Use `UIPotion` or `uipotion` only for technical identifiers such as file names, URLs, JSON keys, package names, and code references.
 
+## Working Rules
+- If a requirement is missing, unclear, or conflicts with another, ask before building: suggest answers and mark the one you recommend.
+- Change incrementally: fix or extend what's needed, keep what works, and don't rewrite.
+- Don't commit, push, switch branches, or add report files unless asked.
+- Keep this file short: add rules in the fewest words, merged into existing lines where they fit.
+
 ## Project Shape
 - Static site generator: Harold (`harold-scripts`) using Markdown, Handlebars, SCSS, and static JSON.
 - Potion Markdown lives in `src/potions/[category]/[slug].md`.
@@ -89,6 +95,8 @@ Rules for guide content, in both formats, which every guide follows where they a
 - Example colors meet 4.5:1 for text and 3:1 for UI parts and icons (1.4.11); remind agents to check the project's colors.
 - Accessible names include the visible text (2.5.3), disclosures have no `aria-haspopup`, required fields say so in text, and links in running text are underlined.
 - Saved UI state uses the app's own storage prefix and applies before the first paint.
+- Rebuild state derived from the page after a form reset and on `pageshow`; a data-changing request with no answer has an unknown result, not a failed one.
+- Name the cases a guide covers and its limits; date facts that go stale (versions, support ranges, end-of-life dates) and say how to recheck them.
 - Don't teach `:focus` outline fallbacks, `transform3d`, focus-trap libraries, or Angular `[label]='Text'` bindings.
 
 ## Index And Dates
@@ -130,3 +138,6 @@ Rules for guide content, in both formats, which every guide follows where they a
 - For potion additions, renames, URL changes, sitemap changes, template changes, style changes, or release-ready checks, run `npm run build`.
 - If `npm run build` changes generated static files, review them before finishing.
 - Do not edit `build/` directly; fix source files and rebuild.
+- Check the browser behavior a rule or snippet relies on in Chromium, Firefox, and WebKit: inside a project's own markup and styles, both ways for each state change (open and close, widen and narrow), and in every mode the guide documents. Run tooling templates with the tool itself.
+- Reproduce a problem with a check before fixing it: the check fails before the fix, passes after, and fails again, for the right reason, when the bug is put back.
+- Before finishing, update the docs the change makes stale: README, CONTRIBUTING, this file, and the About and Contribute pages.
