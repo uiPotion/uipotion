@@ -27,7 +27,6 @@ const BASE_URL = 'https://uipotion.com';
 const STATIC_PAGES = [
   { path: '/', priority: '1.0', changefreq: 'weekly', source: 'src/pages/index.hbs' },
   { path: '/about', priority: '0.8', changefreq: 'monthly', source: 'src/pages/about.hbs' },
-  { path: '/potion-kit', priority: '0.8', changefreq: 'monthly', source: 'src/pages/potion-kit.hbs' },
   { path: '/potions', priority: '0.9', changefreq: 'weekly', source: 'src/pages/potions.hbs' },
   { path: '/contribute', priority: '0.7', changefreq: 'monthly', source: 'src/pages/contribute.hbs' },
   { path: '/validator', priority: '0.6', changefreq: 'monthly', source: 'src/pages/validator.hbs' },

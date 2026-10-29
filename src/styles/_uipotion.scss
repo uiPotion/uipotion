@@ -277,25 +277,6 @@ body::-webkit-scrollbar-thumb:hover {
     line-height: 1.7;
   }
 
-  /* Potion Kit note under the steps: centered, like a footnote */
-  .how-to-use-alt {
-    margin: 48px auto 0;
-    padding: 20px 24px;
-    text-align: center;
-    font-size: 0.9375rem;
-    color: var(--muted);
-    line-height: 1.65;
-    max-width: 560px;
-    background: var(--surface);
-    border: 1px solid var(--hairline);
-    border-radius: 4px;
-
-    @media (max-width: 640px) {
-      padding: 16px 20px;
-      margin-top: 40px;
-    }
-  }
-
   h2 {
     color: var(--text);
   }
@@ -500,7 +481,7 @@ body::-webkit-scrollbar-thumb:hover {
 /* Links in running text: only plain links (no class), so buttons made from links
    never get an underline. A faint underline is always there, so links don't rely on
    color alone; on hover or keyboard focus a solid one draws from left to right. */
-:is(.potion-article, .potion-fit, .potion-breadcrumb, .potions-breadcrumb, .about-breadcrumb, .validator-breadcrumb, .about-article, .about-hero-description, .validator-info, .hero, .section-intro, .how-to-use-alt, .main-footer) a:not([class]) {
+:is(.potion-article, .potion-fit, .potion-breadcrumb, .potions-breadcrumb, .about-breadcrumb, .validator-breadcrumb, .about-article, .about-hero-description, .validator-info, .hero, .section-intro, .main-footer) a:not([class]) {
   color: var(--accent);
   text-decoration: none;
   background-image:
@@ -523,7 +504,7 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 /* ============================================
-   ABOUT-STYLE PAGES: About, Contribute, Potion Kit, Legal, 404
+   ABOUT-STYLE PAGES: About, Contribute, Legal, 404
    ============================================ */
 
 .about-page {

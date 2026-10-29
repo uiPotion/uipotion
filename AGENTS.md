@@ -99,11 +99,11 @@ Rules for guide content, in both formats, which every guide follows where they a
   - Matching `potions-index.json` entry `updated`.
   - `potions-index.json` top-level `lastUpdated`.
   - `uipotion-manifest.json` `meta.updated`.
-- A change that touches only potion page fields (`promptSubject`, `promptReuse`, `useWhen`, `specifies`, `example`) isn't a content change. Don't bump `meta.updated`, the index dates, or the manifest date for it. The index `updated` date drives the sitemap and tells apps such as Potion Kit that a guide changed.
+- A change that touches only potion page fields (`promptSubject`, `promptReuse`, `useWhen`, `specifies`, `example`) isn't a content change. Don't bump `meta.updated`, the index dates, or the manifest date for it. The index `updated` date drives the sitemap and tells apps that read the index that a guide changed.
 - Use `YYYY-MM-DD` dates.
 
 ## Links And URLs
-- Use absolute internal links in templates and Markdown, such as `/about`, `/potions`, `/potion-kit`, `/contribute`, `/legal`, and `/assets/images/...`.
+- Use absolute internal links in templates and Markdown, such as `/about`, `/potions`, `/contribute`, `/legal`, and `/assets/images/...`.
 - Do not use Harold's `relativePath` helper in this project.
 - Potion page URL: `/potions/[category]/[slug]`.
 - Potion JSON URL: `/potions/[category]/[slug].json`.
