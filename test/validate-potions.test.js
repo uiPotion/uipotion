@@ -24,7 +24,7 @@ const COPIED = [
 const GUIDES_DIR = path.join(REPO, 'src/statics/potions'); // `npm run static` also writes Markdown copies here
 const INDEX = 'src/statics/potions-index.json';
 const MANIFEST = 'src/statics/uipotion-manifest.json';
-const BUTTON = 'components/button'; // a potion without known breaks
+const BUTTON = 'components/button'; // a potion the tests break
 const BUTTON_URL = 'https://uipotion.com/potions/components/button';
 const DIALOG = 'components/dialog'; // a potion with an acceptance checklist
 const TABLE = '| a | b |\n| --- | --- |\n| 1 | 2 |';
@@ -62,9 +62,8 @@ function runValidator(root) {
       resolve({
         status: error ? error.code : 0,
         output,
-        // Numbered lines are failures; "- " lines are known breaks printed as warnings
-        errors: lines.filter(line => /^ {2}\d+\. /.test(line)).map(line => line.replace(/^ {2}\d+\. /, '')),
-        warnings: lines.filter(line => line.startsWith('  - ')).map(line => line.slice(4))
+        // Numbered lines are failures
+        errors: lines.filter(line => /^ {2}\d+\. /.test(line)).map(line => line.replace(/^ {2}\d+\. /, ''))
       });
     });
   });
@@ -102,11 +101,6 @@ function fixture(t) {
       Object.entries(fields).reduce((changed, [field, yaml]) => setField(changed, field, yaml), text)
     )),
     editIndexEntry: (id, change) => f.editJson(INDEX, index => change(index.potions.find(entry => entry.id === id))),
-    // Lines added to the copied validator's KNOWN_RULE_BREAKS
-    knownBreaks: lines => f.edit('validate-potions.js', source => source.replace(
-      'const KNOWN_RULE_BREAKS = [\n',
-      start => start + lines.map(line => `  ${JSON.stringify(line)},\n`).join('')
-    )),
     run: () => runValidator(root)
   };
   return f;
@@ -593,9 +587,9 @@ describe('validate-potions.js', { concurrency: CONCURRENCY }, () => {
   it('accepts references that resolve, array items by their event, and skips code and file names', async t => {
     const f = fixture(t);
     f.editJson(guide(BUTTON), data => {
-      data.aiAgentInstructions.implementationSteps.push('Follow componentSpec.interactions.click and accessibility.focusManagement, with values from tokens.json.');
+      data.aiAgentInstructions.implementationSteps.push('Follow componentSpec.interactions.press and accessibility.focusManagement, with values from tokens.json.');
       data.frameworkPatterns.snippet = 'accessibility.noSuchPart();';
-      data.stylingApproaches.snippet = 'componentSpec.noSuchPart';
+      data.stylingApproaches = { snippet: 'componentSpec.noSuchPart' };
     });
     assertPasses(await f.run());
   });
@@ -626,9 +620,9 @@ describe('validate-potions.js', { concurrency: CONCURRENCY }, () => {
     const items = JSON.parse(f.read(guide(BUTTON))).testingChecklist;
     const section = list => `## Acceptance Checklist\n\n${list.map(item => `- [ ] ${item}`).join('\n')}\n\n`;
     const changed = [...items.slice(0, -1), 'A different last item'];
-    // Button's Implementation Checklist, the next section, has "- [ ] " items too
-    f.edit(markdown(BUTTON), text => text.replace('## Implementation Checklist\n', heading => (
-      `\`\`\`md\n${section(['Not an item'])}\`\`\`\n\n${section(changed)}${heading}`
+    // The section after it has "- [ ] " items too
+    f.edit(markdown(BUTTON), text => text.replace(/## Acceptance checklist\n[\s\S]*?(?=## See also\n)/, () => (
+      `\`\`\`md\n${section(['Not an item'])}\`\`\`\n\n${section(changed)}## Notes\n\n- [ ] Not an item either\n\n`
     )));
     assertErrors(await f.run(), [
       `components/button [checklist]: the acceptance checklist differs from testingChecklist at item ${items.length}: "A different last item" in the Markdown, ${JSON.stringify(items.at(-1))} in the JSON`
@@ -689,46 +683,9 @@ describe('validate-potions.js', { concurrency: CONCURRENCY }, () => {
     assertPasses(await f.run());
   });
 
-  // The known-breaks list. These tests go when KNOWN_RULE_BREAKS is deleted.
-
-  const EMOJI_BREAK = 'components/button [emoji]: 1 emoji in the Markdown: 🎉';
-  const NO_LONGER_FOUND = 'no longer found, so delete it from KNOWN_RULE_BREAKS in validate-potions.js: ';
-
-  it('prints a listed break as a warning', async t => {
+  it('fails on a guide without an acceptance checklist section', async t => {
     const f = fixture(t);
-    f.edit(markdown(BUTTON), text => `${text}\n🎉\n`);
-    f.knownBreaks([EMOJI_BREAK]);
-    const result = await f.run();
-    assertPasses(result);
-    assert.ok(result.warnings.includes(EMOJI_BREAK), result.output);
-  });
-
-  it('fails on a listed break that no longer appears', async t => {
-    const f = fixture(t);
-    f.knownBreaks([EMOJI_BREAK]);
-    assertErrors(await f.run(), [`${NO_LONGER_FOUND}${EMOJI_BREAK}`]);
-  });
-
-  it('fails on a new break of a rule whose break is listed', async t => {
-    const f = fixture(t);
-    f.edit(markdown(BUTTON), text => `${text}\n🎉 🚀\n`);
-    f.knownBreaks([EMOJI_BREAK]);
-    assertErrors(await f.run(), [
-      'components/button [emoji]: 2 emoji in the Markdown: 🎉 🚀',
-      `${NO_LONGER_FOUND}${EMOJI_BREAK}`
-    ]);
-  });
-
-  it('fails on a wrong URL next to a listed URL break', async t => {
-    const f = fixture(t);
-    const webUrlBreak = `components/button [urls]: meta.webUrl is "${BUTTON_URL}.html", expected ${BUTTON_URL}`;
-    f.editJson(guide(BUTTON), data => Object.assign(data.meta, {
-      webUrl: `${BUTTON_URL}.html`,
-      agentGuideUrl: `${BUTTON_URL}.html.json`
-    }));
-    f.knownBreaks([webUrlBreak]);
-    const result = await f.run();
-    assertErrors(result, [`components/button [urls]: meta.agentGuideUrl is "${BUTTON_URL}.html.json", expected ${BUTTON_URL}.json`]);
-    assert.ok(result.warnings.includes(webUrlBreak), result.output);
+    f.edit(markdown(DIALOG), text => text.replace('## Acceptance checklist\n', '## Checks\n'));
+    assertErrors(await f.run(), ['components/dialog [checklist]: the Markdown has no "Acceptance checklist" section listing testingChecklist']);
   });
 });

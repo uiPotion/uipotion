@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/patterns.schema.json",
   "id": "ai-action-review",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "name": "AI Action Review Pattern",
   "category": "patterns",
   "tags": [
@@ -519,7 +519,7 @@
   ],
   "meta": {
     "created": "2026-05-23",
-    "updated": "2026-10-17",
+    "updated": "2026-10-28",
     "webUrl": "https://uipotion.com/potions/patterns/ai-action-review",
     "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-action-review.json",
     "markdownUrl": "https://uipotion.com/potions/patterns/ai-action-review.md",

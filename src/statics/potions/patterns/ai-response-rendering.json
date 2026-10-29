@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/patterns.schema.json",
   "id": "ai-response-rendering",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "name": "AI Response Rendering Pattern",
   "category": "patterns",
   "tags": [
@@ -462,7 +462,7 @@
   ],
   "meta": {
     "created": "2026-04-18",
-    "updated": "2026-10-17",
+    "updated": "2026-10-28",
     "webUrl": "https://uipotion.com/potions/patterns/ai-response-rendering",
     "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.json",
     "markdownUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.md",

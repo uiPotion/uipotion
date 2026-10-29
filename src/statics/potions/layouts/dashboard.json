@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
   "id": "dashboard",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "name": "Dashboard Layout with Collapsible Sidebar",
   "category": "layouts",
   "tags": [
@@ -446,7 +446,7 @@
   ],
   "meta": {
     "created": "2026-01-10",
-    "updated": "2026-10-26",
+    "updated": "2026-10-28",
     "webUrl": "https://uipotion.com/potions/layouts/dashboard",
     "relatedPotions": [
       {

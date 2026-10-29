@@ -1,7 +1,7 @@
 {
   "$schema": "https://uipotion.com/schema/categories/layouts.schema.json",
   "id": "documentation",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "name": "Documentation Website Layout",
   "category": "layouts",
   "tags": [
@@ -479,7 +479,7 @@
   ],
   "meta": {
     "created": "2026-02-24",
-    "updated": "2026-10-26",
+    "updated": "2026-10-28",
     "webUrl": "https://uipotion.com/potions/layouts/documentation",
     "agentGuideUrl": "https://uipotion.com/potions/layouts/documentation.json",
     "markdownUrl": "https://uipotion.com/potions/layouts/documentation.md",

@@ -1,8 +1,8 @@
 ---
 layout: 'potion'
-title: 'Toast Notifications (Accessible) with Queue System'
+title: 'Toast Notifications'
 publicationDate: '2026-01-24'
-excerpt: 'A non-blocking toast notification system with success/error/warning/info variants, queue management, auto-dismiss, keyboard navigation, and screen reader announcements. Perfect for user feedback after actions.'
+excerpt: 'Toasts that screen readers announce and keyboard users can reach: live regions in the page from the start, Undo that stays until dismissed, timers that pause, F8 to the newest toast, and a stack that never covers what has focus.'
 category: 'Components'
 tags:
   - components
@@ -18,513 +18,324 @@ tags:
 agentManifest: 'potions/components/toast-notifications.json'
 path: 'potions/components/toast-notifications'
 promptSubject: 'toast notifications'
+useWhen: 'an app needs to tell people what just happened, such as a saved change or a deleted file with Undo, without interrupting them.'
+specifies:
+  - 'Toasts are read out through two live regions that are in the page from the start: errors assertively, the rest politely.'
+  - 'Errors and toasts with an action stay until dismissed, and the other timers pause on hover, on focus, and while the page is hidden.'
+  - 'F8 moves focus to the newest toast and back, and Escape dismisses only the toast that has focus.'
+example: 'Someone deletes a file and hears "File deleted. Press F8 for Undo." The toast stays, F8 reaches it, and Undo brings the file back and returns focus to where they were.'
 ---
 
-A non-blocking toast notification system for providing user feedback after actions. Features success, error, warning, and info variants with queue management, auto-dismiss timers, manual dismiss controls, keyboard navigation, and full screen reader support.
+Toasts tell people what just happened without interrupting them. Their usual failures can't be seen: messages screen readers never hear, an Undo that's gone before a keyboard user reaches it, a stack that covers what has focus, and an Escape that closes the wrong thing. This guide covers when to use a toast, the stack and its live regions, timing, keys, and focus, and targets WCAG 2.2 AA.
 
-## Structure Specification
+## Start from what the project has
 
-### Component Hierarchy
+1. If the project has a toast or notification component, in its design system or a library it already uses, configure or extend it to meet this guide. Keep its API.
+2. Otherwise build one stack for the app, with a small API such as `showToast({ title, description, variant, action })`.
 
-The toast system consists of a Toast Container (fixed-position wrapper) that holds multiple Toast Items. Each Toast contains an Icon (indicating variant type), Content area (with Title and optional Description), and Action Buttons (Dismiss button and optional action like Undo).
+Implement only what the task needs, and add no dependency without asking. The project's conventions win for styling and visual defaults. If one conflicts with an accessibility or correctness requirement here, ask instead of choosing.
 
-The system flows as: Application triggers toast → Toast Manager adds to queue → Container renders visible toasts → Toast auto-dismisses or user dismisses → Next toast in queue appears.
+## When to use a toast
 
-## Detailed Component Specifications
+- A toast is brief news about something that just happened, often with one action: "Message sent", "File deleted" with Undo, "Link copied".
+- Errors people must fix show next to what they concern, as in the Form Validation guide; anything people must read or decide before going on is a dialog.
+- Repeats are grouped ("3 files deleted"), and the same message within a second or so shows once.
 
-### 1. Toast Container
+## The stack and its live regions
 
-**Goal**: Manage the display and lifecycle of multiple toast notifications without blocking user interaction.
+- One `<section>` named "Notifications" holds the toasts, newest last, at the bottom of the screen: at the inline end on wide screens, and as wide as the screen less 32 px on phones. A top corner would sit over the header's own controls (an account menu, a theme choice) and could hide one entirely when it has focus (2.4.11), so toasts go to the bottom on every screen. On a page with a fixed bottom bar, such as a purchase bar or a tab bar, the script measures the bar and sets `--bottom-bar-height` to its height, and the stack sits above it, so the bar's controls stay visible.
+- Two live regions read the toasts out: `role="status"` (polite), and `role="alert"` for errors that need attention now; warnings and the rest are polite. Both are in the page, empty, from the start, outside the section, and never hidden: a live region inside a hidden element drops out of the accessibility tree (checked in Chromium). Neither is atomic (`aria-atomic="false"`): both roles are atomic unless told otherwise, and an atomic region is read out whole each time a message is added, the earlier ones still in it included. Each toast's words go into one of them, and go when the toast goes; the toasts themselves aren't in a live region, so nothing is nested.
+- At most three toasts show at once, one on phones. The rest wait, and show in order when there's room, read out as they show. When the screen narrows, the toasts already showing stay and new ones wait; when it widens, waiting toasts fill the free places in order.
+- Layers: toasts sit above sticky bars and dropdowns and below modals, in the project's layer scale. While a modal is open, the page behind it is inert, toasts and their live regions included, so the result of the modal's task shows in the modal (the Modal Dialog guide's status message) or after it closes.
 
-**Positioning Options**:
-- `top-right` (default) - Most common, good for desktop apps
-- `top-left` - Alternative for right-to-left layouts
-- `bottom-right` - Less intrusive, good for long sessions
-- `bottom-left` - Alternative placement
-- `top-center` - High visibility, good for critical messages
-- `bottom-center` - Mobile-first, often used in mobile apps
+The snippets in this guide are plain HTML, CSS, and JavaScript; adapt them to the project's framework and its version.
 
-**Container Dimensions**:
-- Desktop: 380px width, fixed position
-- Mobile: Full width minus 32px total margins (16px each side)
-- Gap between toasts: 12px vertical spacing
-- Max visible toasts: 3 (configurable, older toasts queue)
-- Distance from viewport edge: 20px
-
-**States**:
-- `position` (enum, default: "top-right") - Container placement
-- `maxVisible` (number, default: 3) - Maximum toasts shown simultaneously
-- `queue` (array) - Pending toasts waiting to be displayed
-- `pauseOnHover` (boolean, default: true) - Pause auto-dismiss on mouse hover
-- `pauseOnFocusWithin` (boolean, default: true) - Pause when toast has focus
-
-### 2. Toast Item Component
-
-**Anatomy Slots**:
-- `icon` - Variant-specific icon (success checkmark, error X, warning triangle, info circle)
-- `content` - Text content area
-- `title` - Main message (required)
-- `description` - Optional secondary text
-- `action` - Optional action button (e.g., "Undo")
-- `dismiss` - Close/dismiss button (X icon)
-- `progressBar` - Optional visual timeout indicator
-
-**Dimensions**:
-- Height: Auto-sizing, minimum 60px
-- Padding: 16px all sides
-- Border radius: 10px
-- Shadow: Medium elevation (comparable to modals)
-- Icon size: 22px
-- Dismiss button size: 32×32px touch target
-- Progress bar height: 3px (if enabled)
-
-**Visual States**:
-- `variant` (enum: "success" | "error" | "warning" | "info") - Visual style and semantics
-- `visible` (boolean) - Display state (controls enter/exit animations)
-- `paused` (boolean) - Whether auto-dismiss timer is paused
-- `action` (object, optional) - Action button config {label, onClick}
-
-**Color Variants**:
-
-**Success**:
-- Background: Green 50-100 (light), Green 900 (dark)
-- Border: Green 200-300 (light), Green 700 (dark)
-- Icon/Text: Green 600-700 (light), Green 100 (dark)
-- Icon: Checkmark circle
-
-**Error**:
-- Background: Red 50-100 (light), Red 900 (dark)
-- Border: Red 200-300 (light), Red 700 (dark)
-- Icon/Text: Red 600-700 (light), Red 100 (dark)
-- Icon: X circle or exclamation circle
-
-**Warning**:
-- Background: Amber/Yellow 50-100 (light), Amber 900 (dark)
-- Border: Amber 200-300 (light), Amber 700 (dark)
-- Icon/Text: Amber 700-800 (light), Amber 100 (dark)
-- Icon: Warning triangle or exclamation triangle
-
-**Info**:
-- Background: Blue 50-100 (light), Blue 900 (dark)
-- Border: Blue 200-300 (light), Blue 700 (dark)
-- Icon/Text: Blue 600-700 (light), Blue 100 (dark)
-- Icon: Info circle or "i" icon
-
-### 3. Toast Manager (State Management)
-
-**Core Responsibilities**:
-- Queue management (add, remove, reorder toasts)
-- Auto-dismiss timers (start, pause, resume, cancel)
-- Maximum visible enforcement (hide overflow, show on dismiss)
-- Unique ID generation for each toast
-- Global toast API (show, dismiss, dismissAll methods)
-
-**State Variables**:
-```
-toasts: Array<Toast>
-- id: string (unique identifier)
-- variant: "success" | "error" | "warning" | "info"
-- title: string
-- description?: string
-- duration: number (ms, 0 = persistent)
-- action?: {label: string, onClick: Function}
-- dismissible: boolean
-- timestamp: number (creation time)
-- paused: boolean
-
-queue: Array<ToastConfig>
-- Pending toasts waiting for available slot
-
-timers: Map<id, TimeoutID>
-- Active auto-dismiss timers by toast ID
+```html
+<!-- At the end of <body>. The section shows the toasts; the two live regions read them out.
+     Both regions are in the page, empty, from the start and are never hidden: one polite, one
+     for errors that need attention now. Neither is atomic, so a new message is read out alone. -->
+<section class="toasts" aria-label="Notifications" aria-keyshortcuts="F8" hidden>
+  <ol></ol>
+</section>
+<div class="visually-hidden" role="status" aria-atomic="false" id="toast-status"></div>
+<div class="visually-hidden" role="alert" aria-atomic="false" id="toast-alert"></div>
 ```
 
-**API Methods**:
-- `toast.success(title, options?)` - Show success toast
-- `toast.error(title, options?)` - Show error toast
-- `toast.warning(title, options?)` - Show warning toast
-- `toast.info(title, options?)` - Show info toast
-- `toast.custom(config)` - Show custom toast
-- `toast.dismiss(id)` - Dismiss specific toast
-- `toast.dismissAll()` - Clear all toasts
-- `toast.promise(promise, messages)` - Show loading → success/error based on promise result
-
-### 4. Auto-Dismiss Behavior
-
-**Default Durations** (configurable):
-- Success: 4000ms (4 seconds)
-- Info: 5000ms (5 seconds)
-- Warning: 6000ms (6 seconds)
-- Error: 7000ms (7 seconds) - Longer for critical messages
-- Persistent: 0ms (requires manual dismiss)
-
-**Timer Behavior**:
-- Timer starts when toast becomes visible
-- Timer pauses on hover (if `pauseOnHover=true`)
-- Timer pauses when toast or action button has keyboard focus
-- Timer resumes when hover/focus ends
-- Timer resets if user interacts with action button
-- Timer cancelled on manual dismiss
-
-**Progress Bar** (optional visual indicator):
-- Thin bar (2-4px height) at bottom or top of toast
-- Fills from 0% to 100% over duration period
-- Pauses fill when timer paused
-- Color matches variant accent color
-- Provides visual countdown for auto-dismiss
-
-### 5. Queue System
-
-**Queue Rules**:
-- Max visible toasts enforced (default: 3)
-- New toasts added to queue when limit reached
-- Oldest toast dismissed first when queue is full (FIFO)
-- Exception: High-priority toasts (error) can bump lower-priority
-- Queue processed on toast dismiss or timeout
-
-**Stacking Behavior**:
-- **Stack (default)**: Toasts stack vertically in container
-- **Replace**: New toast replaces previous toast (for rapid updates)
-- **Queue**: Toasts wait in queue until slot available
-
-**Position Ordering**:
-- Top positions: Newest toast appears at top, pushes older down
-- Bottom positions: Newest toast appears at bottom, pushes older up
-- Animation: Slide in from edge, slide out on dismiss
-
-## Responsive Design
-
-### Desktop (≥1024px)
-- Fixed width: 380px
-- Positioned in corner (top-right default)
-- Multiple toasts stack vertically (max visible: 3-5)
-- Hover interactions enabled
-
-### Tablet (768px - 1023px)
-- Width: 360px
-- Positioned similar to desktop
-- Touch-friendly dismiss buttons (larger targets)
-- Max visible: 2-3 toasts
-
-### Mobile (<768px)
-- Full width minus 32px total margins (16px each side)
-- Positioned at bottom-center (recommended for mobile)
-- Swipe to dismiss gesture enabled (optional)
-- Single toast visible at a time (maxVisible: 1)
-- Touch targets: 44×44px minimum for all buttons
-
-## Accessibility
-
-### Keyboard Navigation
-
-**Focusable Elements**:
-- Dismiss button (X): Always focusable
-- Action button (e.g., Undo): Focusable when present
-- Toast container: Not directly focusable
-
-**Keyboard Controls**:
-- `Escape`: Dismiss focused toast (or all toasts if none focused)
-- `Tab`: Navigate between action and dismiss buttons within toast
-- `Enter/Space`: Activate focused button
-- `Shift+Tab`: Navigate backwards
-
-**Focus Management**:
-- Newly appeared toasts do NOT steal focus (non-intrusive)
-- Keyboard users can Tab to reach toasts
-- Focus returns to trigger element on dismiss (if applicable)
-- Multiple toasts: Tab order follows visual stacking order
-
-### Screen Reader Support
-
-**ARIA Attributes**:
-- Container: `aria-live="polite"` or `aria-live="assertive"` (for errors)
-- Toast: `role="status"` (success, info) or `role="alert"` (error, warning)
-- Title: `aria-atomic="true"` (announces full message)
-- Dismiss button: `aria-label="Dismiss notification"` or `aria-label="Dismiss [variant] notification"`
-- Action button: Descriptive label (e.g., `aria-label="Undo delete action"`)
-
-**Announcement Strategy**:
-- Success/Info: Polite announcements (don't interrupt)
-- Error/Warning: Assertive announcements (interrupt current speech)
-- Title + description read together
-- Multiple rapid toasts: Queue announcements to avoid overlap
-
-**Reduced Motion**:
-- Disable slide/fade animations when `prefers-reduced-motion: reduce`
-- Use instant show/hide or simple fade
-- Maintain functionality without animations
-
-## Animations
-
-### Entry Animation
-- Slide in from container edge + fade in
-- Duration: 250ms
-- Easing: `cubic-bezier(0.16, 1, 0.3, 1)` (ease-out bounce)
-- Transform: `translateX(100%)` or `translateY(-100%)` → `translate(0)`
-- Opacity: 0 → 1
-
-### Exit Animation
-- Slide out to edge + fade out + scale down slightly
-- Duration: 200ms
-- Easing: `cubic-bezier(0.4, 0, 1, 1)` (ease-in)
-- Transform: `translate(0)` → `translateX(100%)` or `translateY(-100%)`
-- Opacity: 1 → 0
-- Scale: 1 → 0.95
-
-### Stacking Animation (Critical Implementation)
-- When toast dismissed, remaining toasts slide to fill gap
-- Duration: 200ms
-- Easing: `cubic-bezier(0.4, 0, 0.2, 1)` (standard ease)
-- **CRITICAL - Coordinated Animation**: Exit animation and stack repositioning happen SIMULTANEOUSLY
-  - Exiting toast slides out WHILE remaining toasts smoothly slide up to fill the gap
-  - No jumping or instant repositioning
-  
-**Recommended Implementation Pattern (Wrapper Approach)**:
-- Use a **wrapper element** around each toast that handles height collapse
-- Structure: `Wrapper (handles height/margin) → Toast (handles slide animation)`
-- When exiting:
-  - Wrapper animates: `max-height` from current to `0px` AND `margin-bottom` from `12px` to `0px` (200-250ms)
-  - Inner toast animates: `translateX` and `opacity` for slide out effect (200-250ms)
-  - Both animations run simultaneously with same duration
-- Why: Wrapper stays in layout flow and collapses smoothly, allowing remaining toasts to slide up naturally without jumping
-- Common mistake: Setting `position: absolute` on toast directly causes it to jump to wrong position before animating
-
-### Progress Bar Animation
-- Linear progression from 0% to 100%
-- Duration: Matches auto-dismiss duration
-- Pause animation on hover/focus
-- Resume from current position when unpaused
-
-### Hover/Focus States
-- Dismiss button: Scale 1 → 1.1 on hover
-- Toast: Subtle elevation increase (shadow grows)
-- Action button: Background color shift
-- All transitions: 150ms ease-in-out
-
-## Usage Patterns
-
-### Basic Usage
-```
-// Success feedback
-toast.success("Changes saved successfully")
-
-// Error feedback
-toast.error("Failed to delete item", {
-  description: "Please try again or contact support."
-})
-
-// Warning with action
-toast.warning("Your session will expire in 5 minutes", {
-  action: {
-    label: "Extend",
-    onClick: () => extendSession()
+```css
+/* At the bottom of every screen, so toasts never cover the header's controls, and above a fixed
+   bottom bar, whose height the script measures. The project's layer for toasts puts them above
+   sticky bars and dropdowns, and below modals. */
+.toasts {
+  inline-size: min(380px, calc(100% - 32px));
+  inset-block-end: calc(16px + var(--bottom-bar-height, 0px));
+  inset-inline-end: 16px;
+  position: fixed;
+  z-index: var(--layer-toasts);
+}
+.toasts ol {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.toast {
+  align-items: center;
+  background: var(--toast-surface);
+  border: 1px solid var(--toast-border);
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+}
+.toast p {
+  flex: 1 1 12rem;
+  margin: 0;
+}
+/* Only F8 focuses a toast, so the ring shows on :focus */
+.toast:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.toast button {
+  min-block-size: 32px;
+  min-inline-size: 32px;
+}
+/* On whatever scrolls the page (here :root; in an app shell, its scroll container): the end of
+   the content has room for a fixed bottom bar and the stack, and a focused element scrolls clear
+   of both. Where the project already keeps room for its bar, count it once. The script keeps both
+   heights up to date. */
+:root {
+  padding-block-end: calc(var(--bottom-bar-height, 0px) + var(--toast-stack-height, 0px));
+  scroll-padding-block-end: calc(var(--bottom-bar-height, 0px) + var(--toast-stack-height, 0px));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .toast {
+    animation: toast-in 250ms cubic-bezier(0.16, 1, 0.3, 1);
   }
-})
-
-// Info notification
-toast.info("New version available", {
-  duration: 0, // Persistent until dismissed
-  action: {
-    label: "Reload",
-    onClick: () => window.location.reload()
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
   }
-})
+}
 ```
 
-### Promise-Based Usage
-```
-toast.promise(
-  saveData(),
-  {
-    loading: "Saving changes...",
-    success: "Changes saved!",
-    error: "Failed to save changes"
+```js
+// showToast({ title, description, variant, action: { label, onSelect }, duration }). Errors and
+// toasts with an action stay until they're dismissed; the others leave after `duration` (see the
+// timers). At most three show, one on phones; the rest wait in order, and are read out when they
+// show. Toasts already showing stay when the screen narrows.
+const region = document.querySelector('.toasts');
+const list = region.querySelector('ol');
+const politeRegion = document.getElementById('toast-status');
+const alertRegion = document.getElementById('toast-alert');
+const fallbackFocus = document.querySelector('main'); // tabindex="-1", as the skip link's target
+const timers = new Map(); // toast → { remaining, started, id }
+const messages = new Map(); // toast → its text in a live region
+const waiting = [];
+const wide = matchMedia('(min-width: 48rem)');
+let returnTo = null; // where focus was before it entered the stack
+
+function showToast(toast) {
+  waiting.push(toast);
+  fill();
+}
+
+// Shows waiting toasts, in order, while there's room
+function fill() {
+  while (waiting.length && list.children.length < (wide.matches ? 3 : 1)) add(waiting.shift());
+}
+wide.addEventListener('change', fill);
+
+function add(toast) {
+  const item = Object.assign(document.createElement('li'), { className: `toast toast-${toast.variant ?? 'info'}`, tabIndex: -1 });
+  const text = Object.assign(document.createElement('p'), { textContent: [toast.title, toast.description].filter(Boolean).join(' ') });
+  item.append(text);
+  if (toast.action) item.append(button(toast.action.label, () => { toast.action.onSelect(); dismiss(item); }));
+  item.append(button('Dismiss', () => dismiss(item)));
+  list.append(item);
+  region.hidden = false;
+  // Errors go to the alert region, the rest to the polite one; an action says how to reach it
+  const message = Object.assign(document.createElement('p'), { textContent: toast.action ? `${text.textContent} Press F8 for ${toast.action.label}.` : text.textContent });
+  (toast.variant === 'error' ? alertRegion : politeRegion).append(message);
+  messages.set(item, message);
+  if (toast.action || toast.variant === 'error') return;
+  timers.set(item, { remaining: toast.duration ?? 5000, id: null });
+  update();
+}
+
+function button(label, onClick) {
+  const element = Object.assign(document.createElement('button'), { type: 'button', textContent: label });
+  element.addEventListener('click', onClick);
+  return element;
+}
+
+// Focus goes back to where it came from, or to the main content when that can't take it (it was
+// removed, disabled, hidden, or made inert)
+function restoreFocus() {
+  returnTo?.focus();
+  if (document.activeElement !== returnTo) fallbackFocus?.focus();
+}
+
+function dismiss(item) {
+  // Focus goes to the newest other toast, or back to where it came from
+  if (item.contains(document.activeElement)) {
+    const next = [...list.children].filter((other) => other !== item).at(-1);
+    if (next) next.focus();
+    else restoreFocus();
   }
-)
+  clearTimeout(timers.get(item)?.id);
+  timers.delete(item);
+  messages.get(item).remove();
+  messages.delete(item);
+  item.remove();
+  region.hidden = list.children.length === 0;
+  fill();
+  update();
+}
 ```
 
-### Undo Pattern
-```
-toast.success("Item deleted", {
-  duration: 5000,
-  action: {
-    label: "Undo",
-    onClick: () => {
-      restoreItem()
-      toast.dismiss() // Close this toast
+## Timing
+
+- Errors and toasts with an action stay until they're dismissed: an Undo that disappears before a keyboard or screen reader user reaches it fails 2.2.1. The others leave after about 5 seconds (4 to 6 suggested, longer for longer text).
+- The timers pause while the pointer is over the stack, while focus is in it, and while the page is hidden, and go on with the time that was left.
+- Dismissing a toast is silent; it just goes.
+
+## Keys and focus
+
+- Showing a toast never moves focus.
+- F8 moves focus to the newest toast, and F8 again returns it. The section has `aria-keyshortcuts="F8"`, and the read-out of a toast with an action ends with the way to it ("Press F8 for Undo"). Radix uses F8; on many Mac keyboards it needs Fn. A shortcut the project already has for this wins.
+- In a toast, Tab moves between its buttons and Escape dismisses it. Escape anywhere else is left to dialogs and menus.
+- When a toast with focus goes, focus moves to the newest other toast, or back to where it was before it entered the stack, by F8, Tab, or a click; F8 back does the same. When that element is gone or can't take focus (removed, disabled, hidden, or made inert), focus goes to the main content: `<main>` with `tabindex="-1"`, the skip link's target. The script checks that focus really moved.
+- Each toast has a Dismiss button (an icon button named "Dismiss"), and its action is a button named by its visible text ("Undo").
+
+The timers and the keys, which go with the stack's script:
+
+```js
+// The timers pause while the stack is hovered or has focus, or the page is hidden, and go on with
+// the time that was left. F8 moves focus to the newest toast and back, and Escape dismisses the
+// toast that has focus. Goes with the stack's script.
+let hovered = false;
+const paused = () => hovered || region.contains(document.activeElement) || document.hidden;
+
+// Starts or pauses every timer at once, keeping the time each toast has left
+function update() {
+  for (const [item, timer] of timers) {
+    if (paused() && timer.id) {
+      clearTimeout(timer.id);
+      timer.id = null;
+      timer.remaining -= Date.now() - timer.started;
+    } else if (!paused() && !timer.id) {
+      timer.started = Date.now();
+      timer.id = setTimeout(() => dismiss(item), timer.remaining);
     }
   }
-})
+}
+
+region.addEventListener('pointerenter', () => { hovered = true; update(); });
+region.addEventListener('pointerleave', () => { hovered = false; update(); });
+// However focus enters the stack (F8, Tab, a click), remember where it came from
+region.addEventListener('focusin', (event) => {
+  if (!region.contains(event.relatedTarget)) returnTo = event.relatedTarget;
+  update();
+});
+region.addEventListener('focusout', (event) => { if (!region.contains(event.relatedTarget)) update(); });
+document.addEventListener('visibilitychange', update);
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'F8' && region.contains(document.activeElement)) {
+    restoreFocus();
+  } else if (event.key === 'F8' && list.lastElementChild) {
+    list.lastElementChild.focus();
+  } else if (event.key === 'Escape' && region.contains(event.target)) {
+    dismiss(event.target.closest('.toast'));
+  } else {
+    return;
+  }
+  event.preventDefault();
+});
+// A fixed bottom bar, in the page from the start (several things fixed at the bottom go in one)
+const bottomBar = document.querySelector('.bottom-bar');
+
+// Scroll padding acts only when something scrolls, so when the stack or the bar appears or
+// changes, or the viewport shrinks, over the focused element, that element scrolls clear of both
+function keepFocusClear() {
+  const focused = document.activeElement;
+  if (region.hidden || !focused || focused === document.body || region.contains(focused) || bottomBar?.contains(focused)) return;
+  const a = focused.getBoundingClientRect();
+  const covers = (b) => a.bottom > b.top && a.top < b.bottom && a.right > b.left && a.left < b.right;
+  if ([region, bottomBar].some((element) => element && covers(element.getBoundingClientRect()))) focused.scrollIntoView({ block: 'nearest' });
+}
+// The stack's height, with its 16 px gap and 8 px for a focus ring, for the padding
+new ResizeObserver(() => {
+  document.documentElement.style.setProperty('--toast-stack-height', `${region.hidden ? 0 : region.offsetHeight + 24}px`);
+  keepFocusClear();
+}).observe(region);
+addEventListener('resize', keepFocusClear);
+visualViewport?.addEventListener('resize', keepFocusClear);
+// The bar's height (its border box, so padding counts) keeps the stack above it, and when the bar
+// appears, hides, or changes, focus scrolls clear
+if (bottomBar) new ResizeObserver(() => {
+  document.documentElement.style.setProperty('--bottom-bar-height', `${bottomBar.offsetHeight}px`);
+  keepFocusClear();
+}).observe(bottomBar, { box: 'border-box' });
 ```
 
-### Custom Configuration
-```
-toast.custom({
-  variant: "success",
-  title: "Profile updated",
-  description: "Your changes are now visible to others",
-  duration: 4000,
-  position: "bottom-center",
-  dismissible: true,
-  pauseOnHover: true
-})
-```
+## Phones and focus
 
-## State Management Integration
+- On phones, toasts sit at the bottom, one at a time, and their buttons are at least 44 px.
+- Whatever scrolls the page gets a `padding-bottom` and a `scroll-padding-bottom` of a fixed bottom bar's height plus, while toasts show, the stack's height and room for a focus ring. That's `:root` usually; in an app whose page scrolls inside a container, it's that container, with `box-sizing: border-box`, since otherwise the padding makes a `height: 100%` container taller than the screen and nothing scrolls (checked). An element that gets focus then scrolls clear of the bar and the stack, and even a short page has room at the end to scroll its last element clear (checked). Where the project already keeps room for its bar at the end of the content, count it once.
+- Scroll padding acts only when something scrolls, so when a toast appears, the stack grows, the bar changes, or the viewport shrinks (the window, or an on-screen keyboard), and the stack or the bar comes over the element that already has focus, the script scrolls that element clear of both (checked in Chromium, Firefox, and WebKit, in the page and in an app's scroll container). Focus inside the stack or the bar stays put.
+- The script measures the bar (`.bottom-bar`, the project's own selector) with a `ResizeObserver` on its border box, so padding counts: when the bar appears, hides (with `hidden`), or changes height, as when its text wraps or its padding makes room for a phone's home indicator, the stack moves above it, and the focused element scrolls clear of the stack and the bar, even when the bar grows past where the stack was (checked). The bar is in the page from the start, and several things fixed at the bottom, such as a tab bar and a cookie banner, go in one fixed container, which is what the script measures.
+- This covers the page scrolling, an app's scroll container, a fixed bottom bar, and changes of the viewport's size.
+- Swiping a toast away is optional; its Dismiss button does the same with a tap (2.5.7).
 
-### Context/Provider Pattern (React/Vue)
-- ToastProvider wraps application root
-- useToast hook provides toast methods
-- Central state management for all toasts
+## Motion
 
-### Global Singleton Pattern
-- Exported toast object with methods
-- Works across any component
-- No provider required
+- Motion is optional: a toast slides in over 250 ms and fades out over 200 ms. When one leaves, its wrapper's height collapses at the same time, so the others move into place without a jump. The snippet shows only the entrance.
+- Under `prefers-reduced-motion: reduce`, toasts appear and leave without moving; a short fade is fine.
+- A countdown bar is optional. It animates `transform: scaleX()`, not `width`, and pauses with the timer.
 
-### Event-Based Pattern
-- Dispatch custom events for toast actions
-- Toast container listens for events
-- Framework-agnostic approach
+## Appearance
 
-## Testing Checklist
+These are suggested defaults; the project's design and tokens win.
 
-- [ ] Success/error/warning/info variants display correct colors and icons
-- [ ] Toasts appear in correct container position (top-right, bottom-center, etc.)
-- [ ] Auto-dismiss works with correct durations (success: 4s, error: 7s, warning: 6s, info: 5s)
-- [ ] Manual dismiss (X button) removes toast with smooth exit animation
-- [ ] **CRITICAL**: Create 3 toasts, dismiss the MIDDLE one - it should slide out smoothly WITHOUT jumping to a different position first
-- [ ] **CRITICAL**: When middle toast exits, bottom toast should smoothly slide up (not jump instantly)
-- [ ] **CRITICAL**: Exit animation and stack repositioning happen simultaneously (coordinated animation)
-- [ ] Exit animation (200ms) and stack repositioning (200ms) run in parallel, not sequentially
-- [ ] Hover pauses auto-dismiss timer (if pauseOnHover enabled)
-- [ ] Keyboard focus pauses auto-dismiss timer (if pauseOnFocusWithin enabled)
-- [ ] Timer resumes when hover/focus ends
-- [ ] Queue enforces maxVisible limit (default: 3 toasts visible)
-- [ ] New toasts added to queue when maxVisible reached
-- [ ] Oldest toast dismissed first when queue is full (FIFO)
-- [ ] Queue processed correctly when toast dismissed or times out
-- [ ] Multiple toasts stack vertically with 12px spacing
-- [ ] Toasts slide to fill gap when one dismissed (stack animation)
-- [ ] Escape key dismisses focused toast or all toasts if none focused
-- [ ] Tab key navigates between action button and dismiss button
-- [ ] Enter/Space activates focused button
-- [ ] Focus order follows visual stacking order for multiple toasts
-- [ ] Screen reader announces new toasts with correct role (status/alert)
-- [ ] aria-live region configured correctly (polite for success/info, assertive for error/warning)
-- [ ] Title and description read together atomically by screen readers
-- [ ] Dismiss button has descriptive aria-label
-- [ ] Action button has descriptive aria-label (if present)
-- [ ] Entry animation: Slide in from edge + fade in (250ms)
-- [ ] Exit animation: Slide out to edge + fade out + slight scale down (200ms)
-- [ ] prefers-reduced-motion disables slide/scale animations, uses simple fade or instant
-- [ ] Progress bar (if enabled) animates from 0-100% over duration
-- [ ] Progress bar pauses when timer paused
-- [ ] Action button executes onClick callback
-- [ ] Action button optionally dismisses toast after callback
-- [ ] Mobile: Toasts are full width minus 32px margins
-- [ ] Mobile: Position switches to bottom-center (recommended)
-- [ ] Mobile: Touch targets are 44×44px minimum for buttons
-- [ ] Mobile: Only 1 toast visible at a time (maxVisible: 1)
-- [ ] Tablet: Toasts are 360px wide with touch-friendly buttons
-- [ ] Desktop: Toasts are 380px wide at configured position
-- [ ] Dark mode: Colors adapt with sufficient contrast for all variants
-- [ ] Rapid toast creation doesn't cause performance issues or queue overflow
-- [ ] toast.dismissAll() clears all active toasts and queue
-- [ ] Toast IDs are unique across all toasts
-- [ ] Timers cleaned up on unmount/dismiss (no memory leaks)
-- [ ] Container z-index (9999) places toasts above most UI but below modals
-- [ ] Long titles/descriptions wrap properly without truncation
-- [ ] Toast height adjusts automatically based on content length
+- Toasts 380 px wide (the screen less 32 px on phones), 12 to 16 px of padding, a 10 px radius, and 12 px apart.
+- Each variant has words and an icon, not only a color. Text meets 4.5:1 and icons 3:1 against the toast: on light tints, use the darkest shades for text (`#14532d` on `#f0fdf4` is 8.7:1) and a dark shade for icons (`#15803d`, 4.8:1), since green-600 text on a green tint is only 3.0 to 3.2:1. Check the project's own colors in both themes.
 
-## Common Variations
+## Edge cases
 
-### Toast with Loading State
-Show spinner in toast while async operation completes, then update to success/error.
+- Long text wraps; it's never cut off with an ellipsis.
+- Many toasts at once: three show, the rest wait in order, and the same message within a second or so shows once.
+- An action that fails, such as an Undo after the item is gone for good, shows its own error toast.
+- Toasts can be cleared when the page changes; errors stay.
+- Offline: one toast that stays while the connection is down, then a brief "Back online".
 
-### Toast with Custom Icon
-Allow custom icon instead of variant defaults (e.g., user avatar, custom SVG).
+## Acceptance checklist
 
-### Toast with Rich Content
-Support for custom content beyond title/description (e.g., images, links, formatted text).
+- [ ] Toasts are for brief news about something that just happened; errors people must fix show next to what they concern, and anything they must read before going on is a dialog
+- [ ] Two live regions, neither atomic, are in the page, empty, from the start and are never hidden: errors go to the alert region, everything else to the polite one
+- [ ] Each toast is read out once, its title and description together; a toast that waits for room is read out when it shows
+- [ ] Errors and toasts with an action stay until they're dismissed; the others leave after about 5 seconds
+- [ ] Timers pause while the stack is hovered or has focus, or the page is hidden, and go on with the time that was left
+- [ ] Showing a toast never moves focus
+- [ ] F8 moves focus to the newest toast and back, and the read-out of a toast with an action says so
+- [ ] Escape dismisses the toast that has focus and does nothing elsewhere
+- [ ] When a toast with focus goes, focus moves to the newest other toast, or back to where it was before it entered the stack, or to the main content when that element is gone or can't take focus
+- [ ] Every toast has a Dismiss button, and an action button named by its visible text
+- [ ] Toasts stack at the bottom, at most three at once (one on phones); the rest wait and show in order when there's room, and the toasts already showing stay when the screen narrows
+- [ ] While toasts show, neither the stack nor a fixed bottom bar hides the focused element, in the page or an app's scroll container: it scrolls clear of both when it gets focus, when a toast appears, when the viewport shrinks, and when the bar appears or changes height, with room at the end of the content for both; the stack sits above the bar and never covers the header
+- [ ] While a modal is open, the result of its task shows in the modal, since the page outside is inert
+- [ ] Long text wraps and is never cut off; text meets 4.5:1 and icons 3:1, and each variant has words and an icon, not only a color
+- [ ] Under reduced motion, toasts appear and leave without moving
+- [ ] Styles come from the project's styling system and tokens
 
-### Toast with Multi-Action
-Multiple action buttons (e.g., "Save" and "Discard").
+## See also
 
-### Notification Center Integration
-Archive dismissed toasts in a notification center for later review.
+- **[Modal Dialog](/potions/components/dialog)**: toasts sit below an open modal, and its task's results show in it.
+- **[Button](/potions/components/button)**: the action and Dismiss buttons.
+- **[Form Validation Pattern - UX and Timing Strategies](/potions/patterns/form-validation)**: errors people must fix show by their fields, not in toasts.
 
-### Grouped Toasts
-Combine similar toasts (e.g., "3 items deleted" instead of 3 separate toasts).
-
-## Framework Patterns
-
-### React
-- Context + useToast hook for global access
-- Custom hooks: `useToastTimer`, `useToastQueue`, `useToastState`
-- Portal for rendering outside DOM hierarchy (`ReactDOM.createPortal`)
-- useReducer or useState for toast state
-- Animations: Use `react-transition-group` or `Framer Motion` with `AnimatePresence`
-- **Wrapper pattern recommended**: Outer div handles height collapse, inner div handles slide animation
-
-### Vue
-- Composition API with provide/inject or Pinia store
-- Composable: `useToast()`, `useToastTimer`, `useToastQueue`, `useToastState`
-- Teleport for rendering in body (`<Teleport to="body">`)
-- ref/reactive for toast state
-- Animations: Use `<TransitionGroup name="toast-list">` - Vue automatically handles move transitions
-- **Important**: Set `position: absolute` on `.toast-list-leave-active` to remove from layout during exit
-
-### Angular
-- Injectable ToastService with BehaviorSubject
-- Services: `ToastService`, `ToastQueueService`, `ToastTimerService`
-- Portal from @angular/cdk for rendering
-- BehaviorSubject for toast state
-- Animations: Use Angular animations with `:enter`, `:leave`, and `query/stagger` for move
-
-### Svelte
-- Writable stores for global toast state
-- Stores: `toastStore`, `queueStore`, `toastAPI`
-- Transition directives for animations (`fly`, `fade`, `flip`)
-- Portal pattern for rendering
-- Example: `import { toast } from './toast'; toast.success('Saved!');`
-
-## Edge Cases & Considerations
-
-### Rapid Toast Creation
-- Debounce identical messages within short timeframe (e.g., 500ms)
-- Group similar toasts (e.g., "3 items deleted")
-- Prevent queue overflow (max queue size: 10-20)
-
-### Long Messages
-- Wrap text properly (don't truncate)
-- Auto-adjust height based on content
-- Limit max height and add scroll if needed
-
-### Multiple Actions
-- Support secondary action button
-- Ensure proper keyboard navigation between multiple buttons
-- Consider toast width for multiple actions
-
-### Network State Changes
-- Offline toast: Persistent, high priority
-- Online toast: Brief success notification
-- Automatic toast on connection changes
-
-### Cleanup on Route Changes
-- Optionally dismiss all toasts on navigation
-- Or persist across routes for important messages
-- Configurable behavior per toast
-
-### Z-Index Conflicts
-- Toast container should be above most UI (z-index: 9999 or similar)
-- Below modals/dialogs if both open
-- Above dropdowns, tooltips, popovers
-
-### Performance
-- Limit DOM nodes (max visible + small queue)
-- Use CSS transforms for animations (hardware accelerated)
-- Debounce rapid updates
-- Clean up timers and event listeners
-
-This toast notification system provides comprehensive user feedback while maintaining accessibility, performance, and a polished user experience across all devices and contexts.
+These are suggestions; toasts work on their own.

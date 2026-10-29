@@ -228,6 +228,6 @@ The host's scroll area follows new content only while the reader is at the botto
 - **[AI Action Review Pattern](/potions/patterns/ai-action-review)**: the approval surface for tool calls with consequences.
 - **[Toast Notifications](/potions/components/toast-notifications)**: feedback outside the message, such as a failed Copy.
 - **[Modal Dialog](/potions/components/dialog)**: confirmations, and the full-screen view of an artifact.
-- **[Dark/Light Mode Pattern](/potions/patterns/dark-light-mode)**: theme tokens that keep cards, previews, and code readable in both themes.
+- **[Dark/Light Mode](/potions/patterns/dark-light-mode)**: theme tokens that keep cards, previews, and code readable in both themes.
 
 These are suggestions; the pattern works with any chat shell.

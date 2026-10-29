@@ -17,7 +17,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/dashboard",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/dashboard.json",
       "created": "2026-01-10",
-      "updated": "2026-10-26",
+      "updated": "2026-10-28",
       "markdownUrl": "https://uipotion.com/potions/layouts/dashboard.md"
     },
     {
@@ -111,7 +111,7 @@
     },
     {
       "id": "toast-notifications",
-      "name": "Toast Notifications (Accessible) with Queue System",
+      "name": "Toast Notifications",
       "category": "components",
       "tags": [
         "components",
@@ -123,14 +123,13 @@
         "a11y",
         "wcag",
         "aria",
-        "queue",
-        "auto-dismiss"
+        "queue"
       ],
-      "excerpt": "A non-blocking toast notification system with success/error/warning/info variants, queue management, auto-dismiss, keyboard navigation, and screen reader announcements. Perfect for user feedback after actions.",
+      "excerpt": "Toasts that screen readers announce and keyboard users can reach: live regions in the page from the start, Undo that stays until dismissed, timers that pause, F8 to the newest toast, and a stack that never covers what has focus.",
       "webUrl": "https://uipotion.com/potions/components/toast-notifications",
       "agentGuideUrl": "https://uipotion.com/potions/components/toast-notifications.json",
       "created": "2026-01-24",
-      "updated": "2026-01-24",
+      "updated": "2026-10-28",
       "markdownUrl": "https://uipotion.com/potions/components/toast-notifications.md"
     },
     {
@@ -157,7 +156,7 @@
     },
     {
       "id": "eslint-config",
-      "name": "ESLint Config Generator for UI Projects",
+      "name": "ESLint Config",
       "category": "tooling",
       "tags": [
         "tooling",
@@ -170,11 +169,11 @@
         "accessibility",
         "formatting"
       ],
-      "excerpt": "A comprehensive ESLint configuration generator supporting React, Vue, Angular, and Svelte with accessibility linting, TypeScript support, and Prettier integration.",
+      "excerpt": "ESLint for UI projects: build on the lint setup the project has, flat config for ESLint 10, the framework's accessibility rules, TypeScript and Prettier, and plugins checked against the installed ESLint.",
       "webUrl": "https://uipotion.com/potions/tooling/eslint-config",
       "agentGuideUrl": "https://uipotion.com/potions/tooling/eslint-config.json",
       "created": "2026-01-24",
-      "updated": "2026-04-18",
+      "updated": "2026-10-28",
       "markdownUrl": "https://uipotion.com/potions/tooling/eslint-config.md"
     },
     {
@@ -200,7 +199,7 @@
     },
     {
       "id": "dark-light-mode",
-      "name": "Dark/Light Mode Pattern - Theme Switching and Color Schemes",
+      "name": "Dark/Light Mode",
       "category": "patterns",
       "tags": [
         "patterns",
@@ -212,11 +211,11 @@
         "design-tokens",
         "responsive"
       ],
-      "excerpt": "A framework-agnostic pattern for implementing dark and light theme switching with system preference detection, user override persistence, semantic color tokens, and accessibility compliance.",
+      "excerpt": "Light, dark, and System themes that never flash: the saved choice applied before the first paint, tokens that set color-scheme, a radio group to choose, and System following the system's setting as it changes.",
       "webUrl": "https://uipotion.com/potions/patterns/dark-light-mode",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/dark-light-mode.json",
       "created": "2026-02-14",
-      "updated": "2026-02-14",
+      "updated": "2026-10-28",
       "markdownUrl": "https://uipotion.com/potions/patterns/dark-light-mode.md"
     },
     {
@@ -348,11 +347,11 @@
         "variants",
         "forms"
       ],
-      "excerpt": "A foundational, accessible Button component with semantic variants, sizes, icon-only support, loading/disabled states, and optional link/toggle behavior. Designed to map cleanly into existing design systems via tokens.",
+      "excerpt": "Accessible buttons that build on the project's own: variants, sizes that grow with their labels, icon-only names, toggles, and a busy state that keeps focus and says what's happening.",
       "webUrl": "https://uipotion.com/potions/components/button",
       "agentGuideUrl": "https://uipotion.com/potions/components/button.json",
       "created": "2026-02-04",
-      "updated": "2026-02-04",
+      "updated": "2026-10-28",
       "markdownUrl": "https://uipotion.com/potions/components/button.md"
     },
     {
@@ -439,7 +438,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/documentation",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/documentation.json",
       "created": "2026-02-24",
-      "updated": "2026-10-26",
+      "updated": "2026-10-28",
       "markdownUrl": "https://uipotion.com/potions/layouts/documentation.md"
     },
     {
@@ -482,7 +481,7 @@
       "webUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page",
       "agentGuideUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page.json",
       "created": "2026-03-24",
-      "updated": "2026-10-26",
+      "updated": "2026-10-28",
       "markdownUrl": "https://uipotion.com/potions/layouts/ecommerce-product-page.md"
     },
     {
@@ -504,7 +503,7 @@
       "webUrl": "https://uipotion.com/potions/patterns/ai-response-rendering",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.json",
       "created": "2026-04-18",
-      "updated": "2026-10-17",
+      "updated": "2026-10-28",
       "markdownUrl": "https://uipotion.com/potions/patterns/ai-response-rendering.md"
     },
     {
@@ -526,10 +525,10 @@
       "webUrl": "https://uipotion.com/potions/patterns/ai-action-review",
       "agentGuideUrl": "https://uipotion.com/potions/patterns/ai-action-review.json",
       "created": "2026-05-23",
-      "updated": "2026-10-17",
+      "updated": "2026-10-28",
       "markdownUrl": "https://uipotion.com/potions/patterns/ai-action-review.md"
     }
   ],
   "totalCount": 24,
-  "lastUpdated": "2026-10-26"
+  "lastUpdated": "2026-10-28"
 }

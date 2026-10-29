@@ -236,7 +236,7 @@ These are suggested defaults; the project's design and tokens win.
 - **[Dashboard Layout with Collapsible Sidebar](/potions/layouts/dashboard)**: the drawer snippet, with the rest of the page inert and focus kept across 1024 px.
 - **[Navigation Bar (Responsive) with Mobile Menu](/potions/components/navbar)**: the header's links and its dropdowns, such as a version switcher.
 - **[Tabs Component](/potions/components/tabs)**: variants of the same code, such as npm, pnpm, and yarn.
-- **[Dark/Light Mode Pattern](/potions/patterns/dark-light-mode)**: the theme control and a theme set before the first paint.
+- **[Dark/Light Mode](/potions/patterns/dark-light-mode)**: the theme control and a theme set before the first paint.
 - **[Button](/potions/components/button)**: Copy, Menu, and the header's buttons.
 
 These are suggestions; the layout works on its own.

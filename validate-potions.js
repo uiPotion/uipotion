@@ -20,18 +20,6 @@ const POTIONS_INDEX_FILE = 'src/statics/potions-index.json';
 const MANIFEST_FILE = 'src/statics/uipotion-manifest.json';
 const SITE_URL = 'https://uipotion.com';
 
-// Authoring rules from AGENTS.md that these potions broke when the checks were added (2026-10-11).
-// Each line is one finding exactly as the validator prints it, so a potion with a known break
-// still fails on any new break, including another break of the same rule. The lines print as
-// warnings until each potion's pass fixes them and deletes them here. A line that no longer
-// matches a finding fails validation. Never add a line: fix a new break instead.
-const KNOWN_RULE_BREAKS = [
-  'components/toast-notifications [urls]: meta.webUrl is "https://uipotion.com/potions/components/toast-notifications.html", expected https://uipotion.com/potions/components/toast-notifications',
-  'patterns/dark-light-mode [urls]: meta.webUrl is "https://uipotion.com/potions/patterns/dark-light-mode.html", expected https://uipotion.com/potions/patterns/dark-light-mode',
-  'tooling/eslint-config [first-tag]: the first tag is "eslint", expected "tooling"',
-  'tooling/eslint-config [urls]: meta.webUrl is "https://uipotion.com/potions/tooling/eslint-config.html", expected https://uipotion.com/potions/tooling/eslint-config'
-];
-
 // Each category folder has its schema at categories/[category].schema.json
 function categorySchemaFile(category) {
   return path.join(SCHEMAS_DIR, 'categories', `${category}.schema.json`);
@@ -693,7 +681,7 @@ function acceptanceChecklists(tree, body) {
  * with a schema, front matter, tags, titles and names, the potion page fields, no emoji, text
  * diagrams, Markdown tables, or level-1 headings, no template placeholders, the guide URLs,
  * related potions, the dates, the guide's references to its own parts, and the acceptance
- * checklist. Each finding names the exact break, so a known break can't hide a new one.
+ * checklist. Each finding names the exact break.
  */
 async function checkAuthoringRules(potions) {
   const findings = []; // { key, rule, message }
@@ -813,10 +801,13 @@ async function checkAuthoringRules(potions) {
     })(tree);
     if (h1s.length) add(key, 'markdown-h1', `${h1s.length} level-1 heading(s) in the Markdown: ${h1s.join(', ')} (the page shows the title as its h1, so headings start at ##)`);
 
-    // Each "Acceptance checklist" section lists exactly testingChecklist, in order, as "[ ] " items,
-    // so the count an agent reports from the JSON matches the page
+    // The Markdown has an "Acceptance checklist" section, and each one lists exactly
+    // testingChecklist, in order, as "[ ] " items, so the count an agent reports from the JSON
+    // matches the page
     const jsonItems = Array.isArray(data.testingChecklist) ? data.testingChecklist : [];
-    acceptanceChecklists(tree, body).forEach(checklist => {
+    const checklists = acceptanceChecklists(tree, body);
+    if (checklists.length === 0) add(key, 'checklist', 'the Markdown has no "Acceptance checklist" section listing testingChecklist');
+    checklists.forEach(checklist => {
       const length = Math.max(checklist.length, jsonItems.length);
       let item = 0;
       while (item < length && checklist[item] && checklist[item].box && checklist[item].text === jsonItems[item]) item += 1;
@@ -963,33 +954,14 @@ async function main() {
     console.log('\n✓ potions-index.json entries match guide metadata');
   }
 
-  // AGENTS.md authoring rules: findings listed in KNOWN_RULE_BREAKS warn, anything else fails
-  const expectedBreaks = new Map(); // known finding -> how many times it's still expected
-  KNOWN_RULE_BREAKS.forEach(line => expectedBreaks.set(line, (expectedBreaks.get(line) || 0) + 1));
-  const ruleErrors = [];
-  const ruleWarnings = [];
-  (await checkAuthoringRules(potions)).forEach(({ key, rule, message }) => {
-    const line = `${key} [${rule}]: ${message}`;
-    if (expectedBreaks.get(line)) {
-      expectedBreaks.set(line, expectedBreaks.get(line) - 1);
-      ruleWarnings.push(line);
-    } else {
-      ruleErrors.push(line);
-    }
-  });
-  expectedBreaks.forEach((count, line) => {
-    if (count > 0) ruleErrors.push(`no longer found, so delete it from KNOWN_RULE_BREAKS in validate-potions.js: ${line}`);
-  });
+  // AGENTS.md authoring rules: every finding fails
+  const ruleErrors = (await checkAuthoringRules(potions)).map(({ key, rule, message }) => `${key} [${rule}]: ${message}`);
   if (ruleErrors.length > 0) {
     console.log('\n✗ AGENTS.md authoring rules failed:\n');
     ruleErrors.forEach((line, i) => console.log(`  ${i + 1}. ${line}`));
     totalErrors += ruleErrors.length;
   } else {
-    console.log('✓ AGENTS.md authoring rules hold, apart from the known breaks below');
-  }
-  if (ruleWarnings.length > 0) {
-    console.log(`\n⚠ Known authoring-rule breaks, to be fixed in the potion passes (${ruleWarnings.length}):\n`);
-    ruleWarnings.forEach(line => console.log(`  - ${line}`));
+    console.log('✓ AGENTS.md authoring rules hold');
   }
 
   // Summary

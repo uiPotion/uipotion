@@ -1,8 +1,8 @@
 {
   "$schema": "https://uipotion.com/schema/categories/patterns.schema.json",
   "id": "dark-light-mode",
-  "version": "1.0.0",
-  "name": "Dark/Light Mode Pattern - Theme Switching and Color Schemes",
+  "version": "1.1.0",
+  "name": "Dark/Light Mode",
   "category": "patterns",
   "tags": [
     "patterns",
@@ -14,137 +14,96 @@
     "design-tokens",
     "responsive"
   ],
-  "description": "A framework-agnostic pattern for implementing dark and light theme switching with system preference detection, user override persistence, semantic color tokens, preventing flash of unstyled content, and accessibility compliance.",
+  "description": "Light, dark, and System themes: the saved choice applied in the head before the first paint, with storage that can fail; color tokens with a light and a dark value that set color-scheme; a radio group to choose; System that follows the system's setting live; and a control that stays in step after Back and across tabs.",
   "aiAgentInstructions": {
-    "summary": "Implement dark and light mode theme switching that respects system preference and allows user override. First detect the project's framework and styling system. Apply theme via inline script in head (before paint) to prevent flash. Use semantic color tokens. Persist user choice in localStorage. Ensure WCAG contrast in both themes and respect prefers-reduced-motion. Adapt to the project's existing styling approach (Tailwind, CSS variables, SCSS, etc.).",
+    "summary": "Add or extend themes: Light, Dark, and System, saved under the app's storage prefix and applied by a short script in the head before the first paint; color tokens with a light and a dark value, and color-scheme set to match; a radio group to choose; System following the system's setting as it changes; and a control that stays in step with the saved choice. Build on the project's theme setup when it has one. Implement only what the task needs, keep existing APIs, and match the project's styling and tokens. The project's conventions win for styling and visual defaults; if one conflicts with an accessibility or correctness requirement in this guide, ask the user instead of choosing silently. Target WCAG 2.2 AA.",
     "keyFeatures": [
-      "Preference resolution: user override first, then prefers-color-scheme, then light fallback",
-      "Flash prevention: inline script in head sets data-theme before body renders",
-      "Semantic color tokens (--color-background, --color-text, etc.) with light/dark values",
-      "color-scheme meta tag and CSS property for native control styling",
-      "localStorage persistence for user choice (light, dark, system)",
-      "WCAG AA contrast in both themes",
-      "Respect prefers-reduced-motion for theme switch animations",
-      "Media handling: images, SVGs, favicons for both themes",
-      "Logos and icons: header logo, social icons, decorative icons must switch for dark mode (filter: invert, separate asset, or currentColor)",
-      "Framework-agnostic: adapts to React, Vue, Angular, Svelte and any styling system"
+      "The saved choice applied before the first paint, with storage wrapped in try/catch",
+      "Light, Dark, and System, with System following the system's setting live",
+      "Tokens with a light and a dark value, color-scheme to match, and theme-color",
+      "A radio group (or a menu of three) to choose, shown by the script",
+      "The control in step with the saved choice after Back and across tabs",
+      "Contrast in both themes, with a stronger border token for fields and controls"
     ],
     "implementationSteps": [
-      "1. CRITICAL: Detect project framework and styling system (package.json, existing styles, config)",
-      "2. Add <meta name=\"color-scheme\" content=\"dark light\" /> in document head",
-      "3. Add inline blocking script in <head> that reads localStorage, resolves preference (user override > prefers-color-scheme > light), sets data-theme on html before any content renders",
-      "4. Define semantic color tokens with light and dark values (use :root and [data-theme=\"dark\"] or @media (prefers-color-scheme))",
-      "5. Set color-scheme: light dark on :root; override with color-scheme: light or color-scheme: dark when data-theme is set",
-      "6. Replace hardcoded colors in components with token references",
-      "7. Create theme toggle that writes to localStorage and updates data-theme on html",
-      "8. If using transitions, check prefers-reduced-motion and use instant switch when reduce",
-      "9. Verify WCAG contrast for both themes",
-      "10. Handle images/SVGs: use CSS variables in inline SVGs, consider <picture> for critical images",
-      "11. Audit logos and icons: header logo, social icons (GitHub, Twitter, etc.), decorative icons - dark-on-light assets become invisible in dark mode; use filter: invert(1), separate light/dark assets, or currentColor in inline SVGs",
-      "12. Test: no flash on load, persistence works, both themes meet contrast, logos and icons visible in both themes"
+      "1. Detect the framework and its version, the styling system, the tokens, and any theme setup (projectDetection). If the project already has themes, extend them to meet this guide instead of adding a second system, and keep their API and storage key.",
+      "2. Add the script before the first paint (frameworkPatterns.themeBeforePaint, implementationDetails.beforePaint).",
+      "3. Set up the color tokens and color-scheme (implementationDetails.colors), and move components onto the tokens.",
+      "4. Add the control (frameworkPatterns.themeChoice, implementationDetails.control).",
+      "5. Check media, motion, and forced colors (implementationDetails.media, implementationDetails.motion, implementationDetails.forcedColors).",
+      "6. Check the result against testingChecklist in both themes, with both system settings, after Back, with a keyboard, and in forced colors, and run the project's existing tests and checks."
     ]
   },
   "patternSpec": {
-    "problem": "Users expect dark mode for reduced eye strain and extended usage. Implementing it well causes flash on load, no persistence, inconsistent contrast, mismatched native controls, and images that look wrong. Many implementations are framework-specific or assume a particular styling system.",
-    "solution": "Apply systematic preference resolution (user override > system > fallback). Use inline script in head to apply theme before paint. Define semantic color tokens per theme. Set color-scheme for native controls. Persist in localStorage. Meet WCAG in both themes. Respect prefers-reduced-motion. Adapt images and SVGs. This pattern is framework-agnostic and works with any styling system.",
+    "problem": "Themes applied after the page paints flash the other theme on every load; choices get lost; form controls stay light on a dark page; borders that pass in one theme vanish in the other; and a toggle that cycles through three states hides what the next press does.",
+    "solution": "Save Light, Dark, or System; apply it in the head before the first paint; color with tokens that have a light and a dark value and set color-scheme to match; offer the choice as a radio group; follow the system's setting under System; and keep the control in step with what's saved.",
     "do": [
-      "Add color-scheme meta tag in head for early browser hint",
-      "Run blocking script in head to read localStorage and set data-theme before body renders",
-      "Use semantic tokens (--color-background, --color-text, --color-border, etc.)",
-      "Map each token to light and dark values",
-      "Avoid pure black (#000000); use dark gray (#121212 or similar) in dark mode",
-      "Set color-scheme on :root and override when data-theme is light or dark",
-      "Support three modes: light, dark, system (follow prefers-color-scheme)",
-      "Store user choice in localStorage (key: theme or color-scheme)",
-      "Meet WCAG AA contrast (4.5:1 normal text, 3:1 large text and UI) in both themes",
-      "Respect prefers-reduced-motion: use instant switch or no animation when reduce",
-      "Use inline SVG with CSS variables for fill/stroke, or add color-scheme to external SVG root",
-      "Provide favicon dark variant via media attribute when applicable",
-      "Detect project styling system and use ONLY that (Tailwind, CSS, SCSS, etc.)",
-      "Audit logos and icons: header/brand logo, social icons, decorative icons - dark assets need light variant for dark mode (e.g. filter: invert(1), separate image, or currentColor)"
+      "Apply the saved choice with a short blocking script in the head, before the stylesheets",
+      "Wrap storage in try/catch and fall back to the system's setting",
+      "Use tokens by purpose with a light and a dark value, and set color-scheme to the theme",
+      "Offer Light, Dark, and System as a radio group, or a menu of the three",
+      "Keep the choice in memory, so a failed save loses nothing; follow the system's setting live under System; and resync the control on pageshow and the storage event, a cleared storage included",
+      "Keep text at 4.5:1 and the borders of fields and controls at 3:1 in both themes"
     ],
     "dont": [
-      "Apply theme in useEffect, onMounted, or after first paint (causes flash)",
-      "Use pure black backgrounds in dark mode",
-      "Ignore system preference when user has not overridden",
-      "Forget color-scheme (form controls and scrollbars will mismatch)",
-      "Force dark mode without user or system preference",
-      "Use highly saturated colors in dark mode (eye strain)",
-      "Animate theme switch without checking prefers-reduced-motion",
-      "Hardcode hex colors like #fff or #000 in components",
-      "Rely on single-theme images that look wrong in dark mode",
-      "Forget logos and icons: header logo and social icons (GitHub, Twitter, etc.) with dark fill become invisible on dark background; must adapt via filter, asset swap, or currentColor",
-      "Introduce a new styling system; adapt to project's existing approach"
+      "Apply the theme in a framework's mount or effect",
+      "Store the choice under a bare key such as \"theme\" instead of the app's prefix",
+      "Use a button that cycles through three states",
+      "Use the 1.3:1 divider color for the borders of fields and controls",
+      "Invert colored logos with a filter",
+      "Animate a theme change under reduced motion"
     ],
     "examples": [
-      "Preference resolution: Stored value 'dark' -> use dark. Stored value 'system' -> check prefers-color-scheme. If dark, use dark. Else use light.",
-      "Inline script: <script>const t=localStorage.getItem('theme');const d=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t==='light'||t==='dark'?t:d);</script>",
-      "CSS tokens: :root{--color-bg:#fff;--color-text:#111;}[data-theme=dark]{--color-bg:#121212;--color-text:#eee;}",
-      "light-dark() when supported: --color-bg: light-dark(#fff, #121212);",
-      "Toggle: On click, cycle light->dark->system or toggle light/dark, write to localStorage, set data-theme on html",
-      "Reduced motion: @media (prefers-reduced-motion:reduce){[data-theme]{transition:none}}"
-    ],
-    "antiPatterns": [
-      "Late application: Theme applied in framework lifecycle causes visible flash",
-      "No persistence: User selects dark, refreshes, sees light",
-      "Pure black: #000 background causes harsh contrast",
-      "Missing color-scheme: Native form controls stay light on dark page",
-      "Color-only indicators: Error/warning colors that fail in one theme",
-      "Aggressive animation: Theme switch animation ignores reduced motion",
-      "Hardcoded colors: Components using #fff instead of var(--color-background)",
-      "Unadapted images: Bright white-background images in dark mode",
-      "Invisible logos/icons: Dark header logo or social icons on dark background (forgotten adaptation)"
+      "Saved \"dark\" on a light system: dark before the first paint.",
+      "Saved \"system\", or nothing, on a dark system: dark, then light the moment the system switches.",
+      "Storage blocked in a sandboxed frame: the page follows the system's setting, and a choice holds until the page closes."
     ],
     "checklist": [
-      "User override persists across reloads",
-      "System preference respected when no override",
-      "No visible flash on initial load",
-      "Form controls and scrollbars match active theme",
-      "WCAG AA contrast in both themes",
-      "Reduced motion disables or shortens animation",
-      "Theme toggle works and stores preference",
-      "Forced-colors mode degrades gracefully",
-      "Images/SVGs acceptable in both themes",
-      "Works across target breakpoints",
-      "Logos and icons (header, social, decorative) visible and readable in both themes"
+      "The acceptance checklist is testingChecklist."
     ]
   },
   "tokens": {
-    "description": "Semantic color tokens for theme switching. Each token has light and dark values. Components reference the token, not raw colors.",
+    "description": "Suggested tokens by purpose, each with a light and a dark value; the project's tokens win. Contrast is against the background and the surface.",
     "required": [
       {
         "name": "--color-background",
-        "purpose": "Page background",
+        "purpose": "The page",
         "lightExample": "#ffffff",
         "darkExample": "#121212"
       },
       {
         "name": "--color-surface",
-        "purpose": "Cards, panels",
+        "purpose": "Cards and panels",
         "lightExample": "#f5f5f5",
         "darkExample": "#1e1e1e"
       },
       {
         "name": "--color-text",
-        "purpose": "Primary text",
+        "purpose": "Text",
         "lightExample": "#111111",
         "darkExample": "#eeeeee"
       },
       {
         "name": "--color-text-muted",
-        "purpose": "Secondary text",
+        "purpose": "Secondary text, at least 4.5:1",
         "lightExample": "#666666",
         "darkExample": "#999999"
       },
       {
         "name": "--color-border",
-        "purpose": "Borders, dividers",
+        "purpose": "Dividers only",
         "lightExample": "#e0e0e0",
         "darkExample": "#333333"
       },
       {
+        "name": "--color-border-strong",
+        "purpose": "The borders of fields and controls, at least 3:1",
+        "lightExample": "#767676",
+        "darkExample": "#8a8a8a"
+      },
+      {
         "name": "--color-accent",
-        "purpose": "Links, buttons, highlights",
+        "purpose": "Links, focus, and highlights",
         "lightExample": "#0066cc",
         "darkExample": "#4da6ff"
       }
@@ -152,163 +111,187 @@
     "optional": [
       {
         "name": "--color-elevated",
-        "purpose": "Dropdowns, modals"
+        "purpose": "Menus and dialogs"
       },
       {
         "name": "--color-error",
-        "purpose": "Error states"
+        "purpose": "Errors"
       },
       {
         "name": "--color-success",
-        "purpose": "Success states"
+        "purpose": "Success"
       },
       {
         "name": "--color-warning",
-        "purpose": "Warning states"
+        "purpose": "Warnings"
       }
     ]
   },
   "implementationDetails": {
-    "commonOversights": {
-      "description": "Elements often forgotten when adding dark mode. Audit and fix each.",
-      "items": [
-        {
-          "item": "Header/brand logo",
-          "issue": "Dark logo on light background becomes invisible on dark background",
-          "fix": "Use filter: invert(1) in [data-theme='dark'], provide separate white/light logo asset, or use SVG with currentColor"
-        },
-        {
-          "item": "Social and action icons",
-          "issue": "GitHub, Twitter/X, email icons with dark fill disappear on dark background",
-          "fix": "filter: invert(1) for img/svg, or use inline SVG with fill: currentColor"
-        },
-        {
-          "item": "Decorative icons",
-          "issue": "Icons in navbars, article headers, footers may be single-color dark",
-          "fix": "Same as social icons - invert filter or currentColor"
-        },
-        {
-          "item": "Series/card blocks",
-          "issue": "Content blocks (e.g. related articles) may use hardcoded light background",
-          "fix": "Use --color-surface or theme-aware token so background adapts"
-        }
-      ]
-    },
-    "preferenceResolution": {
-      "order": [
-        "userOverride",
-        "systemPreference",
-        "fallback"
-      ],
-      "storageKey": "theme",
-      "storageValues": [
+    "preference": {
+      "choices": [
         "light",
         "dark",
         "system"
       ],
-      "fallback": "light",
+      "default": "system",
+      "storageKey": "The app's own prefix, such as acme.theme, or a cookie for server rendering",
+      "unknownValues": "Count as system",
       "mediaQuery": "(prefers-color-scheme: dark)"
-    }
+    },
+    "beforePaint": "A short blocking script, first in <head> before the stylesheets, reads the saved choice and sets data-theme=\"light\" or \"dark\" on <html>. Applied later, in a framework's mount or effect, the other theme paints first. Reading storage can throw where it's blocked (a SecurityError in a sandboxed frame, in Chromium, Firefox, and WebKit, checked), so it's wrapped in try/catch, and the page then follows the system's setting. The script also sets <meta name=\"theme-color\">, which colors the browser's toolbar on phones. Under a Content-Security-Policy it needs the page's nonce or its hash. Server-rendered apps put the script where the framework writes the head (Next.js: the root layout; Nuxt: app.head; SvelteKit: app.html). The attribute it sets differs from the server's HTML, so React needs suppressHydrationWarning on <html>; or the server reads a cookie and renders the right theme.",
+    "colors": "Colors are tokens by purpose (background, surface, text, muted text, border, strong border, accent), each with a light and a dark value, and components use the tokens, never raw colors. color-scheme: light dark on :root with light-dark() follows the system's setting even without script, and data-theme pins color-scheme to one theme, which also switches form controls and scrollbars (checked: an input's background in all three engines). light-dark() has been in every current browser since 2024; for older ones, repeat the tokens under [data-theme=\"dark\"]. Contrast holds in both themes: 4.5:1 for text, and 3:1 for the borders of fields and controls (1.4.11). Thin dividers can be lighter (#e0e0e0 is 1.3:1 on white), so controls get a stronger border token (#767676, 4.5:1). Check the project's own colors in both themes. Dark backgrounds are usually a dark gray, such as #121212, rather than black, and saturated colors are toned down; both are suggestions, and the project's palette wins. Tailwind follows the attribute with @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *)); in its CSS (version 4), or darkMode: ['selector', '[data-theme=\"dark\"]'] in its config (version 3.4.1 and later).",
+    "control": "Three choices are a radio group (a <fieldset> with the legend \"Theme\") drawn as a segmented control, or a menu of three radio items. Two themes are one button with aria-pressed and a label that stays the same (\"Dark theme\"). A button that cycles through three states doesn't say what the next press does. Icons beside the words are decorative; with icons only, each option still has its name. A choice applies at once and holds for the page, which keeps it in memory; it's saved where storage works, so a save that fails, with storage blocked or full, loses nothing on the page. Under System, the theme follows the system's setting as it changes: a matchMedia listener fires in all three engines (checked). The control shows the saved choice at load, again on pageshow (after Back, Chromium restores the checked radio after the page's scripts have run, checked), and when another tab saves a choice or clears storage (the storage event, whose key is null after a clear). A page restored from the back/forward cache takes the saved choice only if what storage holds changed while it was away (a removed choice is a change, not saved System), so a choice that couldn't be saved isn't lost (checked in Chromium's back/forward cache). Without script, the control stays hidden, since it couldn't do anything. Choosing announces nothing more: the radio says its new state.",
+    "media": "Logos and icons need to show in both themes: an inline SVG with currentColor, a second asset, or <picture> with prefers-color-scheme sources, which follow the system's setting rather than the saved choice. filter: invert(1) suits single-color dark logos only; it turns an orange logo blue. Images with white backgrounds can sit on a surface, or be dimmed slightly in the dark theme. A favicon for dark tabs: <link rel=\"icon\" media=\"(prefers-color-scheme: dark)\">.",
+    "motion": "Colors change at once. Elements with hover transitions also animate when the theme changes; if that looks wrong, turn transitions off for a frame while switching, with a class on <html>. Under prefers-reduced-motion: reduce, a theme change never animates, View Transitions included.",
+    "forcedColors": "In forced colors, the system's colors replace the tokens. Nothing depends on a color or a background image alone, and the chosen option in the control takes Highlight."
   },
   "accessibility": {
     "wcagCompliance": {
       "level": "AA",
+      "version": "2.2",
       "requirements": {
-        "1.4.3": "Contrast (Minimum) - 4.5:1 for normal text, 3:1 for large text and UI components in BOTH themes",
-        "2.3.1": "Three Flashes - No theme transition should flash more than 3 times per second",
-        "2.3.3": "Animation from Interactions - Respect prefers-reduced-motion for theme switch"
+        "1.4.1": "The chosen option shows by more than color.",
+        "1.4.3": "Text meets 4.5:1 in both themes.",
+        "1.4.11": "The borders of fields and controls, focus indicators, and icons meet 3:1 in both themes.",
+        "2.1.1": "The control works with the keyboard: one Tab stop, the arrows choose.",
+        "2.4.7": "Focus indicators show in both themes.",
+        "4.1.2": "The control is a radio group named \"Theme\", or a button with aria-pressed."
       }
     },
-    "prefersReducedMotion": "When prefers-reduced-motion: reduce, use instant theme switch. Do not animate color changes.",
-    "forcedColors": "When forced-colors: active, browser overrides colors. Use semantic tokens; avoid relying on specific hex values. Test in Windows High Contrast.",
-    "focusIndicators": "Ensure focus rings are visible in both light and dark themes."
+    "keyboardNavigation": {
+      "control": "One Tab stop; the arrows choose and apply."
+    },
+    "ariaAttributes": {
+      "required": {
+        "control": {
+          "fieldset": "With the legend \"Theme\"; radios named Light, Dark, and System"
+        }
+      },
+      "optional": {
+        "twoThemes": {
+          "aria-pressed": "On one button with a label that stays the same"
+        }
+      }
+    },
+    "forcedColors": "In forced colors, the system's colors replace the tokens. Nothing depends on a color or a background image alone, and the chosen option in the control takes Highlight.",
+    "reducedMotion": "Colors change at once. Elements with hover transitions also animate when the theme changes; if that looks wrong, turn transitions off for a frame while switching, with a class on <html>. Under prefers-reduced-motion: reduce, a theme change never animates, View Transitions included."
+  },
+  "projectDetection": {
+    "framework": {
+      "description": "Find the framework, its version, and how existing components are written before writing code.",
+      "detectionSteps": [
+        "Read the project's dependencies (package.json or its equivalent) for the framework and its version, and use the syntax that version supports.",
+        "Open two or three existing components to see their file structure, state handling, and naming.",
+        "Look for an existing component that already does this job, in the project or in a design system or UI library it uses, and build on it."
+      ]
+    },
+    "stylingSystem": {
+      "description": "Use the styling system the project already uses, and only that one.",
+      "detectionSteps": [
+        "Check the dependencies and config for the styling setup: Tailwind (version 4 keeps its theme in CSS with @theme, version 3 in tailwind.config.*), CSS Modules, Sass, CSS-in-JS, or plain CSS.",
+        "See how existing components apply styles and compose class names, for example with cn or clsx.",
+        "Check for design documentation: DESIGN.md, a design system package, or Storybook stories for existing components."
+      ],
+      "adaptationRules": [
+        "Write styles the way existing components do, and add no new styling library or system.",
+        "With plain CSS, use classes in the project's stylesheets instead of inline styles, except for values computed at runtime.",
+        "If the setup is unclear or mixed, ask before choosing."
+      ]
+    },
+    "designTokens": {
+      "description": "Use the project's tokens for color, spacing, radius, type, shadows, motion, and layering.",
+      "detectionSteps": [
+        "Find the tokens: CSS custom properties, a Tailwind theme (@theme or config), a theme object, or a tokens file.",
+        "Use them instead of this guide's example values; where there are none, match the closest existing components.",
+        "Check that the colors you use meet the contrast minimums: 4.5:1 for text, and 3:1 for focus indicators, icons, and control boundaries."
+      ]
+    }
   },
   "frameworkPatterns": {
-    "react": {
-      "note": "Script in index.html or _document handles flash prevention. React state/custom hook syncs with data-theme for toggle UI.",
-      "approach": "Inline script in public/index.html or similar. Theme context or hook for components. useEffect to sync toggle with document.documentElement.dataset.theme."
+    "note": "Short snippets in plain HTML, CSS, and JavaScript for the parts that are easiest to get wrong; adapt them to the project's framework and its version.",
+    "themeBeforePaint": {
+      "description": "The head script and the tokens: the saved choice read in try/catch, an unknown value counted as System, data-theme and theme-color set before the first paint; tokens with light-dark() and color-scheme: light dark, which follow the system's setting without script, pinned by data-theme. \"acme\" stands for the app's storage prefix.",
+      "html": "<!-- First in <head>, before the stylesheets: the saved choice is applied before the first paint.\n     \"acme\" stands for the app's own storage prefix. Under a Content-Security-Policy, the script\n     needs the page's nonce or its hash. -->\n<meta name=\"color-scheme\" content=\"light dark\">\n<meta name=\"theme-color\" content=\"#ffffff\">\n<script>\n  (() => {\n    let choice = 'system';\n    try {\n      choice = localStorage.getItem('acme.theme') ?? 'system';\n    } catch {\n      // Storage can be blocked; the page then follows the system's setting\n    }\n    // Light or Dark as chosen; anything else follows the system's setting\n    const dark = choice === 'dark' || (choice !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);\n    document.documentElement.dataset.theme = dark ? 'dark' : 'light';\n    document.querySelector('meta[name=\"theme-color\"]').content = dark ? '#121212' : '#ffffff';\n  })();\n</script>",
+      "css": "/* color-scheme: light dark follows the system's setting, without script too, and the script's\n   data-theme pins one. Each token has its light and its dark value. */\n:root {\n  color-scheme: light dark;\n  --color-background: light-dark(#ffffff, #121212);\n  --color-surface: light-dark(#f5f5f5, #1e1e1e);\n  --color-text: light-dark(#111111, #eeeeee);\n  --color-text-muted: light-dark(#666666, #999999);\n  --color-border: light-dark(#e0e0e0, #333333); /* dividers only */\n  --color-border-strong: light-dark(#767676, #8a8a8a); /* fields and controls: 3:1 */\n  --color-accent: light-dark(#0066cc, #4da6ff);\n}\n:root[data-theme=\"light\"] {\n  color-scheme: light;\n}\n:root[data-theme=\"dark\"] {\n  color-scheme: dark;\n}\nbody {\n  background: var(--color-background);\n  color: var(--color-text);\n}"
     },
-    "vue": {
-      "note": "Script in index.html for flash prevention. Vue app mounts after theme is set.",
-      "approach": "Inline script in index.html. Composables or provide/inject for theme state. Watch localStorage if needed for cross-tab sync."
-    },
-    "angular": {
-      "note": "Script in index.html for flash prevention. Angular bootstrap runs after.",
-      "approach": "Inline script in index.html. Service for theme state. Document is already themed when app loads."
-    },
-    "svelte": {
-      "note": "Script in index.html for flash prevention.",
-      "approach": "Inline script in index.html. Store or context for theme. Same as React/Vue for state sync."
+    "themeChoice": {
+      "description": "The control: Light, Dark, and System as real radios drawn as a segmented control and shown by the script; a choice applied at once and kept in memory, saved where storage works, so a failed save loses nothing; System following the system's setting live; the control and the theme set again on pageshow; and the saved choice read again when another tab saves a choice or clears storage, and taken when the page comes back from the back/forward cache only if storage changed while it was away.",
+      "html": "<!-- The theme choice, shown by the script: a radio group drawn as a segmented control -->\n<fieldset class=\"theme-choice\" hidden>\n  <legend>Theme</legend>\n  <div class=\"theme-options\">\n    <label><input type=\"radio\" name=\"theme\" value=\"light\"> Light</label>\n    <label><input type=\"radio\" name=\"theme\" value=\"dark\"> Dark</label>\n    <label><input type=\"radio\" name=\"theme\" value=\"system\" checked> System</label>\n  </div>\n</fieldset>",
+      "css": "/* A radio group drawn as a segmented control: the radios stay real, so the arrows move between\n   them, and each label shows the state */\n.theme-choice {\n  border: 0;\n  margin: 0;\n  padding: 0;\n}\n.theme-options {\n  border: 1px solid var(--color-border-strong);\n  border-radius: 999px;\n  display: inline-flex;\n  padding: 4px;\n}\n.theme-options label {\n  border-radius: 999px;\n  cursor: pointer;\n  padding: 6px 12px;\n  position: relative;\n}\n.theme-options input {\n  inset: 0;\n  margin: 0;\n  opacity: 0;\n  position: absolute;\n}\n.theme-options label:has(input:checked) {\n  background: var(--color-text);\n  color: var(--color-background);\n}\n/* :focus, not :focus-visible: WebKit doesn't match :focus-visible on a radio the arrows moved to */\n.theme-options label:has(input:focus) {\n  outline: 2px solid var(--color-accent);\n  outline-offset: 2px;\n}\n/* Forced colors replace backgrounds, so the chosen option takes the system's highlight */\n@media (forced-colors: active) {\n  .theme-options label:has(input:checked) {\n    background: Highlight;\n    color: HighlightText;\n    forced-color-adjust: none;\n  }\n}",
+      "script": "// The theme choice: Light, Dark, or System. A choice applies at once and holds for this page, and\n// is saved where storage works; System follows the system's setting as it changes; and the\n// control matches the saved choice after Back and when another tab changes or clears it. The\n// colors repeat the head script's.\nconst KEY = 'acme.theme';\nconst control = document.querySelector('.theme-choice');\nconst inputs = [...control.querySelectorAll('input')];\nconst systemDark = matchMedia('(prefers-color-scheme: dark)');\nlet choice = 'system'; // nothing saved (null) or a value the app doesn't know counts as System\nlet stored = null; // what storage held when this page last read or wrote it, null for nothing\n\n// What storage holds, or this page's own choice where storage can't be read\nfunction saved() {\n  try {\n    return localStorage.getItem(KEY);\n  } catch {\n    return choice;\n  }\n}\n\nfunction apply() {\n  const input = inputs.find((option) => option.value === choice) ?? inputs.find((option) => option.value === 'system');\n  input.checked = true;\n  const dark = input.value === 'dark' || (input.value === 'system' && systemDark.matches);\n  document.documentElement.dataset.theme = dark ? 'dark' : 'light';\n  document.querySelector('meta[name=\"theme-color\"]').content = dark ? '#121212' : '#ffffff';\n}\n\ncontrol.addEventListener('change', (event) => {\n  choice = event.target.value;\n  try {\n    localStorage.setItem(KEY, choice);\n    stored = choice;\n  } catch {\n    // Not saved where storage is blocked or full; the choice still holds on this page\n  }\n  apply();\n});\nsystemDark.addEventListener('change', apply);\n// Another tab saved a choice, or cleared storage (an event without a key)\naddEventListener('storage', (event) => {\n  if (event.storageArea !== localStorage || (event.key !== KEY && event.key !== null)) return;\n  choice = stored = saved();\n  apply();\n});\n// After Back, Chromium restores the checked radio after this script has run, so the choice is\n// applied again. A page restored from the back/forward cache takes the saved choice only if\n// storage changed while it was away, so a choice that couldn't be saved isn't lost.\naddEventListener('pageshow', (event) => {\n  const now = event.persisted ? saved() : stored;\n  if (now !== stored) choice = stored = now;\n  apply();\n});\nchoice = stored = saved();\ncontrol.hidden = false;\napply();"
     }
   },
-  "stylingApproaches": {
-    "tailwindCSS": {
-      "note": "Use dark: variant. Ensure dark mode strategy: class (data-theme) or media. Tailwind v3+ supports both.",
-      "approach": "Configure darkMode: 'class' in tailwind.config. Set class='dark' or class='light' on html based on data-theme. Use dark:bg-gray-900 etc."
-    },
-    "cssVariables": {
-      "note": "Define variables on :root and [data-theme='dark'].",
-      "approach": ":root { --color-bg: #fff; } [data-theme='dark'] { --color-bg: #121212; }. Use var(--color-bg) everywhere."
-    },
-    "scss": {
-      "note": "Same as CSS variables; use SCSS variables that compile to custom properties or use @media (prefers-color-scheme) with data-theme override.",
-      "approach": "Map SCSS variables to CSS custom properties, or use mixins for theme-aware values."
-    },
-    "styledComponents": {
-      "note": "Theme provider or CSS variables. Ensure theme is available at root.",
-      "approach": "ThemeProvider with theme object that has light/dark. Or use CSS variables and set them on document.documentElement."
-    }
+  "edgeCases": {
+    "severalTabs": "Several tabs: a choice in one applies in the others.",
+    "frames": "Frames from other sites keep their own theme; pass it as a parameter where they take one.",
+    "chartsAndCode": "Charts and code highlighting need their own colors in each theme.",
+    "darkOnly": "An app that has only a dark theme sets color-scheme: dark and offers no control."
+  },
+  "outputConstraints": {
+    "must": [
+      "Build on the project's theme setup when it has one, and keep its API and storage key",
+      "Apply the saved choice before the first paint, with storage in try/catch",
+      "Offer System, and follow the system's setting while it's chosen",
+      "Set color-scheme and theme-color to the theme",
+      "Use the project's framework version, styling system, and tokens, the way existing components do"
+    ],
+    "mustNot": [
+      "Apply the theme in a framework's mount or effect",
+      "Use a button that cycles through three states",
+      "Hardcode colors in components instead of tokens",
+      "Add a dependency, such as a theme library, without asking",
+      "Use inline styles for static values in a plain-CSS project, or hardcode colors the project has tokens for"
+    ]
   },
   "testingChecklist": [
-    "User selects dark, refreshes -> dark theme applied immediately, no flash",
-    "User selects light, refreshes -> light theme applied immediately",
-    "User selects system, OS is dark -> dark theme",
-    "User selects system, OS is light -> light theme",
-    "No theme stored, OS dark -> dark on load",
-    "No theme stored, OS light -> light on load",
-    "Toggle switches theme and UI updates immediately",
-    "localStorage contains correct value after toggle",
-    "Form inputs, selects, scrollbars match active theme",
-    "Contrast ratio 4.5:1+ for body text in light theme",
-    "Contrast ratio 4.5:1+ for body text in dark theme",
-    "prefers-reduced-motion: reduce -> instant switch, no animation",
-    "Focus indicators visible in light theme",
-    "Focus indicators visible in dark theme",
-    "SVGs with currentColor or CSS variables adapt correctly",
-    "Header logo and social icons visible in dark mode (not dark-on-dark)",
-    "Forced-colors mode does not break layout"
+    "The saved choice is applied in the head, before the first paint, so no load or reload shows the other theme first",
+    "Light and Dark apply as chosen; System, nothing saved, or a value the app doesn't know follows the system's setting",
+    "Where storage is blocked or full, nothing breaks: the page follows the system's setting or the saved choice, and a new choice holds until the page closes, also when the page comes back from the back/forward cache",
+    "Under System, the theme follows the system's setting when it changes, without a reload",
+    "The control offers Light, Dark, and System as a radio group or a menu of the three, or for two themes one button with aria-pressed; no button cycles through three states",
+    "The control shows the saved choice at load, after Back, and when another tab changes or clears it",
+    "color-scheme matches the theme, so form controls and scrollbars follow it, and so does theme-color",
+    "Without script, the page follows the system's setting and the control is hidden",
+    "Colors are tokens with a light and a dark value, and components use the tokens",
+    "Text meets 4.5:1 and the borders of fields and controls 3:1 in both themes; thin dividers may be lighter",
+    "Focus indicators show in both themes",
+    "Logos, icons, and images stay visible in both themes",
+    "In forced colors, the page uses the system's colors and the chosen option stays visible",
+    "Under reduced motion, a theme change doesn't animate",
+    "Styles come from the project's styling system and tokens"
   ],
   "meta": {
     "created": "2026-02-14",
-    "updated": "2026-02-14",
-    "webUrl": "https://uipotion.com/potions/patterns/dark-light-mode.html",
+    "updated": "2026-10-28",
+    "webUrl": "https://uipotion.com/potions/patterns/dark-light-mode",
     "relatedPotions": [
       {
         "id": "button",
         "category": "components",
         "relationship": "applies-to",
-        "description": "Optional: Button variants should use theme tokens for colors",
+        "description": "Optional: buttons and their focus rings in both themes.",
         "required": false
       },
       {
         "id": "navbar",
         "category": "components",
         "relationship": "applies-to",
-        "description": "Optional: Navbar commonly hosts theme toggle control",
+        "description": "Optional: the header that usually holds the theme control.",
         "required": false
       },
       {
         "id": "dialog",
         "category": "components",
         "relationship": "applies-to",
-        "description": "Optional: Dialogs should inherit theme correctly",
+        "description": "Optional: dialogs and their backdrop in both themes.",
         "required": false
       },
       {
         "id": "form-validation",
         "category": "patterns",
         "relationship": "complements",
-        "description": "Optional: Error/success colors must meet contrast in both themes",
+        "description": "Optional: error and success colors that meet contrast in both themes.",
         "required": false
       }
     ],

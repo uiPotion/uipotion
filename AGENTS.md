@@ -18,7 +18,7 @@
 - Generated Markdown copies under `src/statics/potions/**/*.md` are gitignored and removed after production builds. Edit the source files in `src/potions/` instead.
 
 ## Commands
-- `npm run validate`: validate every potion: its JSON against the category schema, the potions index against the guides, and the authoring rules in this file (Markdown front matter and content, URLs, related potions, dates), that a guide's dotted references to its own parts resolve (`section-refs`), and that an "Acceptance checklist" section matches `testingChecklist` (`checklist`). Breaks that existed when a rule was added are listed in `KNOWN_RULE_BREAKS` in `validate-potions.js`; delete a line there once its potion's fix removes the break, and never add one.
+- `npm run validate`: validate every potion: its JSON against the category schema, the potions index against the guides, the authoring rules in this file (Markdown front matter and content, URLs, related potions, dates), that a guide's dotted references to its own parts resolve (`section-refs`), and that its Markdown has an "Acceptance checklist" section matching `testingChecklist` (`checklist`).
 - The browser validator at `/validator` checks one pasted JSON against its category schema only.
 - `npm run static`: regenerate `src/statics/sitemap.xml`, `src/statics/_redirects`, and temporary Markdown copies for static publishing.
 - `npm run build`: preferred full check; runs validate, static generation, Harold build, and postbuild cleanup.
@@ -28,10 +28,8 @@
 
 ## Potion Model
 - Supported categories are `layouts`, `components`, `features`, `patterns`, and `tooling`.
-- A potion normally has two source files: Markdown for humans and JSON for agents.
-- Add or update the index entry in `src/statics/potions-index.json` whenever adding, renaming, or materially changing a potion.
-- Keep `src/statics/uipotion-manifest.json` `meta.updated` in sync when potion content changes.
-- Each potion must remain independently useful. Cross-references are suggestions, not dependencies.
+- A potion normally has two source files: Markdown for humans and JSON for agents. Start both from a same-category potion, and the JSON from its category schema in `src/statics/schema/categories/`.
+- Each potion must remain independently useful; related potions are suggestions, not dependencies.
 
 ## Markdown Potions
 - Required front matter:
@@ -66,21 +64,19 @@ path: 'potions/components/component-name'
 - Do not use ASCII art, text-based diagrams, emojis, or Markdown tables in potion Markdown. Use clear prose and bullets instead.
 - No `#` heading in the body: the page shows `title` as its only `h1`, so sections start at `##`.
 - Do not make Markdown potions framework-specific. Describe behavior, structure, states, accessibility, responsive behavior, animation, and testing in stack-neutral terms.
-- Use same-category existing potions as templates before inventing a new structure.
 
 ## JSON Guides
 - Required base fields include `$schema`, `id`, `version`, `name`, `category`, `tags`, `description`, `aiAgentInstructions`, and `meta`.
-- Use the category schema in `src/statics/schema/categories/` and a same-category existing guide as the template.
 - `id` must be kebab-case and should match the file slug.
 - `version` is SemVer.
 - `category` is lowercase.
-- Include enough detail for an AI agent to implement without guessing: structure, components, responsive breakpoints, state, accessibility, animations, framework patterns, styling approaches, edge cases, and testing.
+- Include enough detail for an AI agent to implement without guessing: structure, state, accessibility, responsive behavior, motion, edge cases, and testing.
 - When a guide includes implementation guidance, require agents to detect the user's framework, styling system, existing tokens, and component conventions before writing code, with the Dialog guide's `projectDetection` wording.
-- JSON may include code-like examples in `frameworkPatterns` or `stylingApproaches`, but the potion remains a specification, not a shipped component package.
+- Code goes in `frameworkPatterns` (tooling: `templates`) as short tested snippets, shown as the same code blocks in the Markdown; the potion remains a specification, not a shipped component package.
 - Optional `meta.relatedPotions` entries must use `required: false` unless there is a truly exceptional reason.
 
 ## Guide Rules
-Rules for guide content, in both formats. Every guide but Button, Toast Notifications, Dark/Light Mode, and ESLint Config follows all of them; bring those in line when you edit them.
+Rules for guide content, in both formats, which every guide follows where they apply.
 - State each rule once, mark options and suggested sizes as such, and end with a short acceptance checklist.
 - Tell agents to implement only what the task needs, keep existing APIs, build on a suitable existing component, and add no dependency without asking.
 - The project's conventions win for styling and visual defaults; conflicts with accessibility or correctness go to the user.
@@ -126,8 +122,7 @@ Rules for guide content, in both formats. Every guide but Button, Toast Notifica
 ## Content Voice
 - Write for human developers browsing the site and for AI agents consuming structured specs.
 - Be precise about dimensions, states, interaction timing, focus behavior, ARIA, responsive behavior, and failure states.
-- Prefer neutral wording: "works well with", "consider using", "see also", "complements", and "commonly paired with".
-- Avoid dependency language for related potions: do not say "requires", "must use", "depends on", or "you need".
+- For related potions, write "works well with", "see also", or "complements", never "requires", "must use", "depends on", or "you need".
 - Keep legal/disclaimer wording aligned with `README.md`, `LICENSE`, and the legal page.
 
 ## Verification

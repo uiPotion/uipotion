@@ -207,7 +207,7 @@ These are suggested defaults; the project's design and tokens win.
 - **[Modal Dialog](/potions/components/dialog)**: the full-size gallery, as a native dialog.
 - **[Select and Combobox](/potions/components/dropdown-select)**: groups with many options.
 - **[Form Validation Pattern](/potions/patterns/form-validation)**: the timing and wording of the missing choice's message.
-- **[Toast Notifications (Accessible) with Queue System](/potions/components/toast-notifications)**: a short confirmation after adding to the cart.
+- **[Toast Notifications](/potions/components/toast-notifications)**: a short confirmation after adding to the cart.
 - **[Tabs Component](/potions/components/tabs)**: the details on wide screens, when they're short.
 - **[Button](/potions/components/button)**: Add to cart and the other actions.
 

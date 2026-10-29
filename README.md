@@ -155,7 +155,7 @@ We welcome contributions! UI Potion grows with community input.
 
 ## What Makes a Good Potion?
 
-The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content. Every guide but Button, Toast Notifications, Dark/Light Mode, and ESLint Config follows all of them; those four get them as they're revised.
+The [Guide Rules](AGENTS.md#guide-rules) list the rules for guide content, and every guide follows them.
 
 ### Human Documentation (Markdown)
 

@@ -225,7 +225,7 @@ Motion is optional. State changes use a short background or border transition (1
 - **[Command Palette](/potions/components/command-palette)**: commands with consequences can go through the same review.
 - **[Data Table](/potions/components/data-table)**: bulk actions and selectable affected objects.
 - **[Form Validation Pattern](/potions/patterns/form-validation)**: editable action parameters.
-- **[Dark/Light Mode Pattern](/potions/patterns/dark-light-mode)**: risk labels and status colors that stay readable in both themes.
+- **[Dark/Light Mode](/potions/patterns/dark-light-mode)**: risk labels and status colors that stay readable in both themes.
 - **[Button](/potions/components/button)**: approve, reject, destructive, busy, and icon-only buttons.
 
 These are suggestions; the pattern works in any agent workflow.

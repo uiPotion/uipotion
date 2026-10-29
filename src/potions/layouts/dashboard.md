@@ -268,7 +268,7 @@ These are suggested defaults; the project's design and tokens win.
 - **[Command Palette](/potions/components/command-palette)**: keyboard-first navigation and commands for dense apps.
 - **[Data Table (Sortable, Paginated, Filterable)](/potions/components/data-table)**: tables in the main area.
 - **[Modal Dialog](/potions/components/dialog)**: confirmations and forms over the dashboard.
-- **[Toast Notifications (Accessible) with Queue System](/potions/components/toast-notifications)**: brief messages about results.
+- **[Toast Notifications](/potions/components/toast-notifications)**: brief messages about results.
 - **[Select and Combobox](/potions/components/dropdown-select)**: filters and settings.
 - **[File Upload Component](/potions/components/file-upload)**: imports and attachments.
 - **[Button](/potions/components/button)**: the header's and the page's actions.
